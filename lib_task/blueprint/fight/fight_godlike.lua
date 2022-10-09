@@ -1,0 +1,1 @@
+-- Stun the hero running away from you "You're next.", then finish off the hero next to you. Triggered by extremely low risk factors.

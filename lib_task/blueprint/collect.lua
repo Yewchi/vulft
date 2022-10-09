@@ -1,0 +1,1 @@
+-- Take a short detour to the secret shop for my ring of health, pick up a jungle item, collect bounty and power runes.

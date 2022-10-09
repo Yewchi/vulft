@@ -1,0 +1,2 @@
+#!/bin/bash
+vim -S .syswf & vim -S .anwf & vim -S .taskwf & vim -S .herowf

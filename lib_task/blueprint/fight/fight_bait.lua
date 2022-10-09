@@ -1,0 +1,1 @@
+-- Engage an opponent, attack move away from them towards a more dangerous fighting pit, avoiding high-impact ability use, when more allies are prowling, or you have an important CD just about to come off.

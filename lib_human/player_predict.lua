@@ -1,0 +1,3 @@
+-- Determine a player's current desires, try to predict their current goals
+-- Formulates confirmed denials for the player based on their predicted farming patterns.
+-- Anti-Mage may still blink into a creep set and steal all their farm because he's 1.0 greed. I might even give AM 1.5 greed because I love toxic Anti-Mage bot.

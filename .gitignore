@@ -1,0 +1,12 @@
+*
+!*.*
+!*/
+!Makefile
+*.sw*
+*.dat
+*.exe
+*.o
+*build/
+*test/
+*guides*
+*hard-code*

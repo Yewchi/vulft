@@ -1,0 +1,33 @@
+local abilities = {
+	[0] = {"a", ABILITY_TYPE.ATTACK_MODIFIER + ABILITY_TYPE.UNIT_TARGET + ABILITY_TYPE.SINGLE_TARGET + ABILITY_TYPE.NUKE},
+	{"b", ABILITY_TYPE.SLOW + ABILITY_TYPE.SUMMON + ABILITY_TYPE.UNIT_TARGET},
+	{"c", ABILITY_TYPE.HEAL + ABILITY_TYPE.AOE},
+	[5] = {"d", ABILITY_TYPE.PASSIVE + ABILITY_TYPE.BUFF},
+}
+
+local currentTask = Task_GetCurrentTaskHandle
+local ACTIVITY_TYPE = ACTIVITY_TYPE
+
+local fight_harass_task_handle = FightHarass_GetTaskHandle()
+
+local min = math.min
+local max = math.max
+
+local t_player_abilities = {}
+
+local d
+d = {
+	["Initialize"] = function(gsiPlayer)
+		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
+	end,
+	["AbilityThink"] = function(gsiPlayer)
+		if not UseAbility_IsPlayerLocked(gsiPlayer) then
+			local thisPlayerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
+		end
+	end
+}
+local hero_access = function(key) return d[key] end
+
+do
+	HeroData_SetHeroData(hero_data, abilities, hero_access)
+end

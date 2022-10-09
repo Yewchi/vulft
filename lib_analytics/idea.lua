@@ -1,0 +1,51 @@
+-- Ideas are a class (dealt with modularly) of metrics that assist with the creation
+-- - of analytical values, via valued functions that define how the state of the idea
+-- - can be understood more clearly, and operated upon via logical limits or scales
+-- - to other values inside of otherwise more simple and logical parts of code.
+-- For example, many things that players would say during a match in communcation
+-- - may be abstracted to ideas, such as "how is top lane doing?", so we would have
+-- - a (implied only) subclass of lane-ideas and three of them defined so that bots
+-- - can check their own and other teammates lanes at top, mid and bot, from
+-- - previously computed values, i.e. values that are set to be limited in their
+-- - frequency of updates.
+-- An example of the utility of defining ideas would be to be more likely to ward lanes
+-- - that are not having a great time, ward mid when our mid needs a fountain-break
+-- - because their lane is going horribly, the support has a ward, and we don't want to
+-- - loose the XP when the support's core is already having a very good game, or maybe
+-- - also scaled with the fact that the core in their lane has great escape.
+
+-- Implement:
+-- 		* Lane performance.
+-- 			- Don't dive, play more careful // Push them out of lane, don't let them get XP
+-- 		* Hero historical fight efficacy
+-- 			- xXx_PubGod_xXx Sniper is present, don't fight the low health support
+-- 		* Hero historical farm efficacy (start bench at jungle camp, end bench at
+-- 				leaving cleared, or go stale if never updated)
+-- 			- Be selected to farm jungle when moving through lane in lurk
+-- 			- Farm jungle even when low health
+-- 			- Increase CageFight scores to jungle camps and roshan
+-- 		* Historical degree of enemy grouping. (some bots / players may snowball)
+-- 			- Lurk more often as a team, less often lurk solo, split push escape heroes
+-- 			- Conversely: catch and kill pushers, ward one layer deeper, travel in pairs
+-- 		* Ward-spot predicted historical throughput of enemies.
+-- 			- Deward area, ward in uncommon places
+-- 			- Ward less, and more obviously. -- NB the logic for predicted throughput needs
+-- 					to be highly complex and somehow convoluted, so that players cannot
+-- 					predict it too easily based on their own memory of the game.
+-- 					There is also a rock-paper-scissors guided by the desperation of a
+-- 					required vision (the reliance on the vision for seeing a won game),
+-- 					"would they ward in the obvious spot when this is so important?"
+-- 					"would they ward in the strange spot when it is obviously important?"
+-- 					Anyways, sky pie, think about it later.
+
+-- NB. Something like Lane Performance would use other ideas to simplify it's own logic,
+-- - it may use fight efficacy, throughput (how many times has the enemy mid ganked this
+-- - lane, do heroes often port to the lane such as when a core is having a bad lane),
+-- - enemy historical farm efficacy (so, return both value from the kind of data you
+-- - might get from looking at the scoreboard, as well as the value you might get from
+-- - checking the lasthit/deny count difference of enemies to allies in the lane)
+--
+-- - - The above suggests that ideas may be combined if their logic or data is similar.
+--
+-- .......... After some thought there are less and less reasons to abstract this, the only
+-- - defining factor is that analytical value-generating functions are limited by a timed data

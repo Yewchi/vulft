@@ -1,0 +1,1 @@
+-- Punish an opening -- Ability stun and power ratings should trigger the best response.

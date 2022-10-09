@@ -1,0 +1,1 @@
+-- Operate on the outskirts of a fight, contribute stuns and long-range abilities when helpful and safe.
