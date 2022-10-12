@@ -1,12 +1,12 @@
 local hero_data = {
 	"doom_bringer",
-	{1, 3, 2, 2, 1, 4, 2, 3, 1, 6, 1, 3, 3, 2, 7, 4, 4, 10, 11},
+	{1, 2, 2, 6, 2, 4, 2, 1, 1, 1, 3, 3, 3, 3, 7, 4, 4, 10, 11},
 	{
-		"item_gauntlets","item_quelling_blade","item_tango","item_circlet","item_branches","item_branches","item_ward_observer","item_bracer","item_gloves","item_hand_of_midas","item_boots","item_chainmail","item_phase_boots","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_invis_sword","item_sange","item_sange_and_yasha","item_ogre_axe","item_mithril_hammer","item_black_king_bar","(null)","item_aghanims_shard","item_shivas_guard","item_pers","item_pers","item_refresher",
+		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_branches","item_branches","item_boots","item_chainmail","item_blades_of_attack","item_gloves","item_hand_of_midas","item_magic_wand","item_phase_boots","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_platemail","item_shivas_guard","item_aghanims_shard","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_pers","item_pers","item_refresher",
 	},
-	{ {3,3,1,2,2,}, {3,3,1,2,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,2,4,}, 0.1 },
 	{
-		"Devour","Scorched Earth","Infernal Blade","Doom","+12% Magic Resistance","+20 Scorched Earth Damage","-8.0s Scorched Earth Cooldown","Devour Can Target Ancients","+30 Doom DPS","+15% Scorched Earth Movement Speed","+2.1% Infernal Blade Damage","+150% Cleave",
+		"Devour","Scorched Earth","Infernal Blade","Doom","Devour grants +15% Magic Resistance","+20 Scorched Earth Damage","+10% Scorched Earth Movement Speed","Devour Can Target Ancients","-12.0s Scorched Earth Cooldown","-35s Doom Cooldown","+2.1% Infernal Blade Damage","Doom applies Break",
 	}
 }
 --@EndAutomatedHeroData

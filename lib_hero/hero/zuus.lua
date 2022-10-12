@@ -1,12 +1,12 @@
 local hero_data = {
 	"zuus",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 2, 2, 7, 6, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 2, 2, 2, 2, 4, 3, 3, 5, 7, 4, 10, 11},
 	{
-		"item_ward_observer","item_faerie_fire","item_branches","item_sobi_mask","item_bottle","item_boots","item_energy_booster","item_arcane_boots","item_void_stone","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_aghanims_shard","item_ogre_axe","item_ultimate_scepter","item_arcane_boots","item_vitality_booster","item_aeon_disk","item_pers","item_refresher","item_vitality_booster","item_energy_booster","item_octarine_core","item_kaya",
+		"item_ward_observer","item_circlet","item_branches","item_mantle","item_mantle","item_faerie_fire","item_null_talisman","item_null_talisman","item_null_talisman","item_boots","item_void_stone","item_aghanims_shard","item_aether_lens","item_staff_of_wizardry","item_staff_of_wizardry","item_soul_booster","item_octarine_core","item_kaya","item_ethereal_blade","item_blink","item_ultimate_scepter","item_cyclone","item_wind_waker","item_ultimate_scepter_2","item_pers","item_pers","item_refresher","item_vitality_booster","item_energy_booster","item_aeon_disk","item_aeon_disk","item_sheepstick",
 	},
-	{ {2,2,2,3,1,}, {2,2,2,4,5,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Arc Lightning","Lightning Bolt","Heavenly Jump","Thundergod's Wrath","+1.25 Mana Regen","+20 Movement Speed","+350 Health","+1 Heavenly Jump Target","+100 Thundergod's Wrath Damage","+0.4s Lightning Bolt Ministun","325 AOE Lightning Bolt","+100 Arc Lightning Damage",
+		"Arc Lightning","Lightning Bolt","Heavenly Jump","Thundergod's Wrath","-4s Heavenly Jump Cooldown","+250 Health","+30 Movement Speed after Heavenly Jump","+1 Heavenly Jump Target","+100 Thundergod's Wrath Damage","+0.4s Lightning Bolt Ministun","325 AOE Lightning Bolt","+100 Arc Lightning Damage",
 	}
 }
 --@EndAutomatedHeroData

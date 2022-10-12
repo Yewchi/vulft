@@ -1,12 +1,12 @@
 local hero_data = {
 	"life_stealer",
-	{2, 3, 3, 1, 3, 4, 3, 2, 1, 5, 1, 4, 1, 2, 7, 2, 4, 9, 12},
+	{2, 1, 3, 2, 2, 4, 3, 3, 1, 1, 1, 4, 2, 6, 8, 3, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_circlet","item_gauntlets","item_branches","item_branches","item_tango","item_circlet","item_gauntlets","item_branches","item_branches","item_bracer","item_orb_of_venom","item_boots","item_chainmail","item_magic_wand","item_phase_boots","item_blades_of_attack","item_helm_of_iron_will","item_gloves","item_armlet","item_relic","item_radiance","item_reaver","item_claymore","item_satanic","item_sange","item_sange_and_yasha","item_gem",
+		"item_gauntlets","item_circlet","item_branches","item_branches","item_quelling_blade","item_tango","item_orb_of_venom","item_bracer","item_boots","item_blight_stone","item_fluffy_hat","item_chainmail","item_blades_of_attack","item_magic_wand","item_phase_boots","item_orb_of_corrosion","item_gloves","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_ogre_axe","item_sange","item_heavens_halberd","item_mithril_hammer","item_belt_of_strength","item_basher","item_hyperstone","item_assault","item_mithril_hammer","item_black_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Rage","Feast","Ghoul Frenzy","Infest","+30 Attack Speed","+10% Rage Move Speed","+25 Damage","+325 Health","16% Evasion","+10% Ghoul Frenzy Slow","+1.2% Feast Lifesteal","+1.5s Rage Duration",
+		"Rage","Feast","Ghoul Frenzy","Infest","+150 Infest Damage","+12% Rage Movement Speed","+325 Health","+25 Damage","+15%% Infest Target Movespeed/Health","+15% Ghoul Frenzy Slow","+1.2% Feast Lifesteal","+1.5s Rage Duration",
 	}
 }
 --@EndAutomatedHeroData

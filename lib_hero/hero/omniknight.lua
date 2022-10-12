@@ -1,12 +1,12 @@
 local hero_data = {
 	"omniknight",
-	{3, 1, 1, 2, 2, 4, 2, 2, 1, 5, 1, 4, 3, 3, 8, 3, 4, 9, 11},
+	{3, 1, 1, 2, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 8, 3, 4},
 	{
-		"item_ward_sentry","item_tango","item_enchanted_mango","item_faerie_fire","item_branches","item_ward_sentry","item_gauntlets","item_gauntlets","item_tango","item_soul_ring","item_boots","item_arcane_boots","item_magic_wand","item_mekansm","item_headdress","item_fluffy_hat","item_holy_locket","item_wind_lace","item_arcane_boots","item_aghanims_shard",
+		"item_tango","item_enchanted_mango","item_branches","item_branches","item_ward_sentry","item_enchanted_mango","item_flask","item_faerie_fire","item_ward_sentry","item_boots","item_magic_wand","item_energy_booster","item_arcane_boots","item_aether_lens","item_gem","item_buckler","item_ring_of_basilius","item_lifesteal","item_blades_of_attack","item_vladmir","item_point_booster","item_wraith_pact",
 	},
-	{ {3,3,4,4,4,}, {5,5,5,1,4,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Purification","Heavenly Grace","Hammer of Purity","Guardian Angel","+4s Heavenly Grace Duration","+50 Base Damage","-2.0s Purification Cooldown","-30.0s Guardian Angel Cooldown","+4 Heavenly Grace Strength/HP Regen per Stack","-6s Hammer of Purity Cooldown","+160 Purification Damage/Heal","+75% Hammer of Purity Damage",
+		"Purification","Heavenly Grace","Hammer of Purity","Guardian Angel","+4s Heavenly Grace Duration","+50 Base Damage","-2.0s Purification Cooldown","-30.0s Guardian Angel Cooldown","+3 Heavenly Grace Strength/HP Regen per Debuff","-6s Hammer of Purity Cooldown","+160 Purification Damage/Heal","+75% Hammer of Purity Damage",
 	}
 }
 --@EndAutomatedHeroData

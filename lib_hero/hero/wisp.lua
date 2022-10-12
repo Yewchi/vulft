@@ -1,12 +1,12 @@
 local hero_data = {
 	"wisp",
-	{1, 3, 3, 1, 3, 4, 3, 1, 2, 5, 2, 4, 2, 2, 7, 9},
+	{1, 3, 3, 1, 3, 4, 3, 9},
 	{
-		"item_faerie_fire","item_headdress","item_ward_dispenser","item_ward_dispenser","item_magic_wand","item_chainmail","item_mekansm","item_ring_of_basilius","item_headdress","item_fluffy_hat","item_holy_locket","item_buckler","item_lifesteal","item_blades_of_attack","item_vladmir","(null)",
+		"item_tango","item_headdress","item_ward_sentry","item_chainmail","item_mekansm","item_headdress","item_magic_wand","item_fluffy_hat","item_energy_booster","item_holy_locket","item_aghanims_shard","item_cloak","item_gem","item_glimmer_cape","item_oblivion_staff","item_mage_slayer",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Tether","Spirits","Overcharge","Relocate","+4 Health Regen","+15 Attack Damage to Tethered Units","+6% Tether Movement Speed","+45 Spirits Hero Damage","+0.2% Overcharge Max HP Regen Bonus","-25s Relocate Cooldown","+400 Health to Tethered Units","Attack Tethered Ally's Target",
+		"Tether","Spirits","Overcharge","Relocate","+15% Tether Enemy Move/Attack Slow","+15 Attack Damage to Tethered Units","+6% Tether Movement Speed","+55 Spirits Hero Damage","+0.2% Overcharge Max HP Regen Bonus","-25s Relocate Cooldown","+400 Health to Tethered Units","Attack Tethered Ally's Target",
 	}
 }
 --@EndAutomatedHeroData

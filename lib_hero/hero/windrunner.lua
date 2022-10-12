@@ -1,12 +1,12 @@
 local hero_data = {
 	"windrunner",
-	{3, 2, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 6, 4, 9, 11},
+	{3, 1, 2, 1, 2, 4, 1, 3, 3, 1, 3, 4, 2, 2, 7, 6, 4, 9, 12},
 	{
-		"item_branches","item_branches","item_mantle","item_branches","item_tango","item_bottle","item_null_talisman","item_javelin","item_boots","item_mithril_hammer","item_maelstrom","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blink","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_ultimate_orb","item_pers","item_sphere",
+		"item_faerie_fire","item_branches","item_branches","item_branches","item_tango","item_bottle","item_gloves","item_robe","item_power_treads","item_javelin","item_magic_wand","item_maelstrom","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blink","item_lesser_crit","item_demon_edge","item_greater_crit","item_boots","item_ultimate_scepter","item_ultimate_orb","item_pers","item_sphere","item_ultimate_scepter_2","item_octarine_core",
 	},
-	{ {2,2,1,3,3,}, {2,2,5,3,3,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,4,4,}, 0.1 },
 	{
-		"Shackleshot","Powershot","Windrun","Focus Fire","-5% Powershot Damage Reduction","-2.0s Shackleshot Cooldown","-4s Windrun Cooldown","+225 Windrun Radius","+0.8s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Grants Invisibility","Focus Fire Kills Advance Cooldown by 20s.",
+		"Shackleshot","Powershot","Windrun","Focus Fire","+200 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.8s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
 	}
 }
 --@EndAutomatedHeroData

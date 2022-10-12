@@ -1,12 +1,12 @@
 local hero_data = {
 	"gyrocopter",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 10, 4, 12},
+	{2, 1, 1, 2, 1, 4, 2, 1, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_magic_wand","item_quelling_blade","item_branches","item_boots_of_elves","item_boots","item_ring_of_basilius","item_power_treads","item_broadsword","item_blades_of_attack","item_lesser_crit","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_ogre_axe","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_lifesteal","item_skadi","item_claymore","item_satanic","item_invis_sword","item_silver_edge","item_bloodthorn","item_ultimate_scepter_2",
+		"item_tango","item_magic_stick","item_quelling_blade","item_branches","item_branches","item_enchanted_mango","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_boots_of_elves","item_magic_wand","item_power_treads","item_mithril_hammer","item_maelstrom","item_blade_of_alacrity","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_crown","item_crown","item_gungir","item_reaver","item_satanic",
 	},
-	{ {1,1,1,1,3,}, {5,5,1,4,1,}, 0.1 },
+	{ {3,3,3,5,1,}, {4,4,4,4,1,}, 0.1 },
 	{
-		"Rocket Barrage","Homing Missile","Flak Cannon","Call Down","+300 Flak Cannon Range","+200 Health","+0.4s Homing Missile Stun Duration","+2 Flak Cannon Attacks","+30 Movement Speed","+16 Rocket Barrage Damage","-6s Flak Cannon Cooldown","3x Call Down",
+		"Rocket Barrage","Homing Missile","Flak Cannon","Call Down","+30 Movement Speed during Rocket Barrage","+200 Health","+0.4s Homing Missile Stun Duration","+2 Flak Cannon Attacks","+40 Flak Cannon Damage","+16 Rocket Barrage Damage","-6s Flak Cannon Cooldown","3x Call Down",
 	}
 }
 --@EndAutomatedHeroData

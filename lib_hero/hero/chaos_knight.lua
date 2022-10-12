@@ -1,12 +1,12 @@
 local hero_data = {
 	"chaos_knight",
-	{1, 2, 3, 3, 3, 4, 3, 2, 2, 2, 6, 4, 1, 1, 8, 1, 4, 10, 11},
+	{1, 3, 2, 3, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 8, 6, 4, 10, 11},
 	{
-		"item_quelling_blade","item_ring_of_protection","item_magic_stick","item_tango","item_helm_of_iron_will","item_gloves","item_blades_of_attack","item_armlet","item_power_treads","item_blitz_knuckles","item_shadow_amulet","item_void_stone","item_aghanims_shard","item_energy_booster","item_aether_lens","item_broadsword","item_invis_sword","item_hyperstone","item_octarine_core","item_blink","item_moon_shard","item_overwhelming_blink","item_boots","item_sheepstick","item_boots","item_vitality_booster","item_reaver","item_heart",
+		"item_tango","item_branches","item_branches","item_quelling_blade","item_gauntlets","item_circlet","item_bracer","item_boots","item_gloves","item_power_treads","item_gloves","item_helm_of_iron_will","item_blades_of_attack","item_armlet","item_magic_wand","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_cloak","item_mage_slayer","item_blitz_knuckles","item_claymore","item_orchid","item_bloodthorn","item_ultimate_orb","item_skadi","item_reaver","item_overwhelming_blink","item_basher",
 	},
-	{ {1,1,1,3,3,}, {1,1,1,3,3,}, 0.1 },
+	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{
-		"Chaos Bolt","Reality Rift","Chaos Strike","Phantasm","+20% Chaos Strike Lifesteal","+200 Reality Rift Pull Distance","-3s Chaos Bolt Cooldown","+12 Strength","+0.5 Min/Max Chaos Bolt Duration","Reality Rift Pierces Spell Immune","+10% Chaos Strike Chance","+10.0s Phantasm Duration",
+		"Chaos Bolt","Reality Rift","Chaos Strike","Phantasm","+22% Chaos Strike Lifesteal","+225 Reality Rift Pull Distance","-3s Chaos Bolt Cooldown","--75% Phantasm Illusion Incoming Damage","+0.5 Min/Max Chaos Bolt Duration","Reality Rift Pierces Spell Immune","+10% Chaos Strike Chance","+10.0s Phantasm Duration",
 	}
 }
 --@EndAutomatedHeroData

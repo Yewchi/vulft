@@ -19,7 +19,7 @@ function GetDesire()
 		return 0.0
 	elseif DEBUG_KILLSWITCH then
 		if not DEBUG_KILLSWITCH_ALERT then
-			TEAM_CAPTAIN_UNIT:ActionImmediate_Chat("Fatal error in VUL-FTcript. :\\This *may* be fixed with console command 'dota_bot_reload_scripts'.", true)
+			TEAM_CAPTAIN_UNIT:ActionImmediate_Chat("Fatal error in VUL-FT script. :\\This *may* be fixed with console command 'dota_bot_reload_scripts'.", true)
 			DEBUG_KILLSWITCH_ALERT = true
 		end
 		return 0.0

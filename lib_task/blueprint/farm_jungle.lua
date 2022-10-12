@@ -247,7 +247,7 @@ function FarmJungle_GetNearestUncertainUncleared(gsiUnit, difficultyLimit)
 	newCached[CLOSEST_NEUTRALS_I__SPAWNER_INDEX] = closestIndex
 	newCached[CLOSEST_NEUTRALS_I__EXPIRES] = GameTime() + CLOSEST_NEUTRALS_VALID_TIME
 	t_unit_closest_neutrals[gsiUnit] = newCached
-	return loc, false, nearbyNeutrals
+	return loc, false, nearbyNeutrals and (nearbyNeutrals[1] and nearbyNeutrals) or false
 end
 local get_nearest_uncertain_uncleared = FarmJungle_GetNearestUncertainUncleared
 

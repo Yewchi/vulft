@@ -1,12 +1,12 @@
 local hero_data = {
 	"treant",
-	{1, 2, 3, 1, 3, 4, 1, 3, 3, 5, 1, 4, 2, 2, 8, 2, 4, 9, 12},
+	{1, 2, 2, 1, 3, 4, 3, 3, 1, 1, 3, 4, 2, 2, 8, 5, 4, 9},
 	{
-		"item_ward_observer","item_smoke_of_deceit","item_faerie_fire","item_orb_of_venom","item_tango","item_enchanted_mango","item_ward_sentry","item_magic_stick","item_boots","item_arcane_boots","item_headdress","item_fluffy_hat","item_holy_locket","item_blink","item_arcane_boots","item_platemail","item_lotus_orb","item_gem","item_gem","item_aghanims_shard","item_gem","item_gem","item_gem","item_vladmir",
+		"item_magic_stick","item_orb_of_venom","item_tango","item_ward_dispenser","item_boots","item_magic_wand","item_aghanims_shard","item_ring_of_basilius","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_tranquil_boots","item_buckler","item_vladmir","item_point_booster","item_wraith_pact","item_wind_lace","item_glimmer_cape",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Nature's Grasp","Leech Seed","Living Armor","Overgrowth","+36 Living Armor Heal","-5.0s Nature's Grasp Cooldown","+15% Leech Seed Movement Slow","+30 Nature's Grasp Damage","+8 Living Armor Bonus Armor","+40 Leech Seed Damage/Heal","100 DPS Overgrowth","450 AoE Living Armor",
+		"Nature's Grasp","Leech Seed","Living Armor","Overgrowth","+2 Living Armor Heal Per Second","-5.0s Nature's Grasp Cooldown","+15% Leech Seed Movement Slow","+30 Nature's Grasp Damage","+8 Living Armor Bonus Armor","+40 Leech Seed Damage/Heal","Overgrowth Undispellable","450 AoE Living Armor",
 	}
 }
 --@EndAutomatedHeroData

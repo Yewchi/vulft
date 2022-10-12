@@ -1,12 +1,12 @@
 local hero_data = {
 	"dazzle",
-	{1, 3, 1, 2, 1, 5, 1, 2, 2, 2, 3, 5, 6, 3, 8, 3, 5, 10, 13},
+	{1, 3, 1, 3, 2, 5, 2, 2, 2, 1},
 	{
-		"item_flask","item_tango","item_faerie_fire","item_branches","item_ward_sentry","item_branches","item_ring_of_basilius","item_boots","item_magic_wand","item_arcane_boots","item_aghanims_shard","item_void_stone","item_aether_lens","item_gem","item_arcane_boots","item_lifesteal","item_buckler","item_blades_of_attack","item_vladmir","item_gem","(null)","item_gem","item_vitality_booster",
+		"item_tango","item_branches","item_ward_sentry","item_branches","item_magic_stick","item_boots","item_wind_lace","item_magic_wand","item_energy_booster","item_arcane_boots","item_void_stone","item_platemail","item_ring_of_health","item_lotus_orb","item_aghanims_shard","item_headdress","item_fluffy_hat","item_energy_booster","item_holy_locket","item_headdress","item_chainmail","item_mekansm",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {1,1,1,3,4,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Poison Touch","Shallow Grave","Shadow Wave","Good Juju","Bad Juju","+50 Damage","+1.75 Mana Regen","+50 Shadow Wave Heal / Damage","+60 Attack Speed","+250 Heal On Shallow Grave End","+40 Poison Touch DPS","-32% Poison Touch Slow","+0.5 Bad Juju Armor Reduction",
+		"Poison Touch","Shallow Grave","Shadow Wave","Good Juju","Bad Juju","+50 Damage","+1.75 Mana Regen","+45 Shadow Wave Heal / Damage","+350 Poison Touch Attack Range","+200 Heal On Shallow Grave End","+45 Poison Touch DPS","-40% Poison Touch Slow","+0.5 Bad Juju Armor Reduction",
 	}
 }
 --@EndAutomatedHeroData

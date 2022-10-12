@@ -1,12 +1,12 @@
 local hero_data = {
 	"alchemist",
-	{2, 1, 3, 1, 1, 4, 3, 3, 3, 1, 2, 4, 2, 2, 7, 5, 4, 9, 12},
+	{3, 1, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 2, 2, 7, 6, 4, 10, 12},
 	{
-		"item_gauntlets","item_gauntlets","item_quelling_blade","item_branches","item_branches","item_tango","item_bracer","item_soul_ring","item_boots","item_chainmail","item_phase_boots","item_bracer","item_relic","item_talisman_of_evasion","item_blink","item_radiance","item_ogre_axe","item_black_king_bar","item_platemail","item_hyperstone","item_buckler","item_assault","item_lifesteal","item_reaver","item_claymore","item_satanic","item_boots","item_refresher",
+		"item_tango","item_branches","item_quelling_blade","item_gauntlets","item_gauntlets","item_ward_observer","item_bottle","item_boots","item_phase_boots","item_soul_ring","item_relic","item_radiance","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_blitz_knuckles","item_claymore","item_orchid","item_basher","item_vanguard","item_abyssal_blade","item_mage_slayer","item_bloodthorn","item_aghanims_shard","item_reaver","item_overwhelming_blink",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
-		"Acid Spray","Unstable Concoction","Greevil's Greed","Chemical Rage","+15 Attack Speed","+125 Unstable Concoction Radius","+350 Health","+20 Damage","+25% Cleave","+400 Unstable Concoction Max Damage","+50 Chemical Rage Movement Speed","+50 Chemical Rage Regeneration",
+		"Acid Spray","Unstable Concoction","Greevil's Greed","Chemical Rage","+1 Acid Spray Armor Reduction","+125 Unstable Concoction Radius","Acid Spray grants armor to allies","+1 Damage per Greevil's Greed stack","-0.1s Chemical Rage Base Attack Time","+400 Unstable Concoction Max Damage","+50 Chemical Rage Movement Speed","+50 Chemical Rage Regeneration",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,12 +1,12 @@
 local hero_data = {
 	"spirit_breaker",
-	{3, 1, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 8, 6, 4, 10, 11},
+	{3, 1, 3, 6, 3, 5, 3, 2, 2, 2, 2, 5, 1, 1, 8, 1, 5, 11, 9, 13},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_ward_dispenser","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_oblivion_staff","item_echo_sabre","item_broadsword","item_shadow_amulet","item_blitz_knuckles","item_invis_sword","item_aghanims_shard","item_blades_of_attack","item_broadsword","item_silver_edge","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_ultimate_scepter_2","item_gem","item_gem",
+		"item_tango","item_gauntlets","item_circlet","item_quelling_blade","item_branches","item_enchanted_mango","item_boots","item_phase_boots","item_magic_wand","item_bracer","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_void_stone","item_wind_lace","item_pers","item_platemail","item_lotus_orb","item_sange","item_blade_of_alacrity","item_boots_of_elves",
 	},
-	{ {3,3,3,2,5,}, {3,3,4,2,4,}, 0.1 },
+	{ {3,3,3,5,2,}, {4,4,3,3,2,}, 0.1 },
 	{
-		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
+		"Charge of Darkness","Bulldoze","Greater Bash","Planar Pocket","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
 	}
 }
 --@EndAutomatedHeroData

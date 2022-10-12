@@ -1,12 +1,12 @@
 local hero_data = {
 	"viper",
-	{1, 3, 1, 2, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 8, 2, 4, 10, 12},
+	{1, 3, 1, 2, 1, 5, 1, 3, 2, 3, 7, 5, 2, 2, 9, 3, 5, 11, 13, 6},
 	{
-		"item_slippers","item_circlet","item_tango","item_flask","item_branches","item_branches","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_wind_lace","item_null_talisman","item_magic_wand","item_boots_of_elves","item_boots_of_elves","item_ogre_axe","item_dragon_lance","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_mystic_staff","item_sheepstick",
+		"item_circlet","item_branches","item_tango","item_ward_observer","item_bottle","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_wraith_band","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_blade_of_alacrity","item_dragon_lance","item_hurricane_pike","item_mithril_hammer","item_javelin","item_gungir","item_ogre_axe","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_invis_sword","item_silver_edge","item_skadi","item_boots",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
-		"Poison Attack","Nethertoxin","Corrosive Skin","Viper Strike","+20 Attack Speed","+13 Corrosive Skin Damage","+40 Nethertoxin Min/Max Damage","+300 Health","+80 Viper Strike DPS","+8% Poison Attack Magic Resistance Reduction","-11.0s Nethertoxin Cooldown","2.0x Corrosive Skin Slow and Resistance",
+		"Poison Attack","Nethertoxin","Corrosive Skin","Nosedive","Viper Strike","+5% Poison Attack Magic Resistance Reduction","+13 Corrosive Skin Damage","+40 Nethertoxin Min/Max Damage","+12% Corrosive Skin Magic Resistance","+80 Viper Strike DPS","+25%% Poison Attack slow/damage","-11.0s Nethertoxin Cooldown","-50%% Viper Strike manacost/cooldown",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,10 +1,10 @@
 local hero_data = {
 	"abyssal_underlord",
-	{1, 3, 1, 2, 1, 3, 1, 2, 3, 5, 2, 4, 2, 3, 7, 4, 4, 9, 11},
+	{1, 3, 1, 5, 1, 4, 1, 2, 2, 2, 2, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_branches","item_bracer","item_soul_ring","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_vitality_booster","item_vanguard","item_helm_of_iron_will","item_crimson_guard","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_platemail","item_buckler","item_hyperstone","item_assault","item_platemail","item_shivas_guard","item_ghost","item_kaya","item_boots",
+		"item_tango","item_ring_of_protection","item_circlet","item_quelling_blade","item_branches","item_magic_wand","item_boots","item_arcane_boots","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_ogre_axe","item_sange","item_talisman_of_evasion","item_heavens_halberd","item_vladmir","item_void_stone","item_platemail","item_lotus_orb","item_point_booster","item_wraith_pact",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
 		"Firestorm","Pit of Malice","Atrophy Aura","Fiend's Gate","+5 Armor","+100 Firestorm Radius","+75 Pit of Malice AoE","-4s Firestorm Cooldown","+1% Firestorm Burn Damage","+15% Atrophy Aura Attack Damage Reduction","+0.65s Pit of Malice Root","+50% Atrophy Allied Hero Bonus",
 	}

@@ -110,6 +110,7 @@ end
 Blueprint_RegisterTask(task_init_func)
 
 local creep_agro_reset_time = {}
+local disallow_deagro_time = {}
 local enemy_intents = {}
 local friendly_intents = {}
 
@@ -137,8 +138,12 @@ blueprint = {
 			local attackDamage = hPlayer:GetAttackDamage()
 			if highRecentTakenType == UNIT_TYPE_CREEP and highRecentTaken > attackDamage then
 				local nearbyFriendly = Set_GetNearestAlliedCreepSetToLocation(gsiPlayer.lastSeen.location)
-				if nearbyFriendly[1] and Analytics_GetNearFutureHealth(gsiPlayer, 3) then
-					hPlayer:Action_AttackUnit(nearbyFriendly[1].hUnit)
+				if nearbyFriendly[1] and Analytics_GetNearFutureHealth(gsiPlayer, 3) < 400
+						and ( not disallow_deagro_time[pnot] or disallow_deagro_time[pnot] < GameTime() ) then
+					-- SUPERHUMAN deagro and return to normal behaviour next frame.
+					-- Assumes server triggers a deagro to process from any friendly attack event, or checks deagros every frame.
+					disallow_deagro_time[pnot] = GameTime() + 6
+					hPlayer:Action_AttackUnit(nearbyFriendly[1].hUnit, false)
 					return xetaScore;
 				end
 			end

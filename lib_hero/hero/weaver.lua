@@ -1,12 +1,12 @@
 local hero_data = {
 	"weaver",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 3, 2, 1, 2, 4, 2, 1, 3, 1, 6, 4, 1, 3, 8, 3, 4, 9, 12},
 	{
-		"item_tango","item_slippers","item_circlet","item_magic_stick","item_branches","item_branches","item_flask","item_wraith_band","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_ring_of_health","item_javelin","item_magic_wand","item_maelstrom","item_boots_of_elves","item_ogre_axe","item_dragon_lance","item_void_stone","item_pers","item_ultimate_orb","item_sphere","item_lesser_crit","item_aghanims_shard","item_ultimate_orb","item_skadi","item_demon_edge","item_greater_crit","item_gungir",
+		"item_slippers","item_tango","item_circlet","item_branches","item_branches","item_faerie_fire","item_magic_wand","item_wraith_band","item_javelin","item_mithril_hammer","item_maelstrom","item_fluffy_hat","item_boots","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_boots_of_elves","item_power_treads","item_mithril_hammer","item_black_king_bar","item_lesser_crit","item_greater_crit","item_ultimate_orb","item_sphere","item_ultimate_orb","item_ultimate_orb","item_skadi","item_gungir",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,3,5,}, {1,1,1,4,4,}, 0.1 },
 	{
-		"The Swarm","Shukuchi","Geminate Attack","Time Lapse","+50 Shukuchi Damage","+9 Strength","+20 Mana Break","+2 Swarm Attacks to Kill","+90 Geminate Attack Damage","+0.5 Swarm Armor Reduction","2 Shukuchi Charges","+1 Geminate Attack",
+		"The Swarm","Shukuchi","Geminate Attack","Time Lapse","+50 Shukuchi Damage","+9 Strength","+20 Mana Break","+2 Swarm Attacks to Kill","+90 Geminate Attack Damage","+0.5 Swarm Armor Reduction","+2 Shukuchi Charges","+1 Geminate Attack",
 	}
 }
 --@EndAutomatedHeroData

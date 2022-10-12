@@ -1,12 +1,12 @@
 local hero_data = {
 	"tidehunter",
-	{3, 1, 3, 1, 3, 4, 3, 2, 2, 2, 2, 4, 1, 1, 7, 5, 4, 9, 11},
+	{3, 1, 3, 2, 3, 5, 3, 2, 2, 2, 1, 5, 1, 1, 8, 6, 5, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_ring_of_protection","item_gauntlets","item_enchanted_mango","item_bracer","item_soul_ring","item_ring_of_health","item_hood_of_defiance","item_boots","item_magic_wand","item_headdress","item_pipe","item_platemail","item_energy_booster","item_arcane_boots","item_pers","item_lotus_orb","item_blink","item_buckler","item_ring_of_basilius","item_lifesteal","item_blades_of_attack","item_vladmir","item_point_booster","(null)","item_ultimate_orb","item_mystic_staff","item_void_stone",
+		"item_tango","item_quelling_blade","item_flask","item_magic_stick","item_enchanted_mango","item_boots","item_magic_wand","item_arcane_boots","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_pers","item_refresher","item_overwhelming_blink","item_platemail","item_shivas_guard","item_void_stone","item_soul_booster","item_octarine_core","item_ultimate_scepter_2","item_moon_shard",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Gush","Kraken Shell","Anchor Smash","Ravage","+10.0% Gush Slow","-100.0 Kraken Shell Damage Threshold","+120 Gush Damage","-20% Anchor Smash Damage Reduction","+30 Kraken Shell Damage Block","-4 Gush Armor","+1.0s Ravage Stun","50% chance of Anchor Smash on attack",
+		"Gush","Kraken Shell","Anchor Smash","Tendrils of the Deep","Ravage","+50 Anchor Smash Damage","+10.0% Gush Slow","+120 Gush Damage","-25% Anchor Smash Damage Reduction","Anchor Smash affects buildings","+40 Kraken Shell Damage Block","+1s Ravage Stun","50% chance of Anchor Smash on attack",
 	}
 }
 --@EndAutomatedHeroData

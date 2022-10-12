@@ -1,12 +1,12 @@
 local hero_data = {
 	"snapfire",
-	{1, 2, 1, 2, 1, 5, 1, 2, 2, 6, 3, 5, 3, 3, 9, 3, 5, 11, 7},
+	{1, 2, 1, 2, 1, 5, 1, 2, 2, 3, 3, 5, 3, 3, 9, 6, 5, 11, 7, 13},
 	{
-		"item_faerie_fire","item_tango","item_ward_observer","item_branches","item_magic_wand","item_boots","item_wind_lace","item_staff_of_wizardry","item_bottle","item_void_stone","item_staff_of_wizardry","item_cyclone","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_lesser_crit","item_greater_crit","item_javelin","item_gem","item_blitz_knuckles","item_monkey_king_bar","item_rapier",
+		"item_branches","item_tango","item_faerie_fire","item_branches","item_ward_observer","item_branches","item_bottle","item_boots","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_aghanims_shard","item_black_king_bar","item_aghanims_shard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aether_lens","item_point_booster","item_void_stone","item_octarine_core","item_blink",
 	},
-	{ {3,3,3,2,2,}, {2,2,3,4,4,}, 0.1 },
+	{ {3,3,1,2,2,}, {4,4,5,2,2,}, 0.1 },
 	{
-		"Scatterblast","Firesnap Cookie","Lil' Shredder","Spit Out","Mortimer Kisses","+0.3s Firesnap Cookie Stun","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","+80 Scatterblast Damage","Lil' Shredder Uses Your Attack Damage","+20% Mortimer Kisses Movement Slow","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
+		"Scatterblast","Firesnap Cookie","Lil' Shredder","Spit Out","Mortimer Kisses","+60 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","Lil' Shredder Uses Your Attack Damage","+60 Mortimer Kisses Impact Damage","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
 	}
 }
 --@EndAutomatedHeroData

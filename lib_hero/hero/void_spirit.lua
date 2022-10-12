@@ -1,12 +1,12 @@
 local hero_data = {
 	"void_spirit",
-	{3, 1, 3, 2, 3, 4, 2, 2, 2, 3, 1, 4, 1, 1, 8, 6, 4, 9, 12},
+	{3, 1, 3, 2, 2, 4, 2, 2, 3, 3, 1, 4, 1, 1, 8, 6, 4, 9, 12},
 	{
-		"item_branches","item_tango","item_quelling_blade","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_bottle","item_null_talisman","item_boots","item_robe","item_magic_wand","item_blitz_knuckles","item_chainmail","item_chainmail","item_witch_blade","item_staff_of_wizardry","item_cyclone","item_staff_of_wizardry","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_aghanims_shard","item_kaya","item_kaya_and_sange","item_ultimate_orb","item_sphere","(null)","item_gem","item_aether_lens","item_ultimate_scepter_2","item_octarine_core","item_wind_waker",
+		"item_quelling_blade","item_tango","item_faerie_fire","item_branches","item_magic_stick","item_branches","item_boots","item_null_talisman","item_magic_wand","item_gloves","item_robe","item_power_treads","item_blitz_knuckles","item_wind_lace","item_witch_blade","item_staff_of_wizardry","item_cyclone","item_aghanims_shard","item_void_stone","item_energy_booster","item_aether_lens","item_octarine_core","item_sphere","item_kaya","item_ethereal_blade","item_wind_waker",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{
-		"Aether Remnant","Dissimilate","Resonant Pulse","Astral Step","+1.75 Mana Regen","+50 Aether Remnant Damage","Remnant Provides 475 True Sight","+80 Resonant Pulse Damage","+12% Spell Amplification","-4s Astral Step Charge Restore Time","Astral Step 160% Crit","Dissimilate Stuns for 1.75s",
+		"Aether Remnant","Dissimilate","Resonant Pulse","Astral Step","+1.75 Mana Regen","+50 Aether Remnant Damage","Remnant Provides 475 True Sight","Outer Dissimilate Ring","+120 Resonant Pulse Damage","-4s Astral Step Charge Restore Time","Astral Step 160% Crit","Dissimilate Roots for 2.0s",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,12 +1,12 @@
 local hero_data = {
 	"lion",
-	{1, 2, 1, 3, 1, 4, 1, 3, 2, 3, 2, 4, 2, 3, 8, 6, 4, 9, 11},
+	{1, 3, 1, 3, 2, 4, 1, 1, 3, 3, 2, 4, 2, 2, 8, 5, 4, 9, 12},
 	{
-		"item_flask","item_tango","item_ward_sentry","item_branches","item_branches","item_clarity","item_magic_wand","item_boots","item_tranquil_boots","item_wind_lace","item_energy_booster","item_void_stone","item_aether_lens","item_aghanims_shard","item_point_booster","item_gem","item_ultimate_scepter","item_octarine_core","item_force_staff","item_ethereal_blade","item_gem",
+		"item_tango","item_flask","item_faerie_fire","item_branches","item_ward_dispenser","item_magic_stick","item_boots","item_blink","item_fluffy_hat","item_magic_wand","item_staff_of_wizardry","item_force_staff","item_energy_booster","item_void_stone","item_aether_lens","item_glimmer_cape","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_vitality_booster","item_energy_booster","item_octarine_core","item_ultimate_scepter_2","item_aghanims_shard","item_gem",
 	},
-	{ {3,3,1,5,1,}, {4,4,4,5,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Earth Spike","Hex","Mana Drain","Finger of Death","+15 Movement Speed","+60 Damage","-2.0s Earth Spike Cooldown","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","Mana Drain Restores Allies","+800 Earth Spike Range","+250 AoE Hex",
+		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-2s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
 	}
 }
 --@EndAutomatedHeroData

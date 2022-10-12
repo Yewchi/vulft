@@ -1,12 +1,12 @@
 local hero_data = {
 	"nyx_assassin",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 2, 2, 8, 5, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 6, 3, 4, 2, 2, 7, 2, 4, 9},
 	{
-		"item_magic_stick","item_tango","item_ward_dispenser","item_ring_of_regen","item_clarity","item_ward_dispenser","item_wind_lace","item_boots","item_tranquil_boots","item_magic_wand","item_fluffy_hat","item_fluffy_hat","item_wind_lace","item_void_stone","item_cyclone","item_blink","item_staff_of_wizardry","item_crown","item_dagon_5","item_dagon_2L",
+		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_branches","item_branches","item_urn_of_shadows","item_magic_wand","item_boots","item_gloves","item_tranquil_boots","item_hand_of_midas","item_energy_booster","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_blink","item_ghost","item_kaya","item_ethereal_blade",
 	},
-	{ {3,3,3,1,1,}, {4,4,4,5,5,}, 0.1 },
+	{ {3,3,3,3,1,}, {4,4,4,5,3,}, 0.1 },
 	{
-		"Impale","Mana Burn","Spiked Carapace","Vendetta","+8% Spell Amplification","+0.25s Impale Stun Duration","+250 Health","+0.5x Mana Burn Intelligence Multiplier","+0.6s Spiked Carapace Stun Duration","+130 Impale Damage","+300 Mana Burn Radius","Vendetta Unobstructed Pathing",
+		"Impale","Mana Burn","Spiked Carapace","Vendetta","+8% Spell Amplification","+0.25s Impale Stun Duration","+0.5s Spiked Carapace Reflect Duration","+0.5x Mana Burn Intelligence Multiplier","+0.6s Spiked Carapace Stun Duration","+130 Impale Damage","+300 Mana Burn Radius","Vendetta Unobstructed Pathing",
 	}
 }
 --@EndAutomatedHeroData

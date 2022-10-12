@@ -368,7 +368,7 @@ function bUnit_NewSafeUnit(hUnit, dontIndex)
 	newSafeUnit.barracksType = not newSafeUnit.isTower and not newSafeUnit.isFountain
 			and string.find(newSafeUnit.name, "melee") and BARRACKS_TYPE_MELEE
 			or string.find(newSafeUnit.name, "range") and BARRACKS_TYPE_RANGE or false
-	newSafeUnit.isShrine = string.find(newSafeUnit.name, "filler") ~= "" and true or false
+	newSafeUnit.isShrine = string.find(newSafeUnit.name, "filler") and true or false
 	newSafeUnit.isAncient = hUnit:IsFort()
 	if newSafeUnit.isAncient then
 		if newSafeUnit.team == TEAM then

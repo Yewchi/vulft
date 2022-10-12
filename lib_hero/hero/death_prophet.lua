@@ -1,12 +1,12 @@
 local hero_data = {
 	"death_prophet",
-	{1, 3, 1, 3, 1, 4, 3, 3, 2, 1, 5, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 3, 3, 1, 3, 4, 1, 1, 2, 5, 3, 4, 2, 2, 7, 2, 4, 9, 12},
 	{
-		"item_branches","item_faerie_fire","item_tango","item_ward_observer","item_branches","item_branches","item_bottle","item_null_talisman","item_boots","item_magic_wand","item_wind_lace","item_staff_of_wizardry","item_void_stone","item_cyclone","item_ogre_axe","item_belt_of_strength","item_sange","item_robe","item_kaya_and_sange","item_blink","item_platemail","item_shivas_guard","item_aether_lens","item_vitality_booster","item_energy_booster","item_octarine_core",
+		"item_tango","item_circlet","item_branches","item_faerie_fire","item_branches","item_mantle","item_null_talisman","item_boots","item_magic_wand","item_gloves","item_robe","item_power_treads","item_blades_of_attack","item_falcon_blade","item_platemail","item_mystic_staff","item_shivas_guard","item_wind_lace","item_blink","item_void_stone","item_cyclone","item_aghanims_shard","item_mystic_staff","item_wind_waker","item_void_stone","item_energy_booster","item_soul_booster","item_octarine_core",
 	},
-	{ {2,2,2,1,3,}, {2,2,2,5,3,}, 0.1 },
+	{ {3,3,3,2,1,}, {3,3,3,2,1,}, 0.1 },
 	{
-		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+1% Max Health Spirit Siphon","-2.0s Crypt Swarm Cooldown","20.0% Spirit Siphon Move Speed Slow","+400 Health","-20s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
+		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+30 Spirit Siphon Damage/Heal","-2.0s Crypt Swarm Cooldown","20.0% Spirit Siphon Move Speed Slow","+400 Health","-20s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
 	}
 }
 --@EndAutomatedHeroData
@@ -51,6 +51,7 @@ local CRYPT_SWARM_RANGE = 1110
 
 local push_handle = Push_GetTaskHandle()
 local fight_harass_handle = FightHarass_GetTaskHandle()
+local zonedef_handle = ZoneDefend_GetTaskHandle()
 
 local t_player_abilities = {}
 
@@ -206,13 +207,19 @@ d = {
 					end
 				end
 			end
-			if currentTask == push_handle
-					and Analytics_GetTheoreticalDangerAmount(gsiPlayer) < -2
-					and HIGH_USE(gsiPlayer, cryptSwarm, highUse, playerHpp) then
-				local nearbyCreepSet = Set_GetNearestEnemyCreepSetToLocation(playerLoc)
+			print("dp cs push", currentTask, HIGH_USE(gsiPlayer, cryptSwarm,
+							0 or max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
+							1-playerHpp
+						))
+			if (currentTask == push_handle or currentTask == zonedef_handle)
+					and HIGH_USE(gsiPlayer, cryptSwarm,
+							0 or max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
+							1-playerHpp
+						) then
+				local nearbyEnemyCreepSet = Set_GetNearestEnemyCreepSetToLocation(playerLoc)
 				if nearbyEnemyCreepSet and nearbyEnemyCreepSet.units[1] then
-					local crowdedCenter, crowdedRating = CROWDED_RATING(nearbyEnemyCreepSet.center)
-					if crowdedRating > 2 and VEC_POINT_DSTANCE(playerLoc, crowdedCenter) then
+					local crowdedCenter, crowdedRating = CROWDED_RATING(nearbyEnemyCreepSet.center, SET_CREEP_ENEMY)
+					if crowdedRating > 2 and VEC_POINT_DISTANCE(playerLoc, crowdedCenter) then
 						USE_ABILITY(gsiPlayer, cryptSwarm, crowdedCenter, 400, nil)
 						return;
 					end

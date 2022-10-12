@@ -1,12 +1,12 @@
 local hero_data = {
 	"slardar",
-	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 8, 2, 4, 9, 12},
+	{3, 2, 3, 1, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 8, 5, 4, 10},
 	{
-		"item_quelling_blade","item_tango","item_gauntlets","item_circlet","item_branches","item_branches","item_bracer","item_gloves","item_boots","item_power_treads","item_quarterstaff","item_lifesteal","item_mask_of_madness","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_hyperstone","item_platemail","item_buckler","item_assault","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
+		"item_tango","item_branches","item_gauntlets","item_quelling_blade","item_circlet","item_branches","item_bracer","item_boots","item_gloves","item_belt_of_strength","item_power_treads","item_wind_lace","item_bracer","item_mask_of_madness","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_platemail","item_buckler","item_gem","item_assault","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_overwhelming_blink",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+10% Slithereen Crush Attack/Move Slow","+325 Health","+60 Bash Damage","+150.0 Slithereen Crush Damage","-4 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
+		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+0.2s Slithereen Crush Stun Duration","+325 Health","+50 Bash of the Deep Damage","+150.0 Slithereen Crush Damage","-4 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
 	}
 }
 --@EndAutomatedHeroData

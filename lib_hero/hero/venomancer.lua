@@ -1,12 +1,12 @@
 local hero_data = {
 	"venomancer",
-	{1, 2, 2, 3, 3, 3, 3, 2, 2, 1, 4, 4, 1, 1, 8, 5, 4, 9, 12},
+	{1, 2, 2, 1, 2, 3, 3, 3, 3, 2, 7, 5, 5, 1, 9, 1, 5, 11, 13, 6},
 	{
-		"item_tango","item_circlet","item_circlet","item_branches","item_branches","item_faerie_fire","item_wraith_band","item_wraith_band","item_boots","item_wind_lace","item_magic_wand","item_gloves","item_boots_of_elves","item_power_treads","item_kaya","item_kaya_and_sange","item_dragon_lance","item_force_staff","item_hurricane_pike","item_ultimate_orb","item_ultimate_orb","item_point_booster","item_skadi",
+		"item_sobi_mask","item_circlet","item_tango","item_branches","item_faerie_fire","item_ward_dispenser","item_urn_of_shadows","item_boots","item_wind_lace","item_tranquil_boots","item_vitality_booster","item_spirit_vessel","item_fluffy_hat","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_belt_of_strength","item_robe","item_ancient_janggo","item_pers","item_platemail","item_lotus_orb","item_boots_of_bearing","item_staff_of_wizardry","item_wind_lace","item_cyclone",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,5,}, {3,3,3,4,4,}, 0.1 },
 	{
-		"Venomous Gale","Poison Sting","Plague Ward","Poison Nova","-6s Venomous Gale CD","+175 Health","12% Spell Lifesteal","-8% Poison Sting Slow","+5.0s Poison Nova Duration","-1.5s Plague Ward Cooldown","Poison Nova reduces +100 Attack Speed","2.5x Plague Ward HP/Damage",
+		"Venomous Gale","Poison Sting","Plague Ward","Latent Toxicity","Poison Nova","-5s Venomous Gale CD","+20% Poison Sting Health Regen Reduction","-1.0s Plague Ward Cooldown","-8% Poison Sting Slow","+5.0s Poison Nova Duration","Gale Creates Plague Wards","Poison Nova reduces +100 Attack Speed","2.5x Plague Ward HP/Damage",
 	}
 }
 --@EndAutomatedHeroData

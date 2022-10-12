@@ -1,12 +1,12 @@
 local hero_data = {
 	"lina",
-	{1, 3, 1, 2, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 3, 1, 2, 1, 5, 1, 3, 3, 6, 3, 5, 2, 2, 9, 2, 5, 11, 13, 7},
 	{
-		"item_faerie_fire","item_branches","item_branches","item_branches","item_ward_observer","item_tango","item_bottle","item_soul_ring","item_boots","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blitz_knuckles","item_shadow_amulet","item_broadsword","item_invis_sword","item_lesser_crit","item_silver_edge","item_gem","item_gem","item_ultimate_orb","item_ring_of_health","item_sphere","item_lifesteal","item_satanic",
+		"item_ward_observer","item_faerie_fire","item_branches","item_branches","item_tango","item_branches","item_bottle","item_null_talisman","item_boots","item_magic_wand","item_arcane_boots","item_void_stone","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_blink","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_octarine_core","item_shadow_amulet","item_blitz_knuckles","item_invis_sword","item_ultimate_scepter_2","item_lesser_crit","item_silver_edge","item_arcane_blink",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Dragon Slave","Light Strike Array","Fiery Soul","Laguna Blade","+25 Damage","-3.5s Dragon Slave Cooldown","+350 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+15/1.0% Fiery Soul Per Stack","-25.0s Laguna Blade Cooldown","+125 Attack Range",
+		"Dragon Slave","Light Strike Array","Fiery Soul","Flame Cloak","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+350 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure and pierces Spell Immunity",
 	}
 }
 --@EndAutomatedHeroData

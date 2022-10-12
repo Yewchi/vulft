@@ -332,6 +332,12 @@ end
 end
 
 function VAN_InformDefensibleFell(gsiBuilding)
+	INFO_print(string.format("[vantage] VAN_InformDefensibleFell(). %s, isShrine:%s, isTower:%s",
+					gsiBuilding,
+					gsiBuilding and gsiBuilding.isShrine and 'y' or 'n',
+					gsiBuilding and gsiBuilding.isTower and 'y' or 'n'
+				)
+			)
 	if gsiBuilding and gsiBuilding.isShrine then
 		return;
 	end

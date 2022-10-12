@@ -2,11 +2,11 @@ local hero_data = {
 	"phantom_assassin",
 	{1, 2, 1, 3, 1, 4, 2, 2, 2, 5, 1, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_quelling_blade","item_blight_stone","item_tango","item_branches","item_branches","item_orb_of_venom","item_orb_of_corrosion","item_gloves","item_boots_of_elves","item_magic_wand","item_boots","item_power_treads","item_pers","item_claymore","item_bfury","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_mithril_hammer","item_blight_stone","item_desolator","item_basher","item_reaver","item_lifesteal","item_claymore","item_satanic","item_nullifier","item_vanguard","item_abyssal_blade",
+		"item_quelling_blade","item_tango","item_magic_stick","item_circlet","item_branches","item_orb_of_venom","item_blight_stone","item_fluffy_hat","item_orb_of_corrosion","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_magic_wand","item_claymore","item_broadsword","item_bfury","item_ogre_axe","item_mithril_hammer","item_aghanims_shard","item_black_king_bar","item_aghanims_shard","item_mithril_hammer","item_basher","item_desolator","item_abyssal_blade","item_lifesteal","item_claymore","item_satanic","item_point_booster","item_boots","item_ultimate_scepter_2",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Stifling Dagger","Phantom Strike","Blur","Coup de Grace","+1s Phantom Strike Duration","-2.0s Stifling Dagger Cooldown","15% Lifesteal","+250 Phantom Strike Cast Range","+20% Stifling Dagger Damage","+35% Blur Evasion","+7% Coup de Grace chance","Triple Strike Stifling Dagger",
+		"Stifling Dagger","Phantom Strike","Blur","Coup de Grace","+0.5s Phantom Strike Duration","-2.0s Stifling Dagger Cooldown","+25% Blur Evasion","+250 Phantom Strike Cast Range","+20% Stifling Dagger Damage","+60 Phantom Strike Attack Speed","+7% Coup de Grace chance","Triple Strike Stifling Dagger",
 	}
 }
 --@EndAutomatedHeroData

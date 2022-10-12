@@ -1,12 +1,12 @@
 local hero_data = {
 	"juggernaut",
-	{1, 3, 1, 2, 1, 5, 1, 2, 2, 6, 2, 5, 3, 3, 9, 3, 8, 11, 13},
+	{1, 3, 1, 2, 1, 5, 1, 2, 2, 2, 6, 5, 3, 3, 9, 3, 7, 5, 12},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_slippers","item_branches","item_slippers","item_magic_wand","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_yasha","item_manta","item_aghanims_shard","item_mithril_hammer","item_belt_of_strength","item_basher","item_eagle","item_quarterstaff","item_butterfly","item_mjollnir","item_abyssal_blade","item_skadi","item_blink","item_swift_blink",
+		"item_quelling_blade","item_magic_stick","item_branches","item_tango","item_branches","item_branches","item_boots","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_ring_of_basilius","item_javelin","item_maelstrom","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_manta","item_aghanims_shard","item_blink","item_mjollnir","item_basher","item_skadi","item_eagle","item_swift_blink","item_vanguard","item_abyssal_blade","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter_2","item_rapier","item_rapier",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Blade Fury","Healing Ward","Blade Dance","Swiftslash","Omnislash","+5 All Stats","+75.0 Blade Fury Radius","-20.0s Healing Ward Cooldown","+1s Blade Fury Duration","+40% Blade Dance Lifesteal","+150 Blade Fury DPS","+475 Health","+1.0s Omnislash Duration",
+		"Blade Fury","Healing Ward","Blade Dance","Swiftslash","Omnislash","+5 All Stats","+75.0 Blade Fury Radius","-20.0s Healing Ward Cooldown","+1s Blade Fury Duration","+40% Blade Dance Lifesteal","+150 Blade Fury DPS","+1s Omnislash Duration","+2 Healing Ward Hits to Kill",
 	}
 }
 --@EndAutomatedHeroData

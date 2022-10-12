@@ -1,12 +1,12 @@
 local hero_data = {
 	"night_stalker",
-	{1, 3, 1, 3, 3, 4, 3, 1, 2, 6, 1, 4, 2, 2, 7, 2, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 2, 3, 6, 3, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_tango","item_gauntlets","item_quelling_blade","item_branches","item_branches","item_circlet","item_bracer","item_boots","item_chainmail","item_phase_boots","item_bracer","item_ogre_axe","item_quarterstaff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_mithril_hammer","item_belt_of_strength","item_gem","item_relic","item_nullifier","item_gem","item_gem","item_aghanims_shard","item_reaver","item_reaver",
+		"item_tango","item_branches","item_quelling_blade","item_branches","item_enchanted_mango","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_magic_wand","item_ogre_axe","item_robe","item_echo_sabre","item_mithril_hammer","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_blink","item_mithril_hammer","item_belt_of_strength","item_basher","item_hyperstone","item_buckler","item_assault",
 	},
 	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Void","Crippling Fear","Hunter in the Night","Dark Ascension","+50 Void Damage","+8s Dark Ascension Duration","+35 Dark Ascension Damage","+10% Hunter In The Night Movement Speed","-5.0s Crippling Fear Cooldown","+20 Strength","+100 Hunter In The Night Attack Speed","-50s Dark Ascension Cooldown",
+		"Void","Crippling Fear","Hunter in the Night","Dark Ascension","+50 Void Damage","+8s Dark Ascension Duration","+35 Dark Ascension Damage","+15% Hunter in the Night Status Resistance","-5.0s Crippling Fear Cooldown","+20 Strength","+100 Hunter In The Night Attack Speed","-50s Dark Ascension Cooldown",
 	}
 }
 --@EndAutomatedHeroData

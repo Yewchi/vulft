@@ -1,10 +1,10 @@
 local hero_data = {
 	"ogre_magi",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 8, 3, 4, 10, 11},
+	{2, 1, 2, 1, 2, 4, 1, 1, 2, 5, 3, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_gauntlets","item_gauntlets","item_tango","item_enchanted_mango","item_ward_dispenser","item_enchanted_mango","item_soul_ring","item_boots","item_gloves","item_hand_of_midas","item_blink","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_tranquil_boots","item_ancient_janggo","(null)","item_moon_shard",
+		"item_tango","item_ward_sentry","item_ward_sentry","item_clarity","item_clarity","item_flask","item_tango","item_branches","item_branches","item_boots","item_energy_booster","item_arcane_boots","item_hood_of_defiance","item_headdress","item_pipe","item_void_stone","item_aether_lens","item_force_staff","item_aghanims_shard",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,3,4,}, 0.1 },
 	{
 		"Fireblast","Ignite","Bloodlust","Multicast","+16 Ignite DPS","-1.0s Fireblast Cooldown","+80 Damage","+250 Health","+30 Strength","+25 Bloodlust AS","17% Fireblast chance on attack","+240 Fireblast Damage",
 	}

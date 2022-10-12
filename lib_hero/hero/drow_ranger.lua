@@ -1,12 +1,12 @@
 local hero_data = {
 	"drow_ranger",
-	{1, 3, 1, 2, 3, 4, 3, 3, 1, 6, 1, 4, 2, 2, 8, 2, 4, 9, 11},
+	{1, 3, 1, 3, 3, 4, 3, 6, 1, 1, 2, 4, 2, 9, 8, 2, 2, 4, 11},
 	{
-		"item_tango","item_quelling_blade","item_slippers","item_slippers","item_branches","item_branches","item_boots_of_elves","item_gloves","item_boots","item_power_treads","item_boots_of_elves","item_boots_of_elves","item_magic_wand","item_dragon_lance","item_blitz_knuckles","item_broadsword","item_invis_sword","item_mithril_hammer","item_black_king_bar","item_fluffy_hat","item_staff_of_wizardry","item_hurricane_pike","item_broadsword","item_blades_of_attack","item_silver_edge","item_aghanims_shard","item_ultimate_orb","item_skadi","item_eagle","item_talisman_of_evasion","item_quarterstaff","item_butterfly","item_eagle","item_blink","item_swift_blink",
+		"item_slippers","item_slippers","item_circlet","item_circlet","item_wraith_band","item_wraith_band","item_boots_of_elves","item_boots","item_boots_of_elves","item_gloves","item_power_treads","item_hand_of_midas","item_dragon_lance","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_invis_sword","item_broadsword","item_silver_edge","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_skadi","item_eagle","item_talisman_of_evasion","item_quarterstaff","item_butterfly",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Frost Arrows","Gust","Multishot","Marksmanship","+50% Gust Blind","+15.0 Frost Arrow Damage","+250.0 Gust Width","-8.0s Multishot Cooldown","+28% Multishot Damage","-4.0s Gust Cooldown","+12% Marksmanship Chance","+3.0 Multishot Waves",
+		"Frost Arrows","Gust","Multishot","Marksmanship","+15% Gust Self Movement Speed","+15.0 Frost Arrow Damage","Gust Reveals Invisible Units","-8.0s Multishot Cooldown","+25% Multishot Damage","-4.0s Gust Cooldown","+12% Marksmanship Chance","+3.0 Multishot Waves",
 	}
 }
 --@EndAutomatedHeroData

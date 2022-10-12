@@ -1,12 +1,12 @@
 local hero_data = {
 	"silencer",
-	{2, 1, 2, 3, 1, 4, 1, 3, 3, 5, 1, 4, 2, 2, 7, 3, 4, 9, 12},
+	{2, 1, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_magic_wand","item_ring_of_basilius","item_tango","item_branches","item_boots","item_magic_wand","item_null_talisman","item_wind_lace","item_gloves","item_hand_of_midas","item_robe","item_power_treads","item_invis_sword","item_blitz_knuckles","item_robe","item_chainmail","item_witch_blade","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_wind_lace","item_boots","(null)","item_dragon_lance","item_hurricane_pike","item_refresher",
+		"item_tango","item_magic_stick","item_faerie_fire","item_enchanted_mango","item_branches","item_ward_dispenser","item_boots","item_magic_wand","item_ring_of_basilius","item_crown","item_veil_of_discord","item_staff_of_wizardry","item_force_staff","item_gem","item_glimmer_cape","item_gem","item_arcane_boots","item_energy_booster","item_void_stone","item_aether_lens","item_gem","item_gem",
 	},
-	{ {1,1,1,3,2,}, {5,5,2,1,4,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+12 Arcane Curse Damage","+20 Attack Speed","+100 Attack Range","+8% Arcane Curse Slow","-25.0s Global Silence Cooldown","+1.2x Last Word Int Multiplier","+15% Glaives of Wisdom Damage","Last Word Mutes",
+		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+12 Arcane Curse Damage","+20 Attack Speed","-25.0s Global Silence Cooldown","+0.8x Last Word Int Multiplier","+10% Glaives of Wisdom Damage","Arcane Curse Undispellable","+2 Glaives of Wisdom Bounces","Last Word Mutes",
 	}
 }
 --@EndAutomatedHeroData

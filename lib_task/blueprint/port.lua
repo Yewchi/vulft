@@ -19,6 +19,7 @@ local desired_locations = {}
 local port_state = {}
 
 function Port_BuyPortScrollsIfNeeded(gsiPlayer)
+	-- 12/10/22 buying behaviour should mostly trigger from port.score()
 	if Item_TownPortalScrollsOwned(gsiPlayer) < 2 and gsiPlayer.hUnit:GetGold() > GetItemCost("item_tpscroll") then
 		--print("purchasing tp", gsiPlayer.shortname)
 		gsiPlayer.hUnit:ActionImmediate_PurchaseItem("item_tpscroll")
@@ -107,9 +108,10 @@ end
 	end,
 	
 	score = function(gsiPlayer, prevObjective, prevScore)
+		Port_BuyPortScrollsIfNeeded(gsiPlayer)
+
 		local pnot = gsiPlayer.nOnTeam
 		if port_state[pnot] == NO_CHECK_PORT_NEEDED then return prevObjective, prevScore or XETA_SCORE_DO_NOT_RUN end
-		Port_BuyPortScrollsIfNeeded(gsiPlayer)
 		if port_state[pnot] == CHECK_PORT_NEEDED then
 			port_state[pnot] = NO_CHECK_PORT_NEEDED
 			if desired_locations[pnot] and gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT) and gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT):IsCooldownReady() then 

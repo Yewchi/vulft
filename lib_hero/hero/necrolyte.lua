@@ -1,12 +1,12 @@
 local hero_data = {
 	"necrolyte",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 5, 4, 2, 2, 7, 2, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_branches","item_faerie_fire","item_circlet","item_branches","item_ward_observer","item_branches","item_boots","item_urn_of_shadows","item_magic_wand","item_vitality_booster","item_spirit_vessel","item_cloak","item_hood_of_defiance","item_ogre_axe","item_sange","item_heavens_halberd","item_aghanims_shard","item_platemail","item_shivas_guard","item_point_booster","item_ultimate_scepter",
+		"item_tango","item_mantle","item_circlet","item_branches","item_branches","item_boots","item_null_talisman","item_chainmail","item_blades_of_attack","item_magic_wand","item_phase_boots","item_staff_of_wizardry","item_robe","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_blink","item_aghanims_shard","item_ultimate_orb","item_mystic_staff","item_void_stone","item_sheepstick","item_cyclone","item_pers","item_pers","item_refresher",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
-		"Death Pulse","Ghost Shroud","Heartstopper Aura","Reaper's Scythe","+100 Reaper's Scythe Cast Range","+8 Strength","+24% Ghost Shroud Slow","+32 Death Pulse Heal","+15% Magic Resistance","+32% Heartstopper Regen Reduction","+0.5% Heartstopper Aura","-2.5s Death Pulse Cooldown",
+		"Death Pulse","Ghost Shroud","Heartstopper Aura","Reaper's Scythe","+100 Reaper's Scythe Cast Range","+2s Heartstopper Aura Stack Duration","+24% Ghost Shroud Slow","+32 Death Pulse Heal","+15% Ghost Shroud Self Restoration Amp","+32% Heartstopper Regen Reduction","+0.5% Heartstopper Aura Damage","-2.5s Death Pulse Cooldown",
 	}
 }
 --@EndAutomatedHeroData

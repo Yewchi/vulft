@@ -1,12 +1,12 @@
 local hero_data = {
 	"dark_seer",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 5, 1, 4, 1, 1, 7, 3, 4, 10, 11},
+	{2, 3, 2, 3, 2, 4, 2, 1, 1, 1, 1, 4, 5, 3, 8, 3, 4, 9, 11},
 	{
-		"item_tango","item_gauntlets","item_gauntlets","item_faerie_fire","item_ring_of_protection","item_clarity","item_soul_ring","item_ring_of_health","item_hood_of_defiance","item_boots","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_arcane_boots","item_aether_lens","item_void_stone","item_cyclone","item_octarine_core","item_kaya","item_ethereal_blade","item_wind_waker","item_refresher","item_ultimate_scepter_2","item_ultimate_orb","item_void_stone","item_sheepstick","item_moon_shard",
+		"item_ring_of_protection","item_gauntlets","item_gauntlets","item_tango","item_clarity","item_soul_ring","item_boots","item_energy_booster","item_arcane_boots","item_mekansm","item_cloak","item_ring_of_health","item_hood_of_defiance","item_headdress","item_pipe","item_buckler","item_guardian_greaves","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_blink","item_void_stone",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Vacuum","Ion Shell","Surge","Wall of Replica","+20% Wall of Replica Illusion Damage","+6 Armor","+100 Vacuum AoE","+75 Ion Shell Radius","-40.0s Wall of Replica Cooldown","+50 Ion Shell Damage","Parallel Wall","350 AoE Surge",
+		"Vacuum","Ion Shell","Surge","Wall of Replica","+20% Wall of Replica Illusion Damage","+50 Ion Shell Radius","+100 Vacuum AoE","Ion Shell Provides +250 Max Health","-40.0s Wall of Replica Cooldown","+50 Ion Shell Damage","+2 Ion Shell Charges ","350 AoE Surge",
 	}
 }
 --@EndAutomatedHeroData

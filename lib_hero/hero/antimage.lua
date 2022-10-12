@@ -1,12 +1,12 @@
 local hero_data = {
 	"antimage",
-	{1, 2, 1, 3, 1, 4, 2, 2, 2, 1, 6, 4, 3, 3, 8, 3, 4, 10, 12},
+	{1, 2, 1, 3, 2, 4, 2, 2, 3, 5, 3, 4, 3, 1, 7, 1, 4, 10, 12},
 	{
-		"item_quelling_blade","item_magic_stick","item_branches","item_branches","item_faerie_fire","item_tango","item_ring_of_health","item_boots","item_boots_of_elves","item_power_treads","item_broadsword","item_claymore","item_bfury","item_blade_of_alacrity","item_boots_of_elves","item_magic_wand","item_yasha","item_manta","item_ultimate_orb","item_ultimate_orb","item_skadi","item_ultimate_orb","item_ring_of_health","item_belt_of_strength","item_pers","item_sphere","item_basher","item_abyssal_blade","item_blink","item_swift_blink","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_black_king_bar",
+		"item_quelling_blade","item_tango","item_slippers","item_circlet","item_branches","item_branches","item_ring_of_health","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_broadsword","item_claymore","item_bfury","item_boots_of_elves","item_wraith_band","item_yasha","item_manta","item_ultimate_orb","item_skadi","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_pers","item_sphere","item_butterfly","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_moon_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Mana Break","Blink","Counterspell","Mana Void","+9 Strength","-1s Blink Cooldown","+0.6% Max Mana Mana Burn","+0.7s Mana Void Stun","+0.1 Mana Void Damage Multiplier","+250 Blink Cast Range","+20% Counterspell Magic Resistance","-50s Mana Void Cooldown",
+		"Mana Break","Blink","Counterspell","Mana Void","+9 Strength","-1s Blink Cooldown","+0.6% Max Mana Mana Burn","+150 Mana Void Radius","+0.1 Mana Void Damage Multiplier","+250 Blink Cast Range","+20% Counterspell Magic Resistance","-50s Mana Void Cooldown",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,12 +1,12 @@
 local hero_data = {
 	"sniper",
-	{2, 1, 1, 3, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 7, 5, 4, 9, 11},
+	{1, 2, 2, 1, 1, 5, 1, 3, 2, 3, 3, 2, 3, 5, 8, 6, 5, 11, 9},
 	{
-		"item_magic_stick","item_circlet","item_slippers","item_branches","item_branches","item_tango","item_branches","item_quelling_blade","item_branches","item_magic_wand","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_ogre_axe","item_javelin","item_maelstrom","item_dragon_lance","item_mithril_hammer","item_black_king_bar","item_dragon_lance","item_hyperstone","item_mjollnir","item_blade_of_alacrity","item_yasha","item_manta","item_quarterstaff","item_butterfly","item_aghanims_shard","item_ultimate_orb","item_pers","item_sphere","item_blink","item_eagle","item_swift_blink","item_boots",
+		"item_quelling_blade","item_tango","item_magic_stick","item_circlet","item_branches","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_lifesteal","item_magic_wand","item_quarterstaff","item_mask_of_madness","item_blade_of_alacrity","item_dragon_lance","item_blitz_knuckles","item_broadsword","item_invis_sword","item_hurricane_pike","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_aghanims_shard","item_lesser_crit","item_silver_edge","item_blitz_knuckles","item_monkey_king_bar","item_moon_shard","item_satanic","item_boots",
 	},
-	{ {1,1,2,2,3,}, {1,1,2,2,4,}, 0.1 },
+	{ {1,1,2,3,3,}, {1,1,2,4,3,}, 0.1 },
 	{
-		"Shrapnel","Headshot","Take Aim","Assassinate","+1.0s Take Aim Duration","+15 Damage","+30 Attack Speed","-14% Shrapnel Slow","+28 Knockback Distance Headshot","+24 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
+		"Shrapnel","Headshot","Take Aim","Concussive Grenade","Assassinate","+1.0s Take Aim Duration","+30 Headshot Damage","+30 Attack Speed","-14% Shrapnel Slow","+28 Knockback Distance Headshot","+24 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
 	}
 }
 --@EndAutomatedHeroData

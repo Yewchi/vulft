@@ -1,12 +1,12 @@
 local hero_data = {
 	"jakiro",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 8, 3, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_tango","item_flask","item_enchanted_mango","item_clarity","item_sobi_mask","item_ward_sentry","item_ring_of_basilius","item_boots","item_crown","item_veil_of_discord","item_magic_wand","item_arcane_boots","item_aghanims_shard","item_void_stone","item_aether_lens","item_tranquil_boots","item_cloak",
+		"item_magic_stick","item_enchanted_mango","item_tango","item_ward_dispenser","item_branches","item_branches","item_ring_of_basilius","item_magic_wand","item_boots","item_crown","item_veil_of_discord","item_energy_booster","item_arcane_boots","item_void_stone","item_aether_lens","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_vladmir","item_wraith_pact","item_gem","item_gem","item_aghanims_shard",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+325 Attack Range","+6% Spell Amplification","-50 Liquid Fire Attack Speed","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","2x Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
+		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+275 Attack Range","-10%/-10 Dual Breath Movement/Attack Speed Slow","-50 Liquid Fire Attack Speed","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","+100%% Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
 	}
 }
 --@EndAutomatedHeroData

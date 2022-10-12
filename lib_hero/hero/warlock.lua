@@ -1,12 +1,12 @@
 local hero_data = {
 	"warlock",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 6, 3, 4, 3, 3, 7, 3, 4, 9, 11},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 6, 1, 4, 1, 1, 7, 3, 4, 9},
 	{
-		"item_tango","item_branches","item_ward_sentry","item_faerie_fire","item_enchanted_mango","item_smoke_of_deceit","item_branches","item_ward_sentry","item_boots","item_magic_wand","item_arcane_boots","item_aghanims_shard","item_point_booster","item_buckler","item_ring_of_basilius","item_lifesteal","item_blades_of_attack","(null)","item_vitality_booster","item_aeon_disk",
+		"item_ward_sentry","item_tango","item_magic_stick","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_magic_wand","item_ring_of_basilius","item_boots","item_aghanims_shard","item_buckler","item_blades_of_attack","item_vladmir","item_wraith_pact","item_arcane_boots","item_holy_locket",
 	},
 	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
-		"Fatal Bonds","Shadow Word","Upheaval","Chaotic Offering","+3% Fatal Bonds Damage","+2s Shadow Word Duration","+10 Upheaval Attack Speed per second on Allies","-4.0s Shadow Word Cooldown","Summons a Golem on death","+25 Shadow Word Damage/Heal","+20 Chaotic Offering Golems Armor","80% Magic Resistance for Chaotic Offering Golems",
+		"Fatal Bonds","Shadow Word","Upheaval","Chaotic Offering","+3% Fatal Bonds Damage","+75 Upheaval Radius","+12 Upheaval Attack Speed per second on Allies","-4s Shadow Word Cooldown","Summons a Golem on death","+25 Shadow Word Damage/Heal","+20 Chaotic Offering Golems Armor","80% Magic Resistance for Chaotic Offering Golems",
 	}
 }
 --@EndAutomatedHeroData
