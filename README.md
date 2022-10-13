@@ -5,6 +5,7 @@ Development status: Active, suprisingly (13/10/22)
 VUL-FT - Very U(gly, Unrolled, Unabstracted, and Fast) Lua Full Takeover for Dota 2
 
 ==Project workflow==
+
 Project workspaces can be viewed in the vim sessions (enter g then CTRL+T to tab through):
 
 	vim -S .taskwf
@@ -16,6 +17,7 @@ or alternatively in bash
 	. .wf
 
 ==Full-takeover==
+
 I need to explain why I overrode the mode_x.lua files for a full-takeover bot:
 I'm unable to make the bots pick up river bounty runes. I've tried many silly things. So
 the full takeover is conducted by forcing mode_roam into a 100% desire state, running the
@@ -34,6 +36,7 @@ However, if this is the solution followed, it might mean other problems in the f
 item management being interrupted by default bots being the most likely.
 
 ==Dotabuff data integration==
+
 I wrote a dotabuff data ripper which means that I can automate item and talent builds
 based on recent behaviour at the top of ranked. So, if gyrocopter support is a meme build
 that is used half of games, then the scoring would be increased for gyro to be given a
@@ -55,6 +58,7 @@ wombo combo style bots. Now, the bots 'play better', but lose out to RMM's stron
 for taking objectives -- Something VUL doesn't really understand yet. 13/10/22
 
 ==Lua is frustrating==
+
 The code is generally okay but due to the scale, very messy. I have strong feelings about
 the overhead that Lua provides when calling functions and switching file contexts--the
 way that it takes a mile-long step away from C data handling--not because it is
@@ -77,6 +81,7 @@ I'm quite sure they are Valves compiled and optimized C++ -- I did this because
 I wanted to improve my vector mathematics.
 
 ==Problem of scope==
+
 The bots are at 'about 1/2' of their intended macro and micro strength, and 'maybe 3/4'
 of my own computational limit target. So there would be a hell of a lot more to do on
 this project. The task system I designed allows the tacking-on of additional tasks
@@ -104,16 +109,10 @@ value that starts at large arbitrary negative P and increases by a static value 
 a priority per frame, sorting tasks during priority increases, then running the top 5
 tasks and putting them back at -P.
 
-==Stick a fork in me Jerry, I'm done==
-I worry that offliners are really a rare breed, people just play online, so I'm halting
-until I find that it's specifically worth my time. I *love* working on this, but it's far
-from what I would consider complete, even at over 30,000 lines of code. And Lua dements me
-slightly, in a project that I would never be happy about until it was very good--a lot of
-perceivably unpaid late nights in the future. I've taken a fair few multi-month breaks
-during making this, and coming back to it each time is more daunting every time. It just
-needs a full-time treatment.
+woo
 
 Thank you for reading,
+
 ==Contact==
 
 	zyewchi@gmail.com -- Mike
