@@ -8,23 +8,23 @@ assignees: Yewchi
 
 ---
 
-######Describe the error or crash
+**Describe the error or crash**
 
 
-######Can you cause the error to happen by doing anything?
+**Can you cause the error to happen by doing anything?**
 
 
-##Optional:
-######Screenshots of match
+**Optional:**
+**Screenshots of match**
 
-######What was the game clock? ( -1:30 to 0:00 to xx:xx )
+**What was the game clock? ( -1:30 to 0:00 to xx:xx )**
 
-######Are you in an All Pick match, with 5 players vs 5 players, on Local Dev Script custom lobby?
-######If not, state the game settings for your match
+**Are you in an All Pick match, with 5 players vs 5 players, on Local Dev Script custom lobby?**
+**If not, state the game settings for your match**
 
 
-######Console dump (best if you pause the match right when it happens)**
+**Console dump (best if you pause the match right when it happens)**
 ```
 Copy and paste any console text here
 ```
-_Note: If you run the game with the -dev launch option there will be console dumps at "%SteamInstall%/steamapps/common/dota 2 beta/game/dota/console.#########.log"_
+<sub>_Note: If you run the game with the -dev launch option there will be console dumps at "%SteamInstall%/steamapps/common/dota 2 beta/game/dota/console.#########.log"_</sub>
