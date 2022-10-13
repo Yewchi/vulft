@@ -1,5 +1,5 @@
 ---
-name: bug
+name: "[bug]"
 about: the bots are acting strangely, some of the bots still act normally, or they
   will return to normal after a while
 title: "[bug] Enter short description here"
