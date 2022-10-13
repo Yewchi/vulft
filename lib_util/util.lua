@@ -58,6 +58,11 @@ function Util_TableRemoveUnordered(tbl, i)
 	tbl[#tbl] = nil
 end
 
+function Util_ThrowError()
+	local throw
+	throw=throw+0
+end
+
 local function draw_from_table(t1, t2)
 	local t2NextSize = #t2
 	for i=#t1,1,-1 do

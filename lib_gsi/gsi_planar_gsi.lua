@@ -72,6 +72,7 @@ function GSI_Initialize()
 	TEAM_NUMBER_OF_HUMANS = 0
 	local teamplayerIDs = GetTeamPlayers(TEAM)
 	for i=1,#teamplayerIDs,1 do
+		INFO_print(string.format("[gsi_planar_gsi] Loading team player, ID:%d, pnot:%d", teamplayerIDs[i], i))
 		local player = pUnit_LoadTeamPlayer(teamplayerIDs[i], i)
 		if player.hUnit:IsBot() then
 			TEAM_NUMBER_OF_BOTS = TEAM_NUMBER_OF_BOTS + 1

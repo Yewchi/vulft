@@ -412,7 +412,7 @@ local function check_clarity(gsiPlayer, hItem, playerManaAfterPassiveRegenBuffer
 end
 
 local function check_bottle(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, playerManaAfterPassiveRegen, beatScore)
-	if hItem:GetCurrentCharges() > 0 and hItem:IsCooldownReady() 
+	if hItem:GetCurrentCharges() > 0 and hItem:GetCooldownTimeRemaining() == 0
 			and (playerHealthAfterPassiveRegenBuffer/gsiPlayer.maxHealth < BOTTLE_USE_ON_HEALTH_PERCENT
 			or playerManaAfterPassiveRegen/gsiPlayer.maxMana < BOTTLE_USE_ON_MANA_PERCENT) then
 		local activityType = Blueprint_GetCurrentTaskActivityType(gsiPlayer)
@@ -438,7 +438,7 @@ end
 
 local function check_arcane_boots(gsiPlayer, hItem, playerManaAfterPassiveRegenBuffer, beatScore)
 	local manaPercent = Unit_GetManaPercent(gsiPlayer)
-	if hItem:IsCooldownReady() and (manaPercent < ARCANE_USE_ON_MANA_PERCENT or gsiPlayer.maxMana-playerManaAfterPassiveRegenBuffer > ARCANE_USE_ON_MANA_MISSING) then
+	if hItem:GetCooldownTimeRemaining() == 0 and (manaPercent < ARCANE_USE_ON_MANA_PERCENT or gsiPlayer.maxMana-playerManaAfterPassiveRegenBuffer > ARCANE_USE_ON_MANA_MISSING) then
 		local score = ARCANE_BASIC_MANA_GAIN*VALUE_OF_ONE_MANA
 		if score > beatScore then
 			local instruction = p_saved_instruction[gsiPlayer.nOnTeam]
@@ -454,7 +454,7 @@ end
 local function check_mekansm(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, beatScore)
 	-- TODO is self only
 	local healthPercent = Unit_GetHealthPercent(gsiPlayer)
-	if hItem:IsCooldownReady() and (healthPercent < MEKANSM_USE_ON_HEALTH_PERCENT or gsiPlayer.maxHealth-playerHealthAfterPassiveRegenBuffer > MEKANSM_USE_ON_HEALTH_MISSING) then
+	if hItem:GetCooldownTimeRemaining() == 0 and (healthPercent < MEKANSM_USE_ON_HEALTH_PERCENT or gsiPlayer.maxHealth-playerHealthAfterPassiveRegenBuffer > MEKANSM_USE_ON_HEALTH_MISSING) then
 		local score = MEKANSM_BASIC_HEALTH_GAIN*VALUE_OF_ONE_HEALTH
 		if score > beatScore then
 			local instruction = p_saved_instruction[gsiPlayer.nOnTeam]
@@ -470,7 +470,7 @@ end
 local function check_guardian_greaves(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, playerManaAfterPassiveRegenBuffer, beatScore)
 	-- TODO is self only, just copies mek
 	local healthPercent = Unit_GetHealthPercent(gsiPlayer)
-	if hItem:IsCooldownReady() and (healthPercent < MEKANSM_USE_ON_HEALTH_PERCENT or gsiPlayer.maxHealth-playerHealthAfterPassiveRegenBuffer > MEKANSM_USE_ON_HEALTH_MISSING) then
+	if hItem:GetCooldownTimeRemaining() == 0 and (healthPercent < MEKANSM_USE_ON_HEALTH_PERCENT or gsiPlayer.maxHealth-playerHealthAfterPassiveRegenBuffer > MEKANSM_USE_ON_HEALTH_MISSING) then
 		local score = MEKANSM_BASIC_HEALTH_GAIN*VALUE_OF_ONE_HEALTH
 		if score > beatScore then
 			local instruction = p_saved_instruction[gsiPlayer.nOnTeam]
@@ -504,8 +504,8 @@ blueprint = {
 		local instruction = p_saved_instruction[gsiPlayer.nOnTeam]
 		local instructionItem = instruction[SAVED_CONSUME_I__ITEM]
 		--print(instruction[SAVED_CONSUME_I__ITEM]:IsNull())
-		--print(gsiPlayer.shortName, "item cooldown", instruction[SAVED_CONSUME_I__ITEM]:IsCooldownReady(), instruction[SAVED_CONSUME_I__ITEM]:GetCooldownTimeRemaining())
-		if not instructionItem or not instructionItem:IsCooldownReady()
+		--print(gsiPlayer.shortName, "item cooldown", instruction[SAVED_CONSUME_I__ITEM]:GetCooldownTimeRemaining() == 0, instruction[SAVED_CONSUME_I__ITEM]:GetCooldownTimeRemaining())
+		if not instructionItem or not instructionItem:GetCooldownTimeRemaining() == 0
 				or not instructionItem:IsFullyCastable()
 				or p_time_task_allowed[gsiPlayer.nOnTeam] > GameTime() then
 			return XETA_SCORE_DO_NOT_RUN -- Don't try to run us till we re-score high (because item is ready from backpack switch)
@@ -524,7 +524,7 @@ blueprint = {
 				and Task_GetCurrentTaskScore(gsiPlayer) > 100
 				and not Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1600, 5)[1] then
 			-- local _, bottle = Item_ItemInMainInventory(gsiPlayer, "item_bottle")
-			-- if bottle and bottle:GetCurrentCharges() > 0 and bottle:IsCooldownReady() then 
+			-- if bottle and bottle:GetCurrentCharges() > 0 and bottle:GetCooldownTimeRemaining() == 0 then 
 				-- if not UseAbility_IsPlayerLocked(gsiPlayer) 
 						-- and not gsiPlayer.hUnit:HasModifier("modifier_bottle_regeneration") then
 					-- UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, bottle, nil, 500)
@@ -690,7 +690,7 @@ blueprint = {
 			lock_bags_may_warn(gsiPlayer, ITEM_NEEDED_SWITCH_SLOT_WAIT_TIME, ITEM_SWITCH_ITEM_READY_TIME)
 			return false
 		end
-		if not hItem:IsCooldownReady() or not hItem:IsFullyCastable() then
+		if not hItem:GetCooldownTimeRemaining() == 0 or not hItem:IsFullyCastable() then
 			return false
 		end
 		return ensureItemCarriedResult == true and extrapolatedXeta or false

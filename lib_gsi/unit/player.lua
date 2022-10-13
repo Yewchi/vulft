@@ -562,13 +562,26 @@ function pUnit_CreateDominatedUnit(playerId, unit)
 	return thisDominatedUnit
 end
 
+local function assert_load_player_hunit(hUnit, TEAM, playerId, nOnTeam)
+	if not hUnit then
+		ERROR_print("[player] player was not a contiguous member of it's team.")
+		Util_TablePrint(GetTeamPlayers(TEAM))
+		ERROR_print(string.format("[player] confirm_load_player_hunit(%s, %d, %d, %d)",
+					tostring(hUnit), TEAM, playerId, nOnTeam)
+				)
+		Util_ThrowError()
+	end
+end
+
 function pUnit_LoadTeamPlayer(playerId, nOnTeam)	
 	local thisPlayer = {}
 	local hUnit = GetTeamMember(nOnTeam)
 
+	assert_load_player_hunit(hUnit, TEAM, playerId, nOnTeam)
+
 	thisPlayer.nOnTeam = nOnTeam
 	thisPlayer.playerID = playerId
-	
+
 	insert_player_data(thisPlayer, hUnit)
 	
 	thisPlayer.zAxisMagnitudeSweeperRadians = RandomFloat(0, MATH_2PI) -- See lib_task/positioning.lua: Positioning_ProgressZNormalSweeper__Job()

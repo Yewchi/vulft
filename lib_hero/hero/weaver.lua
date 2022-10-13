@@ -30,6 +30,7 @@ local INCENTIVISE = Task_IncentiviseTask
 local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint
 local ACTIVITY_TYPE = ACTIVITY_TYPE
 local CURR_TASK_SCORE = Task_GetCurrentTaskScore
+local CAN_BE_CAST = AbilityLogic_AbilityCanBeCast
 local currentActivityType = Blueprint_GetCurrentTaskActivityType
 local currentTask = Task_GetCurrentTaskHandle
 local HIGH_USE = AbilityLogic_HighUseAllowOffensive
@@ -70,7 +71,7 @@ local d = {
 		local playerHealthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 		local isInvis = gsiPlayer.hUnit:IsInvisible()
 
-		if geminate:IsCooldownReady() then
+		if CAN_BE_CAST(gsiPlayer, geminate) then
 			INCENTIVISE(gsiPlayer, fight_harass_handle, 14, 9)
 		end
 
@@ -85,7 +86,7 @@ local d = {
 				and fht.lastSeenHealth / fht.maxHealth or 1.0
 		local arbitraryEnemy = nearbyEnemies[1] or outerEnemies[1]
 
-		if arbitraryEnemy and AbilityLogic_AbilityCanBeCast(gsiPlayer, timeLapse) then
+		if arbitraryEnemy and CAN_BE_CAST(gsiPlayer, timeLapse) then
 			local currTaskScore = CURR_TASK_SCORE(gsiPlayer)
 			local recentDmgTaking = Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit)
 			local score = min(400, 600*(1-playerHealthPercent)*recentDmgTaking
@@ -111,7 +112,7 @@ local d = {
 				gsiPlayer.attackRange = 0
 				INCENTIVISE(gsiPlayer, fight_harass_handle, 60, 30)
 			end
-			if fhtReal and not isInvis and AbilityLogic_AbilityCanBeCast(gsiPlayer, swarm)
+			if fhtReal and not isInvis and CAN_BE_CAST(gsiPlayer, swarm)
 					and HIGH_USE(gsiPlayer, swarm, highUse - swarm:GetManaCost(), fhtPercHp) then
 				local extrapolatedTime
 						= 0.3 + VEC_POINT_DISTANCE(
@@ -127,7 +128,7 @@ local d = {
 					Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
 						> gsiPlayer.attackRange
 					) then
-				if AbilityLogic_AbilityCanBeCast(gsiPlayer, shukuchi)
+				if CAN_BE_CAST(gsiPlayer, shukuchi)
 						and HIGH_USE(gsiPlayer, shukuchi, highUse - shukuchi:GetManaCost(), fhtPercHp) then
 					USE_ABILITY(gsiPlayer, shukuchi, nil, 400, nil)
 					-- TODO work around while UseAbility combos unfinished
@@ -138,7 +139,7 @@ local d = {
 			end
 		end
 		if currActivityType > ACTIVITY_TYPE.CAREFUL then
-			if nearbyEnemies[1] and AbilityLogic_AbilityCanBeCast(gsiPlayer, shukuchi)
+			if nearbyEnemies[1] and CAN_BE_CAST(gsiPlayer, shukuchi)
 					and HIGH_USE(gsiPlayer, shukuchi, highUse - shukuchi:GetManaCost(), playerHealthPercent) then
 				if nearbyEnemies[1].hUnit.IsNull and not nearbyEnemies[1].hUnit:IsNull() then
 					USE_ABILITY(gsiPlayer, shukuchi, nil, 500, nil)

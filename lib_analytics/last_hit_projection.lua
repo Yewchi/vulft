@@ -433,10 +433,9 @@ function Lhp_GetAnyDeniesViableSimple(gsiPlayer)
 			for i=1,#creepSetUnits,1 do
 				local gsiAlliedCreep = creepSetUnits[i]
 				if not cUnit_IsNullOrDead(gsiAlliedCreep)
-						and Unit_GetHealthPercent(gsiAlliedCreep) < 0.4 and 
-					gsiAlliedCreep.lastSeenHealth 
-							- (gsiAlliedCreep.hUnit:TimeSinceDamagedByCreep() < 2.0 and 95 or 53)
-						< playerAttackDamage then
+						and Unit_GetHealthPercent(gsiAlliedCreep) < 0.3
+						and Analytics_GetNearFutureHealth(gsiAlliedCreep, 2)
+							< playerAttackDamage then
 					return gsiAlliedCreep
 				end
 			end
