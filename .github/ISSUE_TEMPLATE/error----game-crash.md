@@ -27,4 +27,4 @@ assignees: Yewchi
 ```
 Copy and paste any console text here
 ```
-<sub>_Note: If you run the game with the -dev launch option there will be console dumps at "%SteamInstall%/steamapps/common/dota 2 beta/game/dota/console.#########.log"_</sub>
+<sub>_Note: If you run the game with the -condebug launch option there will be console dumps at "%SteamInstall%/steamapps/common/dota 2 beta/game/dota/console.#########.log"_</sub>
