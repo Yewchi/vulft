@@ -125,7 +125,7 @@ function GSI_GetGSIJobDomain()
 end
 
 function GSI_GetTeamString(team)
-	return team == 2 and "TEAM_RADIANT" or "TEAM_DIRE"
+	return team == TEAM_RADIANT and "TEAM_RADIANT" or team == TEAM_DIRE and "TEAM_DIRE" or "TEAM_NEUTRALS"
 end
 
 function GSI_UnitCanStartAttack(gsiUnit)

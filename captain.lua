@@ -27,15 +27,39 @@ function Captain_RegisterCaptain(thisBot, microThinkFunc, deleteThisFunc)
 		job_domain:RegisterJob(
 				function(workingSet)
 					if workingSet.throttle:allowed() then
-						if GetTeamMember(1) and GetGameState() > GAME_STATE_HERO_SELECTION then
-							if Captain_InitializeCaptain then
-								Captain_InitializeCaptain() -- deleted if previously called (from river rune fix)
-							end
-							job_domain:DeregisterJob("JOB_WAIT_FOR_GAME_INIT")
+						if GetGameState() <= GAME_STATE_HERO_SELECTION then
+							return;
 						end
+						local teamplayerIDs = GetTeamPlayers(TEAM)
+						for i=#teamplayerIDs,1,-1 do
+							if GetTeamMember(i) == nil then
+								if workingSet.nextAdviseWaiting < GameTime() then
+									workingSet.nextAdviseWaiting = GameTime() + workingSet.addAdviseWait
+									workingSet.addAdviseWait = workingSet.addAdviseWait * 2
+									local adviseStr = workingSet.printFuncEscalates == INFO_print
+											and string.format(
+													"[captain] Waiting normally for team data.. "
+														+ "Missing player was N: %d, ID: %d, time: %f, clock: %f",
+													n, teamplayerIDs[n], GameTime(), DotaTime() )
+											or string.format(
+													"[captain] Ensure GameMode: ALL PICK; Five vs Five heroes on the standard Dota 2 map.. "
+														+ "Missing player was N: %d, ID: %d, time: %f, clock: %f",
+													n, teamplayerIDs[n], GameTime(), DotaTime() )
+									workingSet.printFuncEscalates(adviseStr)
+									workingSet.printFuncEscalates = ERROR_print
+									INFO_print(string.format("[captain] Num players on %s: %d.", GSI_GetTeamString(TEAM), #teamplayerIDs))
+								end
+								return
+							end
+						end
+						-- We have a full team, try init
+						if Captain_InitializeCaptain then
+							Captain_InitializeCaptain() -- deleted if previously called (from river rune fix)
+						end
+						job_domain:DeregisterJob("JOB_WAIT_FOR_GAME_INIT")
 					end
 				end,
-				{["throttle"] = Time_CreateThrottle(0.5)},
+				{["throttle"] = Time_CreateThrottle(0.5), ["nextAdviseWaiting"] = GameTime() + 1, ["addAdviseWait"] = 2, ["printFuncEscalates"] = INFO_print},
 				"JOB_WAIT_FOR_GAME_INIT"
 			)
 	else
@@ -100,8 +124,12 @@ local i = 0
 local DEBUG_timeTestThrottle = Time_CreateThrottle(10.0)
 local err_count = 0
 local err_check = 0
+
+
 function Captain_CaptainThink()	
-	if DEBUG then if err_check == 1 then err_count = err_count + 1 end err_check = 1 if err_count > 0 then DebugDrawText(140, 30, string.format("%d", err_count), 255, 0, 0) end end
+	--[[TESTTRUE]]if DEBUG then
+		if err_check == 1 then err_count = err_count + 1 end err_check = 1 if err_count > 0 then DebugDrawText(140, 30, string.format("%d", err_count), 150, 0, 0) end
+	end
 	if job_domain_gsi.active then
 		Time_TryTimeDataReset()
 		if DEBUG and DEBUG_timeTestThrottle:allowed() then 
@@ -114,60 +142,82 @@ function Captain_CaptainThink()
 			end
 		end
 		i = 1 DEBUG_fromTime = RealTime()
+	
+		
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_ENEMY_PLAYERS_NONE_TYPED")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYER_DATA")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYERS_LAST_SEEN")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_SCOREBOARD_AND_KILLSTREAKS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_CREEP_UNITS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_UNIT_SETS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_BUILDING_UNITS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
 	end
 	
 	if job_domain_analytics.active then
+		
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_CURRENT_VANTAGE")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_FUTURE_DAMAGE_LISTS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_analytics:DoJob("JOB_UPDATE_FOW_PREDICTION")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_analytics:DoJob("JOB_UPDATE_LANE_PRESSURE")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
 		job_domain_analytics:DoJob("JOB_UPDATE_STRATEGIZE_WARDS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
 	end
 	
 	if job_domain_task.active then
+		
 		job_domain_task:DoAllJobs()
 	end
 
 	if job_domain.active then
+		
+		
+		
 		job_domain:DoAllJobs()
 	end
 
 	if DEBUG and TEAM == TEAM_DIRE  then
 		DEBUG_CreepAdventure()
 	end
+	
 	AbilityThink_RotateAbilityThinkSetRun()
+	
 	Task_TryDecrementIncentives()
-	if DEBUG then err_check = 0 end
+	--[[TESTTRUE]]if DEBUG then
+		err_check = 0
+	end
 	generic_microthink()
 	if VERBOSE then 
 		local locs = VAN_GetWardLocations()

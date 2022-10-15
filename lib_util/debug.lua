@@ -50,6 +50,24 @@ if DEBUG then
 			table.insert(task_store[i][j], {0, 0, 0})
 		end
 	end
+	function VEBUG_PlayerFrameProgressBarStart(pnot, offsetx, offsety)
+		offsety = (offsety or 230) + (pnot-1)*10
+		if TEAM_IS_RADIANT then
+			DebugDrawText((offsetx or 300), offsety, "[", 100, 255, 100)
+		else
+			DebugDrawText((offsetx or 430), offsety, "[", 255, 100, 100)
+		end
+	end
+	function VEBUG_PlayerFrameProgressBar(pnot, progress, offsetx, offsety)
+		offsety = (offsety or 230) + (pnot-1)*10
+		if TEAM_IS_RADIANT then
+			offsetx = (offetx or 300) + 8 + progress
+			DebugDrawText(offsetx, offsety, progress < 100 and "|" or "|]", 100, 255, 100)
+		else
+			offsetx = (offetx or 430) + 8 + progress
+			DebugDrawText(offsetx, offsety, progress < 100 and "|" or "|]", 255, 100, 100)
+		end
+	end
 	function DEBUG_TaskDiagnostic(g, o, s)
 		local pnot = g.nOnTeam
 		if o == true then

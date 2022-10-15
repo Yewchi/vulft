@@ -120,6 +120,7 @@ function ZoneDefend_TakeCreepAggroTowerToHeroDownLane(gsiPlayer, objective)
 			) and distToSet < gsiPlayer.attackRange + (-currDanger*300) then
 		local pullUnit = Set_GetSetUnitNearestToLocation(gsiPlayer.lastSeen.location, enemyCreeps)
 		if pullUnit then
+			
 			DebugDrawText(700, 300, string.format("%s pulls creeps off tower.", gsiPlayer.shortName), 255, 255, 255)
 			gsiPlayer.hUnit:Action_AttackUnit(pullUnit.hUnit, true)
 			return true
@@ -250,7 +251,7 @@ blueprint = {
 									) and Vector_PointDistance(
 											thisPlayer.lastSeen.location,
 											wpObjective.lastSeen.location
-										) > 1600 + 4000 * towerHpp then
+										) < 1600 + 4000 * towerHpp then
 								if DEBUG then
 									DebugDrawText(1300, 100+gsiPlayer.nOnTeam*10, 
 											string.format("%5s-wait:%5s for def", gsiPlayer.shortName,

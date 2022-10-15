@@ -1,2 +1,4 @@
 #!/bin/bash
-vim -S .syswf & vim -S .anwf & vim -S .taskwf & vim -S .herowf
+
+workingdir=$(dirname "${BASH_SOURCE[0]}")
+vim -S "$workingdir/.syswf" & vim -S "$workingdir/.anwf" & vim -S "$workingdir/.taskwf" & vim -S "$workingdir/.herowf"

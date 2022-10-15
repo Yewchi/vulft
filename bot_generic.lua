@@ -52,22 +52,38 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 		this_bot:disabledAndDominatedFunc()
 		return
 	end
-	if DEBUG then
+	--[[TESTTRUE]]if DEBUG then
 		if err_flag==1 then
 			err_count = err_count + 1
 		end
 		if err_count>0 then
-			DebugDrawText(5, 5, string.format("err_count: %d", err_count), 255, 0, 0)
+			DebugDrawText(5, 5, string.format("err_c: %d", err_count), 150, 0, 0)
 		end
 		err_flag = 1
 	end
 	-- run this_bot
 	Time_IndicateNewFrame(this_bot)
 	if this_bot.hUnit:IsAlive() then
+	
+	
+	
+	
 		Task_InformAliveAndRemoveObjectiveDisallows(this_bot)
+	
+	
+	
 		AbilityThink_TryRun(this_bot)
+	
+	
+	
 		Task_HighestPriorityTaskScoringContinue(this_bot)
+	
+	
+	
 		Task_CurrentTaskContinue(this_bot)
+	
+	
+	
 		Hero_InvestAbilityPointsAndManageItems(this_bot)
 	else
 		if while_dead_behaviour_throttle:allowed() then
@@ -97,12 +113,17 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 			thisDominatedUnit = nextUnit
 		end
 	end
+
+
+
 --	if this_bot.shortName == "void_spirit" or this_bot.shortName == "sven" then
 --		this_bot.hUnit:Action_MoveDirectly(Vector(4600, -6000))
 --	end
 --if TEAM_IS_RADIANT then	this_bot.hUnit:Action_MoveDirectly(Vector_Addition(Map_GetTeamFountainLocation(), Vector(-400, 1500, 0))) end -- dominate stuck test
 --if not TEAM_IS_RADIANT then	this_bot.hUnit:Action_MoveDirectly(Vector_Addition(Map_GetTeamFountainLocation(), Vector(400, -1000, 0))) end
-	if DEBUG then err_flag = 0 end
+	--[[TESTTRUE]]if DEBUG then
+		err_flag = 0
+	end
 end
 
 local function bot_initialization_wait_gsi_ready__job(workingSet)
@@ -129,11 +150,11 @@ end
 
 -- Think = ...
 local function generic_microthink() -- See Think() counterparts (grander scale thinking) in team_logic.lua
-	if VERBOSE and ( string.find(this_bot.shortName or "", "void_spirit")
-			or string.find(this_bot.shortName or "", "skeleton_king")
-			or string.find(this_bot.shortName or "", "chaos_knight") ) then
-		VEBUG_print(this_bot.shortName, "running generic_microthink")
-	end
+
+
+
+
+
 	if job_domain.active then
 		job_domain:DoAllJobs()
 	end
