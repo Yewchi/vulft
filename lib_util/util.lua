@@ -5,7 +5,7 @@ HIGH_32_BIT = 0x80000000
 LOW_32_BIT = -0x80000000
 EMPTY_TABLE = {}
 
-DEBUG = false
+DEBUG = true
 VERBOSE = true and DEBUG
 TEST = true and DEBUG
 

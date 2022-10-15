@@ -124,8 +124,8 @@ local i = 0
 local DEBUG_timeTestThrottle = Time_CreateThrottle(10.0)
 local err_count = 0
 local err_check = 0
-
-
+--[[DEV]]local dev_progress = 0.0001 + 100/15--[[/DEV]]
+--[[DEV]]local floor = math.floor--[[/DEV]]
 function Captain_CaptainThink()	
 	--[[TESTTRUE]]if DEBUG then
 		if err_check == 1 then err_count = err_count + 1 end err_check = 1 if err_count > 0 then DebugDrawText(140, 30, string.format("%d", err_count), 150, 0, 0) end
@@ -143,77 +143,77 @@ function Captain_CaptainThink()
 		end
 		i = 1 DEBUG_fromTime = RealTime()
 	
-		
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBarStart(-1)--[[/DEV]]
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(0*dev_progress))--[[/DEV]]
 		job_domain_gsi:DoJob("JOB_UPDATE_ENEMY_PLAYERS_NONE_TYPED")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(1*dev_progress))--[[/DEV]]
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYER_DATA")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(2*dev_progress))--[[/DEV]]
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYERS_LAST_SEEN")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(3*dev_progress))--[[/DEV]]
 		job_domain_gsi:DoJob("JOB_UPDATE_SCOREBOARD_AND_KILLSTREAKS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(4*dev_progress))--[[/DEV]]
 		job_domain_gsi:DoJob("JOB_UPDATE_CREEP_UNITS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(5*dev_progress))--[[/DEV]]
 		job_domain_gsi:DoJob("JOB_UPDATE_UNIT_SETS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(6*dev_progress))--[[/DEV]]
 		job_domain_gsi:DoJob("JOB_UPDATE_BUILDING_UNITS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
 	end
 	
 	if job_domain_analytics.active then
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(7*dev_progress))--[[/DEV]]
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_CURRENT_VANTAGE")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(8*dev_progress))--[[/DEV]]
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_FUTURE_DAMAGE_LISTS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(9*dev_progress))--[[/DEV]]
 		job_domain_analytics:DoJob("JOB_UPDATE_FOW_PREDICTION")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(10*dev_progress))--[[/DEV]]
 		job_domain_analytics:DoJob("JOB_UPDATE_LANE_PRESSURE")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
 		i = i + 1 DEBUG_fromTime = RealTime()
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(11*dev_progress))--[[/DEV]]
 		job_domain_analytics:DoJob("JOB_UPDATE_STRATEGIZE_WARDS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
 	end
 	
 	if job_domain_task.active then
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(12*dev_progress))--[[/DEV]]
 		job_domain_task:DoAllJobs()
 	end
 
 	if job_domain.active then
-		
-		
-		
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(13*dev_progress))--[[/DEV]]
+		--[[DEV]]VEBUG_print("printing captin job_domain")--[[/DEV]]
+		--[[DEV]]job_domain:ListJobKeys()--[[/DEV]]--[[/DEV]]--[[/DEV]]
 		job_domain:DoAllJobs()
 	end
 
 	if DEBUG and TEAM == TEAM_DIRE  then
 		DEBUG_CreepAdventure()
 	end
-	
+	--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(14*dev_progress))--[[/DEV]]
 	AbilityThink_RotateAbilityThinkSetRun()
-	
+	--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(15*dev_progress))--[[/DEV]]
 	Task_TryDecrementIncentives()
 	--[[TESTTRUE]]if DEBUG then
 		err_check = 0

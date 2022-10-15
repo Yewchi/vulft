@@ -64,26 +64,26 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 	-- run this_bot
 	Time_IndicateNewFrame(this_bot)
 	if this_bot.hUnit:IsAlive() then
-	
-	
-	
-	
+	--[[DEV]]	if VERBOSE then
+	--[[DEV]]		VEBUG_PlayerFrameProgressBarStart(this_bot.nOnTeam)
+	--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 0)
+	--[[DEV]]	end
 		Task_InformAliveAndRemoveObjectiveDisallows(this_bot)
-	
-	
-	
+	--[[DEV]]	if VERBOSE then
+	--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 20)
+	--[[DEV]]	end
 		AbilityThink_TryRun(this_bot)
-	
-	
-	
+	--[[DEV]]	if VERBOSE then
+	--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 40)
+	--[[DEV]]	end
 		Task_HighestPriorityTaskScoringContinue(this_bot)
-	
-	
-	
+	--[[DEV]]	if VERBOSE then
+	--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 60)
+	--[[DEV]]	end
 		Task_CurrentTaskContinue(this_bot)
-	
-	
-	
+	--[[DEV]]	if VERBOSE then
+	--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 80)
+	--[[DEV]]	end
 		Hero_InvestAbilityPointsAndManageItems(this_bot)
 	else
 		if while_dead_behaviour_throttle:allowed() then
@@ -113,9 +113,9 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 			thisDominatedUnit = nextUnit
 		end
 	end
-
-
-
+--[[DEV]]	if VERBOSE then
+--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 100)
+--[[DEV]]	end
 --	if this_bot.shortName == "void_spirit" or this_bot.shortName == "sven" then
 --		this_bot.hUnit:Action_MoveDirectly(Vector(4600, -6000))
 --	end
@@ -150,11 +150,11 @@ end
 
 -- Think = ...
 local function generic_microthink() -- See Think() counterparts (grander scale thinking) in team_logic.lua
-
-
-
-
-
+--[[DEV]]	if VERBOSE and ( string.find(this_bot.shortName or "", "void_spirit")
+--[[DEV]]			or string.find(this_bot.shortName or "", "skeleton_king")
+--[[DEV]]			or string.find(this_bot.shortName or "", "chaos_knight") ) then
+--[[DEV]]		VEBUG_print(this_bot.shortName, "running generic_microthink")
+--[[DEV]]	end
 	if job_domain.active then
 		job_domain:DoAllJobs()
 	end
