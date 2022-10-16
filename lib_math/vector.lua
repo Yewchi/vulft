@@ -27,6 +27,16 @@ end
 local Vector_PointToPointLine = Vector_PointToPointLine
 
 function Vector_UnitFacingUnit(u1, u2)
+--[[DEV]]if VERBOSE then
+--[[DEV]]	if u1 and (
+--[[DEV]]				(not u1.hUnit and u1.GetFacing and u1:IsNull())
+--[[DEV]]				or (u1.hUnit and u1.hUnit.GetFacing and u1.hUnit:IsNull())
+--[[DEV]]			) then
+--[[DEV]]		ERROR_print("[vector] UnitFacingUnit() looking unit parameter is null")
+--[[DEV]]		Util_TablePrint(u1)
+--[[DEV]]		DEBUG_KILLSWITCH = true
+--[[DEV]]	end
+--[[DEV]]end
 	local u1Facing = u1.GetFacing and u1:GetFacing() or u1.hUnit:GetFacing()
 	local u1Loc = u1.GetLocation and u1:GetLocation() or u1.lastSeen.location
 	local u2Loc = u2.GetLocation and u2:GetLocation() or u2.lastSeen.location

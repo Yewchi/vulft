@@ -47,32 +47,51 @@ end
 
 local function handle_player_spell_or_item_cast(castInfo, abc)
 -- NB. CANNOT enter code with GetBot() calls -- Callback triggers presumably make their Lua hook directly without stepping into per-bot code.
+	--[[DEV]]if DEBUG then DebugDrawText(960, 540, "::ABILITY::", 150, 150, 255) end
+	--[[DEV]]local steps = 100/15; local floor = math.floor
 	local thisPlayer = GSI_GetPlayerFromPlayerID(castInfo.player_id)
+	--[[DEV]]VEBUG_PlayerFrameProgressBarStart(thisPlayer.nOnTeam, 600, 150)
 	local ability = castInfo.ability
+	--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(0*steps), 600, 150)
 	if thisPlayer.team == TEAM then
 		UseAbility_IndicateCastCompleted(castInfo)
+	--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(1*steps), 600, 150)
 	end
 	local abilityName = ability:GetName()
+	--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(2*steps), 600, 150)
 	if thisPlayer.illusionsUp then
 		if thisPlayer.shortName ~= "phantom_lancer" then
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(3*steps), 600, 150)
 			thisPlayer.knownNonIllusionUnit = castInfo.unit -- knownNon will drop check Rand(1,6)%6 == 0, for fairness
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(4*steps), 600, 150)
 		end
 	end
 	if ability:GetName() == "item_tpscroll" then
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(5*steps), 600, 150)
 		if TEST then INFO_print(string.format("CAUGHT %s TELEPORT", thisPlayer.shortName)) end
 		Analytics_RegisterPortActivity(thisPlayer, castInfo)
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(6*steps), 600, 150)
 		--Util_TablePrint(castInfo)
 	elseif ability:GetName():match("^item") then
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(7*steps), 600, 150)
 		if thisPlayer.team == TEAM then
+			--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(8*steps), 600, 150)
 			Consumable_CheckConsumableUse(thisPlayer, ability)
+			--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(9*steps), 600, 150)
 		else
+			--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(10*steps), 600, 150)
 			Item_UpdateKnownCooldown(thisPlayer, ability)
+			--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(11*steps), 600, 150)
 		end
 	else
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(12*steps), 600, 150)
 		--Util_TablePrint(castInfo)
 		if VERBOSE then print(castInfo.unit and castInfo.unit:GetUnitName(), castInfo.location and castInfo.location.x or castInfo.location.GetUnitName) end
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(13*steps), 600, 150)
 		AbilityLogic_InformAbilityCast(thisPlayer, ability)
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(14*steps), 600, 150)
 	end
+	--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(15*steps), 600, 150)
 end
 
 local function update_allied_hero_game_data(gsiPlayer)

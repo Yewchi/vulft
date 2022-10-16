@@ -151,6 +151,12 @@ function abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpHandle)
 	local t_team_members = t_team_members
 	local closestDist = 0xFFFF
 	local closestPlayer
+	--[[DEV]]if VERBOSE and not wpHandle[POSTER_I.OBJECTIVE].runeHandle then
+	--[[DEV]]	ERROR_print(string.format("[rune] Found an iobjective rune without a rune handle"))
+	--[[DEV]]	Util_TablePrint(wpHandle[POSTER_I.OBJECTIVE], 4)
+	--[[DEB]]	DEBUG_KILLSWITCH = true
+	--[[DEV]]	Util_ThrowError()
+	--[[DEV]]end
 	local thisRune = RUNE_LOCATIONS[wpHandle[POSTER_I.OBJECTIVE].runeHandle+1]
 	if thisRune[RUNE_I__CLOSEST_SAFE_HERO] then
 		safeHero = thisRune[RUNE_I__CLOSEST_SAFE_HERO]

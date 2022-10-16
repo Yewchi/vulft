@@ -298,10 +298,15 @@ function Item_HandleItemShop(gsiPlayer)
 				gsiPlayer.lastSeen.location,	
 				Map_GetTeamFountainLocation()) < 600 then
 			-- IN FOUNTAIN SWAP
-			gsiPlayer.hUnit:ActionImmediate_SwapItems(
-					stashSlot,
-					select(2, Item_HaveFreeInventorySlot(gsiPlayer)) -- implied true by num carried
-				)
+			local hasFree, freeSlot = Item_HaveFreeInventorySlot(gsiPlayer)
+			if hasFree then
+				gsiPlayer.hUnit:ActionImmediate_SwapItems(
+						stashSlot,
+						freeSlot
+					)
+			end
+			-- TODO Better items are just ignored? Don't want to use BestSwap because wards not impl. yet.
+			-- -- don't want wards stuck in stash
 		elseif gsiPlayer.hCourier then
 			--print("have courier", gsiPlayer.shortName)
 			local courierFountainDist = Math_PointToPointDistance2D(

@@ -314,9 +314,11 @@ if DEBUG then
 			if unitAttacked then
 				currentProjectile = unitAttacked:GetIncomingTrackingProjectiles()
 				for i=1,#currentProjectile do
-					if currentProjectile[i].caster == garyhUnit then
-						currentProjectile = currentProjectile[i]
-						break;
+					if currentProjectile[i] then
+						if currentProjectile[i].caster == garyhUnit then
+							currentProjectile = currentProjectile[i]
+							break;
+						end
 					end
 					if i == #currentProjectile then currentProjectile = nil end
 				end

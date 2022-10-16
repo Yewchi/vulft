@@ -245,7 +245,7 @@ blueprint = {
 						-- only avoid while waiting for incoming defenders unless soon destroyed
 						for i=1,TEAM_NUMBER_OF_PLAYERS do
 							local thisPlayer = t_team_players[i]
-							if WP_CommitIsCommit(gsiPlayer, wpForBotTask)
+							if WP_CommitIsCommit(thisPlayer, wpForBotTask)
 									and (Vector_UnitFacingUnit(thisPlayer, wpObjective) 
 											or Unit_GetHealthPercent(thisPlayer) > 0.7
 									) and Vector_PointDistance(
