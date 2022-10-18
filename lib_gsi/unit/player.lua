@@ -47,32 +47,51 @@ end
 
 local function handle_player_spell_or_item_cast(castInfo, abc)
 -- NB. CANNOT enter code with GetBot() calls -- Callback triggers presumably make their Lua hook directly without stepping into per-bot code.
+	
+	
 	local thisPlayer = GSI_GetPlayerFromPlayerID(castInfo.player_id)
+	
 	local ability = castInfo.ability
+	
 	if thisPlayer.team == TEAM then
 		UseAbility_IndicateCastCompleted(castInfo)
+	
 	end
 	local abilityName = ability:GetName()
+	
 	if thisPlayer.illusionsUp then
 		if thisPlayer.shortName ~= "phantom_lancer" then
+		
 			thisPlayer.knownNonIllusionUnit = castInfo.unit -- knownNon will drop check Rand(1,6)%6 == 0, for fairness
+		
 		end
 	end
 	if ability:GetName() == "item_tpscroll" then
+		
 		if TEST then INFO_print(string.format("CAUGHT %s TELEPORT", thisPlayer.shortName)) end
 		Analytics_RegisterPortActivity(thisPlayer, castInfo)
+		
 		--Util_TablePrint(castInfo)
 	elseif ability:GetName():match("^item") then
+		
 		if thisPlayer.team == TEAM then
+			
 			Consumable_CheckConsumableUse(thisPlayer, ability)
+			
 		else
+			
 			Item_UpdateKnownCooldown(thisPlayer, ability)
+			
 		end
 	else
+		
 		--Util_TablePrint(castInfo)
 		if VERBOSE then print(castInfo.unit and castInfo.unit:GetUnitName(), castInfo.location and castInfo.location.x or castInfo.location.GetUnitName) end
+		
 		AbilityLogic_InformAbilityCast(thisPlayer, ability)
+		
 	end
+	
 end
 
 local function update_allied_hero_game_data(gsiPlayer)

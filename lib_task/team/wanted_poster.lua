@@ -173,7 +173,10 @@ function WP_Initialize()
 end
 
 function WP_BurnPoster(wpHandle)
-	--print("WP - Burning", wpHandle[POSTER_I__TYPE], wpHandle[POSTER_I__OBJECTIVE].name)
+	
+	
+	
+	
 	local taskHandle = wpHandle[POSTER_I__TASK_HANDLE]
 	for i=1,TEAM_NUMBER_OF_PLAYERS do
 		if t_player_task_wanted_poster[i][taskHandle] == wpHandle then -- don't remove posters for other runes etc.
@@ -300,8 +303,10 @@ function WP_InformDead(gsiPlayer)
 			thisPreCommitTypes[pnot] = commitType
 			t_player_task_wanted_poster[pnot][thisPoster[POSTER_I__TASK_HANDLE]] = false
 
-			WP_AllocateToHighestScores(thisPoster) -- triggered by old data, needs updated data, not to be overwritten
-			thisPoster[POSTER_I__LAST_ALLOCATE] = GameTime()
+			if thisPoster[POSTER_I__CHECK_INS] == TEAM_NUMBER_OF_PLAYERS then
+				WP_AllocateToHighestScores(thisPoster) -- triggered by old data, needs updated data, not to be overwritten
+				thisPoster[POSTER_I__LAST_ALLOCATE] = GameTime()
+			end
 		else
 			thisCommitTypes[pnot] = commitType -- see above and if
 			thisPreCommitTypes[pnot] = commitType

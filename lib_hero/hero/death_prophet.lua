@@ -41,6 +41,7 @@ local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
 local NEARBY_OUTER = Set_GetEnemyHeroesInPlayerRadiusAndOuter
 local NEARBY_ENEMY = Set_GetEnemyHeroesInPlayerRadius
 local HIGH_USE = AbilityLogic_HighUseAllowOffensive
+local HIGH_USE_SAFE = AbilityLogic_HighUseAllowSafe
 local SPELL_SUCCESS = AbilityLogic_CastOnTargetWillSucceed
 local max = math.max
 local min = math.min
@@ -207,14 +208,10 @@ d = {
 					end
 				end
 			end
-			print("dp cs push", currentTask, HIGH_USE(gsiPlayer, cryptSwarm,
-							0 or max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
-							1-playerHpp
-						))
 			if (currentTask == push_handle or currentTask == zonedef_handle)
-					and HIGH_USE(gsiPlayer, cryptSwarm,
-							0 or max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
-							1-playerHpp
+					and HIGH_USE_SAFE(gsiPlayer, cryptSwarm,
+							highUse*2, --max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
+							2.25+Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 						) then
 				local nearbyEnemyCreepSet = Set_GetNearestEnemyCreepSetToLocation(playerLoc)
 				if nearbyEnemyCreepSet and nearbyEnemyCreepSet.units[1] then

@@ -36,6 +36,7 @@ local currentTask = Task_GetCurrentTaskHandle
 local HIGH_USE = AbilityLogic_HighUseAllowOffensive
 local FOUNTAIN_LOC = Map_GetTeamFountainLocation()
 local SPELL_SUCCESS = AbilityLogic_CastOnTargetWillSucceed
+local PUNIT_NULLED = pUnit_IsNullOrDead
 
 local fight_harass_handle = FightHarass_GetTaskHandle()
 local push_handle = Push_GetTaskHandle()
@@ -86,8 +87,7 @@ local d = {
 					ABILITY_USE_RANGE, false
 				)
 		local fightHarassTarget = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
-		local fhtReal = fightHarassTarget
-				and fightHarassTarget.hUnit.IsNull and not fightHarassTarget.hUnit:IsNull()
+		local fhtReal = fightHarassTarget and not PUNIT_NULLED(fightHarassTarget)
 		local fhtPercHp = fightHarassTarget
 				and fightHarassTarget.lastSeenHealth / fightHarassTarget.maxHealth or 1.0
 		local fhtMagicRes = fhtReal
@@ -147,7 +147,7 @@ local d = {
 			end
 			if AbilityLogic_AbilityCanBeCast(gsiPlayer, storm)
 					and (
-							(fhtReal and fightHarassTarget.hUnit:IsStunned() or fightHarassTarget.hUnit:IsRooted())
+							(fhtReal and (fightHarassTarget.hUnit:IsStunned() or fightHarassTarget.hUnit:IsRooted()))
 						or
 							HIGH_USE(gsiPlayer, storm, highUse - storm:GetManaCost()*crowdedRating, fhtPercHp)
 					) and Vector_PointDistance(gsiPlayer.lastSeen.location, crowdingCenter) < 200 then

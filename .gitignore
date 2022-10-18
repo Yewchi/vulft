@@ -6,6 +6,9 @@
 *.dat
 *.exe
 *.o
+*.sh
+*.bat
+*.exe
 *build/
 *test/
 *guides*

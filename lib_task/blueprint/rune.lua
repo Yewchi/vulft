@@ -151,6 +151,12 @@ function abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpHandle)
 	local t_team_members = t_team_members
 	local closestDist = 0xFFFF
 	local closestPlayer
+	
+	
+	
+	--[[DEB]]	DEBUG_KILLSWITCH = true
+	
+	
 	local thisRune = RUNE_LOCATIONS[wpHandle[POSTER_I.OBJECTIVE].runeHandle+1]
 	if thisRune[RUNE_I__CLOSEST_SAFE_HERO] then
 		safeHero = thisRune[RUNE_I__CLOSEST_SAFE_HERO]
@@ -743,6 +749,7 @@ blueprint = {
 				-- a late-game death is game-losing, and it shouldn't be given over a known as contested or suspected as contested bounty rune. this is not represented. TODO
 				WP_BurnPoster(wpForBotTask)	
 				if TEST then print(string.format("%s burns poster because %.2f > %.2f || (%s ? %d : NULL == %d && %s)", gsiPlayer.shortName, GameTime(), player_pick_up_time_limit[pnot], runeAreaVisible, GetRuneStatus(objective.runeHandle), RUNE_STATUS_MISSING, notPreSpawnPeriod)) end
+				thisRune[RUNE_I__WANTED_POSTER] = nil
 				thisRune[RUNE_I__PRESUMED_UNOBTAINABLE] = true
 				gsiPlayer.hUnit:ActionImmediate_Ping(wpObjective.lastSeen.location.x, wpObjective.lastSeen.location.y, false)
 				player_pick_up_time_limit[pnot] = 0xFFFF

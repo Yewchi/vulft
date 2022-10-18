@@ -803,13 +803,29 @@ function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
 	end
 end
 
--- "high use", meaning, the full use of ones mana before death, and in order to secure kills. The situational volatility.
+-- TODO NOTE THAT THE USE OF INVERSE HEALTH PERCENT IN HIGHUSE IS VERY DEGENERATE.
+-- -- IT DOES NOT HELP ANYTHING EXCEPT FOR ENEMIES THAT TAKE PERCENT REMAINING HEALTH
+-- -- DAMAGE. NEED TO RESOLVE IN HERO FILES WHERE THIS INSANITY WAS USED AS LAX SAFETY
+-- -- IT ALSO IGNORES THE MEANING OF THE TERM, BY MAKING THE BOT USE ABILITIES WHEN
+-- -- IT IS ALREADY SAFE ACCORDING TO THE SINGLE METRIC OF HEALTH. THEY MAY DRAIN
+-- -- TO ZERO MANA BECAUSE OF THE ARITHMETIC WAS EXPECTING HUGE GOLD CHANGES FOR VERY
+-- -- LOW HEALTH PERCENTAGE USES
+-- "high use", meaning, the full use of ones mana before death, and in order to secure
+-- - kills. The situational volatility.
 function AbilityLogic_HighUseAllowOffensive(gsiPlayer, hAbility, highUseMana, enemyHealthPercent)
 	--[DEBUG]]]print(gsiPlayer.lastSeenMana - hAbility:GetManaCost(), "highuse>>", (enemyHealthPercent > 0.57 and highUseMana*1.5 or highUseMana*max(0, enemyHealthPercent-0.35)*6.67))
 	--[DEBUG]]]print("health percent is min(", enemyHealthPercent, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth + 0.15)
 	enemyHealthPercent = min(enemyHealthPercent, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth + 0.15)
 	-- TODO the reason I used +0.15 player health was to mitigate just having a bad lane and like, waiting for regen on courier. But the truth is that the value to inform unloading all your mana would be an evaluation of how likely you are to die soon in the future.
-	return gsiPlayer.lastSeenMana - hAbility:GetManaCost() > (enemyHealthPercent > 0.57 and highUseMana*1.5 or highUseMana*max(0, enemyHealthPercent-0.35)*6.67)
+	return gsiPlayer.lastSeenMana - hAbility:GetManaCost()
+			> ( enemyHealthPercent > 0.57 and highUseMana*1.5
+				or highUseMana*max(0, enemyHealthPercent-0.35)*6.67 )
+end
+
+-- See above "high use" def.
+function AbilityLogic_HighUseAllowSafe(gsiPlayer, hAbility, highUseMana, safety)
+	return gsiPlayer.lastSeenMana - hAbility:GetManaCost()
+			> ( safety > 0.57 and highUseMana*1.5 or highUseMana*max(0, safety-0.35)*6.67 )
 end
 
 function AbilityLogic_LoadAbilityToPlayer(gsiPlayer, abilityData)

@@ -903,7 +903,8 @@ blueprint = {
 						)
 				)
 		end
-		if currentlyCasting == itemToUse then
+		if (itemToUse and currentlyCasting == itemToUse) or itemToUse:IsNull() then
+			-- TODO Doesn't '(bool and bool)' above break channels? Why would I do this.
 			return xetaScore
 		end
 		itemToUse = gsiPlayer.hUnit:GetItemInSlot(gsiPlayer.hUnit:FindItemSlot(itemToUse:GetName()))
@@ -971,10 +972,11 @@ blueprint = {
 			-- TODO NB. no inventory switching if not in main inventory
 			local itemSlot = hUnit:FindItemSlot(itemName)
 			if thisItem and itemSlot >= 0 and itemSlot <= ITEM_END_BACKPACK_INDEX then
+				thisItem = hUnit:GetItemInSlot(itemSlot)
 				local thisScoreFunc = T_ITEM_FUNCS[itemName]
 				thisScoreFunc = thisScoreFunc and thisScoreFunc[ITEM_FUNCS_I__SCORE_FUNC]
 				--print(thisScoreFunc)
-				if thisScoreFunc then
+				if thisItem and thisScoreFunc then
 					local thisTarget, thisScore
 							= thisScoreFunc(gsiPlayer, thisItem, nearbyEnemies, nearbyAllies)
 					--print(thisTarget and thisTarget.shortName or thisTarget, thisScore)

@@ -119,7 +119,7 @@ d = {
 				local inRangeLowest
 				local inRangeLowestHpp = 1.1
 				for i=1,#nearbyEnemies do
-					local thisEnemy = nearbyEnemies[1]
+					local thisEnemy = nearbyEnemies[i]
 					local thisHpp = thisEnemy.lastSeenHealth / thisEnemy.maxHealth
 					if VEC_POINT_DISTANCE(playerLoc, thisEnemy.lastSeen.location)
 									< brainSapCastRange

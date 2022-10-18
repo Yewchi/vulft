@@ -258,12 +258,20 @@ blueprint = {
 						nearestTower.lastSeen.location, nearestTower.attackRange + 200
 					) then
 				if VERBOSE then print("returning last push") end
+
+				-- Avoid attacking enemy creeps when you're standing next to enemy heroes
+				local _, _, potentialDpsToMeIsBad = FightClimate_ImmediatelyExposedToAttack(gsiPlayer)
+				potentialDpsToMeIsBad = potentialDpsToMeIsBad
+							* Unit_GetArmorPhysicalFactor(gsiPlayer)
+							/ (gsiPlayer.lastSeenHealth*0.01) -- "30 points per dps per 10th of health = 0.01"
+
 				return arbitraryUnit,
 						min(gsiPlayer.level*2,
 								-40*(theoreticalDanger)
 							)
 						- Xeta_CostOfTravelToLocation(gsiPlayer, enemy.center)
 						+ underAttack + finishAttack + attackStraysScore
+						- potentialDpsToMeIsBad
 			end
 		end
 		return false, XETA_SCORE_DO_NOT_RUN

@@ -158,7 +158,7 @@ blueprint = {
 					)
 				moveSafe = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveSafe, SET_CREEP_ENEMY, 800)
 	if abs(moveSafe.x) > 9000 or abs(moveSafe.y) > 9000 or abs(moveSafe.z) > 9000 then
-		printf("BIG DIST") debug.traceback();
+		WARN_print(string.format("[fight_harass] BIG DIST: %s", debug.traceback()));
 	end
 				hPlayer:Action_MoveToLocation(moveSafe)
 				if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveSafe, 80, 255, 180) end
@@ -375,7 +375,7 @@ blueprint = {
 			for iIntent=1,numFriendlyIntent do
 				if friendly_intents[iIntent] == thisEnemy then
 					thisHarassableRating = thisHarassableRating + 15
-					if DEBUG then DebugDrawText(200+iIntent*8, (TEAM_IS_RADIANT and 760 or 860)+gsiPlayer.nOnTeam*8, "o", 255, 255, 255) end
+					if DEBUG then DebugDrawText(220+iIntent*8, (TEAM_IS_RADIANT and 610 or 710)+gsiPlayer.nOnTeam*8, "*", 255, 255, 255) end
 				end
 			end
 		--	if not underAttack then

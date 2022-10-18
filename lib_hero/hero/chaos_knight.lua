@@ -88,8 +88,6 @@ local d = {
 		local playerLoc = gsiPlayer.lastSeen.location
 		local playerHpp = HEALTH_PERCENT(gsiPlayer)
 
-		Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 300, 1)
-
 		local distToFht = fht and VEC_POINT_DISTANCE(playerLoc, fhtLoc)
 
 		local nearbyEnemies, outerEnemies = NEARBY_OUTER(playerLoc, rift:GetCastRange(), 1200, 2)

@@ -127,7 +127,7 @@ local err_check = 0
 
 
 function Captain_CaptainThink()	
-	--[[TESTTRUE]]if DEBUG then
+	if 1 then
 		if err_check == 1 then err_count = err_count + 1 end err_check = 1 if err_count > 0 then DebugDrawText(140, 30, string.format("%d", err_count), 150, 0, 0) end
 	end
 	if job_domain_gsi.active then
@@ -215,7 +215,7 @@ function Captain_CaptainThink()
 	AbilityThink_RotateAbilityThinkSetRun()
 	
 	Task_TryDecrementIncentives()
-	--[[TESTTRUE]]if DEBUG then
+	if 1 then
 		err_check = 0
 	end
 	generic_microthink()

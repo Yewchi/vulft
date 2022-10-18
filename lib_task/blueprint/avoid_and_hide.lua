@@ -57,7 +57,7 @@ Blueprint_RegisterTask(task_init_func)
 
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore, forceRun)
-		local nearbyFriendlyTower, distanceToTower = Set_GetNearestTeamTowerToPlayer(TEAM, gsiPlayer)
+		local nearbyFriendlyTower, distanceToTower = Set_GetNearestTeamTowerToPlayer(TEAM, gsiPlayer) -- nb. "nearby" because "nearest" betrays a potential switch to higher tier
 		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1750, 8)
 		local theorizedDanger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 		
@@ -71,14 +71,17 @@ blueprint = {
 		if nearbyFriendlyTower then	
 			local nearbyTowerLoc = nearbyFriendlyTower.lastSeen.location
 			local nearestEnemy, distToEnemyHero = Set_GetNearestEnemyHeroToLocation(gsiPlayer.lastSeen.location, 9) -- TODO Redundantly checking full hero list
+			local enemiesCenter = nearestEnemy and Set_GetCrowdedRatingToSetTypeAtLocation(nearestEnemy.lastSeen.location, SET_HERO_ENEMY)
 			local healthDiffOutnumbered = FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
 			local higherTierTower = GSI_GetHigherTierTower(nearbyFriendlyTower)
 			if higherTierTower == nil then print("/VUL-FT/ <DEBUG> No higher tier!!!! --", nearbyFriendlyTower.team, nearbyFriendlyTower.lane, nearbyFriendlyTower.tier, bUnit_IsNullOrDead(nearbyFriendlyTower)) higherTierTower = GSI_GetTeamFountainUnit(TEAM) end
 			local enemyDistanceToNearbyTower = nearestEnemy
-					and Math_PointToPointDistance2D(nearbyFriendlyTower.lastSeen.location,
-							nearestEnemy.lastSeen.location
+					and Math_PointToPointDistance2D(
+							nearbyFriendlyTower.lastSeen.location,
+							enemiesCenter
 						)
 					or 0xFFFF
+
 			--[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(250, 800, string.format("%.1f;%d;%d", healthDiffOutnumbered, enemyDistanceToNearbyTower, distanceToTower), 255, 255, 0) end
 			-- If the tower will not help us considerably in a fight, and the enemy is nearby it || closer to it then us, and there are no enemies from us to the higher tier tower, then retreat to a higher tier tower. (Walking past an enemy closer to a backwards-retreatable T1 will flip it from T2 to T1, usually seemlessly)
 			local directionalToHigherTier = Vector_UnitDirectionalPointToPoint(gsiPlayer.lastSeen.location, higherTierTower.lastSeen.location)
@@ -93,7 +96,8 @@ blueprint = {
 				nearbyTowerLoc = nearbyFriendlyTower.lastSeen.location
 				distanceToTower = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, nearbyFriendlyTower.lastSeen.location)
 			end
-			local avoidedLocation = nearestEnemy and nearestEnemy.lastSeen.location or enemy_fountain_loc
+			-- TODO nearestEnemy change to crowded needs test
+			local avoidedLocation = enemiesCenter or enemy_fountain_loc
 			local behindTowerFromEnemy = Vector_Addition(
 					nearbyTowerLoc,
 					Vector_ScalarMultiply2D(

@@ -150,8 +150,10 @@ d = {
 									difficultyLimit
 								)
 							--DebugDrawLine(playerLoc, spawnerLoc, 255, 255, 255)
-							playerHUnit:Action_MoveDirectly(spawnerLoc)
 							--print("diffic", difficultyLimit, spawnerLoc, playerLoc, creeps, creeps[1])
+							if spawnerLoc then
+								playerHUnit:Action_MoveDirectly(spawnerLoc)
+							end
 							if not spawnerLoc or VEC_POINT_DISTANCE(playerLoc, spawnerLoc) > 2000 then
 								local nearbyCreeps = playerHUnit:GetNearbyNeutralCreeps(600)
 								for i=1,#nearbyCreeps do

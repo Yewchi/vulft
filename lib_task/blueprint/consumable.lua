@@ -157,7 +157,7 @@ function Consumable_IsBotEagerToMakeSpace(gsiPlayer)
 end
 
 function Consumable_CheckConsumableUse(gsiPlayer, ability)
-	if DEBUG then print(gsiPlayer.shortName, "saw ability in CheckConsumaleUse", ability:GetName()) end
+	if DEBUG then print(gsiPlayer.shortName, "saw ability in CheckConsumableUse", ability:GetName()) end
 	if ability:GetName() == "item_flask" then
 		Task_IncentiviseTask(gsiPlayer, LeechExperience_GetTaskHandle(), 70, 8)
 	elseif ability:GetName() == "item_clarity" then

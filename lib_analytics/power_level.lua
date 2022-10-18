@@ -84,7 +84,7 @@ function Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies, location)
 	local playerPower = GetPowerLevel(gsiPlayer)
 	local knownEngageables, theorizedEngageables, theorizedDangerAmount
 			= Analytics_GetKnownTheorizedEngageables(gsiPlayer, location) -- TIMEDATA known/theorizedEngables set
-	theorizedDangerAmount = theorizedDangerAmount * playerPower -- Reverse the mimic to true score
+	theorizedDangerAmount = theorizedDangerAmount * playerPower -- Reverse the mimic score to raw power of enemies
 	if DEBUG and DEBUG_IsBotTheIntern() then
 		print("THEORETICAL DANGER CHECK", theorizedDangerAmount)
 	end

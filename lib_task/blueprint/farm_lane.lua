@@ -270,7 +270,8 @@ blueprint_farm_lane = {
 					)
 				)
 			if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(950, 524, "attaViableWalkAway", 255, 0, 0) end
-			Positioning_ZSMoveCasual(gsiPlayer, moveTo, 120*(damageTaken / gsiPlayer.lastSeenHealth) / Unit_GetHealthPercent(gsiPlayer)^3, towerDist < 1400 and maxActionDist or nil)
+			-- TODO Test set 1300 range tower dist
+			Positioning_ZSMoveCasual(gsiPlayer, moveTo, 120*(damageTaken / gsiPlayer.lastSeenHealth) / Unit_GetHealthPercent(gsiPlayer)^3, towerDist < 1400 and 1300 or nil)
 		else
 			-- if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1500, 800, string.format("%f", timeTillStartAttack), 255, 255, 0) end
 			local nearFutureHealth = Analytics_GetNearFutureHealthPercent(objective)

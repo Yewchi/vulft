@@ -360,6 +360,7 @@ function Task_HighestPriorityTaskScoringContinue(gsiPlayer)
 		-- print(gsiPlayer.shortName, "initializing on", taskScoringHighest[TASK_I__OBJECTIVE])
 		local initializationSuccessOrScore = taskScoringHighest[TASK_I__INIT_FUNC](gsiPlayer, taskScoringHighest[TASK_I__OBJECTIVE], taskScoringHighest[TASK_I__SCORE])
 		if initializationSuccessOrScore == false then -- Task init failed
+			
 			handle_failed_initialize(gsiPlayer, taskScoringHighest)
 		else -- Task init success
 			if DEBUG and DEBUG_IsBotTheIntern() then print(gsiPlayer.shortName, "score switch", taskScoringHighest[TASK_I__SCORE], taskScoringHighest[TASK_I__HANDLE], ">", prevCurrentScore, prevCurrent[TASK_I__HANDLE]) end

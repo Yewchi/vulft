@@ -121,7 +121,6 @@ function ZoneDefend_TakeCreepAggroTowerToHeroDownLane(gsiPlayer, objective)
 		local pullUnit = Set_GetSetUnitNearestToLocation(gsiPlayer.lastSeen.location, enemyCreeps)
 		if pullUnit then
 			
-			DebugDrawText(700, 300, string.format("%s pulls creeps off tower.", gsiPlayer.shortName), 255, 255, 255)
 			gsiPlayer.hUnit:Action_AttackUnit(pullUnit.hUnit, true)
 			return true
 		end
@@ -188,6 +187,8 @@ blueprint = {
 		end
 		local wpObjective = wpForBotTask and wpForBotTask[POSTER_I.OBJECTIVE]
 		local fightIncentive = -Analytics_GetTheoreticalDangerAmount(gsiPlayer, nil, objective.lastSeen.location)*20
+		-- TODO zone_defend needs to be 2nd highest to ensure graceful flip, and same activity type
+		-- -- better solution is probably a strong hook to FH.run().
 		Task_IncentiviseTask(gsiPlayer, fight_harass_handle, fightIncentive, fightIncentive/10)
 		local distToObjective = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, objective.lastSeen.location) 
 		
@@ -245,22 +246,27 @@ blueprint = {
 						-- only avoid while waiting for incoming defenders unless soon destroyed
 						for i=1,TEAM_NUMBER_OF_PLAYERS do
 							local thisPlayer = t_team_players[i]
-							if WP_CommitIsCommit(gsiPlayer, wpForBotTask)
+							if WP_CommitIsCommit(thisPlayer, wpForBotTask)
 									and (Vector_UnitFacingUnit(thisPlayer, wpObjective) 
 											or Unit_GetHealthPercent(thisPlayer) > 0.7
 									) and Vector_PointDistance(
 											thisPlayer.lastSeen.location,
 											wpObjective.lastSeen.location
-										) < 1600 + 4000 * towerHpp then
+										) > 1600 + 4000 * towerHpp then
 								if DEBUG then
 									DebugDrawText(1300, 100+gsiPlayer.nOnTeam*10, 
-											string.format("%5s-wait:%5s for def", gsiPlayer.shortName,
-													thisPlayer.shortName
+											string.format("%5s-wait:%5s for def %.0f", gsiPlayer.shortName,
+													thisPlayer.shortName,
+													Vector_PointDistance(
+															thisPlayer.lastSeen.location,
+															wpObjective.lastSeen.location
+														)
 												),
 											255, 255, 255
 										)
 								end
 								Blueprint_RegisterCustomActivityType(gsiPlayer, ACTIVITY_TYPE.CAREFUL)
+								-- TODO refac Dawdle_Run(gsiPlayer, objv, score, avoidEnemyVal)??
 								avoid_hide_run(gsiPlayer, gsiPlayer, avoidHideScore, true)
 								return xetaScore;
 							end
