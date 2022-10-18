@@ -27,8 +27,11 @@ WORKSHOP_RETURN_TO_LOCAL_DEV() {
 			
 			echo " -- Returning to pre-script copy -- "
 			rm -rf ../.bots.revertreleasable.d
+			sleep 1
 			mv -v ../.bots.recentreleasable.d ../.bots.revertreleasable.d
+			sleep 1
 			mv -v ../bots ../.bots.recentreleasable.d
+			sleep 1
 			mv -v ../.bots.recentstaged.d ../bots
 		else
 			# FAILED
@@ -38,11 +41,14 @@ WORKSHOP_RETURN_TO_LOCAL_DEV() {
 				if [[ $do_delete =~ ^[Yy] ]]; then
 					echo "deleting ../.bots.recentfailedstaged.d"
 					rm -rf ../.bots.recentfailedstaged.d
+					sleep 1
 					mv -v ../bots ../.bots.recentfailedstaged.d
+					sleep 1
 					mv -v ../.bots.recentstaged.d ../bots
 				fi
 			else
 				mv -v ../bots ../.bots.recentfailedstaged.d
+				sleep 1
 				mv -v ../.bots.recentstaged.d ../bots
 			fi
 		fi

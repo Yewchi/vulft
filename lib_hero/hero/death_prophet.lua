@@ -207,13 +207,24 @@ d = {
 					end
 				end
 			end
-			print("dp cs push", currentTask, HIGH_USE(gsiPlayer, cryptSwarm,
-							0 or max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
+		--	print("dp cs push", currentTask, HIGH_USE(gsiPlayer, cryptSwarm,
+		--					0 or max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
+		--					1-playerHpp
+		--				))
+			print("[death_prophet] dp high use for push crypt", push_handle, highUse)
+			local i = 1
+			while(i < 100) do
+				if not HIGH_USE(gsiPlayer, cryptSwarm,
+							highUse*i, --max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
 							1-playerHpp
-						))
+						) then
+					print("[death_prophet] Stops allowing at", i)
+				end
+				i = i + 1
+			end
 			if (currentTask == push_handle or currentTask == zonedef_handle)
 					and HIGH_USE(gsiPlayer, cryptSwarm,
-							0 or max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
+							highUse*2, --max(highUse, highUse*(2-Analytics_GetTheoreticalDangerAmount(gsiPlayer)*0.5)),
 							1-playerHpp
 						) then
 				local nearbyEnemyCreepSet = Set_GetNearestEnemyCreepSetToLocation(playerLoc)

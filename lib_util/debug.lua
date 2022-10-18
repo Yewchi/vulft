@@ -7,7 +7,7 @@ if DEBUG then
 	
 	ARC_DISABLE_FRAMES = 0
 
-	DEBUG_SHORTNAME = "lich"
+	DEBUG_SHORTNAME = "chaos_knight"
 	
 	MAP_COORDS_TO_SCREEN_SCALE = 0.08
 	MAP_COORDS_TO_MINIMAP_SCALE = 0.015
@@ -61,10 +61,10 @@ if DEBUG then
 	function VEBUG_PlayerFrameProgressBar(pnot, progress, offsetx, offsety)
 		offsety = (offsety or 230) + (pnot-1)*10
 		if TEAM_IS_RADIANT then
-			offsetx = (offetx or 300) + 8 + progress
+			offsetx = (offsetx or 300) + 8 + progress
 			DebugDrawText(offsetx, offsety, progress < 100 and "|" or "|]", 100, 255, 100)
 		else
-			offsetx = (offetx or 430) + 8 + progress
+			offsetx = (offsetx or 430) + 8 + progress
 			DebugDrawText(offsetx, offsety, progress < 100 and "|" or "|]", 255, 100, 100)
 		end
 	end

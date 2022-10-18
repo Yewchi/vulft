@@ -173,7 +173,10 @@ function WP_Initialize()
 end
 
 function WP_BurnPoster(wpHandle)
-	--print("WP - Burning", wpHandle[POSTER_I__TYPE], wpHandle[POSTER_I__OBJECTIVE].name)
+	--[[DEV]]if VERBOSE then
+	--[[DEV]]	INFO_print(string.format("[wp] Burns type %d. %s", wpHandle[POSTER_I__TYPE] or -0, Util_Printable(wpHandle[POSTER_I__OBJECTIVE])))
+	--[[DEV]]	INFO_print(debug.traceback())
+	--[[DEV]]end
 	local taskHandle = wpHandle[POSTER_I__TASK_HANDLE]
 	for i=1,TEAM_NUMBER_OF_PLAYERS do
 		if t_player_task_wanted_poster[i][taskHandle] == wpHandle then -- don't remove posters for other runes etc.

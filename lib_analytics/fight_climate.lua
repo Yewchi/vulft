@@ -183,6 +183,30 @@ function FightClimate_RegisterAnalyticsJobDomainToFightClimate(gsiDomain)
 
 end
 
+function FightClimate_ImmediatelyExposedToAttack(gsiAllied, enemyHeroes)
+	local exposedCount = 0
+	local playerLoc = gsiAllied.lastSeen.location
+
+	enemyHeroes = enemyHeroes or Set_GetEnemyHeroesInPlayerRadius(gsiAllied, 1500, 10)
+	local tblNum = #enemyHeroes
+	local i = 1
+	while(i <= tblNum) do
+		local thisEnemy = enemyHeroes[i]
+		if thisEnemy.attackRange + min(200, thisEnemy.attackRange*0.25)
+				> Vector_PointDistance2D(playerLoc, thisEnemy.lastSeen.location) then
+			exposedCount = exposedCount + 1
+			i = i + 1
+		else
+			enemyHeroes[i] = enemyHeroes[tblNum]
+			tblNum = tblNum - 1
+		end
+	end
+	if tblNum > 0 then
+		return true, tblNum, select(2, GSI_GetTotalDpsOfUnits(enemyHeroes))
+	end
+	return false, 0, 0
+end
+
 function FightClimate_GetBestInterruptTarget(gsiCasting, hCast, peircesMagicImmune, forceCast, gsiPlayerTbl)
 --	will remove the required interrupt or stun on find. Upper code is expected to be 'found' -> 'cast'.
 --	if heroes fail to cast the spell due to being disabled they 'should' re-register the response themselves
