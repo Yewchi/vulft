@@ -303,8 +303,10 @@ function WP_InformDead(gsiPlayer)
 			thisPreCommitTypes[pnot] = commitType
 			t_player_task_wanted_poster[pnot][thisPoster[POSTER_I__TASK_HANDLE]] = false
 
-			WP_AllocateToHighestScores(thisPoster) -- triggered by old data, needs updated data, not to be overwritten
-			thisPoster[POSTER_I__LAST_ALLOCATE] = GameTime()
+			if thisPoster[POSTER_I__CHECK_INS] == TEAM_NUMBER_OF_PLAYERS then
+				WP_AllocateToHighestScores(thisPoster) -- triggered by old data, needs updated data, not to be overwritten
+				thisPoster[POSTER_I__LAST_ALLOCATE] = GameTime()
+			end
 		else
 			thisCommitTypes[pnot] = commitType -- see above and if
 			thisPreCommitTypes[pnot] = commitType

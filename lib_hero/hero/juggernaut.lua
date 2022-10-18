@@ -39,7 +39,7 @@ local HEALING_WARD_DURATION = 25
 
 local d = {
 	["ReponseNeeds"] = function()
-		FightClimate_RegAvoidHeroReponse(R.RESPONSE_TYPE_AVOID_CASTER
+		FightClimate_RegAvoidHeroReponse(R.RESPONSE_TYPE_AVOID_CASTER,
 				nil,
 				"juggernaught", "juggernaught_blade_fury",
 				BLADE_FURY_DURATION, BLADE_FURY_RADIUS, 0.3,

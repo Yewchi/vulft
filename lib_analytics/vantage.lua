@@ -338,7 +338,8 @@ function VAN_InformDefensibleFell(gsiBuilding)
 					gsiBuilding and gsiBuilding.isTower and 'y' or 'n'
 				)
 			)
-	if gsiBuilding and gsiBuilding.isShrine then
+	if (gsiBuilding and gsiBuilding.isShrine)
+			or not (t_ward_loc_reserved[1] or t_ward_loc[1]) then
 		return;
 	end
 	local radiantBoundPoints = {}

@@ -120,8 +120,7 @@ function ZoneDefend_TakeCreepAggroTowerToHeroDownLane(gsiPlayer, objective)
 			) and distToSet < gsiPlayer.attackRange + (-currDanger*300) then
 		local pullUnit = Set_GetSetUnitNearestToLocation(gsiPlayer.lastSeen.location, enemyCreeps)
 		if pullUnit then
-			
-			DebugDrawText(700, 300, string.format("%s pulls creeps off tower.", gsiPlayer.shortName), 255, 255, 255)
+			--[[DEV]]if DEBUG then DebugDrawText(700, 300, string.format("%s pulls creeps off tower.", gsiPlayer.shortName), 255, 255, 255) end
 			gsiPlayer.hUnit:Action_AttackUnit(pullUnit.hUnit, true)
 			return true
 		end

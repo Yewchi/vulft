@@ -903,8 +903,8 @@ blueprint = {
 						)
 				)
 		end
-		if itemToUse and currentlyCasting == itemToUse then
-			-- TODO Doesn't this break channels? Why would I do this.
+		if (itemToUse and currentlyCasting == itemToUse) or itemToUse:IsNull() then
+			-- TODO Doesn't '(bool and bool)' above break channels? Why would I do this.
 			return xetaScore
 		end
 		itemToUse = gsiPlayer.hUnit:GetItemInSlot(gsiPlayer.hUnit:FindItemSlot(itemToUse:GetName()))

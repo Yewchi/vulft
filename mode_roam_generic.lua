@@ -2,6 +2,7 @@ require(GetScriptDirectory().."/lib_math/vector")
 require(GetScriptDirectory().."/partial_full_handover")
 
 local DEBUG_KILLSWITCH_ALERT = false
+local DEBUG_KILLSWITCH = false
 local FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST = 150
 function Think() --[[annoying in the early game] print("RUNNING ROAM")--]] end
 function GetDesire()

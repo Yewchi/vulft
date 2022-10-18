@@ -182,6 +182,28 @@ if [[ $1 == "--WORKSHOP" ]] || [[ $1 == "--WS" ]]; then
 	REMOVE_DEV_LUA_LINES
 	OKAY
 
+	CHECK="upgrade minor VERSION from recent"
+	START_CHECK
+	VERSION_LINE=$(grep -w "VERSION = " $VULFT_RELEASE_DIR/lib_util/util.lua)
+	VERSION_FULL=$(echo "$VERSION_LINE" | sed -r 's/[^0-9]*([0-9]*)\.([0-9]*).*/\1\.\2/g')
+	MAJOR_VERSION=$(echo "$VERSION_FULL" | sed -r 's/\.[0-9]*$//g')
+	MINOR_VERSION=$(echo "$VERSION_FULL" | sed -r 's/^[0-9]*\.//g')
+	read -p "Found '$VERSION_LINE' '$VERSION_FULL', MAJOR '$MAJOR_VERSION' MINOR '$MINOR_VERSION'. Upgrade MINOR?" reply
+	if [[ $reply =~ ^[Yy] ]]; then
+		MINOR_VERSION=$(($MINOR_VERSION+1))
+	fi
+	VERSION_SET="v$MAJOR_VERSION.$MINOR_VERSION"
+
+	DATE=$(date -u +%y%m%d)
+
+	read -p "Ammend date? $VERSION_SET-$DATE" reply
+	if [[ $reply =~ ^[Yy] ]]; then
+		VERSION_SET="$VERSION_SET-$DATE"
+	fi
+	echo "Using VERSION = \"$VERSION_SET\""
+	sed -i -e "s/VERSION = \"v[0-9]*\.[0-9]*.*/VERSION = \"$VERSION_SET\"/g" $VULFT_RELEASE_DIR/lib_util/util.lua
+	OKAY
+
 	CHECK="bot reload succeeds"
 	START_CHECK
 	find $VULFT_RELEASE_DIR/ -type f -name "*.lua" | xargs sed -i -e 's/\-\-\[\[TESTTRUE\]\].*/if 1 then/g'

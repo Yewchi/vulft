@@ -10,7 +10,7 @@ VERBOSE = true and DEBUG
 TEST = true and DEBUG
 
 RELEASE_STAGE = "Alpha"
-VERSION = "v0.1"
+VERSION = "v0.2-221018"
 
 VULFT_VERSION = RELEASE_STAGE..(DEBUG and "-Dev" or "")..(TEST and "-Test" or "").." "..VERSION
 

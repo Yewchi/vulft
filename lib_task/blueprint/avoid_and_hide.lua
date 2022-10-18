@@ -71,7 +71,7 @@ blueprint = {
 		if nearbyFriendlyTower then	
 			local nearbyTowerLoc = nearbyFriendlyTower.lastSeen.location
 			local nearestEnemy, distToEnemyHero = Set_GetNearestEnemyHeroToLocation(gsiPlayer.lastSeen.location, 9) -- TODO Redundantly checking full hero list
-			local enemiesCenter = Set_GetCrowdedRatingToSetTypeAtLocation(nearestEnemy.lastSeen.location, SET_HERO_ENEMY)
+			local enemiesCenter = nearestEnemy and Set_GetCrowdedRatingToSetTypeAtLocation(nearestEnemy.lastSeen.location, SET_HERO_ENEMY)
 			local healthDiffOutnumbered = FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
 			local higherTierTower = GSI_GetHigherTierTower(nearbyFriendlyTower)
 			if higherTierTower == nil then print("/VUL-FT/ <DEBUG> No higher tier!!!! --", nearbyFriendlyTower.team, nearbyFriendlyTower.lane, nearbyFriendlyTower.tier, bUnit_IsNullOrDead(nearbyFriendlyTower)) higherTierTower = GSI_GetTeamFountainUnit(TEAM) end
