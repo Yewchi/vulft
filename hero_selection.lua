@@ -492,9 +492,6 @@ function Think()
 				end
 			else
 				turn_to_pick = turn_to_pick + 1
-				if turn_to_pick == 5 then
-					SelectHero(team_members[5], "npc_dota_hero_sand_king")
-				end
 			end
 		end
 	end
