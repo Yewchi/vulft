@@ -17,7 +17,7 @@ and copy the contents of that folder to the bots folder at
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
 -- Via Github: (updated by the creator)
-If you know how to use github you can manually download the bots from the official VUL-FT Github[github.com] and put them in
+If you know how to use github you can manually download the bots from the [url=https://github.com/Yewchi/vulft]official VUL-FT Github[/url] and put them in
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
 -- Running:
@@ -51,7 +51,7 @@ In addition. I promise this project's code is 100% functional offline and will s
 
 ==Error Report==
 Lua Error Dump (steam discussion link) -- Use this if you just want to quickly dump some console output.
-VUL-FT source code[github.com] -- Public github
+[url=https://github.com/Yewchi/vulft]VUL-FT source code[/url] -- Public github
 
 ==Not yet implemented==
 Player lane choices. The bots will currently calculate where they think you should go.
