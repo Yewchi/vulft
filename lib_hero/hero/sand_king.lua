@@ -1,10 +1,10 @@
 local hero_data = {
 	"sand_king",
-	{1, 2, 3, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 11},
+	{3, 1, 2, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_gauntlets","item_branches","item_branches","item_enchanted_mango","item_bracer","item_ring_of_health","item_vanguard","item_blink","item_boots","item_aghanims_shard","item_void_stone","item_pers","item_platemail","item_energy_booster","item_lotus_orb","item_gem","item_mystic_staff","item_platemail","item_shivas_guard","item_gem","item_ultimate_orb","item_pers",
+		"item_tango","item_gauntlets","item_branches","item_quelling_blade","item_flask","item_enchanted_mango","item_ring_of_health","item_soul_ring","item_boots","item_blink","item_wind_lace","item_staff_of_wizardry","item_pers","item_cyclone","item_aghanims_shard","item_crown","item_void_stone","item_meteor_hammer","item_black_king_bar","item_platemail","item_mystic_staff","item_shivas_guard","item_gem","item_gem","item_gem","item_sheepstick","item_overwhelming_blink",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
 		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.3s Burrowstrike Stun","+125 Sand Storm Radius","+100.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
 	}

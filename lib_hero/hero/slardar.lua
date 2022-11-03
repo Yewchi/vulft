@@ -1,8 +1,8 @@
 local hero_data = {
 	"slardar",
-	{3, 2, 3, 1, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 8, 5, 4, 10},
+	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_tango","item_branches","item_gauntlets","item_quelling_blade","item_circlet","item_branches","item_bracer","item_boots","item_gloves","item_belt_of_strength","item_power_treads","item_wind_lace","item_bracer","item_mask_of_madness","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_platemail","item_buckler","item_gem","item_assault","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_overwhelming_blink",
+		"item_quelling_blade","item_circlet","item_gauntlets","item_branches","item_branches","item_branches","item_tango","item_bracer","item_gloves","item_boots","item_power_treads","item_wind_lace","item_magic_wand","item_blink","item_buckler","item_ring_of_basilius","item_lifesteal","item_vladmir","item_wraith_pact","item_ogre_axe","item_black_king_bar","item_hyperstone","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar","item_hyperstone",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

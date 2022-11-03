@@ -1,10 +1,10 @@
 local hero_data = {
 	"treant",
-	{1, 2, 2, 1, 3, 4, 3, 3, 1, 1, 3, 4, 2, 2, 8, 5, 4, 9},
+	{1, 2, 2, 1, 1, 4, 1, 2, 3, 3, 3, 4, 5, 3, 8, 2, 4, 9, 11},
 	{
-		"item_magic_stick","item_orb_of_venom","item_tango","item_ward_dispenser","item_boots","item_magic_wand","item_aghanims_shard","item_ring_of_basilius","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_tranquil_boots","item_buckler","item_vladmir","item_point_booster","item_wraith_pact","item_wind_lace","item_glimmer_cape",
+		"item_boots","item_ward_observer","item_tango","item_ring_of_basilius","item_chainmail","item_phase_boots","item_falcon_blade","item_aghanims_shard","item_chainmail","item_blade_mail","item_platemail","item_void_stone","item_lotus_orb","item_void_stone","item_gem","item_ring_of_health","item_ring_of_health","item_gem","item_refresher",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Nature's Grasp","Leech Seed","Living Armor","Overgrowth","+2 Living Armor Heal Per Second","-5.0s Nature's Grasp Cooldown","+15% Leech Seed Movement Slow","+30 Nature's Grasp Damage","+8 Living Armor Bonus Armor","+40 Leech Seed Damage/Heal","Overgrowth Undispellable","450 AoE Living Armor",
 	}

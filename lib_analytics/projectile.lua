@@ -12,7 +12,7 @@ local max = math.max
 local TURN_RATE_BASIC = 0.9 / 0.03 -- higher-end (turnRate rad) / tickRate 
 local START_CAST_RAD = rad(11.5) -- 0.201 rad - source:dota2 gamepedia 02/14/21
 
-local function time_to_turn_facing_to_directional(facingRad, v)
+function Projectile_TimeTilFacingDirectional(facingRad, v)
 	-- TODO there's probably some simpler rule for this
 	local goalDirection = acos(rad(v.x / Vector_LengthOfVector(v)))
 	goalDirection = v.y < 0 and MATH_2PI-goalDirection or goalDirection
@@ -20,6 +20,7 @@ local function time_to_turn_facing_to_directional(facingRad, v)
 	turnRad = max(0, abs(turnRad > MATH_PI and MATH_2PI - turnRad - START_CAST_RAD or turnRad - START_CAST_RAD))
 	return turnRad / TURN_RATE_BASIC 
 end
+local Projectile_TimeTilFacingDirectional = Projectile_TimeTilFacingDirectional
 
 -- a.b = |a||b|cos(t).
 -- let a = directionalVector, b = unit vector (1, 0, 0)
@@ -34,7 +35,7 @@ function Projectile_TimeToLandProjectile(gsiUnit, gsiTarget)
 	local hUnitProjectileSpeed = gsiUnit.isRanged and gsiUnit.hUnit:GetAttackProjectileSpeed() or 160000
 	local facingDeg = hUnit:GetFacing() -- skipping for now, don't know turning speed algorithm nor func
 	local directionalToTarget = Vector_PointToPointLine(gsiUnit.lastSeen.location, gsiTarget.lastSeen.location)
-	local timeToTurn = time_to_turn_facing_to_directional(rad(facingDeg), directionalToTarget)
+	local timeToTurn = Projectile_TimeTilFacingDirectional(rad(facingDeg), directionalToTarget)
 	local timeToArriveAtAttack = max(Math_PointToPointDistance2D(gsiUnit.lastSeen.location, gsiTarget.lastSeen.location)
 			- gsiUnit.attackRange, 0)/gsiUnit.currentMovementSpeed
 	return Vector_LengthOfVector(directionalToTarget)

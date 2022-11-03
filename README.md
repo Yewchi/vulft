@@ -12,6 +12,8 @@ Project workspaces can be viewed in the vim sessions (enter g then CTRL+T to tab
 	vim -S .anwf
 	vim -S .syswf
 	vim -S .herowf
+
+(Requires Vim 8.2 or greater)
 	
 or alternatively in bash
 	. .wf

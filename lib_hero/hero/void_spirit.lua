@@ -1,10 +1,10 @@
 local hero_data = {
 	"void_spirit",
-	{3, 1, 3, 2, 2, 4, 2, 2, 3, 3, 1, 4, 1, 1, 8, 6, 4, 9, 12},
+	{3, 1, 3, 2, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 8, 6, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_faerie_fire","item_branches","item_magic_stick","item_branches","item_boots","item_null_talisman","item_magic_wand","item_gloves","item_robe","item_power_treads","item_blitz_knuckles","item_wind_lace","item_witch_blade","item_staff_of_wizardry","item_cyclone","item_aghanims_shard","item_void_stone","item_energy_booster","item_aether_lens","item_octarine_core","item_sphere","item_kaya","item_ethereal_blade","item_wind_waker",
+		"item_ward_observer","item_branches","item_quelling_blade","item_tango","item_branches","item_faerie_fire","item_circlet","item_boots","item_bottle","item_null_talisman","item_boots","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_staff_of_wizardry","item_robe","item_kaya","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_sange","item_kaya_and_sange","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ghost","item_ultimate_orb","item_sphere","item_boots","item_aghanims_shard","item_mystic_staff","item_void_stone","item_sheepstick","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
 		"Aether Remnant","Dissimilate","Resonant Pulse","Astral Step","+1.75 Mana Regen","+50 Aether Remnant Damage","Remnant Provides 475 True Sight","Outer Dissimilate Ring","+120 Resonant Pulse Damage","-4s Astral Step Charge Restore Time","Astral Step 160% Crit","Dissimilate Roots for 2.0s",
 	}

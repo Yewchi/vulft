@@ -1,8 +1,8 @@
 local hero_data = {
 	"mars",
-	{2, 1, 1, 2, 1, 4, 1, 2, 2, 3, 5, 4, 3, 3, 7, 3, 4, 10, 11},
+	{2, 1, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 7, 3, 4, 10, 12},
 	{
-		"item_tango","item_gauntlets","item_circlet","item_branches","item_branches","item_quelling_blade","item_bracer","item_blades_of_attack","item_falcon_blade","item_boots","item_magic_wand","item_chainmail","item_phase_boots","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mithril_hammer","item_mithril_hammer","item_desolator","item_reaver","item_claymore","item_satanic",
+		"item_magic_stick","item_branches","item_quelling_blade","item_tango","item_branches","item_faerie_fire","item_magic_wand","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_fluffy_hat","item_falcon_blade","item_ring_of_basilius","item_buckler","item_blades_of_attack","item_vladmir","item_wind_lace","item_wraith_pact","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_mystic_staff","item_sheepstick",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

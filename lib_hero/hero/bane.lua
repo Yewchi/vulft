@@ -1,10 +1,10 @@
 local hero_data = {
 	"bane",
-	{2, 3, 2, 3, 3, 4, 3, 2, 2, 1, 1, 4, 1, 1, 8, 5, 4, 9},
+	{2, 3, 2, 3, 2, 4, 2, 1, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9},
 	{
-		"item_tango","item_sobi_mask","item_branches","item_flask","item_branches","item_ward_sentry","item_ring_of_basilius","item_boots","item_magic_wand","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_arcane_boots","item_aether_lens","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_vladmir",
+		"item_ward_sentry","item_tango","item_enchanted_mango","item_branches","item_clarity","item_flask","item_enchanted_mango","item_boots","item_wind_lace","item_magic_wand","item_wind_lace","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_glimmer_cape","item_aether_lens","item_blink",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Enfeeble","Brain Sap","Nightmare","Fiend's Grip","Nightmare Damage Heals Bane","+20% Enfeeble Cast Range Reduction","-3s Brain Sap Cooldown","+5% Fiend's Grip Max Mana Drain","-3s Nightmare Cooldown","+30 Movement Speed","+200 Brain Sap Damage/Heal","+5s Fiend's Grip Duration",
 	}

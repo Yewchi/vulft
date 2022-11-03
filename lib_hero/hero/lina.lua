@@ -1,8 +1,8 @@
 local hero_data = {
 	"lina",
-	{1, 3, 1, 2, 1, 5, 1, 3, 3, 6, 3, 5, 2, 2, 9, 2, 5, 11, 13, 7},
+	{2, 3, 1, 1, 1, 5, 1, 3, 3, 6, 3, 5, 2, 2, 8, 2, 5, 11, 13, 9},
 	{
-		"item_ward_observer","item_faerie_fire","item_branches","item_branches","item_tango","item_branches","item_bottle","item_null_talisman","item_boots","item_magic_wand","item_arcane_boots","item_void_stone","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_blink","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_octarine_core","item_shadow_amulet","item_blitz_knuckles","item_invis_sword","item_ultimate_scepter_2","item_lesser_crit","item_silver_edge","item_arcane_blink",
+		"item_tango","item_ward_observer","item_branches","item_faerie_fire","item_branches","item_branches","item_bottle","item_boots","item_arcane_boots","item_magic_wand","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_octarine_core","item_invis_sword","item_sphere","item_lesser_crit","item_aghanims_shard","item_ultimate_scepter_2","item_silver_edge",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

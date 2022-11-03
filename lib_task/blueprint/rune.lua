@@ -154,7 +154,7 @@ function abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpHandle)
 	--[[DEV]]if VERBOSE and not wpHandle[POSTER_I.OBJECTIVE].runeHandle then
 	--[[DEV]]	ERROR_print(string.format("[rune] Found an iobjective rune without a rune handle"))
 	--[[DEV]]	Util_TablePrint(wpHandle[POSTER_I.OBJECTIVE], 4)
-	--[[DEB]]	DEBUG_KILLSWITCH = true
+	--[[DEV]]	DEBUG_KILLSWITCH = true
 	--[[DEV]]	Util_ThrowError()
 	--[[DEV]]end
 	local thisRune = RUNE_LOCATIONS[wpHandle[POSTER_I.OBJECTIVE].runeHandle+1]

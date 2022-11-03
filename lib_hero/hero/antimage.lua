@@ -1,8 +1,8 @@
 local hero_data = {
 	"antimage",
-	{1, 2, 1, 3, 2, 4, 2, 2, 3, 5, 3, 4, 3, 1, 7, 1, 4, 10, 12},
+	{1, 2, 1, 3, 1, 4, 2, 2, 2, 1, 5, 4, 3, 3, 7, 3, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_slippers","item_circlet","item_branches","item_branches","item_ring_of_health","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_broadsword","item_claymore","item_bfury","item_boots_of_elves","item_wraith_band","item_yasha","item_manta","item_ultimate_orb","item_skadi","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_pers","item_sphere","item_butterfly","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_moon_shard",
+		"item_quelling_blade","item_orb_of_venom","item_branches","item_branches","item_tango","item_ring_of_health","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_broadsword","item_bfury","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_basher","item_vanguard","item_abyssal_blade","item_hyperstone","item_assault","item_black_king_bar","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_ultimate_scepter_2","item_skadi",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

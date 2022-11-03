@@ -1,8 +1,8 @@
 local hero_data = {
 	"tidehunter",
-	{3, 1, 3, 2, 3, 5, 3, 2, 2, 2, 1, 5, 1, 1, 8, 6, 5, 10, 12},
+	{3, 2, 3, 2, 3, 5, 3, 2, 2, 6, 1, 5, 1, 1, 8, 1, 5, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_flask","item_magic_stick","item_enchanted_mango","item_boots","item_magic_wand","item_arcane_boots","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_pers","item_refresher","item_overwhelming_blink","item_platemail","item_shivas_guard","item_void_stone","item_soul_booster","item_octarine_core","item_ultimate_scepter_2","item_moon_shard",
+		"item_gauntlets","item_gauntlets","item_tango","item_quelling_blade","item_branches","item_branches","item_soul_ring","item_boots","item_magic_wand","item_blades_of_attack","item_ring_of_basilius","item_lifesteal","item_vladmir","item_boots","item_point_booster","item_wraith_pact","item_belt_of_strength","item_phase_boots","item_hood_of_defiance","item_pipe","item_belt_of_strength","item_ogre_axe","item_sange","item_heavens_halberd","item_pers","item_aghanims_shard","item_platemail","item_energy_booster","item_lotus_orb","item_ghost",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

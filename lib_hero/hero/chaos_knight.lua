@@ -1,8 +1,8 @@
 local hero_data = {
 	"chaos_knight",
-	{1, 3, 2, 3, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 8, 6, 4, 10, 11},
+	{1, 2, 3, 3, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 7, 5, 4, 10, 11},
 	{
-		"item_tango","item_branches","item_branches","item_quelling_blade","item_gauntlets","item_circlet","item_bracer","item_boots","item_gloves","item_power_treads","item_gloves","item_helm_of_iron_will","item_blades_of_attack","item_armlet","item_magic_wand","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_cloak","item_mage_slayer","item_blitz_knuckles","item_claymore","item_orchid","item_bloodthorn","item_ultimate_orb","item_skadi","item_reaver","item_overwhelming_blink","item_basher",
+		"item_enchanted_mango","item_magic_stick","item_branches","item_quelling_blade","item_branches","item_gloves","item_power_treads","item_gloves","item_magic_wand","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_wind_lace","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_cloak","item_mage_slayer","item_aghanims_shard","item_overwhelming_blink","item_blitz_knuckles","item_void_stone","item_bloodthorn","item_gem","item_silver_edge","item_gem","item_ultimate_scepter_2","item_moon_shard","item_gem",
 	},
 	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{

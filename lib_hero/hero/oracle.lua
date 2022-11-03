@@ -1,10 +1,10 @@
 local hero_data = {
 	"oracle",
-	{1, 3, 3, 2, 3, 5, 3, 1, 2, 1, 1, 5, 2, 2, 6, 7, 5, 10},
+	{1, 3, 3, 2, 3, 5, 3, 2, 2, 7, 2, 5, 1, 1, 9, 1, 5, 6, 13},
 	{
-		"item_faerie_fire","item_tango","item_faerie_fire","item_flask","item_enchanted_mango","item_smoke_of_deceit","item_boots","item_arcane_boots","item_magic_wand","item_void_stone","item_aether_lens","item_arcane_boots","item_aether_lens","item_tranquil_boots","item_headdress","item_fluffy_hat","item_holy_locket","item_aghanims_shard","item_gem","item_gem",
+		"item_magic_stick","item_flask","item_tango","item_enchanted_mango","item_ward_sentry","item_magic_wand","item_boots","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_shadow_amulet","item_glimmer_cape","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_mekansm","item_aghanims_shard","item_guardian_greaves",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,2,}, {5,5,5,5,2,}, 0.1 },
 	{
 		"Fortune's End","Fate's Edict","Purifying Flames","Rain of Destiny","False Promise","+0.5s Fortune's End Duration","+10 Armor False Promise","+80 Fortune's End Damage","-1.25s Purifying Flames Cooldown","-20s False Promise Cooldown","+30% Purifying Flames Enemy Damage","Instant Fortune's End","+1.5s False Promise Duration",
 	}

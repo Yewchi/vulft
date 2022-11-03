@@ -1,10 +1,10 @@
 local hero_data = {
 	"spirit_breaker",
-	{3, 1, 3, 6, 3, 5, 3, 2, 2, 2, 2, 5, 1, 1, 8, 1, 5, 11, 9, 13},
+	{3, 1, 3, 1, 3, 5, 3, 1, 2, 1, 2, 5, 2, 2, 9, 7, 5, 11},
 	{
-		"item_tango","item_gauntlets","item_circlet","item_quelling_blade","item_branches","item_enchanted_mango","item_boots","item_phase_boots","item_magic_wand","item_bracer","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_void_stone","item_wind_lace","item_pers","item_platemail","item_lotus_orb","item_sange","item_blade_of_alacrity","item_boots_of_elves",
+		"item_tango","item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_branches","item_boots","item_magic_wand","item_chainmail","item_phase_boots","item_soul_ring","item_blitz_knuckles","item_shadow_amulet","item_broadsword","item_invis_sword","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_staff_of_wizardry","item_kaya","item_boots_of_elves","item_yasha_and_kaya","item_black_king_bar","item_heart",
 	},
-	{ {3,3,3,5,2,}, {4,4,3,3,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,2,4,}, 0.1 },
 	{
 		"Charge of Darkness","Bulldoze","Greater Bash","Planar Pocket","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
 	}

@@ -1,10 +1,10 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 3, 1, 1, 4, 3, 3, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
+	{3, 1, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
 	{
-		"item_circlet","item_circlet","item_faerie_fire","item_branches","item_branches","item_branches","item_ward_observer","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_boots","item_staff_of_wizardry","item_crown","item_rod_of_atos","item_gungir","item_aether_lens","item_octarine_core","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_kaya","item_ghost","item_ethereal_blade","item_staff_of_wizardry","item_point_booster","item_blade_of_alacrity","item_ogre_axe","item_sheepstick","item_ultimate_scepter_2","item_blink","item_overwhelming_blink","item_aghanims_shard","item_moon_shard","item_moon_shard","item_dagon_5L","item_desolator",
+		"item_branches","item_branches","item_branches","item_circlet","item_faerie_fire","item_circlet","item_gloves","item_hand_of_midas","item_javelin","item_mithril_hammer","item_boots","item_maelstrom","item_rod_of_atos","item_gungir","item_arcane_boots","item_aether_lens","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_sheepstick","item_ultimate_scepter_2","item_overwhelming_blink","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_mystic_staff","item_wind_waker","item_aghanims_shard","item_moon_shard","item_ethereal_blade","item_solar_crest",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{
 		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+225 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed","+125 Spark Wraith Damage","+40 Flux Damage","+50% Tempest Double Cooldown Reduction","+12s Tempest Double Duration",
 	}

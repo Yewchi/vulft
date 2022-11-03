@@ -1,10 +1,10 @@
 local hero_data = {
 	"bounty_hunter",
-	{2, 1, 2, 1, 2, 4, 2, 3, 1, 6, 1, 4, 3, 3, 7, 3, 4, 9, 11},
+	{2, 1, 1, 2, 2, 4, 1, 2, 1, 6, 3, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_branches","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_magic_wand","item_cloak","item_hood_of_defiance","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_energy_booster","item_aether_lens","item_vitality_booster","item_energy_booster","item_point_booster","item_void_stone","item_octarine_core","item_reaver","item_heart","item_eternal_shroud","item_desolator","item_magic_wand","item_magic_wand",
+		"item_quelling_blade","item_tango","item_magic_stick","item_circlet","item_branches","item_boots","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_bracer","item_point_booster","item_blade_of_alacrity","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_aether_lens","item_octarine_core","item_reaver","item_heart","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_ultimate_orb","item_point_booster","item_skadi","item_ultimate_scepter_2","item_basher","item_moon_shard",
 	},
-	{ {3,3,3,1,1,}, {3,3,5,1,4,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,2,4,}, 0.1 },
 	{
 		"Shuriken Toss","Jinada","Shadow Walk","Track","+10% Shadow Walk Slow","+40 Jinada Damage","+2s Silence on Hit With Shadow Walk","Half Track Bonus Speed to Allies","Track Grants 600 Ground Vision","+50 Jinada Gold Steal","2 Shuriken Toss Charges","+250 Track Gold",
 	}
