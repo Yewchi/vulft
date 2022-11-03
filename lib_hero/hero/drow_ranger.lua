@@ -1,8 +1,8 @@
 local hero_data = {
 	"drow_ranger",
-	{1, 3, 1, 3, 3, 4, 3, 6, 1, 1, 2, 4, 2, 9, 8, 2, 2, 4, 11},
+	{1, 3, 1, 2, 3, 4, 3, 3, 1, 6, 1, 4, 2, 2, 8, 2, 4, 9, 11},
 	{
-		"item_slippers","item_slippers","item_circlet","item_circlet","item_wraith_band","item_wraith_band","item_boots_of_elves","item_boots","item_boots_of_elves","item_gloves","item_power_treads","item_hand_of_midas","item_dragon_lance","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_invis_sword","item_broadsword","item_silver_edge","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_skadi","item_eagle","item_talisman_of_evasion","item_quarterstaff","item_butterfly",
+		"item_circlet","item_circlet","item_tango","item_branches","item_slippers","item_magic_stick","item_branches","item_branches","item_branches","item_slippers","item_wraith_band","item_boots_of_elves","item_magic_wand","item_boots","item_power_treads","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_ogre_axe","item_ring_of_basilius","item_mithril_hammer","item_black_king_bar","item_broadsword","item_lesser_crit","item_shadow_amulet","item_blitz_knuckles","item_silver_edge","item_broadsword","item_lesser_crit","item_greater_crit","item_eagle","item_butterfly","item_boots",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

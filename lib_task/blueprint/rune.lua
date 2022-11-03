@@ -154,7 +154,7 @@ function abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpHandle)
 	
 	
 	
-	--[[DEB]]	DEBUG_KILLSWITCH = true
+	
 	
 	
 	local thisRune = RUNE_LOCATIONS[wpHandle[POSTER_I.OBJECTIVE].runeHandle+1]

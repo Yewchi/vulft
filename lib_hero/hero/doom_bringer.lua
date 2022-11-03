@@ -1,10 +1,10 @@
 local hero_data = {
 	"doom_bringer",
-	{1, 2, 2, 6, 2, 4, 2, 1, 1, 1, 3, 3, 3, 3, 7, 4, 4, 10, 11},
+	{2, 1, 2, 1, 2, 4, 2, 1, 3, 6, 1, 3, 3, 3, 7, 4, 4, 10, 11},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_branches","item_branches","item_boots","item_chainmail","item_blades_of_attack","item_gloves","item_hand_of_midas","item_magic_wand","item_phase_boots","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_platemail","item_shivas_guard","item_aghanims_shard","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_pers","item_pers","item_refresher",
+		"item_ring_of_protection","item_tango","item_quelling_blade","item_tango","item_branches","item_branches","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_magic_wand","item_orb_of_venom","item_gloves","item_hand_of_midas","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_shivas_guard","item_refresher","item_overwhelming_blink","item_gem","item_aeon_disk","item_boots","item_boots","item_aghanims_shard",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,2,4,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Devour","Scorched Earth","Infernal Blade","Doom","Devour grants +15% Magic Resistance","+20 Scorched Earth Damage","+10% Scorched Earth Movement Speed","Devour Can Target Ancients","-12.0s Scorched Earth Cooldown","-35s Doom Cooldown","+2.1% Infernal Blade Damage","Doom applies Break",
 	}
@@ -98,8 +98,8 @@ d = {
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
-		local isLocked, isNotCombo = UseAbility_IsPlayerLocked(gsiPlayer)
-		if isNotCombo then
+		local isLocked, isCombo = UseAbility_IsPlayerLocked(gsiPlayer)
+		if isCombo then
 			return;
 		end
 		local playerAbilities = t_player_abilities[gsiPlayer.nOnTeam]

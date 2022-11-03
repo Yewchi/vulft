@@ -1,10 +1,10 @@
 local hero_data = {
 	"grimstroke",
-	{3, 1, 1, 2, 3, 4, 3, 3, 1, 1, 2, 4, 6, 2, 8, 2, 4, 9, 11},
+	{1, 3, 3, 2, 3, 4, 3, 2, 2, 1, 1, 4, 6, 1, 8, 2, 4, 9, 11},
 	{
-		"item_tango","item_flask","item_enchanted_mango","item_ward_sentry","item_ward_sentry","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_wind_lace","item_boots","item_energy_booster","item_arcane_boots","item_magic_wand","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_aghanims_shard","item_aether_lens","item_tranquil_boots",
+		"item_tango","item_faerie_fire","item_branches","item_magic_stick","item_branches","item_ward_dispenser","item_magic_wand","item_boots","item_energy_booster","item_arcane_boots","item_wind_lace","item_staff_of_wizardry","item_void_stone","item_cyclone","item_aghanims_shard","item_void_stone","item_aether_lens","item_arcane_boots","item_vitality_booster","item_aeon_disk","item_gem",
 	},
-	{ {3,3,1,4,1,}, {5,5,5,4,4,}, 0.1 },
+	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
 	{
 		"Stroke of Fate","Phantom's Embrace","Ink Swell","Soulbind","+50 Phantom's Embrace DPS","-5.0s Ink Swell Cooldown","+20.0% Soulbind Spell Damage","+16% Ink Swell Movement Speed","+1000 Stroke of Fate Cast Range","+3 Hits to Kill Phantom","+150 Ink Swell Radius","+50% Stroke of Fate Damage",
 	}

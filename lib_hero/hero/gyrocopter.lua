@@ -1,10 +1,10 @@
 local hero_data = {
 	"gyrocopter",
-	{2, 1, 1, 2, 1, 4, 2, 1, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 11},
+	{1, 2, 1, 2, 1, 4, 3, 2, 3, 6, 1, 4, 2, 3, 7, 3, 4, 9, 11},
 	{
-		"item_tango","item_magic_stick","item_quelling_blade","item_branches","item_branches","item_enchanted_mango","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_boots_of_elves","item_magic_wand","item_power_treads","item_mithril_hammer","item_maelstrom","item_blade_of_alacrity","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_crown","item_crown","item_gungir","item_reaver","item_satanic",
+		"item_wraith_band","item_tango","item_magic_wand","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_javelin","item_mithril_hammer","item_maelstrom","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_belt_of_strength","item_yasha","item_sange_and_yasha","item_lifesteal","item_claymore","item_satanic","item_lesser_crit","item_greater_crit","item_black_king_bar","item_ultimate_scepter_2","item_blink","item_swift_blink","item_moon_shard","item_desolator","item_desolator",
 	},
-	{ {3,3,3,5,1,}, {4,4,4,4,1,}, 0.1 },
+	{ {1,1,1,1,2,}, {1,1,1,4,5,}, 0.1 },
 	{
 		"Rocket Barrage","Homing Missile","Flak Cannon","Call Down","+30 Movement Speed during Rocket Barrage","+200 Health","+0.4s Homing Missile Stun Duration","+2 Flak Cannon Attacks","+40 Flak Cannon Damage","+16 Rocket Barrage Damage","-6s Flak Cannon Cooldown","3x Call Down",
 	}

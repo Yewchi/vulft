@@ -1,10 +1,10 @@
 local hero_data = {
 	"crystal_maiden",
-	{1, 2, 3, 2, 3, 4, 2, 2, 1, 5, 1, 4, 1, 3, 7, 3, 4, 10, 11},
+	{1, 2, 3, 1, 2, 2, 1, 1, 3, 2, 5, 4, 4, 3, 7, 3, 4, 9, 11},
 	{
-		"item_tango","item_enchanted_mango","item_ward_sentry","item_flask","item_clarity","item_branches","item_magic_wand","item_wind_lace","item_tranquil_boots","item_aghanims_shard","item_shadow_amulet","item_glimmer_cape","item_staff_of_wizardry","item_force_staff","item_gem","item_black_king_bar","item_blink","item_ghost","item_gem",
+		"item_faerie_fire","item_tango","item_enchanted_mango","item_magic_stick","item_ward_observer","item_branches","item_branches","item_boots","item_tranquil_boots","item_wind_lace","item_magic_wand","item_fluffy_hat","item_belt_of_strength","item_robe","item_ancient_janggo","item_wind_lace","item_boots_of_bearing","item_ring_of_basilius","item_buckler","item_lifesteal","item_vladmir","item_wraith_pact","item_hood_of_defiance","item_headdress","item_pipe",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Crystal Nova","Frostbite","Arcane Aura","Freezing Field","+250 Health","+125 Crystal Nova AoE","+125 Frostbite Cast Range","-3s Crystal Nova Cooldown","+200 Attack Speed","+50 Freezing Field Damage","+1.25s Frostbite Duration","+240 Crystal Nova Damage",
 	}

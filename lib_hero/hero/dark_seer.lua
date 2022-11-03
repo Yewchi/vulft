@@ -1,8 +1,8 @@
 local hero_data = {
 	"dark_seer",
-	{2, 3, 2, 3, 2, 4, 2, 1, 1, 1, 1, 4, 5, 3, 8, 3, 4, 9, 11},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 11},
 	{
-		"item_ring_of_protection","item_gauntlets","item_gauntlets","item_tango","item_clarity","item_soul_ring","item_boots","item_energy_booster","item_arcane_boots","item_mekansm","item_cloak","item_ring_of_health","item_hood_of_defiance","item_headdress","item_pipe","item_buckler","item_guardian_greaves","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_blink","item_void_stone",
+		"item_tango","item_quelling_blade","item_circlet","item_mantle","item_null_talisman","item_boots","item_energy_booster","item_arcane_boots","item_chainmail","item_headdress","item_mekansm","item_cloak","item_headdress","item_ring_of_health","item_pipe","item_blink","item_buckler","item_guardian_greaves","item_void_stone","item_energy_booster","item_aether_lens","item_octarine_core","item_void_stone","item_sheepstick","item_point_booster","item_ultimate_scepter","item_ultimate_scepter_2","item_black_king_bar",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

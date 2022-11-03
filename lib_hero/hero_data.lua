@@ -41,6 +41,7 @@ local hero_data = { -- Known heroes -> loads to hero data if in-game
 	["enchantress"] = true,
 	["grimstroke"] = true,
 	["gyrocopter"] = true,
+	--["invoker"] = true,
 	["jakiro"] = true,
 	["juggernaut"] = true,
 	["lich"] = true,

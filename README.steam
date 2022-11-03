@@ -1,4 +1,4 @@
-VUL - Full Takeover Bot Script. A full takeover bot script written from the ground up. ~31,000 lines of code. Highly dynamic fight behaviour. Aiming to compete with the best bots on the workshop.
+VUL - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 03/11/22. Requires manual install into vscripts/bots folder (same as Phalanx Bot, and other recent bots, due to a Dota workshop bug). VUL-FT has no affiliation with DotaBuff.
 
 == Manually installing ==
 VUL-FT currently will not work via subscription. It will revert to the default bots, it seems other recent bots have the same issue. I'm still investigating what is going wrong there. For now, it's necessary to manually install the bots.
@@ -16,15 +16,9 @@ After freshly subscribing, find the recent folder in
 and copy the contents of that folder to the bots folder at
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
--- Via Github: (not verified by Valve, uploaded by me)
-You can manually download the bots from github.com/yewchi/vulft and put them in
+-- Via Github: (updated by the creator)
+If you know how to use github you can manually download the bots from the official VUL-FT Github[github.com] and put them in
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
----- Optional: Turn off dev debug drawing:
-navigate to %vscripts directory%/bots/lib_util/util.lua
-open the file and change
-"DEBUG = true"
-to
-"DEBUG = false"
 
 -- Running:
 After one of the above steps are complete, you can run the bots by navigating in-game to
@@ -44,7 +38,7 @@ More player-like.
 Orb Walking.
 Advanced item management.
 Automatically generated and filtered for error ward locations, if the map ever changes.
-DotaBuff parser for averaged out of 5 game skill build, roles and an item build from Divine - Immortal players that week. 
+DotaBuff parser for averaged out of 5 game skill build, roles and an item build from Divine - Immortal players that week.
 Basic jungling in downtime.
 They may jungle self-deny in the early game if they get caught by the enemy.
 Dynamic retreat, to friendly towers (unless the tower gets overrun), or to friendly allies in the direction of the allied fountain.
@@ -56,8 +50,8 @@ Bugs!
 In addition. I promise this project's code is 100% functional offline and will stay that way. No networking API functions, ever.
 
 ==Error Report==
-[url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/]Lua Error Dump (steam discussion link)[/url] -- Use this if you just want to quickly dump some console output.
-[url=https://github.com/Yewchi/vulft/issues]Github Bug Tracker[/url] -- (Requires account) Use this if you would like to interact with the developer, or receive updates about progress on your bug.
+Lua Error Dump (steam discussion link) -- Use this if you just want to quickly dump some console output.
+VUL-FT source code[github.com] -- Public github
 
 ==Not yet implemented==
 Player lane choices. The bots will currently calculate where they think you should go.
@@ -93,11 +87,8 @@ These three rune issues are all technically true, but there is a workaround in p
 
 ==Project State==
 Alpha version. Please give feedback.
-Is the project currently stable: mostly. 13/10/22
-Last DotaBuff meta update: 13/10/22
-
-If you want to donate I will add a paypal. This project needs a lot of additional hours to be in the desired state.
+Is the project currently stable: very stable over 3 matches. 03/11/22 (november 3)
+Last DotaBuff meta update: 03/11/22
 
 ==Dev contact==
 zyewchi@gmail.com
-[url=https://github.com/yewchi/vulft]Github[/url]

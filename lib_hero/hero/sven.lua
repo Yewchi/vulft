@@ -1,8 +1,8 @@
 local hero_data = {
 	"sven",
-	{1, 3, 1, 2, 2, 4, 2, 2, 1, 6, 1, 4, 3, 3, 7, 3, 4, 10, 11},
+	{1, 3, 1, 2, 2, 4, 2, 2, 3, 1, 3, 4, 3, 1, 7, 5, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_branches","item_magic_stick","item_blades_of_attack","item_boots","item_phase_boots","item_gloves","item_lifesteal","item_mask_of_madness","item_ogre_axe","item_quarterstaff","item_robe","item_oblivion_staff","item_ogre_axe","item_echo_sabre","item_black_king_bar","item_echo_sabre","item_blink","item_lesser_crit","item_greater_crit","item_swift_blink","item_satanic","item_skadi",
+		"item_magic_wand","item_quelling_blade","item_magic_wand","item_magic_stick","item_tango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_branches","item_magic_wand","item_boots","item_belt_of_strength","item_gloves","item_power_treads","item_lifesteal","item_mask_of_madness","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_hyperstone","item_moon_shard","item_satanic","item_eagle","item_swift_blink","item_refresher","item_quarterstaff","item_bloodthorn",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

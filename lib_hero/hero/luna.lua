@@ -1,10 +1,10 @@
 local hero_data = {
 	"luna",
-	{1, 3, 3, 1, 3, 2, 2, 3, 2, 2, 4, 4, 1, 1, 7, 6, 4, 10, 12},
+	{1, 3, 3, 1, 3, 2, 2, 3, 2, 2, 1, 1, 4, 4, 7, 6, 4, 9, 12},
 	{
-		"item_quelling_blade","item_branches","item_branches","item_tango","item_circlet","item_slippers","item_wraith_band","item_boots_of_elves","item_gloves","item_power_treads","item_quarterstaff","item_mask_of_madness","item_blade_of_alacrity","item_dragon_lance","item_magic_wand","item_mithril_hammer","item_black_king_bar","item_eagle","item_butterfly","item_claymore","item_satanic","item_lesser_crit","item_greater_crit","item_eagle","item_blink","item_swift_blink",
+		"item_quelling_blade","item_magic_stick","item_tango","item_branches","item_slippers","item_boots","item_magic_wand","item_boots_of_elves","item_power_treads","item_lifesteal","item_mask_of_madness","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_yasha","item_manta","item_mithril_hammer","item_black_king_bar","item_claymore","item_reaver","item_satanic","item_lesser_crit","item_greater_crit","item_refresher","item_blink","item_swift_blink",
 	},
-	{ {1,1,1,1,4,}, {1,1,1,1,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {1,1,1,1,4,}, 0.1 },
 	{
 		"Lucent Beam","Moon Glaives","Lunar Blessing","Eclipse","-8% Moon Glaives Damage Reduction","+0.4s Lucent Beam Ministun","-2.0s Lucent Beam Cooldown","-25.0s Eclipse Cooldown","+500 Moon Glaives fired on Lucent Beam","+100 Lucent Beam Damage","+35 Lunar Blessing Damage","+0.25s Eclipse Lucent Ministun",
 	}

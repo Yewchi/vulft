@@ -1,8 +1,8 @@
 local hero_data = {
 	"disruptor",
-	{1, 2, 1, 2, 2, 4, 3, 2, 3, 3, 3, 4, 1, 1, 8, 5, 4, 9, 11},
+	{1, 2, 1, 3, 2, 4, 2, 2, 1, 3, 3, 4, 3, 1, 8, 5, 4, 9, 11},
 	{
-		"item_tango","item_ward_sentry","item_flask","item_enchanted_mango","item_clarity","item_boots","item_arcane_boots","item_aether_lens","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_arcane_boots","item_point_booster","item_octarine_core","item_glimmer_cape","item_aghanims_shard",
+		"item_tango","item_ward_sentry","item_enchanted_mango","item_enchanted_mango","item_sobi_mask","item_flask","item_clarity","item_boots","item_wind_lace","item_tranquil_boots","item_cloak","item_shadow_amulet","item_glimmer_cape","item_staff_of_wizardry","item_force_staff","item_point_booster","item_gem","item_ultimate_scepter","item_gem","item_blink",
 	},
 	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{

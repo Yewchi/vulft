@@ -1,10 +1,10 @@
 local hero_data = {
 	"necrolyte",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 5, 4, 2, 2, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_mantle","item_circlet","item_branches","item_branches","item_boots","item_null_talisman","item_chainmail","item_blades_of_attack","item_magic_wand","item_phase_boots","item_staff_of_wizardry","item_robe","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_blink","item_aghanims_shard","item_ultimate_orb","item_mystic_staff","item_void_stone","item_sheepstick","item_cyclone","item_pers","item_pers","item_refresher",
+		"item_gauntlets","item_circlet","item_faerie_fire","item_tango","item_branches","item_branches","item_bracer","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_ogre_axe","item_sange","item_staff_of_wizardry","item_kaya_and_sange","item_aghanims_shard","item_cloak","item_ring_of_health","item_hood_of_defiance","item_buckler","item_ring_of_basilius","item_vladmir","item_wraith_pact","item_gem","item_gem","item_staff_of_wizardry","item_wind_lace","item_cyclone",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
 		"Death Pulse","Ghost Shroud","Heartstopper Aura","Reaper's Scythe","+100 Reaper's Scythe Cast Range","+2s Heartstopper Aura Stack Duration","+24% Ghost Shroud Slow","+32 Death Pulse Heal","+15% Ghost Shroud Self Restoration Amp","+32% Heartstopper Regen Reduction","+0.5% Heartstopper Aura Damage","-2.5s Death Pulse Cooldown",
 	}

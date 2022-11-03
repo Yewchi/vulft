@@ -1,8 +1,8 @@
 local hero_data = {
 	"ursa",
-	{3, 1, 3, 2, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 7, 5, 4, 10, 12},
+	{3, 1, 3, 2, 3, 4, 3, 2, 2, 2, 5, 4, 1, 1, 7, 1, 4, 10, 12},
 	{
-		"item_tango","item_magic_stick","item_quelling_blade","item_branches","item_circlet","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_ring_of_health","item_pers","item_broadsword","item_bfury","item_blink","item_mithril_hammer","item_basher","item_black_king_bar","item_abyssal_blade","item_lifesteal","item_claymore","item_satanic","item_swift_blink","item_helm_of_iron_will","item_nullifier","item_boots","item_moon_shard",
+		"item_quelling_blade","item_tango","item_tango","item_branches","item_branches","item_branches","item_magic_stick","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_void_stone","item_magic_wand","item_claymore","item_broadsword","item_bfury","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_basher","item_abyssal_blade","item_swift_blink","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_boots",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

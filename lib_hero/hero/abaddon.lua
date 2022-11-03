@@ -1,10 +1,10 @@
 local hero_data = {
 	"abaddon",
-	{2, 1, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 8, 3, 4, 9, 12},
+	{2, 1, 1, 2, 1, 4, 3, 2, 2, 1, 6, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_ward_sentry","item_tango","item_magic_stick","item_branches","item_branches","item_ring_of_basilius","item_boots","item_arcane_boots","item_magic_wand","item_wind_lace","item_tranquil_boots","item_headdress","item_fluffy_hat","item_holy_locket","item_energy_booster","item_void_stone","item_aether_lens","item_buckler","item_lifesteal","item_vladmir","item_point_booster","item_wraith_pact","item_gem",
+		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_faerie_fire","item_enchanted_mango","item_magic_wand","item_boots","item_orb_of_venom","item_ring_of_basilius","item_chainmail","item_blades_of_attack","item_phase_boots","item_buckler","item_lifesteal","item_vladmir","item_wraith_pact","item_platemail","item_pers","item_lotus_orb","item_gem","item_cloak","item_headdress","item_pipe",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
 	{
 		"Mist Coil","Aphotic Shield","Curse of Avernus","Borrowed Time","+15% Curse of Avernus Movement Slow","+8 Strength","+65 Damage","+50 Mist Coil Heal/Damage","+100 Aphotic Shield Health","-8s Borrowed Time Cooldown","-1 Curse of Avernus Attacks Required","+400 AoE Mist Coil",
 	}

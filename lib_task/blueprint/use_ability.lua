@@ -115,6 +115,27 @@ function UseAbility_IndicateCastCompleted(castInfo) -- Installed @ AbilityThink_
 	end
 end
 
+
+-------- UseAbility_SetComboScore(...)
+-- - For reprioritizing combos that have been put to sleep by
+-- - - dropping their score to XETA_SCORE_DO_NOT_RUN. Invoker
+-- - - e.g. should continue movement when enemies are in a
+-- - - long tornado airtime.
+function UseAbility_SetComboScore(gsiPlayer, comboIdentifier)
+	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
+	local i = 1
+	while(currNode) do i = i + 1
+		if i>100 then DEBUG_KILLSWITCH = true print("UseAbility_SetComboScore KILLSWITCH") Util_ThrowError() end
+		local nextNode = currNode[QUEUED_ABILITY_I__NEXT_NODE]
+		if currNode[QUEUED_ABILITY_I__COMBO_IDENTIFIER] == comboIdentifier then
+			take_and_sew_queue_node(gsiPlayer.nOnTeam, currNode)
+			if VERBOSE then VEBUG_print(string.format("use_ability: Popped %s front ability comboId:'%s'.", gsiPlayer.shortName, comboIdentifier)) end
+			return;
+		end
+		currNode = nextNode
+	end
+end
+
 function UseAbility_PopComboQueue(gsiPlayer, comboIdentifier)
 	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	local i = 1

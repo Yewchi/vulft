@@ -569,3 +569,10 @@ function AbilityLogic_HandleAutocastGeneric(gsiPlayer, ability)
 		--print(gsiPlayer.shortName, "start mana regen benefit on")
 	end
 end
+
+function AbilityLogic_PreCastFindLocation(gsiPlayer, hAbility, hittableUnits,
+			requiredTarget, areaOfEffect, projectileSpeed
+		)
+	local castPoint = hAbility:GetCastPoint()
+	local timeTilCast = castPoint + Projectil_TimeTilFacingDirectional()
+end

@@ -1,8 +1,8 @@
 local hero_data = {
 	"medusa",
-	{2, 3, 2, 1, 2, 1, 2, 1, 1, 3, 4, 3, 3, 6, 7, 4, 4, 10, 12},
+	{2, 3, 2, 1, 2, 1, 1, 1, 5, 2, 4, 3, 3, 3, 7, 4, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_circlet","item_slippers","item_branches","item_wraith_band","item_magic_wand","item_boots","item_boots_of_elves","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_eagle","item_butterfly","item_ultimate_orb","item_skadi","item_lesser_crit","item_greater_crit","item_satanic","item_swift_blink","item_monkey_king_bar","item_moon_shard","item_aghanims_shard","item_black_king_bar",
+		"item_quelling_blade","item_magic_wand","item_boots","item_boots_of_elves","item_gloves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_eagle","item_talisman_of_evasion","item_butterfly","item_mithril_hammer","item_dragon_lance","item_black_king_bar","item_ultimate_orb","item_ultimate_orb","item_skadi","item_ultimate_orb","item_manta","item_hurricane_pike","item_swift_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter_2","item_aghanims_shard","item_boots",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

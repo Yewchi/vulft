@@ -1,10 +1,10 @@
 local hero_data = {
 	"ancient_apparition",
-	{3, 1, 1, 3, 3, 4, 3, 2, 2, 5, 1, 4, 2, 2, 7, 1, 4, 9, 11},
+	{3, 1, 3, 1, 1, 4, 2, 2, 2, 6, 2, 4, 1, 3, 7, 3, 4, 9, 11},
 	{
-		"item_ward_sentry","item_tango","item_tango","item_tango","item_flask","item_enchanted_mango","item_magic_stick","item_branches","item_wind_lace","item_boots","item_tranquil_boots","item_magic_wand","item_ring_of_basilius","item_wind_lace","item_aghanims_shard","item_staff_of_wizardry","item_cyclone","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_aeon_disk","item_aether_lens","item_soul_booster","item_octarine_core","item_moon_shard",
+		"item_tango","item_flask","item_flask","item_faerie_fire","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_ward_sentry","item_enchanted_mango","item_boots","item_tranquil_boots","item_wind_lace","item_belt_of_strength","item_robe","item_ancient_janggo","item_boots_of_bearing","item_aghanims_shard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_ghost","item_kaya","item_kaya","item_ethereal_blade",
 	},
-	{ {2,2,4,3,3,}, {2,2,5,1,5,}, 0.1 },
+	{ {1,1,1,3,5,}, {5,5,5,4,4,}, 0.1 },
 	{
 		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+200 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+200 Cold Feet Breaking distance","-5% Ice Vortex Slow/Resistance","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
 	}

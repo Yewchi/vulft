@@ -34,6 +34,7 @@ local t_heroes_implemented = {
 		"npc_dota_hero_enchantress",
 		"npc_dota_hero_grimstroke",
 		"npc_dota_hero_gyrocopter",
+		--"npc_dota_hero_invoker", -- shh
 		--"npc_dota_hero_jakiro",
 		--"npc_dota_hero_juggernaut",
 		"npc_dota_hero_lich",
@@ -72,6 +73,7 @@ local t_heroes_implemented = {
   --	"npc_dota_hero_enchantress",
   --	"npc_dota_hero_void_spirit",
 }
+
 local pick_pool = {} -- heroes will be randomly loaded and considered for picking based on their role data from 5 recent DotaBuff matches
 -- TODO Include a synergy_and_counters.lua to inform picking, automating data. Increasingly random for bot difficulty levels dropped.
 
@@ -492,6 +494,9 @@ function Think()
 				end
 			else
 				turn_to_pick = turn_to_pick + 1
+				if false and turn_to_pick == 5 then
+					SelectHero(team_members[turn_to_pick], "npc_dota_hero_invoker")
+				end
 			end
 		end
 	end

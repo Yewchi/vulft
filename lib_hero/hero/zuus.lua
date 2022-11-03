@@ -1,8 +1,8 @@
 local hero_data = {
 	"zuus",
-	{1, 3, 1, 3, 1, 4, 1, 2, 2, 2, 2, 4, 3, 3, 5, 7, 4, 10, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 7, 5, 4, 9, 11},
 	{
-		"item_ward_observer","item_circlet","item_branches","item_mantle","item_mantle","item_faerie_fire","item_null_talisman","item_null_talisman","item_null_talisman","item_boots","item_void_stone","item_aghanims_shard","item_aether_lens","item_staff_of_wizardry","item_staff_of_wizardry","item_soul_booster","item_octarine_core","item_kaya","item_ethereal_blade","item_blink","item_ultimate_scepter","item_cyclone","item_wind_waker","item_ultimate_scepter_2","item_pers","item_pers","item_refresher","item_vitality_booster","item_energy_booster","item_aeon_disk","item_aeon_disk","item_sheepstick",
+		"item_circlet","item_branches","item_branches","item_branches","item_enchanted_mango","item_faerie_fire","item_tango","item_ward_observer","item_bottle","item_boots","item_energy_booster","item_arcane_boots","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_robe","item_staff_of_wizardry","item_kaya","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_void_stone","item_void_stone","item_refresher","item_pers","item_ultimate_orb","item_sphere","item_ultimate_scepter_2","item_sheepstick",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
