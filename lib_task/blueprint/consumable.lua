@@ -505,8 +505,10 @@ blueprint = {
 		local instructionItem = instruction[SAVED_CONSUME_I__ITEM]
 		--print(instruction[SAVED_CONSUME_I__ITEM]:IsNull())
 		--print(gsiPlayer.shortName, "item cooldown", instruction[SAVED_CONSUME_I__ITEM]:GetCooldownTimeRemaining() == 0, instruction[SAVED_CONSUME_I__ITEM]:GetCooldownTimeRemaining())
-		if not instructionItem or not instructionItem:GetCooldownTimeRemaining() == 0
-				or not instructionItem:IsFullyCastable()
+		if not instructionItem
+				or (instructionItem and (
+					not instructionItem:GetCooldownTimeRemaining() == 0
+					or not instructionItem:IsFullyCastable()) )
 				or p_time_task_allowed[gsiPlayer.nOnTeam] > GameTime() then
 			return XETA_SCORE_DO_NOT_RUN -- Don't try to run us till we re-score high (because item is ready from backpack switch)
 		end

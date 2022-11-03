@@ -52,7 +52,7 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 		this_bot:disabledAndDominatedFunc()
 		return
 	end
-	if 1 then
+	--[[TESTTRUE]]if DEBUG then
 		if err_flag==1 then
 			err_count = err_count + 1
 		end
@@ -121,7 +121,7 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 --	end
 --if TEAM_IS_RADIANT then	this_bot.hUnit:Action_MoveDirectly(Vector_Addition(Map_GetTeamFountainLocation(), Vector(-400, 1500, 0))) end -- dominate stuck test
 --if not TEAM_IS_RADIANT then	this_bot.hUnit:Action_MoveDirectly(Vector_Addition(Map_GetTeamFountainLocation(), Vector(400, -1000, 0))) end
-	if 1 then
+	--[[TESTTRUE]]if DEBUG then
 		err_flag = 0
 	end
 end

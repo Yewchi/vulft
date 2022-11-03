@@ -127,7 +127,7 @@ local err_check = 0
 --[[DEV]]local dev_progress = 0.0001 + 100/15--[[/DEV]]
 --[[DEV]]local floor = math.floor--[[/DEV]]
 function Captain_CaptainThink()	
-	if 1 then
+	--[[TESTTRUE]]if DEBUG then
 		if err_check == 1 then err_count = err_count + 1 end err_check = 1 if err_count > 0 then DebugDrawText(140, 30, string.format("%d", err_count), 150, 0, 0) end
 	end
 	if job_domain_gsi.active then
@@ -215,7 +215,7 @@ function Captain_CaptainThink()
 	AbilityThink_RotateAbilityThinkSetRun()
 	--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(15*dev_progress))--[[/DEV]]
 	Task_TryDecrementIncentives()
-	if 1 then
+	--[[TESTTRUE]]if DEBUG then
 		err_check = 0
 	end
 	generic_microthink()
