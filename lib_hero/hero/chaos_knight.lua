@@ -1,8 +1,8 @@
 local hero_data = {
 	"chaos_knight",
-	{1, 2, 3, 3, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 7, 5, 4, 10, 11},
+	{1, 2, 3, 3, 3, 4, 3, 2, 2, 2, 6, 4, 1, 1, 1, 7, 4, 10, 12},
 	{
-		"item_enchanted_mango","item_magic_stick","item_branches","item_quelling_blade","item_branches","item_gloves","item_power_treads","item_gloves","item_magic_wand","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_wind_lace","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_cloak","item_mage_slayer","item_aghanims_shard","item_overwhelming_blink","item_blitz_knuckles","item_void_stone","item_bloodthorn","item_gem","item_silver_edge","item_gem","item_ultimate_scepter_2","item_moon_shard","item_gem",
+		"item_tango","item_quelling_blade","item_branches","item_branches","item_magic_stick","item_enchanted_mango","item_boots","item_power_treads","item_magic_wand","item_gloves","item_helm_of_iron_will","item_armlet","item_boots_of_elves","item_yasha","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_aghanims_shard","item_reaver","item_vitality_booster","item_heart","item_void_stone","item_blitz_knuckles","item_claymore","item_orchid","item_cloak","item_robe","item_bloodthorn",
 	},
 	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{

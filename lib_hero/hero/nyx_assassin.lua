@@ -1,10 +1,10 @@
 local hero_data = {
 	"nyx_assassin",
-	{1, 3, 1, 2, 1, 4, 1, 3, 3, 6, 2, 4, 2, 2, 7, 3, 4, 9, 12},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 6, 2, 4, 2, 2, 2, 7, 4, 9, 11},
 	{
-		"item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_enchanted_mango","item_ward_dispenser","item_magic_wand","item_boots","item_wind_lace","item_tranquil_boots","item_blink","item_wind_lace","item_cyclone","item_lotus_orb",
+		"item_branches","item_tango","item_branches","item_faerie_fire","item_wind_lace","item_ward_dispenser","item_boots","item_tranquil_boots","item_magic_wand","item_blink","item_void_stone","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_point_booster","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_energy_booster","item_aether_lens",
 	},
-	{ {3,3,3,2,4,}, {4,4,4,4,5,}, 0.1 },
+	{ {5,5,1,3,3,}, {4,4,4,4,5,}, 0.1 },
 	{
 		"Impale","Mana Burn","Spiked Carapace","Vendetta","+8% Spell Amplification","+0.25s Impale Stun Duration","+0.5s Spiked Carapace Reflect Duration","+0.5x Mana Burn Intelligence Multiplier","+0.6s Spiked Carapace Stun Duration","+130 Impale Damage","+300 Mana Burn Radius","Vendetta Unobstructed Pathing",
 	}
@@ -49,6 +49,9 @@ local min = math.min
 local abs = math.abs
 
 local fight_harass_handle = FightHarass_GetTaskHandle()
+local increase_safety_handle = IncreaseSafety_GetTaskHandle()
+local avoid_hide_handle = AvoidHide_GetTaskHandle()
+local leech_exp_handle = LeechExperience_GetTaskHandle()
 
 local t_player_abilities = {}
 
@@ -100,7 +103,10 @@ d = {
 		local breakingStealthDisallowed = gsiPlayer.hUnit:IsInvisible() and not gsiPlayer.trueSighted
 
 		if gsiPlayer.hasAssassinStrike then
-			Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 10, 5)
+			Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 60, 15)
+			Task_IncentiviseTask(gsiPlayer, increase_safety_handle, 30, 15)
+			Task_IncentiviseTask(gsiPlayer, avoid_hide_handle, 30, 15)
+			Task_IncentiviseTask(gsiPlayer, leech_exp_handle, 30, 15)
 		end
 
 if TEST then 
@@ -128,7 +134,7 @@ end
 				USE_ABILITY(gsiPlayer, vendetta, nil, 400, nil)
 				return;
 			end
-			if fhtReal and not gsiPlayer.hasAssassinStrike
+			if fhtReal and not breakingStealthDisallowed
 					and CAN_BE_CAST(gsiPlayer, impale) and fhtMgkDmgFactor > 0
 					and HIGH_USE(gsiPlayer, impale, highUse - impale:GetManaCost(), fhtHpp) then
 				local extrapolatedTime = IMPALE_CAST_POINT + distToFht / IMPALE_TRAVEL_SPEED
@@ -167,10 +173,10 @@ end
 			end
 		end
 		if currentActivityType > ACTIVITY_TYPE.CAREFUL then
-			print("nyx / can use breaks-stealth:", nearbyEnemies[1], breakingStealthDisallowed, CAN_BE_CAST(gsiPlayer, impale),
-					HIGH_USE(gsiPlayer, impale, highUse - impale:GetManaCost(), playerHpp))
+			--print("nyx / can use breaks-stealth:", nearbyEnemies[1], breakingStealthDisallowed, CAN_BE_CAST(gsiPlayer, impale),
+			--		HIGH_USE(gsiPlayer, impale, highUse - impale:GetManaCost(), playerHpp))
 
-			if nearbyEnemies[1] and not breakingStealthAbilitiesAllowed
+			if nearbyEnemies[1] and not breakingStealthDisallowed
 					and CAN_BE_CAST(gsiPlayer, impale) and SPELL_SUCCESS(gsiPlayer, nearbyEnemies[1], impale) > 0
 					and HIGH_USE(gsiPlayer, impale, highUse - impale:GetManaCost(), playerHpp) then
 				local crowdingCenter, crowdedRating

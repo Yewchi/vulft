@@ -1,10 +1,10 @@
 local hero_data = {
 	"zuus",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 7, 5, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_circlet","item_branches","item_branches","item_branches","item_enchanted_mango","item_faerie_fire","item_tango","item_ward_observer","item_bottle","item_boots","item_energy_booster","item_arcane_boots","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_robe","item_staff_of_wizardry","item_kaya","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_void_stone","item_void_stone","item_refresher","item_pers","item_ultimate_orb","item_sphere","item_ultimate_scepter_2","item_sheepstick",
+		"item_branches","item_branches","item_faerie_fire","item_tango","item_branches","item_ward_observer","item_bottle","item_magic_wand","item_boots","item_arcane_boots","item_robe","item_kaya","item_arcane_boots","item_ogre_axe","item_kaya_and_sange","item_aghanims_shard","item_ogre_axe","item_staff_of_wizardry","item_point_booster","item_ultimate_scepter","item_blink","item_aeon_disk","item_void_stone","item_cyclone","item_wind_waker","item_refresher","item_void_stone","item_overwhelming_blink",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
 	{
 		"Arc Lightning","Lightning Bolt","Heavenly Jump","Thundergod's Wrath","-4s Heavenly Jump Cooldown","+250 Health","+30 Movement Speed after Heavenly Jump","+1 Heavenly Jump Target","+100 Thundergod's Wrath Damage","+0.4s Lightning Bolt Ministun","325 AOE Lightning Bolt","+100 Arc Lightning Damage",
 	}

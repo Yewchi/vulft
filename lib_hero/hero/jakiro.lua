@@ -1,10 +1,10 @@
 local hero_data = {
 	"jakiro",
-	{1, 3, 1, 2, 1, 4, 1, 2, 3, 3, 5, 4, 3, 2, 7, 2, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 5, 2, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_magic_stick","item_enchanted_mango","item_ward_sentry","item_branches","item_tango","item_magic_wand","item_boots","item_medallion_of_courage","item_crown","item_wind_lace","item_solar_crest","item_arcane_boots","item_void_stone","item_pers","item_lotus_orb","item_force_staff","item_aghanims_shard",
+		"item_tango","item_branches","item_branches","item_faerie_fire","item_branches","item_ward_observer","item_bottle","item_wind_lace","item_boots","item_magic_wand","item_robe","item_blitz_knuckles","item_witch_blade","item_aghanims_shard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_staff_of_wizardry","item_cyclone","item_staff_of_wizardry","item_robe","item_kaya","item_wind_waker","item_kaya_and_sange",
 	},
-	{ {1,1,1,1,4,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,4,2,}, {5,5,5,5,2,}, 0.1 },
 	{
 		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+275 Attack Range","-10%/-10 Dual Breath Movement/Attack Speed Slow","-50 Liquid Fire Attack Speed","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","+100%% Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
 	}

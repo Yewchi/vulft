@@ -1,4 +1,4 @@
-VUL - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 03/11/22. Requires manual install into vscripts/bots folder (same as Phalanx Bot, and other recent bots, due to a Dota workshop bug). VUL-FT has no affiliation with DotaBuff.
+VUL - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 18/11/22. Requires manual install into vscripts/bots folder (same as Phalanx Bot, and other recent bots, due to a Dota workshop bug). VUL-FT has no affiliation with DotaBuff.
 
 == Manually installing ==
 VUL-FT currently will not work via subscription. It will revert to the default bots, it seems other recent bots have the same issue. I'm still investigating what is going wrong there. For now, it's necessary to manually install the bots.
@@ -87,8 +87,8 @@ These three rune issues are all technically true, but there is a workaround in p
 
 ==Project State==
 Alpha version. Please give feedback.
-Is the project currently stable: very stable over 3 matches. 03/11/22 (november 3)
-Last DotaBuff meta update: 03/11/22
+Is the project currently stable: unknown over 3 matches. Potential rare game crash (needs confirmation from others). 18/11/22 (november 18)
+Last DotaBuff meta update: 18/11/22
 
 ==Dev contact==
 zyewchi@gmail.com

@@ -1,8 +1,8 @@
 local hero_data = {
 	"abyssal_underlord",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 6, 2, 2, 2, 2, 8, 4, 4, 10, 11},
+	{1, 3, 2, 1, 1, 5, 1, 4, 2, 2, 2, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_ring_of_protection","item_magic_stick","item_branches","item_branches","item_branches","item_power_treads","item_magic_wand","item_vanguard","item_soul_ring","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_buckler","item_lifesteal","item_ring_of_basilius","item_blades_of_attack","item_wraith_pact","item_helm_of_iron_will","item_crimson_guard","item_point_booster","item_ultimate_scepter","item_platemail","item_mystic_staff","item_shivas_guard","item_aghanims_shard",
+		"item_branches","item_quelling_blade","item_magic_stick","item_tango","item_circlet","item_gloves","item_boots","item_belt_of_strength","item_power_treads","item_bracer","item_magic_wand","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_lifesteal","item_ring_of_basilius","item_vladmir","item_wraith_pact","item_boots","item_aether_lens","item_octarine_core","item_gungir","item_hyperstone","item_platemail","item_buckler","item_assault",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

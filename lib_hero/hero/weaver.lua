@@ -1,8 +1,8 @@
 local hero_data = {
 	"weaver",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 8, 1, 4, 9, 12},
+	{2, 3, 1, 2, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 7, 1, 4, 9, 12},
 	{
-		"item_circlet","item_branches","item_quelling_blade","item_branches","item_slippers","item_tango","item_wraith_band","item_boots_of_elves","item_gloves","item_boots","item_power_treads","item_javelin","item_maelstrom","item_magic_wand","item_dragon_lance","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_greater_crit","item_staff_of_wizardry","item_crown","item_crown","item_gem","item_gungir","item_ultimate_orb","item_ultimate_orb","item_skadi","item_ultimate_orb","item_pers","item_sphere","item_claymore","item_aghanims_shard","item_reaver",
+		"item_branches","item_branches","item_mantle","item_slippers","item_circlet","item_tango","item_faerie_fire","item_wraith_band","item_javelin","item_magic_wand","item_mithril_hammer","item_maelstrom","item_crown","item_crown","item_ring_of_health","item_rod_of_atos","item_gungir","item_pers","item_sphere","item_lesser_crit","item_greater_crit","item_gem","item_ultimate_orb","item_skadi","item_black_king_bar","item_gem","item_gem","item_aghanims_shard","item_rapier",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

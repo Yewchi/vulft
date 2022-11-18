@@ -18,6 +18,8 @@ local role_assignments
 local player_disallowed_objective_targets
 local buyback_directive
 
+local t_present_or_committed = {} for i=1,3 do t_present_or_committed[i] = {} end -- state if pnot is at strategic lane
+
 local function check_human_indicating_lane_choice(hUnitHuman)
 	local loc = hUnitHuman.hUnit:GetLocation()
 end
@@ -173,6 +175,9 @@ function Team_CheckBuybackDirective(thisBot)
 	if buyback_directive[thisBot.nOnTeam] then
 		thisBot.hUnit:ActionImmedaite_Buyback()
 	end
+	for iLane=1,3 do
+		t_present_or_committed[iLane][thisBot.nOnTeam] = nil
+	end
 end
 
 function Team_RegisterClearForLaunchHero(gsiPlayer)
@@ -205,13 +210,11 @@ function Team_GetRoleBasedLane(thisPlayer) -- TODO Is there any way to determine
 	end
 end
 
-local t_present_or_committed = {} for i=1,3 do t_present_or_committed[i] = {} end
 function Team_GetStrategicLane(gsiPlayer)
 	local strategicLane = gsiPlayer.time.data.strategicLane
 	if not strategicLane then
-		local roleHelpWeight = (1 - gsiPlayer.role/5)
+		local roleHelpWeight = gsiPlayer.role/5
 		local highestScore = -0xFFFF
-		-- writing this bugged for core lane selection, then fixing it later after POC
 		-- TODO Include game-lateness allocation, or is it a push task alone when trying to counter-push / take obj?
 		-- - Should heroes locked to Push not try to achieve last hit timings? Why rely on farm lane only because
 		-- - of convenience.
@@ -227,7 +230,11 @@ function Team_GetStrategicLane(gsiPlayer)
 	--	DebugDrawText(370, 150+gsiPlayer.nOnTeam*8, string.format("%d-strat:%d-safe:%.1f", gsiPlayer.nOnTeam,
 	--			strategicLane, gsiPlayer.time.data.safetyOfLane[strategicLane]), 255, 255, 255)
 		gsiPlayer.time.data.strategicLane = strategicLane
-		t_present_or_committed[strategicLane][gsiPlayer.nOnTeam] = gsiPlayer
+		local pnot = gsiPlayer.nOnTeam
+		t_present_or_committed[1][pnot] = nil
+		t_present_or_committed[2][pnot] = nil
+		t_present_or_committed[3][pnot] = nil
+		t_present_or_committed[strategicLane][pnot] = gsiPlayer
 --	else
 --		DebugDrawText(370, 150+gsiPlayer.nOnTeam*8, string.format("%d-strat:%d-safe:%.1f", gsiPlayer.nOnTeam,
 --				strategicLane, gsiPlayer.time.data.safetyOfLane[strategicLane]), 255, 255, 255)

@@ -1,10 +1,10 @@
 local hero_data = {
 	"grimstroke",
-	{1, 3, 3, 2, 3, 4, 3, 2, 2, 1, 1, 4, 6, 1, 8, 2, 4, 9, 11},
+	{1, 3, 1, 3, 1, 4, 3, 2, 1, 2, 3, 4, 2, 5, 7, 2, 4, 9, 11},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_magic_stick","item_branches","item_ward_dispenser","item_magic_wand","item_boots","item_energy_booster","item_arcane_boots","item_wind_lace","item_staff_of_wizardry","item_void_stone","item_cyclone","item_aghanims_shard","item_void_stone","item_aether_lens","item_arcane_boots","item_vitality_booster","item_aeon_disk","item_gem",
+		"item_branches","item_tango","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_bottle","item_boots","item_magic_wand","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_blink","item_aghanims_shard","item_arcane_boots","item_aether_lens","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_energy_booster","item_arcane_boots","item_vitality_booster","item_aeon_disk","item_arcane_boots","item_vitality_booster","item_point_booster","item_octarine_core","item_refresher","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_overwhelming_blink",
 	},
-	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
+	{ {1,1,2,4,3,}, {5,5,5,4,2,}, 0.1 },
 	{
 		"Stroke of Fate","Phantom's Embrace","Ink Swell","Soulbind","+50 Phantom's Embrace DPS","-5.0s Ink Swell Cooldown","+20.0% Soulbind Spell Damage","+16% Ink Swell Movement Speed","+1000 Stroke of Fate Cast Range","+3 Hits to Kill Phantom","+150 Ink Swell Radius","+50% Stroke of Fate Damage",
 	}

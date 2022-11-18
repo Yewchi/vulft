@@ -535,6 +535,12 @@ blueprint = {
 			-- Don't use consumables if there are no threats and we're going back to base
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
+
+		local allowInvisBreaks = not gsiPlayer.hUnit:IsInvisible()
+		if not allowInvisBreaks then
+			-- TODO temp
+			return false, XETA_SCORE_DO_NOT_RUN
+		end
 		
 		local healthReplenishAvailable, manaReplenishAvailable
 		

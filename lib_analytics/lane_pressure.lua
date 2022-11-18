@@ -109,7 +109,7 @@ function Analytics_SafetyOfLaneFarm(gsiPlayer, lane, presentOrCommittedTbl)
 		end
 	end
 	local laneTower = GSI_GetLowestTierDefensible(gsiPlayer.team, lane) -- TODO should be towers only
-	local towerPower = laneTower.hUnit:GetAttackDamage() / gsiPlayer.hUnit:GetAttackDamage()
+	local towerPower = max(80, laneTower.hUnit:GetAttackDamage()) / gsiPlayer.hUnit:GetAttackDamage() -- TODO tier power
 	local safety = -( danger - towerPower*max(0,
 			(TOWER_GENERIC_POWER_FALLOFF - Math_PointToPointDistance2D(laneTower.lastSeen.location, laneFront))
 				/ TOWER_GENERIC_POWER_FALLOFF)

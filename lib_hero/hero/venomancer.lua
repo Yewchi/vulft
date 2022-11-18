@@ -1,10 +1,10 @@
 local hero_data = {
 	"venomancer",
-	{2, 1, 2, 3, 2, 5, 3, 3, 3, 2, 7, 5, 1, 1, 9, 1, 5, 11, 13},
+	{2, 1, 2, 1, 2, 3, 3, 5, 3, 3, 2, 5, 6, 1, 9, 1, 5, 11, 7, 13},
 	{
-		"item_tango","item_circlet","item_slippers","item_faerie_fire","item_branches","item_branches","item_wraith_band","item_boots","item_blades_of_attack","item_ring_of_basilius","item_lifesteal","item_buckler","item_magic_wand","item_vladmir","item_fluffy_hat","item_wraith_pact","item_staff_of_wizardry","item_force_staff","item_tranquil_boots","item_hood_of_defiance","item_pipe","item_energy_booster","item_void_stone","item_aether_lens","item_soul_booster","item_octarine_core",
+		"item_ring_of_protection","item_circlet","item_branches","item_branches","item_tango","item_faerie_fire","item_urn_of_shadows","item_boots","item_magic_wand","item_tranquil_boots","item_vitality_booster","item_spirit_vessel","item_cloak","item_headdress","item_hood_of_defiance","item_fluffy_hat","item_pipe","item_force_staff","item_ogre_axe","item_sange","item_kaya_and_sange","item_aghanims_shard","item_blink","item_hurricane_pike","item_boots","item_gem",
 	},
-	{ {3,3,3,3,1,}, {3,3,3,3,5,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
 	{
 		"Venomous Gale","Poison Sting","Plague Ward","Latent Toxicity","Poison Nova","-5s Venomous Gale CD","+20% Poison Sting Health Regen Reduction","-1.0s Plague Ward Cooldown","-8% Poison Sting Slow","+5.0s Poison Nova Duration","Gale Creates Plague Wards","Poison Nova reduces +100 Attack Speed","2.5x Plague Ward HP/Damage",
 	}

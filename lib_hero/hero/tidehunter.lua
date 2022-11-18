@@ -1,8 +1,8 @@
 local hero_data = {
 	"tidehunter",
-	{3, 2, 3, 2, 3, 5, 3, 2, 2, 6, 1, 5, 1, 1, 8, 1, 5, 9, 12},
+	{3, 1, 3, 2, 3, 5, 3, 2, 2, 6, 2, 5, 1, 1, 1, 8, 5, 11, 10},
 	{
-		"item_gauntlets","item_gauntlets","item_tango","item_quelling_blade","item_branches","item_branches","item_soul_ring","item_boots","item_magic_wand","item_blades_of_attack","item_ring_of_basilius","item_lifesteal","item_vladmir","item_boots","item_point_booster","item_wraith_pact","item_belt_of_strength","item_phase_boots","item_hood_of_defiance","item_pipe","item_belt_of_strength","item_ogre_axe","item_sange","item_heavens_halberd","item_pers","item_aghanims_shard","item_platemail","item_energy_booster","item_lotus_orb","item_ghost",
+		"item_branches","item_branches","item_blades_of_attack","item_branches","item_tango","item_tango","item_quelling_blade","item_gauntlets","item_gauntlets","item_tango","item_enchanted_mango","item_enchanted_mango","item_ring_of_health","item_soul_ring","item_boots","item_hood_of_defiance","item_headdress","item_energy_booster","item_arcane_boots","item_mekansm","item_guardian_greaves","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_ogre_axe","item_sange","item_kaya","item_kaya_and_sange","item_gem","item_platemail","item_buckler","item_assault","item_aghanims_shard",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

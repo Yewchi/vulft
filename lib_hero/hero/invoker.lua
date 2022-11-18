@@ -1,8 +1,8 @@
 local hero_data = {
 	"invoker",
-	{3, 1, 3, 1, 1, 3, 1, 2, 2, 3, 3, 2, 3, 3, 2, 2, 2, 2, 1, 9, 1, 7, 6, 1, 11, 1},
+	{3, 1, 3, 1, 3, 1, 3, 1, 3, 2, 3, 2, 3, 2, 2, 2, 2, 2, 1, 9, 1, 1, 6, 7, 11, 1},
 	{
-		"item_tango","item_mantle","item_circlet","item_faerie_fire","item_branches","item_branches","item_null_talisman","item_magic_wand","item_urn_of_shadows","item_boots","item_vitality_booster","item_spirit_vessel","item_gloves","item_hand_of_midas","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_ultimate_orb","item_sphere","item_ultimate_orb","item_sheepstick","item_refresher","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_ultimate_scepter_2","item_octarine_core",
+		"item_branches","item_tango","item_faerie_fire","item_branches","item_circlet","item_mantle","item_ward_observer","item_gloves","item_null_talisman","item_hand_of_midas","item_boots","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_void_stone","item_mystic_staff","item_sheepstick","item_refresher","item_vitality_booster","item_energy_booster","item_soul_booster","item_octarine_core","item_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter_2","item_aeon_disk",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

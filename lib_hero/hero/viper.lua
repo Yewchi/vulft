@@ -1,10 +1,10 @@
 local hero_data = {
 	"viper",
-	{1, 3, 1, 3, 1, 5, 2, 2, 2, 2, 6, 5, 3, 3, 9, 1, 5, 11, 13},
+	{1, 3, 1, 2, 1, 5, 1, 3, 3, 3, 2, 5, 2, 2, 9, 6, 5, 11, 7},
 	{
-		"item_tango","item_slippers","item_enchanted_mango","item_circlet","item_quelling_blade","item_branches","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_null_talisman","item_magic_wand","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_cloak","item_force_staff","item_hurricane_pike","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_hyperstone","item_platemail","item_assault","item_gem","item_sheepstick",
+		"item_slippers","item_tango","item_circlet","item_enchanted_mango","item_enchanted_mango","item_faerie_fire","item_wraith_band","item_boots","item_wraith_band","item_boots_of_elves","item_power_treads","item_cloak","item_hood_of_defiance","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_ogre_axe","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_belt_of_strength","item_sange_and_yasha","item_sheepstick","item_aghanims_shard","item_gem","item_reaver","item_boots","item_lifesteal","item_claymore","item_satanic","item_buckler","item_assault",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
 	{
 		"Poison Attack","Nethertoxin","Corrosive Skin","Nosedive","Viper Strike","+5% Poison Attack Magic Resistance Reduction","+13 Corrosive Skin Damage","+40 Nethertoxin Min/Max Damage","+12% Corrosive Skin Magic Resistance","+80 Viper Strike DPS","+25%% Poison Attack slow/damage","-11.0s Nethertoxin Cooldown","-50%% Viper Strike manacost/cooldown",
 	}

@@ -1,10 +1,10 @@
 local hero_data = {
 	"earth_spirit",
-	{1, 2, 1, 3, 2, 4, 2, 2, 3, 5, 3, 4, 3, 1, 8, 1, 4, 10, 11},
+	{1, 2, 1, 3, 1, 4, 2, 2, 2, 5, 3, 4, 3, 3, 8, 1, 4, 9, 11},
 	{
-		"item_quelling_blade","item_branches","item_gauntlets","item_gauntlets","item_tango","item_faerie_fire","item_ward_observer","item_bottle","item_boots","item_urn_of_shadows","item_gloves","item_belt_of_strength","item_power_treads","item_veil_of_discord","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_platemail","item_lotus_orb","item_aghanims_shard","item_vitality_booster","item_spirit_vessel","item_platemail","item_shivas_guard","item_boots","item_ethereal_blade",
+		"item_tango","item_ring_of_protection","item_orb_of_venom","item_branches","item_branches","item_enchanted_mango","item_ward_dispenser","item_magic_wand","item_urn_of_shadows","item_boots","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_arcane_boots","item_pers","item_lotus_orb","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter",
 	},
-	{ {3,3,3,2,5,}, {4,4,4,4,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {4,4,4,4,2,}, 0.1 },
 	{
 		"Boulder Smash","Rolling Boulder","Geomagnetic Grip","Magnetize","+325 Rolling Boulder Distance","+2s Magnetize Duration","+20 Magnetize Damage Per Second","+120 Rolling Boulder Damage","Geomagnetic Grip Targets Allies","+3.0s Geomagnetic Grip Silence","+25% Spell Amplification","+0.6s Rolling Boulder Stun Duration",
 	}

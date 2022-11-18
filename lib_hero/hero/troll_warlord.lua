@@ -1,8 +1,8 @@
 local hero_data = {
 	"troll_warlord",
-	{2, 1, 3, 3, 2, 4, 6, 3, 3, 1, 1, 4, 1},
+	{2, 1, 3, 3, 2, 4, 2, 1, 3, 1, 3, 4, 2, 6, 7, 1, 4, 10, 12},
 	{
-		"item_branches","item_branches","item_slippers","item_tango","item_quelling_blade","item_circlet","item_wraith_band","item_boots","item_chainmail","item_phase_boots","item_ring_of_health","item_pers","item_claymore","item_broadsword","item_bfury","item_wind_lace","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mithril_hammer","item_belt_of_strength","item_basher","item_reaver","item_satanic","item_yasha","item_ogre_axe","item_belt_of_strength","item_sange_and_yasha","item_swift_blink","item_abyssal_blade","item_aghanims_shard","item_moon_shard",
+		"item_quelling_blade","item_tango","item_magic_stick","item_slippers","item_branches","item_circlet","item_enchanted_mango","item_enchanted_mango","item_wraith_band","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_magic_wand","item_blade_of_alacrity","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blink","item_basher","item_lifesteal","item_claymore","item_satanic","item_abyssal_blade",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

@@ -1,10 +1,10 @@
 local hero_data = {
 	"techies",
-	{3, 1, 1, 3, 1, 5, 1, 3, 3, 6, 2, 5, 2, 2, 8, 2, 5, 11, 10, 13},
+	{1, 3, 1, 3, 1, 5, 1, 3, 3, 6, 2, 5, 2, 2, 8, 2, 5, 11, 13},
 	{
-		"item_tango","item_branches","item_blight_stone","item_branches","item_faerie_fire","item_ward_observer","item_wind_lace","item_magic_wand","item_boots","item_void_stone","item_boots","item_arcane_boots","item_aghanims_shard","item_tranquil_boots","item_aether_lens","item_wind_lace","item_ghost","item_kaya","item_ethereal_blade","item_void_stone","item_ultimate_orb","item_mystic_staff","item_sheepstick",
+		"item_ward_observer","item_boots","item_mantle","item_circlet","item_tango","item_enchanted_mango","item_ward_sentry","item_ward_sentry","item_boots","item_arcane_boots","item_void_stone","item_aether_lens","item_null_talisman","item_aghanims_shard","item_kaya","item_ghost","item_ethereal_blade","item_energy_booster","item_vitality_booster","item_arcane_boots","item_octarine_core",
 	},
-	{ {3,3,3,1,2,}, {4,4,5,3,2,}, 0.1 },
+	{ {3,3,3,3,5,}, {4,4,4,4,4,}, 0.1 },
 	{
 		"Sticky Bomb","Reactive Tazer","Blast Off!","Minefield Sign","Proximity Mines","+20% Magic Resistance","-3s Proximity Mines Cooldown","+200 Blast Off! Damage","+3 Mana Regen","+125 Sticky Bomb Latch/Explosion Radius","-15s Blast Off! Cooldown","+252 Damage","-0.8s Proximity Mines Activation Delay",
 	}

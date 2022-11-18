@@ -923,6 +923,10 @@ blueprint = {
 		end
 		local currentlyCasting = gsiPlayer.hUnit:GetCurrentActiveAbility()
 		local allowInvisBreaks = not gsiPlayer.hUnit:IsInvisible()
+		if not allowInvisBreaks then
+			-- TODO temp
+			return false, XETA_SCORE_DO_NOT_RUN
+		end
 		if currentlyCasting and Task_GetCurrentTaskHandle(gsiPlayer) == task_handle
 				and not (t_player_current_use[gsiPlayer.nOnTeam]
 					and string.find(t_player_current_use[gsiPlayer.nOnTeam]:GetName(),

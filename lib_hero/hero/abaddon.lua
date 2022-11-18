@@ -1,8 +1,8 @@
 local hero_data = {
 	"abaddon",
-	{2, 1, 1, 2, 1, 4, 3, 2, 2, 1, 6, 4, 3, 3, 8, 3, 4, 10, 12},
+	{2, 3, 1, 2, 2, 4, 2, 1, 1, 1, 6, 4, 3, 3, 8, 3, 4, 9},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_faerie_fire","item_enchanted_mango","item_magic_wand","item_boots","item_orb_of_venom","item_ring_of_basilius","item_chainmail","item_blades_of_attack","item_phase_boots","item_buckler","item_lifesteal","item_vladmir","item_wraith_pact","item_platemail","item_pers","item_lotus_orb","item_gem","item_cloak","item_headdress","item_pipe",
+		"item_tango","item_enchanted_mango","item_faerie_fire","item_quelling_blade","item_flask","item_branches","item_magic_wand","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_ogre_axe","item_robe","item_echo_sabre","item_ring_of_basilius","item_buckler","item_lifesteal","item_vladmir","item_point_booster","item_wraith_pact","item_aghanims_shard","item_buckler","item_platemail","item_hyperstone","item_assault","item_javelin",
 	},
 	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
 	{
