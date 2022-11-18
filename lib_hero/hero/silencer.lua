@@ -1,10 +1,10 @@
 local hero_data = {
 	"silencer",
-	{2, 1, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 8, 2, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 11},
 	{
-		"item_mantle","item_branches","item_circlet","item_tango","item_branches","item_branches","item_ward_dispenser","item_null_talisman","item_null_talisman","item_boots","item_gloves","item_robe","item_power_treads","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_belt_of_strength","item_blade_of_alacrity","item_hurricane_pike","item_aghanims_shard","item_blitz_knuckles","item_robe","item_chainmail","item_witch_blade","item_ogre_axe","item_mithril_hammer",
+		"item_ward_observer","item_tango","item_branches","item_branches","item_bottle","item_boots","item_magic_wand","item_ring_of_basilius","item_crown","item_veil_of_discord","item_fluffy_hat","item_arcane_boots","item_staff_of_wizardry","item_force_staff","item_aether_lens","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_kaya","item_ethereal_blade","item_mystic_staff","item_sheepstick","item_ultimate_scepter_2","item_blink","item_octarine_core","item_gem","item_arcane_blink","item_aghanims_shard","item_black_king_bar",
 	},
-	{ {1,1,1,4,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,3,2,}, {5,5,5,3,2,}, 0.1 },
 	{
 		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+12 Arcane Curse Damage","+20 Attack Speed","-25.0s Global Silence Cooldown","+0.8x Last Word Int Multiplier","+10% Glaives of Wisdom Damage","Arcane Curse Undispellable","+2 Glaives of Wisdom Bounces","Last Word Mutes",
 	}

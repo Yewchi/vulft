@@ -1,8 +1,8 @@
 local hero_data = {
 	"queenofpain",
-	{3, 1, 1, 2, 1, 4, 1, 3, 3, 2, 2, 2, 4, 3, 8, 5, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 3, 3, 3, 6, 2, 2, 2, 1, 8, 4, 4, 9, 11},
 	{
-		"item_branches","item_faerie_fire","item_branches","item_branches","item_tango","item_ward_observer","item_bottle","item_magic_wand","item_gloves","item_boots","item_robe","item_power_treads","item_robe","item_blitz_knuckles","item_witch_blade","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_aghanims_shard","item_octarine_core","item_gem","item_staff_of_wizardry","item_crown","item_dagon_2L","item_dagon_5L",
+		"item_tango","item_ward_observer","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_null_talisman","item_boots","item_blitz_knuckles","item_magic_wand","item_robe","item_chainmail","item_witch_blade","item_robe","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_aether_lens","item_octarine_core","item_kaya","item_sange","item_kaya_and_sange","item_pers","item_refresher","item_mystic_staff","item_revenants_brooch","item_mystic_staff","item_ultimate_orb","item_sheepstick",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

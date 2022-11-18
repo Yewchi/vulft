@@ -1,10 +1,10 @@
 local hero_data = {
 	"dawnbreaker",
-	{2, 1, 2, 3, 2, 4, 2, 1, 3, 1, 1, 4, 3, 3, 7, 5, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 7, 1, 4, 10, 11},
 	{
-		"item_gauntlets","item_circlet","item_branches","item_tango","item_quelling_blade","item_branches","item_bracer","item_boots","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_phase_boots","item_blight_stone","item_mithril_hammer","item_desolator","item_aghanims_shard","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_belt_of_strength","item_basher","item_ring_of_health","item_abyssal_blade","item_blink","item_overwhelming_blink","item_lesser_crit",
+		"item_faerie_fire","item_tango","item_enchanted_mango","item_branches","item_branches","item_quelling_blade","item_magic_wand","item_ring_of_basilius","item_boots","item_phase_boots","item_buckler","item_lifesteal","item_vladmir","item_aghanims_shard","item_wraith_pact","item_aghanims_shard","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_void_stone","item_ultimate_orb","item_gem","item_mystic_staff","item_sheepstick",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
 	{
 		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+12% Celestial Hammer Slow","+50% Luminosity Crit","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","2 Starbreaker Charges","+1100 Celestial Hammer Cast Range",
 	}

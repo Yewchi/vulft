@@ -31,6 +31,7 @@ local confirmed_lane_creep_set_request_denials = {} -- I'm pushing the wave down
 local FIGHTING_NO_FARMING_EXPIRY = 2
 local t_fighting_no_farming_expiry = {}
 local t_utilizing_lane_safety_value = {} -- is the bot still locked to a lane during the early game
+local t_power_seal_throttle = {} -- Should the bot check if it can start roaming the map freely
 
 local task_handle = Task_CreateNewTask()
 
@@ -75,6 +76,7 @@ local function task_init_func(taskJobDomain)
 	
 	for i=1,TEAM_NUMBER_OF_PLAYERS do
 		t_utilizing_lane_safety_value[i] = true
+		t_power_seal_throttle[i] = Time_CreateThrottle(8)
 		t_fighting_no_farming_expiry[i] = 0
 	end
 	
@@ -126,11 +128,14 @@ local function task_init_func(taskJobDomain)
 end
 Blueprint_RegisterTask(task_init_func)
 
+
+
 function Farm_GetMostSuitedLane(gsiPlayer, localCreepSet)
 	local roleBasedLane = Team_GetRoleBasedLane(gsiPlayer)
 	-- "return" to your assigned lane unless you're in kill mode or the only core here, before you can 
 	-- farm jungle. as "return" because any single task could keep a bot in any location at any time, but if
 	-- there is nothing of value to do here, consider only your role's lane.
+	--print(gsiPlayer.shortName, "sees localCreepSet lane ", localCreepSet and localCreepSet.lane, Blueprint_GetCurrentTaskActivityType(gsiPlayer), ACTIVITY_TYPE.CONTROLLED_AGGRESSION, localCreepSet and Farm_AnyOtherCoresInLane(gsiPlayer, localCreepSet))
 	if t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] then
 		if gsiPlayer.level >= 4
 				and (GSI_AnyTierUnderHealthPercent(1, 0.15)
@@ -142,6 +147,7 @@ function Farm_GetMostSuitedLane(gsiPlayer, localCreepSet)
 					)
 				)
 			t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] = false
+			t_power_seal_throttle[gsiPlayer.nOnTeam] = nil
 		elseif localCreepSet and localCreepSet.lane ~= roleBasedLane then
 			if Blueprint_GetCurrentTaskActivityType(gsiPlayer) > ACTIVITY_TYPE.CONTROLLED_AGGRESSION
 					and Farm_AnyOtherCoresInLane(gsiPlayer, localCreepSet) then
@@ -307,14 +313,17 @@ blueprint_farm_lane = {
 		-- -| a local reference -- Avoid when possible in-loop.
 		local laneToFarm = Map_GetLaneValueOfMapPoint(gsiPlayer.lastSeen.location)
 		local thisPlayerRoleBasedLane = Team_GetRoleBasedLane(gsiPlayer)
-		local enemyCreepSet = Set_GetEnemyCreepSetLaneFront(thisPlayerRoleBasedLane) -- tmp set til determined
+		local enemyCreepSet = Set_GetEnemyCreepSetLaneFront(laneToFarm)
 		if not t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] or laneToFarm ~= thisPlayerRoleBasedLane then
 			laneToFarm = Farm_GetMostSuitedLane(gsiPlayer, enemyCreepSet)
 			if not enemyCreepSet or laneToFarm ~= enemyCreepSet.lane then
+				--print("changing creep set to lane", laneToFarm, 'from', enemyCreepSet and enemyCreepSet.lane)
 				enemyCreepSet = Set_GetEnemyCreepSetLaneFront(laneToFarm)
 			end
+		elseif t_power_seal_throttle[gsiPlayer.nOnTeam] and t_power_seal_throttle[gsiPlayer.nOnTeam]:allowed() then
+			Farm_GetMostSuitedLane(gsiPlayer, nil)
 		end
-		if DEBUG and not TEAM_IS_RADIANT then DebugDrawText(2, 500+gsiPlayer.nOnTeam*8, string.format("%s-%d-%d-%d", gsiPlayer.shortName, laneToFarm, Team_GetRoleBasedLane(gsiPlayer), Farm_GetMostSuitedLane(gsiPlayer, enemyCreepSet)), 255, 255, 255) end
+		--[[DEV]]if DEBUG and not TEAM_IS_RADIANT then DebugDrawText(2, 500+gsiPlayer.nOnTeam*8, string.format("%s-%d-%d-%d", gsiPlayer.shortName, laneToFarm, Team_GetRoleBasedLane(gsiPlayer), Farm_GetMostSuitedLane(gsiPlayer, enemyCreepSet)), 255, 255, 255) end
 		local alliedCreepSet = Set_GetAlliedCreepSetLaneFront(thisPlayerRoleBasedLane)
 		local recentDamageTakenCare = Analytics_GetTotalDamageInTimeline(gsiPlayer)*VALUE_OF_ONE_HEALTH
 		local playerAttackDamage = gsiPlayer.hUnit:GetAttackDamage() -- nb. this is only to avoid a non-check on creeps not being damaged but very low health
@@ -364,7 +373,7 @@ blueprint_farm_lane = {
 			local highestValueCreepTimelineDamage = 0
 			local previousPlayerForMyHighestValueCreep = nil
 			local laneFrontUnitsEnemy = enemyCreepSet.units
-			if DEBUG then DebugDrawCircle(enemyCreepSet.center, 100, 80, 0, 80) end
+			--[[DEV]]if DEBUG then DebugDrawCircle(enemyCreepSet.center, 100, 80, 0, 80) end
 			local playerCurrentAttackDamage = max(1, gsiPlayer.hUnit:GetAttackDamage())
 			if TEST and DEBUG_IsBotTheIntern() then
 				print(gsiPlayer.shortName, "away from lane care factor", awayFromLaneCareFactor, powerLevel)
@@ -401,11 +410,11 @@ blueprint_farm_lane = {
 					thisXeta = thisXeta - recentDamageTakenCare
 				end
 				if prevObjective == thisCreep then prevScore = thisXeta end
-				if VERBOSE and DEBUG_IsBotTheIntern() then
-					local x, y = Math_ScreenCoordsToCartesianCentered(thisCreep.lastSeen.location.x - gsiPlayer.hUnit:GetLocation().x, gsiPlayer.hUnit:GetLocation().y - thisCreep.lastSeen.location.y, 0.6)
-					local _, player = Farm_CheckTakeOverLastHitRequest(gsiPlayer, thisCreep, thisXeta*0.9)
-					DebugDrawText(x, y, string.format("%d:%.1f:%s", thisCreep.lastSeenHealth, thisXeta, player and string.sub(player.shortName,1,4) or ""), TEAM==TEAM_DIRE and 30 or 255, TEAM==TEAM_RADIANT and 30 or 255, 30)
-				end
+			--[[DEV]]	if VERBOSE and DEBUG_IsBotTheIntern() then
+			--[[DEV]]		local x, y = Math_ScreenCoordsToCartesianCentered(thisCreep.lastSeen.location.x - gsiPlayer.hUnit:GetLocation().x, gsiPlayer.hUnit:GetLocation().y - thisCreep.lastSeen.location.y, 0.6)
+			--[[DEV]]		local _, player = Farm_CheckTakeOverLastHitRequest(gsiPlayer, thisCreep, thisXeta*0.9)
+			--[[DEV]]		DebugDrawText(x, y, string.format("%d:%.1f:%s", thisCreep.lastSeenHealth, thisXeta, player and string.sub(player.shortName,1,4) or ""), TEAM==TEAM_DIRE and 30 or 255, TEAM==TEAM_RADIANT and 30 or 255, 30)
+			--[[DEV]]	end
 				if thisXeta > highestValueCreepXeta then
 					local allowedTakeOver, thisPreviousPlayer = 
 							Farm_CheckTakeOverLastHitRequest(gsiPlayer, thisCreep, thisXeta*0.9)
@@ -586,9 +595,10 @@ function Farm_TryLastHitRequest(gsiPlayer, creep, extrapolatedXeta)
 end
 
 function Farm_AnyOtherCoresInLane(gsiPlayer, creepSet)
-	for i=1,#creepSet do
-		local confirmedDenial = confirmed_lane_creep_set_request_denials[creepSet]
-		if confirmedDenial and confirmedDenial.player ~= gsiPlayer and confirmedDenial.player.role >= 3 then
+	local units = creepSet.units
+	for i=1,#units do
+		local confirmedDenial = confirmed_last_hit_request_denials[units[i]]
+		if confirmedDenial and confirmedDenial.player ~= gsiPlayer and confirmedDenial.player.role <= 3 then
 			if DEBUG then print("I should leave lane for other cores", creepSet.lane, gsiPlayer.shortName) end
 			return true, confirmedDenial.player
 		end

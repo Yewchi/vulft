@@ -1,10 +1,10 @@
 local hero_data = {
 	"dragon_knight",
-	{2, 3, 3, 1, 1, 4, 1, 2, 1, 3, 2, 4, 5, 3, 7, 2, 4, 9, 12},
+	{2, 3, 3, 1, 1, 4, 2, 1, 3, 1, 5, 4, 2, 3, 8, 2, 4, 9, 11},
 	{
-		"item_tango","item_gauntlets","item_gauntlets","item_branches","item_ward_observer","item_quelling_blade","item_branches","item_soul_ring","item_magic_wand","item_boots","item_gloves","item_power_treads","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_hyperstone","item_assault","item_hyperstone","item_mjollnir","item_javelin","item_blitz_knuckles","item_ultimate_scepter_2","item_monkey_king_bar","item_swift_blink",
+		"item_gauntlets","item_gauntlets","item_circlet","item_circlet","item_bracer","item_boots","item_soul_ring","item_gloves","item_belt_of_strength","item_power_treads","item_blink","item_magic_wand","item_aghanims_shard","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_maelstrom","item_hyperstone","item_mjollnir","item_lesser_crit","item_invis_sword","item_silver_edge","item_blitz_knuckles","item_claymore","item_void_stone","item_mage_slayer","item_bloodthorn","item_ultimate_scepter_2","item_black_king_bar","item_boots","item_swift_blink",
 	},
-	{ {3,3,3,2,1,}, {3,3,3,2,1,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,2,4,2,}, 0.1 },
 	{
 		"Breathe Fire","Dragon Tail","Dragon Blood","Elder Dragon Form","+15 Damage","-30% Breathe Fire Damage Reduction","+0.5s Dragon Tail","+400 Health","+175 Elder Dragon Form Attack Range","+75% Breathe Fire Damage/Cast Range in Dragon Form","+12 Dragon Blood HP Regen/Armor","+400 AoE Dragon Tail During Elder Dragon Form",
 	}

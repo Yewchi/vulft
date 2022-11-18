@@ -1,8 +1,8 @@
 local hero_data = {
 	"beastmaster",
-	{1, 2, 1, 4, 2, 6, 2, 2, 4, 4, 4, 6, 1, 1, 10, 7, 6, 12, 14},
+	{1, 4, 1, 2, 1, 6, 1, 2, 2, 2, 4, 6, 4, 4, 9, 7, 6, 12, 13},
 	{
-		"item_quelling_blade","item_enchanted_mango","item_sobi_mask","item_branches","item_branches","item_ring_of_basilius","item_helm_of_iron_will","item_crown","item_helm_of_the_dominator","item_lifesteal","item_buckler","item_blades_of_attack","item_vladmir","item_helm_of_the_overlord","item_boots","item_wind_lace","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ogre_axe","item_ultimate_scepter","item_gem","item_kaya","item_gem","item_ethereal_blade",
+		"item_branches","item_tango","item_quelling_blade","item_enchanted_mango","item_enchanted_mango","item_sobi_mask","item_branches","item_ring_of_basilius","item_helm_of_iron_will","item_crown","item_helm_of_the_dominator","item_boots","item_buckler","item_lifesteal","item_vladmir","item_helm_of_the_overlord","item_aghanims_shard","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_gem","item_blink","item_arcane_boots","item_pers","item_gem","item_lotus_orb",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

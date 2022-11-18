@@ -1,8 +1,8 @@
 local hero_data = {
 	"faceless_void",
-	{1, 3, 2, 3, 3, 4, 3, 1, 1, 1, 6, 4, 2, 2, 7, 2},
+	{1, 2, 3, 3, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 7, 6, 9, 4, 11},
 	{
-		"item_tango","item_branches","item_slippers","item_circlet","item_quelling_blade","item_gloves","item_hand_of_midas","item_wraith_band","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_javelin","item_mithril_hammer","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mjollnir","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_pers","item_pers","item_refresher","item_sphere","item_lesser_crit","item_ultimate_scepter_2","item_greater_crit","item_quarterstaff","item_skadi","item_rapier",
+		"item_enchanted_mango","item_magic_stick","item_quelling_blade","item_branches","item_circlet","item_wraith_band","item_boots_of_elves","item_power_treads","item_gloves","item_gloves","item_hand_of_midas","item_javelin","item_mithril_hammer","item_maelstrom","item_magic_wand","item_ogre_axe","item_black_king_bar","item_ultimate_orb","item_yasha","item_manta","item_mjollnir","item_ultimate_orb","item_ultimate_orb","item_point_booster","item_skadi","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

@@ -1,10 +1,10 @@
 local hero_data = {
 	"bristleback",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 10, 12},
+	{2, 3, 2, 3, 2, 4, 2, 1, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_enchanted_mango","item_enchanted_mango","item_magic_stick","item_branches","item_branches","item_enchanted_mango","item_ring_of_health","item_falcon_blade","item_boots","item_magic_wand","item_vanguard","item_ring_of_health","item_cloak","item_hood_of_defiance","item_power_treads","item_void_stone","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_voodoo_mask","item_eternal_shroud","item_sheepstick","item_aghanims_shard",
+		"item_quelling_blade","item_tango","item_gauntlets","item_gauntlets","item_enchanted_mango","item_soul_ring","item_boots","item_ring_of_health","item_vanguard","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_power_treads","item_ogre_axe","item_black_king_bar","item_platemail","item_aghanims_shard","item_hyperstone","item_buckler","item_assault","item_octarine_core","item_voodoo_mask","item_ultimate_scepter_2","item_bloodstone","item_basher","item_abyssal_blade",
 	},
-	{ {3,3,3,1,1,}, {3,3,3,1,1,}, 0.1 },
+	{ {1,1,1,3,3,}, {1,1,1,3,3,}, 0.1 },
 	{
 		"Viscous Nasal Goo","Quill Spray","Bristleback","Warpath","+15 Damage","+1.5 Mana Regen","+150 Goo Cast Range","+8%/+8% Bristleback Back/Side Damage Reduction","+20 Health Regen","+20 Quill Stack Damage","+12% Spell Lifesteal","+18 Warpath Damage Per Stack",
 	}

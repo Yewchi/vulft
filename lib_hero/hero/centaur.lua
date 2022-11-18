@@ -1,8 +1,8 @@
 local hero_data = {
 	"centaur",
-	{1, 2, 2, 3, 3, 5, 3, 2, 2, 1, 1, 5, 1, 3, 9, 7, 5, 11, 13, 6},
+	{1, 2, 2, 3, 2, 5, 2, 1, 1, 3, 1, 5, 3, 3, 9, 6, 5, 11, 7, 13},
 	{
-		"item_tango","item_quelling_blade","item_ring_of_protection","item_ring_of_protection","item_branches","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_chainmail","item_phase_boots","item_blink","item_aghanims_shard","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_reaver","item_vitality_booster","item_heart","item_platemail","item_hyperstone","item_assault","item_overwhelming_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar",
+		"item_tango","item_magic_stick","item_quelling_blade","item_flask","item_branches","item_branches","item_magic_wand","item_ring_of_health","item_boots","item_chainmail","item_phase_boots","item_hood_of_defiance","item_blink","item_fluffy_hat","item_ring_of_basilius","item_buckler","item_lifesteal","item_blades_of_attack","item_vladmir","item_wraith_pact","item_force_staff","item_reaver","item_overwhelming_blink","item_aghanims_shard",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

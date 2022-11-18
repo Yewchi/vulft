@@ -1,8 +1,8 @@
 local hero_data = {
 	"lina",
-	{2, 3, 1, 1, 1, 5, 1, 3, 3, 6, 3, 5, 2, 2, 8, 2, 5, 11, 13, 9},
+	{1, 3, 1, 2, 1, 5, 1, 3, 3, 6, 3, 5, 2, 2, 8, 2, 5, 11, 13, 9},
 	{
-		"item_tango","item_ward_observer","item_branches","item_faerie_fire","item_branches","item_branches","item_bottle","item_boots","item_arcane_boots","item_magic_wand","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_octarine_core","item_invis_sword","item_sphere","item_lesser_crit","item_aghanims_shard","item_ultimate_scepter_2","item_silver_edge",
+		"item_tango","item_branches","item_ward_observer","item_branches","item_branches","item_faerie_fire","item_bottle","item_magic_wand","item_boots","item_blades_of_attack","item_falcon_blade","item_blitz_knuckles","item_broadsword","item_invis_sword","item_silver_edge","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_sheepstick","item_satanic","item_gem","item_refresher",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

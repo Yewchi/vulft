@@ -1,8 +1,8 @@
 local hero_data = {
 	"juggernaut",
-	{1, 2, 1, 3, 1, 5, 1, 2, 2, 6, 2, 5, 3, 3, 9, 3},
+	{1, 3, 1, 2, 1, 5, 1, 2, 2, 6, 2, 5, 3, 3, 9, 3, 7, 11},
 	{
-		"item_tango","item_quelling_blade","item_circlet","item_branches","item_slippers","item_branches","item_wraith_band","item_boots","item_blades_of_attack","item_phase_boots","item_javelin","item_magic_wand","item_maelstrom","item_boots_of_elves","item_yasha","item_aghanims_shard","item_manta","item_ultimate_orb","item_skadi","item_mithril_hammer","item_belt_of_strength","item_basher","item_mjollnir","item_blink","item_eagle","item_swift_blink","item_nullifier",
+		"item_quelling_blade","item_branches","item_magic_stick","item_tango","item_branches","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_javelin","item_magic_wand","item_mithril_hammer","item_maelstrom","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_ogre_axe","item_sange_and_yasha","item_aghanims_shard","item_ultimate_orb","item_ultimate_orb","item_skadi","item_mithril_hammer","item_basher","item_mjollnir","item_blink",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

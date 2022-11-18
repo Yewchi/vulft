@@ -1,10 +1,10 @@
 local hero_data = {
 	"sniper",
-	{2, 1, 1, 3, 1, 2, 1, 3, 3, 10, 3, 2, 2, 5, 8, 5, 5, 11, 13},
+	{1, 2, 1, 3, 1, 2, 1, 2, 2, 3, 3, 3, 5, 5, 8, 9, 5, 11},
 	{
-		"item_circlet","item_slippers","item_tango","item_slippers","item_branches","item_wraith_band","item_wraith_band","item_gloves","item_boots_of_elves","item_power_treads","item_lifesteal","item_mask_of_madness","item_javelin","item_maelstrom","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_aghanims_shard","item_shadow_amulet","item_blitz_knuckles","item_invis_sword","item_mjollnir","item_silver_edge","item_monkey_king_bar","item_moon_shard","item_blink","item_blink","item_swift_blink",
+		"item_circlet","item_magic_stick","item_branches","item_branches","item_slippers","item_boots_of_elves","item_magic_wand","item_wraith_band","item_gloves","item_boots","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_boots_of_elves","item_yasha","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_hurricane_pike","item_blitz_knuckles","item_javelin","item_demon_edge","item_javelin","item_monkey_king_bar","item_aghanims_shard","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_skadi","item_shadow_amulet","item_blitz_knuckles","item_sange","item_sange_and_yasha",
 	},
-	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
+	{ {1,1,1,2,3,}, {1,1,1,2,3,}, 0.1 },
 	{
 		"Shrapnel","Headshot","Take Aim","Concussive Grenade","Assassinate","+1.0s Take Aim Duration","+30 Headshot Damage","+30 Attack Speed","-14% Shrapnel Slow","+28 Knockback Distance Headshot","+24 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
 	}

@@ -1,8 +1,8 @@
 local hero_data = {
 	"legion_commander",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 8, 3, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 3, 2, 6, 3, 4, 2, 2, 7, 3, 4, 9, 12},
 	{
-		"item_branches","item_tango","item_branches","item_quelling_blade","item_gauntlets","item_gauntlets","item_boots","item_chainmail","item_phase_boots","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_blink","item_broadsword","item_blade_mail","item_ring_of_basilius","item_buckler","item_blades_of_attack","item_vladmir","item_wraith_pact","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_aether_lens","item_arcane_blink",
+		"item_branches","item_tango","item_branches","item_quelling_blade","item_gauntlets","item_circlet","item_bracer","item_blades_of_attack","item_boots","item_falcon_blade","item_chainmail","item_phase_boots","item_blink","item_broadsword","item_blade_mail","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_reaver","item_lifesteal","item_satanic","item_hyperstone","item_assault","item_talisman_of_evasion","item_ultimate_orb",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

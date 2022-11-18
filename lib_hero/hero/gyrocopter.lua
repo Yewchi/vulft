@@ -1,10 +1,10 @@
 local hero_data = {
 	"gyrocopter",
-	{1, 2, 1, 2, 1, 4, 3, 2, 3, 6, 1, 4, 2, 3, 7, 3, 4, 9, 11},
+	{3, 2, 3, 2, 3, 4, 3, 2, 1, 6, 1, 4, 2, 9, 8, 11, 1, 4, 1},
 	{
-		"item_wraith_band","item_tango","item_magic_wand","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_javelin","item_mithril_hammer","item_maelstrom","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_belt_of_strength","item_yasha","item_sange_and_yasha","item_lifesteal","item_claymore","item_satanic","item_lesser_crit","item_greater_crit","item_black_king_bar","item_ultimate_scepter_2","item_blink","item_swift_blink","item_moon_shard","item_desolator","item_desolator",
+		"item_circlet","item_tango","item_branches","item_branches","item_quelling_blade","item_slippers","item_wraith_band","item_gloves","item_magic_wand","item_boots","item_ring_of_basilius","item_boots_of_elves","item_power_treads","item_broadsword","item_blades_of_attack","item_lesser_crit","item_staff_of_wizardry","item_blade_of_alacrity","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lifesteal","item_greater_crit","item_satanic","item_eagle","item_butterfly","item_ultimate_orb","item_skadi","item_ultimate_scepter_2","item_blink",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,4,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {1,1,1,1,4,}, 0.1 },
 	{
 		"Rocket Barrage","Homing Missile","Flak Cannon","Call Down","+30 Movement Speed during Rocket Barrage","+200 Health","+0.4s Homing Missile Stun Duration","+2 Flak Cannon Attacks","+40 Flak Cannon Damage","+16 Rocket Barrage Damage","-6s Flak Cannon Cooldown","3x Call Down",
 	}

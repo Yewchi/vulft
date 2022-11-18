@@ -1,8 +1,8 @@
 local hero_data = {
 	"antimage",
-	{1, 2, 1, 3, 1, 4, 2, 2, 2, 1, 5, 4, 3, 3, 7, 3, 4, 10, 12},
+	{1, 2, 1, 3, 2, 4, 2, 2, 1, 5, 3, 4, 3, 3, 7, 1, 4, 10, 12},
 	{
-		"item_quelling_blade","item_orb_of_venom","item_branches","item_branches","item_tango","item_ring_of_health","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_broadsword","item_bfury","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_basher","item_vanguard","item_abyssal_blade","item_hyperstone","item_assault","item_black_king_bar","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_ultimate_scepter_2","item_skadi",
+		"item_quelling_blade","item_tango","item_branches","item_orb_of_venom","item_branches","item_ring_of_health","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_broadsword","item_claymore","item_bfury","item_magic_wand","item_yasha","item_manta","item_mithril_hammer","item_belt_of_strength","item_blight_stone","item_fluffy_hat","item_basher","item_orb_of_corrosion","item_abyssal_blade","item_ultimate_orb","item_skadi","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_quarterstaff","item_butterfly",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

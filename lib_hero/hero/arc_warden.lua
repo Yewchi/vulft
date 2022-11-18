@@ -1,8 +1,8 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
+	{3, 1, 3, 1, 3, 4, 1, 3, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
 	{
-		"item_branches","item_branches","item_branches","item_circlet","item_faerie_fire","item_circlet","item_gloves","item_hand_of_midas","item_javelin","item_mithril_hammer","item_boots","item_maelstrom","item_rod_of_atos","item_gungir","item_arcane_boots","item_aether_lens","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_sheepstick","item_ultimate_scepter_2","item_overwhelming_blink","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_mystic_staff","item_wind_waker","item_aghanims_shard","item_moon_shard","item_ethereal_blade","item_solar_crest",
+		"item_boots","item_ward_observer","item_circlet","item_tango","item_branches","item_faerie_fire","item_slippers","item_branches","item_gloves","item_hand_of_midas","item_maelstrom","item_boots","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_energy_booster","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_kaya","item_ghost","item_ethereal_blade","item_blink","item_reaver","item_overwhelming_blink","item_shivas_guard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_aghanims_shard","item_moon_shard",
 	},
 	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{

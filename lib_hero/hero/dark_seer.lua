@@ -1,8 +1,8 @@
 local hero_data = {
 	"dark_seer",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 3, 3, 1, 4, 1, 5, 7, 3, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_circlet","item_mantle","item_null_talisman","item_boots","item_energy_booster","item_arcane_boots","item_chainmail","item_headdress","item_mekansm","item_cloak","item_headdress","item_ring_of_health","item_pipe","item_blink","item_buckler","item_guardian_greaves","item_void_stone","item_energy_booster","item_aether_lens","item_octarine_core","item_void_stone","item_sheepstick","item_point_booster","item_ultimate_scepter","item_ultimate_scepter_2","item_black_king_bar",
+		"item_mantle","item_tango","item_circlet","item_quelling_blade","item_branches","item_ring_of_basilius","item_boots","item_null_talisman","item_arcane_boots","item_ring_of_health","item_headdress","item_chainmail","item_mekansm","item_vanguard","item_cyclone","item_buckler","item_guardian_greaves","item_gem","item_blink","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_aghanims_shard","item_crimson_guard","item_mystic_staff","item_ultimate_orb","item_sheepstick",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

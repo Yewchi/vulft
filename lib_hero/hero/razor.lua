@@ -1,10 +1,10 @@
 local hero_data = {
 	"razor",
-	{2, 1, 1, 2, 1, 4, 1, 3, 2, 5, 2, 4, 3, 3, 7, 3, 4, 9, 12},
+	{2, 1, 2, 1, 2, 4, 1, 3, 2, 5, 1, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_boots_of_elves","item_branches","item_branches","item_branches","item_boots","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_gloves","item_power_treads","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_blink","item_black_king_bar","item_ring_of_health","item_pers","item_refresher","item_ultimate_orb","item_skadi","item_reaver","item_satanic","item_gem","item_swift_blink","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter_2","item_boots",
+		"item_magic_stick","item_tango","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_faerie_fire","item_ring_of_basilius","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_magic_wand","item_blade_of_alacrity","item_wind_lace","item_yasha","item_pers","item_refresher","item_platemail","item_shivas_guard","item_manta","item_lifesteal","item_claymore","item_satanic",
 	},
-	{ {1,1,3,2,3,}, {1,1,3,2,3,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
 		"Plasma Field","Static Link","Storm Surge","Eye of the Storm","+30 Plasma Field Damage","+9 Agility","+5 Static Link Damage Steal","+14 Strength","+21% Storm Surge Move Speed","0.1s Eye of the Storm Strike Interval","Creates A Second Plasma Field Delayed By +0.8s","Static Link Steals Attack Speed",
 	}
