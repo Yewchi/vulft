@@ -1,8 +1,8 @@
 local hero_data = {
 	"sand_king",
-	{1, 2, 1, 2, 2, 4, 2, 3, 1, 1, 6, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 3, 2, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_gauntlets","item_gauntlets","item_tango","item_enchanted_mango","item_circlet","item_bracer","item_ring_of_health","item_soul_ring","item_vanguard","item_boots","item_blink","item_aghanims_shard","item_staff_of_wizardry","item_cyclone","item_ultimate_orb","item_pers","item_sphere","item_wind_waker","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_ghost",
+		"item_quelling_blade","item_branches","item_tango","item_flask","item_enchanted_mango","item_gauntlets","item_ward_sentry","item_magic_wand","item_boots","item_blink","item_wind_lace","item_cyclone","item_aghanims_shard","item_platemail","item_pers","item_lotus_orb","item_platemail","item_mystic_staff","item_shivas_guard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_wind_waker","item_overwhelming_blink","item_ultimate_scepter_2","item_aeon_disk","item_refresher",
 	},
 	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{

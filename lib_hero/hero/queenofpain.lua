@@ -1,8 +1,8 @@
 local hero_data = {
 	"queenofpain",
-	{1, 3, 1, 2, 1, 4, 3, 3, 3, 6, 2, 2, 2, 1, 8, 4, 4, 9, 11},
+	{3, 1, 1, 2, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 8, 6, 4, 9, 11},
 	{
-		"item_tango","item_ward_observer","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_null_talisman","item_boots","item_blitz_knuckles","item_magic_wand","item_robe","item_chainmail","item_witch_blade","item_robe","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_aether_lens","item_octarine_core","item_kaya","item_sange","item_kaya_and_sange","item_pers","item_refresher","item_mystic_staff","item_revenants_brooch","item_mystic_staff","item_ultimate_orb","item_sheepstick",
+		"item_branches","item_branches","item_branches","item_tango","item_faerie_fire","item_ward_observer","item_bottle","item_gloves","item_boots","item_robe","item_power_treads","item_chainmail","item_magic_wand","item_blitz_knuckles","item_robe","item_witch_blade","item_staff_of_wizardry","item_robe","item_kaya","item_ethereal_blade","item_platemail","item_mystic_staff","item_shivas_guard","item_black_king_bar","item_aghanims_shard","item_ultimate_orb","item_skadi","item_revenants_brooch","item_octarine_core","item_moon_shard",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

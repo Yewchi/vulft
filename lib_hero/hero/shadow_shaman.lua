@@ -1,8 +1,8 @@
 local hero_data = {
 	"shadow_shaman",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 8, 6, 4, 10, 12},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 3, 3, 4, 3, 2, 8, 5, 4, 10},
 	{
-		"item_tango","item_ward_sentry","item_ward_sentry","item_branches","item_branches","item_branches","item_tango","item_enchanted_mango","item_enchanted_mango","item_boots","item_magic_wand","item_wind_lace","item_arcane_boots","item_aghanims_shard","item_void_stone","item_arcane_boots","item_aether_lens","item_blink","item_arcane_boots","item_cloak","item_gem","item_glimmer_cape",
+		"item_ward_sentry","item_tango","item_flask","item_enchanted_mango","item_faerie_fire","item_gauntlets","item_ward_observer","item_wind_lace","item_boots","item_arcane_boots","item_aether_lens","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_aghanims_shard","item_blink",
 	},
 	{ {3,3,3,1,1,}, {4,4,4,5,5,}, 0.1 },
 	{

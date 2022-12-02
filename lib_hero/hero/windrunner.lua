@@ -1,10 +1,10 @@
 local hero_data = {
 	"windrunner",
-	{2, 3, 2, 3, 2, 4, 2, 3, 3, 1, 1, 4, 1, 1, 7, 6, 4, 10, 12},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 1, 1, 4, 3, 1, 7, 6, 4, 9, 12},
 	{
-		"item_tango","item_branches","item_ward_observer","item_faerie_fire","item_branches","item_branches","item_bottle","item_magic_wand","item_boots","item_orb_of_venom","item_blight_stone","item_orb_of_corrosion","item_robe","item_power_treads","item_javelin","item_mithril_hammer","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_staff_of_wizardry","item_rod_of_atos","item_gungir","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_lesser_crit","item_demon_edge","item_greater_crit",
+		"item_ward_observer","item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_magic_wand","item_boots","item_gloves","item_robe","item_power_treads","item_javelin","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_gem","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_gem","item_boots","item_gungir","item_helm_of_iron_will","item_nullifier","item_gem",
 	},
-	{ {3,3,3,2,2,}, {3,3,2,4,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
 	{
 		"Shackleshot","Powershot","Windrun","Focus Fire","+200 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.8s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
 	}

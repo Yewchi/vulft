@@ -1,10 +1,10 @@
 local hero_data = {
 	"necrolyte",
-	{1, 3, 1, 3, 1, 4, 1, 3, 2, 3, 5, 4, 2, 2, 7, 2, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 2, 3, 3, 5, 4, 2, 2, 2, 7, 4, 9, 11},
 	{
-		"item_magic_stick","item_tango","item_faerie_fire","item_circlet","item_branches","item_magic_wand","item_boots","item_urn_of_shadows","item_cloak","item_ring_of_health","item_hood_of_defiance","item_vitality_booster","item_wind_lace","item_spirit_vessel","item_void_stone","item_cyclone","item_blink","item_reaver","item_overwhelming_blink","item_mystic_staff","item_wind_waker","item_sange","item_staff_of_wizardry","item_kaya","item_kaya_and_sange","item_aghanims_shard",
+		"item_mantle","item_circlet","item_tango","item_faerie_fire","item_branches","item_enchanted_mango","item_null_talisman","item_boots","item_magic_wand","item_chainmail","item_phase_boots","item_belt_of_strength","item_ogre_axe","item_sange","item_aghanims_shard","item_staff_of_wizardry","item_robe","item_kaya_and_sange","item_platemail","item_shivas_guard","item_reaver","item_heart","item_talisman_of_evasion","item_radiance","item_platemail","item_pers","item_energy_booster","item_lotus_orb","item_boots","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,3,1,}, {2,2,2,3,1,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
 	{
 		"Death Pulse","Ghost Shroud","Heartstopper Aura","Reaper's Scythe","+100 Reaper's Scythe Cast Range","+2s Heartstopper Aura Stack Duration","+24% Ghost Shroud Slow","+32 Death Pulse Heal","+15% Ghost Shroud Self Restoration Amp","+32% Heartstopper Regen Reduction","+0.5% Heartstopper Aura Damage","-2.5s Death Pulse Cooldown",
 	}

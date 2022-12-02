@@ -1,10 +1,10 @@
 local hero_data = {
 	"lion",
-	{1, 3, 2, 1, 1, 4, 2, 1, 3, 3, 2, 4, 2, 3, 8, 5, 4, 10},
+	{1, 2, 1, 2, 1, 4, 1, 3, 3, 3, 3, 4, 2, 2, 8, 6, 4, 9, 12},
 	{
-		"item_faerie_fire","item_faerie_fire","item_faerie_fire","item_tango","item_enchanted_mango","item_ward_observer","item_wind_lace","item_boots","item_tranquil_boots","item_wind_lace","item_magic_wand","item_blink","item_aghanims_shard","item_energy_booster","item_aether_lens","item_gem","item_point_booster","item_octarine_core",
+		"item_faerie_fire","item_magic_stick","item_tango","item_faerie_fire","item_enchanted_mango","item_ward_sentry","item_boots","item_wind_lace","item_tranquil_boots","item_magic_wand","item_blink","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_aghanims_shard","item_gem","item_staff_of_wizardry","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem",
 	},
-	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
+	{ {1,1,1,4,3,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-2s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
 	}

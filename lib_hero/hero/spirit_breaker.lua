@@ -1,10 +1,10 @@
 local hero_data = {
 	"spirit_breaker",
-	{3, 1, 3, 1, 3, 5, 3, 1, 1, 2, 2, 5, 2, 2, 9, 6, 5, 11, 7},
+	{3, 1, 3, 1, 3, 5, 3, 2, 1, 2, 1, 5, 2, 2, 8, 9, 5, 11},
 	{
-		"item_boots","item_ward_sentry","item_branches","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_blitz_knuckles","item_shadow_amulet","item_broadsword","item_invis_sword","item_gem","item_black_king_bar","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_gem","item_buckler","item_platemail","item_hyperstone","item_assault","item_ghost",
+		"item_tango","item_enchanted_mango","item_quelling_blade","item_flask","item_branches","item_branches","item_branches","item_boots","item_magic_wand","item_chainmail","item_gloves","item_hand_of_midas","item_phase_boots","item_blitz_knuckles","item_broadsword","item_shadow_amulet","item_invis_sword","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_silver_edge","item_kaya","item_blade_of_alacrity","item_boots_of_elves","item_yasha_and_kaya","item_boots",
 	},
-	{ {3,3,3,5,5,}, {4,4,4,3,3,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,4,4,}, 0.1 },
 	{
 		"Charge of Darkness","Bulldoze","Greater Bash","Planar Pocket","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
 	}

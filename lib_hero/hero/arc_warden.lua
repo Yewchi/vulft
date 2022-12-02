@@ -1,10 +1,10 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 3, 1, 3, 4, 1, 3, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
+	{3, 1, 1, 3, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
 	{
-		"item_boots","item_ward_observer","item_circlet","item_tango","item_branches","item_faerie_fire","item_slippers","item_branches","item_gloves","item_hand_of_midas","item_maelstrom","item_boots","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_energy_booster","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_kaya","item_ghost","item_ethereal_blade","item_blink","item_reaver","item_overwhelming_blink","item_shivas_guard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_aghanims_shard","item_moon_shard",
+		"item_branches","item_quelling_blade","item_tango","item_circlet","item_slippers","item_branches","item_gloves","item_wraith_band","item_hand_of_midas","item_javelin","item_maelstrom","item_boots","item_crown","item_staff_of_wizardry","item_crown","item_magic_wand","item_gungir","item_aether_lens","item_vitality_booster","item_energy_booster","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_ethereal_blade","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
+	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
 	{
 		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+225 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed","+125 Spark Wraith Damage","+40 Flux Damage","+50% Tempest Double Cooldown Reduction","+12s Tempest Double Duration",
 	}

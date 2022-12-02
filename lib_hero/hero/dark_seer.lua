@@ -1,8 +1,8 @@
 local hero_data = {
 	"dark_seer",
-	{2, 1, 2, 3, 2, 4, 2, 1, 3, 3, 1, 4, 1, 5, 7, 3, 4, 9, 11},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 1, 1, 4, 7, 5, 4, 10, 11},
 	{
-		"item_mantle","item_tango","item_circlet","item_quelling_blade","item_branches","item_ring_of_basilius","item_boots","item_null_talisman","item_arcane_boots","item_ring_of_health","item_headdress","item_chainmail","item_mekansm","item_vanguard","item_cyclone","item_buckler","item_guardian_greaves","item_gem","item_blink","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_aghanims_shard","item_crimson_guard","item_mystic_staff","item_ultimate_orb","item_sheepstick",
+		"item_mantle","item_circlet","item_enchanted_mango","item_enchanted_mango","item_branches","item_branches","item_branches","item_null_talisman","item_boots","item_arcane_boots","item_magic_wand","item_staff_of_wizardry","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_platemail","item_shivas_guard","item_glimmer_cape","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_desolator","item_mask_of_madness",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

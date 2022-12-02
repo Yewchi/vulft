@@ -1,8 +1,8 @@
 local hero_data = {
 	"weaver",
-	{2, 3, 1, 2, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 8, 1, 4, 9, 12},
 	{
-		"item_branches","item_branches","item_mantle","item_slippers","item_circlet","item_tango","item_faerie_fire","item_wraith_band","item_javelin","item_magic_wand","item_mithril_hammer","item_maelstrom","item_crown","item_crown","item_ring_of_health","item_rod_of_atos","item_gungir","item_pers","item_sphere","item_lesser_crit","item_greater_crit","item_gem","item_ultimate_orb","item_skadi","item_black_king_bar","item_gem","item_gem","item_aghanims_shard","item_rapier",
+		"item_tango","item_slippers","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_tango","item_branches","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_magic_wand","item_boots_of_elves","item_wraith_band","item_boots","item_gloves","item_power_treads","item_mithril_hammer","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_lesser_crit","item_demon_edge","item_greater_crit","item_lifesteal","item_claymore","item_reaver","item_satanic",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

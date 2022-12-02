@@ -1,10 +1,10 @@
 local hero_data = {
 	"bounty_hunter",
-	{2, 1, 2, 1, 2, 4, 2, 3, 1, 1, 6, 4, 3, 3, 3, 7, 4, 9, 11},
+	{2, 1, 2, 1, 2, 4, 2, 1, 1, 6, 3, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_slippers","item_tango","item_circlet","item_branches","item_quelling_blade","item_enchanted_mango","item_enchanted_mango","item_wraith_band","item_boots","item_chainmail","item_phase_boots","item_ring_of_health","item_ogre_axe","item_magic_wand","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_vanguard","item_aether_lens","item_octarine_core","item_lotus_orb","item_aghanims_shard","item_black_king_bar","item_mystic_staff","item_ultimate_orb",
+		"item_circlet","item_slippers","item_branches","item_tango","item_quelling_blade","item_branches","item_wraith_band","item_boots","item_falcon_blade","item_chainmail","item_blades_of_attack","item_magic_wand","item_phase_boots","item_ogre_axe","item_blade_of_alacrity","item_staff_of_wizardry","item_point_booster","item_ultimate_scepter","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_soul_booster","item_octarine_core","item_ethereal_blade","item_dagon_5","item_dagon_5L",
 	},
-	{ {3,3,3,3,1,}, {3,3,3,1,4,}, 0.1 },
+	{ {3,3,3,1,2,}, {3,3,3,1,2,}, 0.1 },
 	{
 		"Shuriken Toss","Jinada","Shadow Walk","Track","+10% Shadow Walk Slow","+40 Jinada Damage","+2s Silence on Hit With Shadow Walk","Half Track Bonus Speed to Allies","Track Grants 600 Ground Vision","+50 Jinada Gold Steal","2 Shuriken Toss Charges","+250 Track Gold",
 	}

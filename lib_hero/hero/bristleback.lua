@@ -1,10 +1,10 @@
 local hero_data = {
 	"bristleback",
-	{2, 3, 2, 3, 2, 4, 2, 1, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_gauntlets","item_gauntlets","item_enchanted_mango","item_soul_ring","item_boots","item_ring_of_health","item_vanguard","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_power_treads","item_ogre_axe","item_black_king_bar","item_platemail","item_aghanims_shard","item_hyperstone","item_buckler","item_assault","item_octarine_core","item_voodoo_mask","item_ultimate_scepter_2","item_bloodstone","item_basher","item_abyssal_blade",
+		"item_quelling_blade","item_tango","item_enchanted_mango","item_enchanted_mango","item_ring_of_protection","item_branches","item_ring_of_health","item_vanguard","item_boots","item_soul_ring","item_magic_wand","item_staff_of_wizardry","item_point_booster","item_blade_of_alacrity","item_staff_of_wizardry","item_ultimate_scepter","item_arcane_boots","item_lotus_orb","item_platemail","item_hyperstone","item_buckler","item_assault","item_basher","item_abyssal_blade","item_blink","item_overwhelming_blink","item_aghanims_shard",
 	},
-	{ {1,1,1,3,3,}, {1,1,1,3,3,}, 0.1 },
+	{ {3,3,3,1,1,}, {3,3,3,1,1,}, 0.1 },
 	{
 		"Viscous Nasal Goo","Quill Spray","Bristleback","Warpath","+15 Damage","+1.5 Mana Regen","+150 Goo Cast Range","+8%/+8% Bristleback Back/Side Damage Reduction","+20 Health Regen","+20 Quill Stack Damage","+12% Spell Lifesteal","+18 Warpath Damage Per Stack",
 	}

@@ -1,8 +1,8 @@
 local hero_data = {
 	"abyssal_underlord",
-	{1, 3, 2, 1, 1, 5, 1, 4, 2, 2, 2, 4, 3, 3, 8, 3, 4, 9, 11},
+	{3, 1, 1, 3, 1, 4, 1, 2, 3, 3, 2, 4, 2, 2, 8, 5, 4, 9, 11},
 	{
-		"item_branches","item_quelling_blade","item_magic_stick","item_tango","item_circlet","item_gloves","item_boots","item_belt_of_strength","item_power_treads","item_bracer","item_magic_wand","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_lifesteal","item_ring_of_basilius","item_vladmir","item_wraith_pact","item_boots","item_aether_lens","item_octarine_core","item_gungir","item_hyperstone","item_platemail","item_buckler","item_assault",
+		"item_quelling_blade","item_gauntlets","item_gauntlets","item_tango","item_branches","item_branches","item_soul_ring","item_boots","item_energy_booster","item_arcane_boots","item_cloak","item_ring_of_health","item_hood_of_defiance","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_aghanims_shard","item_headdress","item_pipe","item_aghanims_shard","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aether_lens","item_vitality_booster","item_energy_booster","item_energy_booster","item_octarine_core",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

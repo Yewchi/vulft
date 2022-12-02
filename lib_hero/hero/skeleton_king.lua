@@ -1,10 +1,10 @@
 local hero_data = {
 	"skeleton_king",
-	{1, 2, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 9, 11},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 10, 11},
 	{
-		"item_gauntlets","item_magic_stick","item_quelling_blade","item_branches","item_enchanted_mango","item_bracer","item_boots","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_gloves","item_helm_of_iron_will","item_armlet","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_relic","item_radiance","item_blink","item_overwhelming_blink","item_buckler","item_assault","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_refresher",
+		"item_quelling_blade","item_gauntlets","item_circlet","item_branches","item_tango","item_branches","item_gauntlets","item_helm_of_iron_will","item_boots","item_magic_wand","item_blades_of_attack","item_gloves","item_phase_boots","item_armlet","item_soul_ring","item_mithril_hammer","item_blight_stone","item_desolator","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_buckler","item_hyperstone","item_assault","item_basher","item_abyssal_blade","item_overwhelming_blink","item_echo_sabre",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Wraithfire Blast","Vampiric Spirit","Mortal Strike","Reincarnation","+8% Vampiric Spirit Lifesteal","-25%% Summon Skeleton Duration/-25%% Cooldown","+0.7s Wraithfire Blast Stun Duration","+26 Skeletons Attack Damage","+25% Cleave","+6 Minimum Skeletons Spawned","-2.0s Mortal Strike Cooldown","Reincarnation Casts Wraithfire Blast",
 	}

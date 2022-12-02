@@ -1,10 +1,10 @@
 local hero_data = {
 	"snapfire",
-	{1, 2, 1, 2, 1, 5, 1, 2, 2, 6, 3, 5, 3, 3, 8, 3, 5, 10, 12},
+	{1, 2, 1, 2, 1, 5, 1, 2, 2, 6, 3, 5, 3, 3, 9, 3, 5, 11, 13, 7},
 	{
-		"item_tango","item_branches","item_faerie_fire","item_circlet","item_gauntlets","item_ward_observer","item_tango","item_bracer","item_soul_ring","item_boots","item_magic_wand","item_power_treads","item_buckler","item_ring_of_basilius","item_blades_of_attack","item_vladmir","item_wraith_pact","item_aghanims_shard","item_point_booster","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_black_king_bar","item_shadow_amulet","item_blitz_knuckles","item_desolator",
+		"item_ward_dispenser","item_branches","item_ring_of_protection","item_ring_of_basilius","item_boots","item_magic_wand","item_buckler","item_lifesteal","item_aghanims_shard","item_lifesteal","item_blades_of_attack","item_vladmir","item_wraith_pact","item_glimmer_cape","item_platemail","item_energy_booster","item_arcane_boots","item_lotus_orb","item_ethereal_blade","item_gem","item_gem","item_arcane_boots","item_aeon_disk","item_lesser_crit","item_gem","item_greater_crit","item_moon_shard","item_moon_shard",
 	},
-	{ {2,2,2,3,1,}, {2,2,2,3,5,}, 0.1 },
+	{ {2,2,2,3,5,}, {2,2,2,4,4,}, 0.1 },
 	{
 		"Scatterblast","Firesnap Cookie","Lil' Shredder","Spit Out","Mortimer Kisses","+60 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","Lil' Shredder Uses Your Attack Damage","+60 Mortimer Kisses Impact Damage","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
 	}

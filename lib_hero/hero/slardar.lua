@@ -2,7 +2,7 @@ local hero_data = {
 	"slardar",
 	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 8, 2, 4, 10, 12},
 	{
-		"item_tango","item_quelling_blade","item_circlet","item_gauntlets","item_branches","item_magic_stick","item_bracer","item_boots","item_power_treads","item_magic_wand","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_broadsword","item_invis_sword","item_hyperstone","item_buckler","item_assault","item_gem","item_desolator",
+		"item_tango","item_faerie_fire","item_magic_stick","item_gauntlets","item_branches","item_branches","item_ward_observer","item_bracer","item_boots","item_power_treads","item_ogre_axe","item_robe","item_quarterstaff","item_echo_sabre","item_aghanims_shard","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_blitz_knuckles","item_demon_edge","item_javelin","item_monkey_king_bar","item_reaver","item_overwhelming_blink",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

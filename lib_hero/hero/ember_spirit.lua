@@ -1,8 +1,8 @@
 local hero_data = {
 	"ember_spirit",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 3, 3, 4, 3, 3, 7, 5, 4, 10, 11},
+	{3, 2, 2, 1, 2, 4, 2, 1, 1, 1, 4, 3, 3, 3, 7, 5, 4, 10, 11},
 	{
-		"item_tango","item_ward_observer","item_quelling_blade","item_branches","item_branches","item_faerie_fire","item_branches","item_bottle","item_blight_stone","item_magic_wand","item_boots","item_chainmail","item_phase_boots","item_mithril_hammer","item_javelin","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_aghanims_shard","item_force_staff","item_rod_of_atos","item_gungir","item_pers","item_ultimate_scepter_2","item_refresher","item_blink",
+		"item_quelling_blade","item_branches","item_ward_observer","item_tango","item_branches","item_faerie_fire","item_branches","item_bottle","item_boots","item_blight_stone","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_javelin","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_belt_of_strength","item_sange","item_robe","item_staff_of_wizardry","item_kaya_and_sange","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_aghanims_shard","item_sphere","item_gungir",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

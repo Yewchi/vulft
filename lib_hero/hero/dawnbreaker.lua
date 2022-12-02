@@ -1,8 +1,8 @@
 local hero_data = {
 	"dawnbreaker",
-	{2, 1, 2, 3, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 7, 1, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 1, 5, 1, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_faerie_fire","item_tango","item_enchanted_mango","item_branches","item_branches","item_quelling_blade","item_magic_wand","item_ring_of_basilius","item_boots","item_phase_boots","item_buckler","item_lifesteal","item_vladmir","item_aghanims_shard","item_wraith_pact","item_aghanims_shard","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_void_stone","item_ultimate_orb","item_gem","item_mystic_staff","item_sheepstick",
+		"item_branches","item_branches","item_tango","item_orb_of_venom","item_enchanted_mango","item_ward_dispenser","item_wind_lace","item_boots","item_magic_wand","item_orb_of_corrosion","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_aghanims_shard","item_headdress","item_fluffy_hat","item_holy_locket","item_tranquil_boots","item_mekansm","item_energy_booster","item_arcane_boots","item_guardian_greaves","item_gem","item_point_booster","item_ultimate_scepter",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
 	{

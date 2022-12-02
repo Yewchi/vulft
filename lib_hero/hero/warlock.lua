@@ -1,10 +1,10 @@
 local hero_data = {
 	"warlock",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 8, 3, 4, 9, 11},
+	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 7, 3, 4, 9},
 	{
-		"item_tango","item_clarity","item_ward_sentry","item_faerie_fire","item_branches","item_branches","item_magic_stick","item_clarity","item_clarity","item_branches","item_magic_wand","item_boots","item_arcane_boots","item_aghanims_shard","item_cloak","item_shadow_amulet","item_cloak","item_glimmer_cape","item_aether_lens","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_void_stone","item_void_stone","item_pers","item_pers","item_refresher",
+		"item_sobi_mask","item_tango","item_ward_sentry","item_branches","item_branches","item_enchanted_mango","item_ring_of_basilius","item_boots","item_wind_lace","item_belt_of_strength","item_robe","item_ancient_janggo","item_magic_wand","item_arcane_boots","item_void_stone","item_aether_lens","item_tranquil_boots","item_boots_of_bearing","item_gem","item_aghanims_shard","item_veil_of_discord","item_gem","item_refresher",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Fatal Bonds","Shadow Word","Upheaval","Chaotic Offering","+3% Fatal Bonds Damage","+75 Upheaval Radius","+12 Upheaval Attack Speed per second on Allies","-4s Shadow Word Cooldown","Summons a Golem on death","+25 Shadow Word Damage/Heal","+20 Chaotic Offering Golems Armor","80% Magic Resistance for Chaotic Offering Golems",
 	}

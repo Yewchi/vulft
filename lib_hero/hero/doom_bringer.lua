@@ -1,8 +1,8 @@
 local hero_data = {
 	"doom_bringer",
-	{1, 2, 2, 1, 2, 4, 1, 2, 3, 6, 1, 4, 3, 3, 7, 3, 4, 10, 11},
+	{1, 2, 2, 1, 1, 4, 2, 2, 1, 3, 3, 4, 3, 3, 7, 6, 4, 10, 11},
 	{
-		"item_tango","item_magic_stick","item_quelling_blade","item_gauntlets","item_branches","item_magic_wand","item_boots","item_gloves","item_hand_of_midas","item_chainmail","item_blades_of_attack","item_phase_boots","item_wind_lace","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_platemail","item_mystic_staff","item_shivas_guard","item_aghanims_shard","item_aether_lens","item_octarine_core","item_ultimate_scepter","item_boots","item_overwhelming_blink","item_ultimate_scepter_2","item_ring_of_health",
+		"item_faerie_fire","item_tango","item_ward_observer","item_branches","item_branches","item_quelling_blade","item_bottle","item_magic_wand","item_boots","item_gloves","item_hand_of_midas","item_phase_boots","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_energy_booster","item_aether_lens","item_octarine_core","item_platemail","item_shivas_guard","item_ultimate_scepter","item_aghanims_shard","item_overwhelming_blink","item_boots","item_refresher","item_ultimate_scepter_2",
 	},
 	{ {3,3,3,2,1,}, {3,3,3,2,1,}, 0.1 },
 	{

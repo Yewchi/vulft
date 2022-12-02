@@ -1,10 +1,10 @@
 local hero_data = {
 	"lina",
-	{1, 3, 1, 2, 1, 5, 1, 3, 3, 6, 3, 5, 2, 2, 8, 2, 5, 11, 13, 9},
+	{1, 3, 1, 2, 1, 5, 1, 3, 3, 6, 3, 5, 2, 2, 8, 2, 9, 11, 13},
 	{
-		"item_tango","item_branches","item_ward_observer","item_branches","item_branches","item_faerie_fire","item_bottle","item_magic_wand","item_boots","item_blades_of_attack","item_falcon_blade","item_blitz_knuckles","item_broadsword","item_invis_sword","item_silver_edge","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_sheepstick","item_satanic","item_gem","item_refresher",
+		"item_ward_observer","item_branches","item_branches","item_branches","item_tango","item_faerie_fire","item_bottle","item_blades_of_attack","item_falcon_blade","item_boots","item_broadsword","item_blitz_knuckles","item_invis_sword","item_magic_wand","item_pers","item_sphere","item_lesser_crit","item_silver_edge","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_sheepstick","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{
 		"Dragon Slave","Light Strike Array","Fiery Soul","Flame Cloak","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+350 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure and pierces Spell Immunity",
 	}

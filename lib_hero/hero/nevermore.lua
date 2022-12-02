@@ -1,8 +1,8 @@
 local hero_data = {
 	"nevermore",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 2, 1, 2, 1, 2, 1, 2, 4, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_circlet","item_tango","item_magic_stick","item_branches","item_branches","item_bracer","item_boots","item_ring_of_basilius","item_magic_wand","item_belt_of_strength","item_gloves","item_power_treads","item_lifesteal","item_mask_of_madness","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_blitz_knuckles","item_shadow_amulet","item_broadsword","item_invis_sword","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_silver_edge","item_hurricane_pike","item_eagle","item_swift_blink","item_boots",
+		"item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_branches","item_tango","item_tango","item_branches","item_tango","item_faerie_fire","item_ring_of_basilius","item_boots","item_magic_wand","item_gloves","item_boots_of_elves","item_power_treads","item_lifesteal","item_quarterstaff","item_mask_of_madness","item_blade_of_alacrity","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_aghanims_shard","item_broadsword","item_blades_of_attack","item_lesser_crit","item_greater_crit","item_blink","item_mystic_staff","item_arcane_blink","item_eagle","item_butterfly","item_claymore","item_reaver","item_satanic","item_sheepstick","item_moon_shard",
 	},
 	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
 	{
