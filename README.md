@@ -1,8 +1,18 @@
 Developer README.md
 
-Development status: Active, suprisingly (13/10/22)
+Development status: Fortnightly update (11/03/23)
 
 VUL-FT - Very U(gly, Unrolled, Unabstracted, and Fast) Lua Full Takeover for Dota 2
+
+==Installing==
+
+Please see the README.steam file for install instructions. If you have git, you can
+'git clone https://github.com/Yewchi/vulft.git' while in the directory:
+
+	<%STEAM_DIR%>steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots
+
+Alternatively, press the probably green "Code" button above, and download the repo
+as a zip, and unzip it to the same folder stated above.
 
 ==Project workflow==
 
@@ -12,8 +22,6 @@ Project workspaces can be viewed in the vim sessions (enter g then CTRL+T to tab
 	vim -S .anwf
 	vim -S .syswf
 	vim -S .herowf
-
-(Requires Vim 8.2 or greater)
 	
 or alternatively in bash
 	. .wf
@@ -59,61 +67,37 @@ but it was because of split pushing, a total accident that penetrated a weakness
 wombo combo style bots. Now, the bots 'play better', but lose out to RMM's strong desire
 for taking objectives -- Something VUL doesn't really understand yet. 13/10/22
 
-==Lua is frustrating==
+==Lua==
 
-The code is generally okay but due to the scale, very messy. I have strong feelings about
-the overhead that Lua provides when calling functions and switching file contexts--the
-way that it takes a mile-long step away from C data handling--not because it is
-unnessesary and not to ignore accessible community content creation and safety, but
-because it is unfortunate when asking "How often will I call this function?" and the
-answer may be "Often enough to unroll the function anew for each instance of use, and to
-abandon functional abstraction standards; or adhering to standards would see us with
-10 more functions inside of this function, and most computation spent on overhead." To
-strain, I hate this code-base, because it's meant to be lean and mean but it has to be
-bloated, it begs to be cleaned up.
+This codebase is very stubborn about disobeying coding practices that Lua expects of it's
+programmers, in order to improve performance. Modules/Files might be very messy where
+abstraction would make things neat. If it looks like garbage it's because I'm thinking
+about functional overhead.
 
-Additionally, using a C library funciton like band() intead of a self-written locally
-indexed Math_BinaryAnd() was an order of magnitude improvement (for that single
-operation). There is a reason these C for Lua libraries have been written. I double
-checked my work. I made the BinaryAnd func just return the argument value. Still huge
-overhead.
+==Optimizing isn't finished==
 
-Opposing all of this, vector mathematics do not use the Valve API wherever possible --
+Let me know if this runs poorly on your computer, or worse than other bots.
+
+https://steamcommunity.com/sharedfiles/filedetails/?id=2872725543
+
+Vector mathematics do not use the Valve API wherever possible --
 I'm quite sure they are Valves compiled and optimized C++ -- I did this because
 I wanted to improve my vector mathematics.
 
-==Problem of scope==
+==Future progress==
 
-The bots are at 'about 1/2' of their intended macro and micro strength, and 'maybe 3/4'
-of my own computational limit target. So there would be a hell of a lot more to do on
-this project. The task system I designed allows the tacking-on of additional tasks
-like the strength of a knotted rope, computationally. Every other task added fights for
-analytical CPU time like uniquely-coloured gumballs falling through the machine 5 at a
-time or per frame, so quite a few more things could be added, re-prioritized (like
-increasing the weight of that colour gumball) and look like a very colourful gumball
-machine, and much more formidable bot. However, the gumball queue can be flooded if
-too many task priorities are set to the first list ('analyze me' this is re-prioritizing)
-too often.
+Bots aren't done, they can be much better and include grander strategy, but it's a
+lot of work and my main motivation currently is "it's something to do." If I could
+make a job out of this I'd be all over it.
 
-One negative effect of the system is that tasks will usually be assessed multiple frames
-in a row, but they are being filtered down to lower priority lists while they are not
-reprioritizing, and as long as things are calibrated well enough, it gives the
-opportunity for other tasks to get bonus analytics as the other tasks get pushed to lists
-below.
+==Support==
 
-CPU usage naturally drops on slower computers, but tasks tend to receive about the same
-percentage of CPU time. The slower the computer, the more the tasks rely on real-time
-reprioritization to receive consideration.
+Please shoot me an email for any questions or to support the project:
+zyewchi@gmail.com
 
-In a redesign I would pressurize the metaphorical gumballs to pop into the analytical
-loop over time so that priority deltas didn't have to be so hand-crafted. Even a simple
-value that starts at large arbitrary negative P and increases by a static value scaled to
-a priority per frame, sorting tasks during priority increases, then running the top 5
-tasks and putting them back at -P.
-
-woo
-
-Thank you for reading,
+If you would like to support the project, my paypal is on the above email with the
+goofy robot icon. Support means I can justify more time to make them better. But
+also just a nice comment on the workshop page helps a lot.
 
 ==Contact==
 
