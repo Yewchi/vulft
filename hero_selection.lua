@@ -34,7 +34,7 @@ local t_heroes_implemented = {
 		"npc_dota_hero_enchantress",
 		"npc_dota_hero_grimstroke",
 		"npc_dota_hero_gyrocopter",
-		--"npc_dota_hero_invoker", -- shh
+		--"npc_dota_hero_invoker",
 		--"npc_dota_hero_jakiro",
 		--"npc_dota_hero_juggernaut",
 		"npc_dota_hero_lich",
@@ -42,11 +42,13 @@ local t_heroes_implemented = {
 		"npc_dota_hero_lina",
 		"npc_dota_hero_lion",
 		--"npc_dota_hero_luna",
+		"npc_dota_hero_muerta",
 		"npc_dota_hero_night_stalker",
 		"npc_dota_hero_nyx_assassin",
 		"npc_dota_hero_ogre_magi",
 		"npc_dota_hero_phantom_assassin",
 		"npc_dota_hero_queenofpain",
+		--"npc_dota_hero_rattletrap",
 		"npc_dota_hero_sand_king",
 		"npc_dota_hero_silencer",
 		"npc_dota_hero_skeleton_king",
@@ -96,8 +98,9 @@ local abs = math.abs
 local floor = math.floor
 
 --TEMPORARY
-local NEXT_PICK_WAIT = 6
+local NEXT_PICK_WAIT = 7.5
 local NEXT_PICK_POOL_ADDITION_WAIT = 0.75
+local MAX_NEXT_PICK_WAIT_RANDOM_TIME = 7.0
 local next_turn_to_pick_time
 local next_pick_pool_addition
 local turn_to_pick = 0
@@ -138,6 +141,7 @@ local role_distribution = {0, 0, 0, 0, 0} -- how many players could pick each ro
 
 local function load_role_data_by_name(heroName, pick_index)
 	-- Search for the hero if the player had already picked without being loaded
+	print("/VUL-FT/ [#] [hero_selection]", GetTeam(), "loading hero", heroName)
 	if not pick_index then
 		--print(string.format("/VUL-FT/ searching for already picked '%s'.", heroName))
 		local i=0
@@ -149,7 +153,7 @@ local function load_role_data_by_name(heroName, pick_index)
 			i = i + 1
 		end
 		if i == num_heroes_implemented then
-			print("/VUL-FT/ [WARN] ... not found. loading default role data...")
+			print(string.format("/VUL-FT/ [WARN] '%s' from %d known heroes not found. loading default role data...", heroName or 'nil', num_heroes_implemented))
 			heroName = "default"
 			pick_index = -1
 		end
@@ -168,7 +172,7 @@ local function add_random_hero_to_pick_pool()
 	-- find an unloaded hero
 	for i=0,num_heroes_implemented do
 		tryAddHeroIndex = (tryAddHeroIndex + 1) % num_heroes_implemented
-		if pick_pool[tryAddHeroIndex] == HERO_UNLOADED_UNPICKED_FLAG then
+		if pick_pool[tryAddHeroIndex] == HERO_UNPICKED_UNLOADED_FLAG then
 			load_role_data_by_name(t_heroes_implemented[tryAddHeroIndex], tryAddHeroIndex)
 			num_heroes_loaded = num_heroes_loaded + 1
 			return
@@ -340,7 +344,11 @@ local function pick_hero(pickPoolIndex, playerId)
 	while(resetIndex ~= pickPoolIndex) do
 		-- check the hero is not already picked
 		--print(pickPoolIndex, pick_pool[pickPoolIndex], hero_is_free(t_heroes_implemented[pickPoolIndex], pickPoolIndex))
-		if pick_pool[pickPoolIndex] and hero_is_free(t_heroes_implemented[pickPoolIndex], pickPoolIndex) then
+		if pick_pool[pickPoolIndex] then
+			if not hero_is_free(t_heroes_implemented[pickPoolIndex], pickPoolIndex) then
+				pick_pool[pickPoolIndex] = HERO_ALREADY_PICKED_FLAG
+				goto NEXT_TRY_PICK;
+			end
 			-- calculate in basic how much we're revealing the strat
 			-- factor in need for the role
 			local roleData = pick_pool[pickPoolIndex][HD_I__LANE_AND_ROLE][LR_I__ROLE]
@@ -379,6 +387,7 @@ local function pick_hero(pickPoolIndex, playerId)
 				lowSafetyPick = pickPoolIndex
 			end
 		end
+		::NEXT_TRY_PICK::
 		pickPoolIndex = (pickPoolIndex + 1) % num_heroes_implemented
 	end
 	-- pick
@@ -429,11 +438,32 @@ end
 function Think()
 	-- Check TeamPlayers data ready and init
 	if not next_turn_to_pick_time then
+		InstallChatCallback(
+			function(event)
+				if not FAST_PICK_ON then 
+					FAST_PICK_ON = true
+					print(event.string)
+					if event.string == "!fastpick" or event.string == "!goo" or event.string == "!..bruh" or event.string == "!skettit" or event.string == "!fast" or event.string == "!pickfast" then
+						print("Picking speed increased...")
+						if not event.team_only then
+							print("-- Make sure to type the command like '/all !fast' to have both teams increase speed")
+						end
+						next_turn_to_pick_time = next_turn_to_pick_time / 4
+						next_pick_pool_addition = next_pick_pool_addition / 4
+						NEXT_PICK_WAIT = NEXT_PICK_WAIT / 4
+						NEXT_PICK_POOL_ADDITION_WAIT = NEXT_PICK_POOL_ADDITION_WAIT / 4
+						MAX_NEXT_PICK_WAIT_RANDOM_TIME = MAX_NEXT_PICK_WAIT_RANDOM_TIME / 4
+					end
+				end
+			end
+		)
+
 		team_members = GetTeamPlayers(GetTeam())
 		enemy_members = GetTeamPlayers(GetOpposingTeam())
 		print(#team_members, #enemy_members, team_members[1], team_members[4], enemy_members[1], enemy_members[4], "members")
 		if not team_members or not enemy_members then return end
 		for i=1,#team_members do
+			print("/VUL-FT/ [hero_selection] Found team member", team_members[i])
 			if not IsPlayerBot(team_members[i]) then
 				table.insert(players_to_watch, team_members[i])
 			end
@@ -441,6 +471,11 @@ function Think()
 		next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0, 6)
 		next_pick_pool_addition = GameTime() + NEXT_PICK_POOL_ADDITION_WAIT
 		turn_to_pick = 1
+
+--[[DEV]]		if GetTeam() == 3 then 
+--[[DEV]]			SelectHero(9, "npc_dota_hero_doom_bringer")
+--[[DEV]]		end
+
 		return
 	end
 	-- Speed up the picks if the enemy finished picking
@@ -463,11 +498,12 @@ function Think()
 					)
 				table.remove(players_to_watch, i)
 				i=i-1
-				next_pick_pool_addition = next_turn_to_pick_time + NEXT_PICK_WAIT/3 
+				--next_pick_pool_addition = next_turn_to_pick_time + NEXT_PICK_WAIT/3 
 			end
 			i=i+1
 		end
 	end
+
 	-- Add heroes to the pick pool for consideration intermittently
 	if still_making_picks then
 		if next_pick_pool_addition < GameTime() then
@@ -478,7 +514,7 @@ function Think()
 		-- Pick a hero from the pick pool which suits a required role, or keeps our options open
 		if still_making_picks and next_turn_to_pick_time < GameTime() then
 			if pick_hero(RandomInt(0, num_heroes_implemented-1), team_members[turn_to_pick]) then
-				next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0.0, 9.0)
+				next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0.0, MAX_NEXT_PICK_WAIT_RANDOM_TIME)
 			end
 			if turn_to_pick == 5 then
 				still_making_picks = false

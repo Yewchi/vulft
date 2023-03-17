@@ -1,5 +1,9 @@
 require(GetScriptDirectory().."/lib_hero/ability/damage_tracker")
 
+local B_AND = bit.band
+local min = math.min
+local max = math.max
+
 ABILITY_TYPE = {
 		["UNIT_TARGET"] = 		0x000001,
 		["POINT_TARGET"] =		0x000002,
@@ -27,7 +31,43 @@ ABILITY_TYPE = {
 		["INVIS"] =				0x800000,
 }
 
-local B_AND = bit.band
+local function get_ability_vulft_flags(hAbility)
+	--[[ TODO TODO TODO
+	local bFlags = hAbility:GetBehavior()
+	local targFlags = hAbility:GetTargetFlags()
+	local damage = hAbility:GetSpecialValueFloat("damage")
+	local teamFlags = hAbility:GetTargetTeam()
+	damage = damage > 0 and damage or hAbility:GetSpecialValueFloat("damage_per_second")
+	damage = damage > 0 and damage or hAbility:GetSpecialValueFloat("hit_damage")
+	damage = damage > 0 and damage or hAbility:GetSpecialValueFloat("dps")
+	damage = damage > 0 and damage or hAbility:GetSpecialValueFloat("base_damage")
+	local slow = hAbility:GetSpecialValueFloat("slow")
+	slow = slow > 0 and slow or hAbility:GetSpecialValueFloat("movement_slow")
+	slow = slow > 0 and slow or hAbility:GetSpecialValueFloat("move_slow_pct")
+	slow = slow > 0 and slow or hAbility:GetSpecialValueFloat("move_speed_slow_pct")
+	slow = slow > 0 and slow or hAbility:GetSpecialValueFloat("slow_duration")
+	slow = slow > 0 and slow or hAbility:GetSpecialValueFloat("slow_movement_speed_pct")
+	local degen = slow > 0 and slow or hAbility:GetSpecialValueFloat("silence_duration")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("silence")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("attack_damage_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("armor_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("damage_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("attack_speed_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("attack_speed_slow")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("spell_resistance_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("magic_resistance_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("health_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("heal_reduction")
+	degen = degen > 0 and degen or hAbility:GetSpecialValueFloat("regen_reduction_pct")
+	degen = degen > 0 and degen or damage == 0 and heal == 0 and hAbility:GetSpecialValueFloat("duration") and 1 or 0
+	local stun = hAbility:GetSpecialValueFloat("stun")
+	stun = stun > 0 and stun or hAbility:GetSpecialValueFloat("stun_duration")
+	blahreturn (B_AND(ABILITY_BEHAVIOR_UNIT_TARGET, behavior) > 0 and ABILITY_BEHAVIOR_UNIT_TARGET or 0)
+		+ (B_AND(ABILITY_BEHAVIOR_POINT, behavior) > 0 and ABILITY_BEHAVIOR_POINT or 0)
+		+ hAbility:GetSpecialValueFloat("damage") > 0 and 
+	]]
+end
+
 
 local FINAL_ABILITY_FIELD = ABILITY_TYPE.SECONDARY
 
@@ -69,10 +109,9 @@ local t_defensive_ranked = {}
 local t_save_ranked = {} -- i.e. oracle's ult, venge swap
 local t_tempo_switch_ranked = {}
 local t_dps_ranked = {} -- i.e. ranked by what you'd pick first on rosh with no spell block and hero resistances
---
 
-local min = math.min
-local max = math.max
+local warn_limit_ability_unknown = 5
+--
 
 local empty_func = function() end
 local AMMEND_TYPE_FUNCS = {
@@ -177,6 +216,36 @@ local function try_create_valid_build_order(gsiPlayer, skillBuildsTbl) -- Ensure
 	-- Check if skill build will have impossible skill ups
 end
 
+local function create_unknown_ability_index(hAbility)
+	local name = hAbility and hAbility.GetName and hAbility:GetName()
+	--[[ TODO TODO TODO
+	if name and abilityFlags then
+		local newAbiiltyData = {name, 0, nil,
+				{AbilityLogic_AbilityHasAdditionalEffect(hAbility), -- it's false atm
+					B_AND(hAbility:GetTargetFlags(), ABILITY_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES) > 0,
+					not (B_AND(hAbility:GetTargetFlags(), ABILITY_TARGET_FLAG_NOT_ATTACK_IMMUNE) > 0)
+				}
+			}
+		return newAbilityData
+	end
+	if warn_limit_ability_index_unknown > 0 then
+		WARN_print(string.format("[ability_logic] attempt to create ability data for unknown ability failed. Name: '%s'",
+					type(hAbility) ~= "table" and type(hAbility) ~= "userdata" and type(hAbility)
+					or not hAbility.GetName and "none"
+					or hAbility:GetName()
+				)
+			)
+		warn_limit_ability_index_unknown = warn_limit_ability_index_unknown - 1
+	end
+	]]
+	if not name then
+		return false
+	end
+	local newAbilityData = {name, 0, nil, {false, false, false}}
+	t_ability_index[hAbility] = newAbilityData
+	return newAbilityData
+end
+
 function AbilityLogic_Initialize()
 	for i=TEAM_RADIANT,TEAM_DIRE,1 do
 		t_nuke[i] = {}
@@ -220,6 +289,7 @@ function AbilityLogic_Initialize()
 			end
 		end
 	end
+
 	AbilityLogic_RegisterGenericsModule()
 end
 
@@ -310,8 +380,7 @@ function AbilityLogic_HandleLevelAbility(gsiPlayer, skillBuild)
 	local pUnit = gsiPlayer.hUnit
 	local abilityPoints = pUnit:GetAbilityPoints()
 	local nextAbilityIndex = t_skill_build_order_next[gsiPlayer.nOnTeam]
-	print("AL_HLA", gsiPlayer.shortName, abilityPoints, nextAbilityIndex, skillBuild[
-		nextAbilityIndex])
+--[[DEV]]print("AL_HLA", gsiPlayer.shortName, abilityPoints, nextAbilityIndex, skillBuild[nextAbilityIndex])
 	if not skillBuild[nextAbilityIndex] or gsiPlayer.level == 30
 			and not gsiPlayer.skillsFull then
 		local ability = gsiPlayer.hUnit:GetAbilityInSlot(5) -- Could be ultimate slot
@@ -365,7 +434,7 @@ function AbilityLogic_HandleLevelAbility(gsiPlayer, skillBuild)
 			gsiPlayer.skillBuildFixStep = 2
 			return;
 		end
-		ALERT_print(string.format("[ability_logic] %s attempt to upgrade %s%s failed.", gsiPlayer.shortName, ability and ability:GetName() or "build#", t_skill_build_order_next[gsiPlayer.nOnTeam]))
+		ALERT_print(string.format("[ability_logic] %s attempt to upgrade %s %s failed.", gsiPlayer.shortName, ability and ability:GetName() or "build#", t_skill_build_order_next[gsiPlayer.nOnTeam]))
 	end
 	ALERT_print(
 			string.format("[ability_logic] Attempting skill build repair on %s...",
@@ -399,13 +468,19 @@ function AbilityLogic_HandleLevelAbility(gsiPlayer, skillBuild)
 			simulatedLevels[abilityIndex] = simulatedLevels[abilityIndex]+1
 			if preLevel < simulatedLevels[abilityIndex] then
 				pUnit:ActionImmediate_LevelAbility(ability:GetName())
+				if pUnit:GetAbilityPoints() == 0 then
+					return;
+				end
 			end
 		end
-		-- Finally, really make sure, just take anything
+		-- Finally, really make sure, just take anything allowed
 		for i=0,MAX_ABILITY_SLOT do
-			ability = gsiPlayer.hUnit:GetAbilityInSlot(i)
-			if ability and ability:CanAbilityBeUpgraded() then
+			local ability = gsiPlayer.hUnit:GetAbilityInSlot(i)
+			if ability and ability:CanAbilityBeUpgraded() and not ability:IsHidden() then
 				pUnit:ActionImmediate_LevelAbility(ability:GetName())
+				if pUnit:GetAbilityPoints() == 0 then
+					return;
+				end
 			end
 		end
 	end
@@ -744,7 +819,13 @@ end
 function AbilityLogic_AbilityHasAdditionalEffect(hAbility)
 	local abilityData = t_ability_index[hAbility]
 	if not abilityData then
-		return false
+		if not hAbility then
+			return;
+		end
+		abilityData = create_unknown_ability_index(hAbility)
+		if not abilityData then
+			return false
+		end
 	end
 	--Util_TablePrint(abilityData)
 	local abilityBitField = abilityData[2]
@@ -772,8 +853,16 @@ end
 local PIERCES_TEAM_RELATION_FLAGS_POSSIBLE = AbilityLogic_PierceTeamRelationFlagsPossible
 
 function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
-	if target == nil or target.x then return 1 end
-	if not t_ability_index[hAbility] then print("VUL-FT no ability index for", hAbility and hAbility:GetName()) end
+	if target == nil or type(target) == "number" or target.x then return 1 end
+	if not abilityData then
+		if not hAbility then
+			return;
+		end
+		abilityData = create_unknown_ability_index(hAbility)
+		if not abilityData then
+			return false
+		end
+	end
 	local additionalFlags = t_ability_index[hAbility]
 			and t_ability_index[hAbility][ABILITY_I__ADDITIONAL_FLAGS] or EMPTY_TABLE
 	local hUnit = target.hUnit
@@ -794,6 +883,7 @@ function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
 	if damageType == DAMAGE_TYPE_MAGICAL then
 		local result = 1 - (hUnit:GetMagicResist())
 		return additionalFlags[FLAGS2_I__HAS_DEGEN] and sqrt(result) or result -- degen makes more valuable vs resist
+		-- TODO this is lying to one-shot logic due to degen
 	elseif damageType == DAMAGE_TYPE_PHYSICAL then
 		local result = 1 - (effectedByEvasion and hUnit:GetEvasion() or 0)
 				- (Unit_GetArmorPhysicalFactor(target))
@@ -828,6 +918,164 @@ function AbilityLogic_HighUseAllowSafe(gsiPlayer, hAbility, highUseMana, safety)
 			> ( safety > 0.57 and highUseMana*1.5 or highUseMana*max(0, safety-0.35)*6.67 )
 end
 
+local t_neutrals_ability_funcs = {
+		["mud_golem_hurl_boulder"] = function(gsiUnit, ability)
+				-- :| golm :| golm :| golm :| golm :| golm :| golm
+				local castRange = ability:GetCastRange()
+				local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiUnit, castRange*1.4)
+				local bestTarget
+				local bestScore = 0
+				local casterLoc = gsiUnit.lastSeen.location
+				local activityType = gsiUnit.type == UNIT_TYPE_HERO and Blueprint_GetCurrentTaskActivityType(gsiUnit)
+				if activityType and activityType > ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+						and activityType < ACTIVITY_TYPE.FEAR then
+					--[[DEV]]print("player not casting golm for activitytype")
+					return;
+				end
+				for i=1,#nearbyEnemies do
+					local thisEnemy = nearbyEnemies[i]
+					local enemyHunit = thisEnemy.hUnit
+					if enemyHunit and enemyHunit.IsNull and not enemyHunit:IsNull() then
+						-- instagib
+						if thisEnemy.lastSeenHealth < 150
+								and Vector_PointDistance2D(thisEnemy.lastSeen.location, casterLoc) < castRange*0.95 then
+							local magicRes = AbilityLogic_CastOnTargetWillSucceed(gsiUnit, thisEnemy, ability)
+							local nearFuture = Analytics_GetNearFutureHealth(thisEnemy, 1)
+							if nearFuture > 0
+									and nearFuture < ability:GetSpecialValueFloat("damage")*magicRes then
+								return thisEnemy
+							end
+						end
+						-- save for and use on channelers
+						if enemyHunit:IsChanneling() then
+							if Vector_PointDistance2D(thisEnemy.lastSeen.location, casterLoc) < castRange*0.95 then
+								return thisEnemy
+							end
+							-- save it
+							return;
+						end
+						local thisScore = Analytics_GetPowerLevel(thisEnemy) * thisEnemy.lastSeenHealth / thisEnemy.maxHealth
+						if thisScore > bestScore then
+							bestScore = thisScore
+							bestTarget = thisEnemy
+						end
+					end
+				end
+				if bestTarget and Vector_PointDistance2D(bestTarget.lastSeen.location, casterLoc)
+							< castRange*0.95 then
+					return bestTarget
+				end
+			end,
+		["furbolg_ursa_warrior_thunder_clap"] = function(gsiUnit, ability)
+				local nearestEnemy, dist = Set_GetNearestEnemyHeroToLocation(gsiUnit.lastSeen.location)
+				print(gsiUnit.shortName, "clap-like", ability:GetSpecialValueFloat("radius"))
+				if dist < ability:GetSpecialValueFloat("radius") * 0.85 then
+					return true
+				end
+			end,
+		["harpy_stormcrafter_chain_lightning"] = function(gsiUnit, ability)
+				local castRange = ability:GetCastRange()
+				local jumpRange = ability:GetSpecialValueFloat("jump_range")
+				local nearbyEnemies, outerToAllEnemies
+						= Set_GetEnemyHeroesInLocRadOuter(
+								gsiUnit.lastSeen.location,
+								castRange*0.95,
+								castRange + ability:GetSpecialValueFloat("jump_range"))
+				if #nearbyEnemies >= 1 then
+					local dmg = ability:GetSpecialValueFloat("initial_damage")
+					local bestTarget
+					local bestScore = 0
+					Set_NumericalIndexUnion(outerToAllEnemies, nearbyEnemies) -- tbl1 broken
+					for i=1,#nearbyEnemies do
+						local thisEnemy = nearbyEnemies[i]
+						local magicRes = AbilityLogic_CastOnTargetWillSucceed(gsiUnit, thisEnemy, ability)
+						if thisEnemy.lastSeenHealth < dmg*magicRes then
+							return thisEnemy
+						end
+						local _, crowdedRating = Set_GetCrowdedRatingToSetTypeAtLocation(
+								thisEnemy.lastSeen.location,
+								SET_HERO_ENEMY,
+								outerToAllEnemies,
+								jumpRange
+							)
+						if crowdedRating > bestScore then
+							bestScore = crowdedRating
+							bestTarget = thisEnemy
+						end
+					end
+					return bestTarget
+				end
+			end,
+		["satyr_hellcaller_shockwave"] = function(gsiUnit, ability)
+				local distance = ability:GetSpecialValueFloat("distance")
+				local nearbyEnemies, outerToAllEnemies
+						= Set_GetEnemyHeroesInLocRadOuter(
+								gsiUnit.lastSeen.location,
+								distance*0.75,
+								distance,
+								0.5
+							)
+				if #nearbyEnemies >= 1 then
+					local crowdedLoc, crowdedRating = Set_GetCrowdedRatingToSetTypeAtLocation(
+							thisEnemy.lastSeen.location,
+							SET_HERO_ENEMY,
+							outerToAllEnemies,
+							300
+						)
+					if crowdedRating > 3 then
+						return crowdedLoc
+					end
+				end
+			end,
+		["fel_beast_haunt"] = function(gsiUnit, ability) -- silence
+				local castRange = ability:GetCastRange()
+				local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiUnit, castRange*1.4)
+				local bestTarget
+				local bestScore = 0
+				local casterLoc = gsiUnit.lastSeen.location
+				local activityType = gsiUnit.type == UNIT_TYPE_HERO and Blueprint_GetCurrentTaskActivityType(gsiUnit)
+				if activityType
+						and activityType > ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+						and activityType < ACTIVITY_TYPE.FEAR then
+					return;
+				end
+				for i=1,#nearbyEnemies do
+					local enemyHunit = thisEnemy.hUnit
+					if enemyHunit and enemyHunit.IsNull and not enemyHunit:IsNull() then
+						local thisEnemy = nearbyEnemies[i]
+						-- [[ TODO use on enemies with mobility ability flags ]] 
+						-- save for and use on channelers
+						if enemyHunit:IsChanneling() then
+							if Vector_PointDistance2D(thisEnemy.lastSeen.location, casterLoc) < castRange*0.95 then
+								return thisEnemy
+							end
+							-- save it
+							return;
+						end
+						local thisScore = Analytics_GetPowerLevel(thisEnemy) * thisEnemy.lastSeenHealth * thisEnemy.lastSeenMana / (thisEnemy.maxMana * thisEnemy.maxHealth)
+						if thisScore > bestScore then
+							bestScore = thisScore
+							bestTarget = thisEnemy
+						end
+					end
+				end
+				if bestTarget and Vector_PointDistance2D(bestTarget.lastSeen.location, casterLoc)
+							< castRange*0.95 then
+					return bestTarget
+				end
+			end,
+	}
+t_neutrals_ability_funcs["warpine_raider_seed_shot"] = t_neutrals_ability_funcs["mud_golem_hurl_boulder"]
+t_neutrals_ability_funcs["polar_furbolg_ursa_warrior_thunder_clap"] = t_neutrals_ability_funcs["centaur_khan_war_stomp"]
+function AbilityLogic_DetectValidNeutralsAbilityUse(gsiUnit, ability)
+	--[[DEV]]if DEBUG then print("trying", ability:GetName()) end
+	if t_neutrals_ability_funcs[ability:GetName()]
+			and gsiUnit.hUnit:GetMana() > ability:GetManaCost() then
+		return t_neutrals_ability_funcs[ability:GetName()](gsiUnit, ability)
+	end
+	return nil
+end
+
 function AbilityLogic_LoadAbilityToPlayer(gsiPlayer, abilityData)
 --	print("Load Ability", gsiPlayer.team, GetTeam(), abilityData[1])
 	local abilityBitField = abilityData[2]
@@ -841,6 +1089,14 @@ function AbilityLogic_LoadAbilityToPlayer(gsiPlayer, abilityData)
 		abilityBitField = math.floor(abilityBitField / 2)
 		ammendTypeIndex = ammendTypeIndex + 1
 	end
+end
+
+local dontOverkillTbl = {}
+function AbilityLogic_CastingOneHitCallback(gsiPlayer, target)
+	-- TODO Get use_ability data to call this function when a player runs a function registered with this callback
+	-- - or set up special handling for it, e.g. with raw damage registered, calculate the hit's ability to finish
+	-- - off the enemy hero at the time of casting / callback ability check further use_ability and then to this
+	-- - and disallow one hit kills if overkilled. something like that
 end
 
 -- does not consider player's danger, only kill-secure and mana / cooldown management

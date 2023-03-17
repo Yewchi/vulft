@@ -1,8 +1,8 @@
 local hero_data = {
 	"warlock",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 8, 3, 4, 9, 11},
+	{2, 3, 2, 3, 2, 4, 2, 3, 1, 6, 3, 4, 1, 1, 8, 1, 4, 10},
 	{
-		"item_tango","item_clarity","item_ward_sentry","item_faerie_fire","item_branches","item_branches","item_magic_stick","item_clarity","item_clarity","item_branches","item_magic_wand","item_boots","item_arcane_boots","item_aghanims_shard","item_cloak","item_shadow_amulet","item_cloak","item_glimmer_cape","item_aether_lens","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_void_stone","item_void_stone","item_pers","item_pers","item_refresher",
+		"item_tango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_smoke_of_deceit","item_branches","item_branches","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_ward_sentry","item_enchanted_mango","item_ring_of_basilius","item_boots","item_aghanims_shard","item_shadow_amulet","item_point_booster","item_buckler","item_lifesteal","item_blades_of_attack","item_wraith_pact","item_headdress","item_fluffy_hat","item_magic_wand","item_energy_booster","item_holy_locket","item_aether_lens","item_ring_of_health",
 	},
 	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
@@ -89,14 +89,15 @@ d = {
 				local fatalBondsCastRange = fatalBonds:GetCastRange()
 
 				local creeps, creepSetDist = Set_GetNearestEnemyCreepSetToLocation(fhtLoc)
-				creeps = creeps.units
+				creeps = creeps and creeps.units
 				local utilizationOfBonds =
-						(fatalBondsCastRange*1.5 > creepSetDist and #creeps or 0) + #nearbyEnemies*2
+						(creeps and fatalBondsCastRange*1.5 > creepSetDist and #creeps or 0) + #nearbyEnemies*2
 				--print(#creeps, #nearbyEnemies, creepSetDist, utilizationOfBonds)
 				if nearbyEnemies[1]
 							and utilizationOfBonds > 3 then
 					--print("running fatal bonds")
-					local chainTbl = creeps[1] and Set_NumericalIndexUnion(creeps, nearbyEnemies) or nearbyEnemies
+					local chainTbl = creeps and creeps[1]
+							and Set_NumericalIndexUnion(creeps, nearbyEnemies) or nearbyEnemies
 
 					local chainSucceeds, chainingUnit = AbilityLogic_WillChainCastHit(gsiPlayer,
 							fht, fatalBonds:GetCastRange(),

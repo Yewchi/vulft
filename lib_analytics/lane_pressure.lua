@@ -86,39 +86,70 @@ function Analytics_SafetyOfLaneFarm(gsiPlayer, lane, presentOrCommittedTbl)
 	local timeData = gsiPlayer.time.data.safetyOfLane
 	if timeData then
 		if timeData[lane] then
-			return timeData[lane], timeData[lane+3] -- Lua. (readability, extensibility)
+			return timeData[lane], timeData[lane+3], timeData[lane+6], timeData[lane+9]
 		end
 	else
 		timeData = {}
 		gsiPlayer.time.data.safetyOfLane = timeData
 	end
-	local laneFont = Set_GetPredictedLaneFrontLocation(lane) or Set_GetAlliedCreepSetLaneFront(lane)
+	local laneFront = Set_GetPredictedLaneFrontLocation(lane) or Set_GetAlliedCreepSetLaneFront(lane)
 	laneFront = laneFront and laneFront or Map_TeamSpawnerLoc(gsiPlayer.TEAM, lane)
 	local knownEng, theorizedEng, mimicScore = Analytics_GetKnownTheorizedEngageables(gsiPlayer, laneFront)
 	local selfPowerLevel = Analytics_GetPowerLevel(gsiPlayer)
 	local danger = mimicScore - selfPowerLevel
 	local laneHelpNeeded = 0
+	-- tank the pushingHasPressureScore for known, mainly based on mimic
+	local pushingHasPressureScore = max(0, 5 - #knownEng - mimicScore) 
+	local lowestTierEnemyTower = GSI_GetLowestTierTeamLaneTower(ENEMY_TEAM, lane)
+	local lowestTierDist = Vector_PointDistance(
+			lowestTierEnemyTower.lastSeen.location,
+			laneFront
+		)
+	local playerDistToEnemyTower = Vector_PointDistance2D(
+			gsiPlayer.lastSeen.location,
+			lowestTierEnemyTower.lastSeen.location
+		)
+	local playerDistToLaneFront = Vector_PointDistance2D(
+			gsiPlayer.lastSeen.location,
+			laneFront
+		)
+	local canPortFactor = Item_TownPortalScrollCooldown(gsiPlayer) == 0 and 0.5 or 0.75
+	local myFarmScore = (6-gsiPlayer.role)/1.5 * max(0, min(1, lowestTierDist / 4600 - 0.3045))
+			* (1 - canPortFactor*max(0, min(1, playerDistToLaneFront / 5400 - 0.556))) 
 	if presentOrCommittedTbl then
-		-- Works by converting committed allies to personal power and taking from the enemy mimic score
 		for i=1,TEAM_NUMBER_OF_PLAYERS do
 			local thisAllied = presentOrCommittedTbl[i]
-			if thisAllied then
+			local roleDifference = thisAllied and (thisAllied.role - gsiPlayer.role) or -1
+			if roleDifference > 0.1 then
+				local thisAlliedPowerLevel = Analytics_GetPowerLevel(thisAllied)
 				laneHelpNeeded = laneHelpNeeded + (1.1 - thisAllied.role/10)
-				danger = danger - Analytics_GetPowerLevel(thisAllied)/selfPowerLevel
+				laneHelpNeeded = laneHelpNeeded + (roleDifference*0.5) -- blah
+				danger = danger - thisAlliedPowerLevel/selfPowerLevel
 			end
 		end
 	end
+--[[DEV]]if VERBOSE then VEBUG_print(string.format("[lane_pressure] check is for lane %d's lanefront %s to enemy tower %.0f dist away",
+--[[DEV]]				lane, tostring(laneFront), lowestTierDist
+--[[DEV]]			)
+--[[DEV]]		)
+--[[DEV]]end
+	pushingHasPressureScore = pushingHasPressureScore / (1+min(playerDistToEnemyTower, lowestTierDist)/1600) 
+	pushingHasPressureScore = pushingHasPressureScore * 0.25
 	local laneTower = GSI_GetLowestTierDefensible(gsiPlayer.team, lane) -- TODO should be towers only
 	local towerPower = max(80, laneTower.hUnit:GetAttackDamage()) / gsiPlayer.hUnit:GetAttackDamage() -- TODO tier power
 	local safety = -( danger - towerPower*max(0,
 			(TOWER_GENERIC_POWER_FALLOFF - Math_PointToPointDistance2D(laneTower.lastSeen.location, laneFront))
 				/ TOWER_GENERIC_POWER_FALLOFF)
 			)
-	laneHelpNeeded = laneHelpNeeded * -safety
-	gsiPlayer.time.data.safetyOfLane[lane] = safety
-	gsiPlayer.time.data.safetyOfLane[lane+3] = laneHelpNeeded -- Lua. (readability, extensibility)
-	return safety, laneHelpNeeded
+	laneHelpNeeded = laneHelpNeeded * max(0.33, min(1, 1 - abs(safety+0.8)))
+	timeData[lane] = safety
+	timeData[lane+3] = laneHelpNeeded
+	timeData[lane+6] = pushingHasPressureScore
+	timeData[lane+9] = myFarmScore
+	return safety, laneHelpNeeded, pushingHasPressureScore, myFarmScore
 end
+
+
 
 local zero_creeps = {}
 zero_creeps.units = EMPTY_TABLE

@@ -1,8 +1,8 @@
 local hero_data = {
 	"necrolyte",
-	{1, 3, 1, 3, 1, 4, 1, 3, 2, 3, 5, 4, 2, 2, 7, 2, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 5, 2, 7, 2, 4, 10, 11},
 	{
-		"item_magic_stick","item_tango","item_faerie_fire","item_circlet","item_branches","item_magic_wand","item_boots","item_urn_of_shadows","item_cloak","item_ring_of_health","item_hood_of_defiance","item_vitality_booster","item_wind_lace","item_spirit_vessel","item_void_stone","item_cyclone","item_blink","item_reaver","item_overwhelming_blink","item_mystic_staff","item_wind_waker","item_sange","item_staff_of_wizardry","item_kaya","item_kaya_and_sange","item_aghanims_shard",
+		"item_ward_observer","item_faerie_fire","item_tango","item_mantle","item_circlet","item_branches","item_branches","item_magic_wand","item_null_talisman","item_cloak","item_boots","item_hood_of_defiance","item_robe","item_staff_of_wizardry","item_kaya","item_belt_of_strength","item_ogre_axe","item_kaya_and_sange","item_aghanims_shard","item_reaver","item_vitality_booster","item_heart","item_voodoo_mask","item_eternal_shroud","item_platemail","item_energy_booster","item_pers","item_lotus_orb","item_mystic_staff","item_shivas_guard",
 	},
 	{ {2,2,2,3,1,}, {2,2,2,3,1,}, 0.1 },
 	{

@@ -208,13 +208,13 @@ function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, t
 	local isAbility = type(abilityOrFunc) == "table" and true or false
 	local actionFunc = forceAbilityFunc
 
-	print(Util_Printable(abilityOrFunc), type(abilityOrFunc))
+	--[[DEV]]if VERBOSE then VEBUG_print(string.format("[use_ability] %s registers ability at %s. [%s] Custom func.", gsiPlayer.shortName, Util_Printable(target), forceAbilityFunc and "X" or "_")) end
 	
 	if isAbility and not forceAbilityFunc then
 		actionFunc = AbilityLogic_GetBestFitCastFunc(gsiPlayer, abilityOrFunc, target)
 	end
 
-	if TEST then print("use_ability: [RegisterAbilityUseAndLockToScore]", gsiPlayer.shortName, isAbility and abilityOrFunc:GetName() or 'func', target, target and target.shortName, isAbility, actionFunc, forceAbilityFunc) end
+	if TEST then print("use_ability: [RegisterAbilityUseAndLockToScore]", gsiPlayer.shortName, isAbility and abilityOrFunc:GetName() or 'func', target, Util_Printable(target), isAbility, actionFunc, forceAbilityFunc) end
 
 	if skipQueue or (isAbility and not doNotCastPointSkip and abilityOrFunc:GetCastPoint() == 0) then -- e.g. spells with 0.0 cast point can be cast immediately even if other spells are to be cast -- TODO Does it need a facing direction? Probably should have target-in-range check and ability-needs-correct-facing-direction -- doNotCastPointSkip is because we may queue stun -> safety TP type behaviour.
 		local nextNode = t_abilities_queued[nOnTeam]
@@ -291,11 +291,19 @@ blueprint = {
 		local target = thisAbilityOrFuncNode[QUEUED_ABILITY_I__TARGET]
 		local expired = thisAbilityOrFuncNode[QUEUED_ABILITY_I__EXPIRY] < GameTime()
 
-		if VERBOSE then print(type(abilityOrFunc) == "table" and abilityOrFunc:GetName(), target, target and target.x, target and target.lastSeen, target and target.center) end
+		--if VERBOSE then print(type(abilityOrFunc) == "table" and abilityOrFunc:GetName(), target, target and target.x, target and target.lastSeen, target and target.center) end
 		
-		if VERBSOSE then VEBUG_print(string.format("[use_ability]: '%s' abilityOrFunc type = %s.", gsiPlayer.shortName, type(abilityOrFunc))) end
+		if VERBOSE then VEBUG_print(string.format("[use_ability]: '%s' abilityOrFunc type = %s.", gsiPlayer.shortName, type(abilityOrFunc))) end
 		local isAbility = type(abilityOrFunc) == "table" and true or false
 		
+		if isAbility and (not abilityOrFunc.IsNull or abilityOrFunc:IsNull()) then
+			WARN_print(string.format("[use_ability] a none-typed ability was attempted by '%s'.",
+						gsiPlayer.shortName
+					)
+				)
+			 return XETA_SCORE_DO_NOT_RUN
+		end
+
 		local currentlyCasting = gsiPlayer.hUnit:GetCurrentActiveAbility()
 		
 		--[[DEBUG]]if DEBUG  and not currentlyCasting then print("use_ability: [run]", not isAbility and "<func>" or abilityOrFunc:GetName(), target, isAbility and (ChargedCooldown_IsChargedCooldown(gsiPlayer, abilityOrFunc) and ChargedCooldown_GetCurrentCharges(gsiPlayer, abilityOrFunc) or "n/a")) end
@@ -351,7 +359,9 @@ blueprint = {
 				thisAbilityOrFuncNode[QUEUED_ABILITY_I__SCORE] = newScore
 				return newScore
 			end
-		elseif target then
+		elseif thisAbilityOrFuncNode[QUEUED_ABILITY_I__ACTION_FUNC] == gsiPlayer.hUnit.Action_UseAbility then
+			thisAbilityOrFuncNode[QUEUED_ABILITY_I__ACTION_FUNC](gsiPlayer.hUnit, abilityOrFunc)
+		elseif target and type(target) ~= "number" then
 			-- Action_Use...()
 			if target.hUnit then
 				if not Unit_IsNullOrDead(target) then
@@ -362,11 +372,27 @@ blueprint = {
 					return XETA_SCORE_DO_NOT_RUN
 				end
 			else
+				if target and not target.x then
+					WARN_print(string.format("[use_ability] Undefined behaviour type 1. '%s' casts: '%s' -> '%s'",
+								gsiPlayer.shortName,
+								type(abilityOrFunc) == "table" and abilityOrFunc.GetName and abilityOrFunc:GetName()
+										or Util_Printable(abilityOrFunc),
+								target and target.GetName and target:GetName() or Util_Printable(target)
+							)
+						)
+				end
 				thisAbilityOrFuncNode[QUEUED_ABILITY_I__ACTION_FUNC](gsiPlayer.hUnit, abilityOrFunc, target)
 			end
-		elseif thisAbilityOrFuncNode[QUEUED_ABILITY_I__ACTION_FUNC] == gsiPlayer.hUnit.Action_UseAbility then
-			thisAbilityOrFuncNode[QUEUED_ABILITY_I__ACTION_FUNC](gsiPlayer.hUnit, abilityOrFunc)
 		else
+			if type(target) ~= "number" then
+				WARN_print(string.format("[use_ability] Undefined behaviour type 2. '%s' casts: '%s' -> '%s'",
+							gsiPlayer.shortName,
+							type(abilityOrFunc) == "table" and abilityOrFunc.GetName and abilityOrFunc:GetName()
+									or Util_Printable(abilityOrFunc),
+							target and target.GetName and target:GetName() or Util_Printable(target)
+						)
+					)
+			end
 			thisAbilityOrFuncNode[QUEUED_ABILITY_I__ACTION_FUNC](gsiPlayer.hUnit, abilityOrFunc, target)
 		end
 		return xetaScore

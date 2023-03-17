@@ -1,8 +1,8 @@
 local hero_data = {
 	"drow_ranger",
-	{1, 3, 1, 2, 1, 4, 3, 3, 2, 1, 3, 4, 2, 5, 8, 2, 4, 9, 11},
+	{1, 3, 1, 3, 2, 4, 3, 3, 1, 6, 1, 4, 2, 2, 8, 2, 4, 9, 11},
 	{
-		"item_slippers","item_branches","item_tango","item_branches","item_quelling_blade","item_circlet","item_boots","item_gloves","item_wraith_band","item_boots_of_elves","item_power_treads","item_magic_wand","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_blade_of_alacrity","item_dragon_lance","item_shadow_amulet","item_blitz_knuckles","item_invis_sword","item_force_staff","item_hurricane_pike","item_lesser_crit","item_silver_edge","item_aghanims_shard","item_skadi","item_black_king_bar","item_blink","item_swift_blink",
+		"item_tango","item_magic_stick","item_circlet","item_quelling_blade","item_branches","item_boots","item_wraith_band","item_gloves","item_boots_of_elves","item_power_treads","item_wind_lace","item_blade_of_alacrity","item_magic_wand","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_aghanims_shard","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_blitz_knuckles","item_invis_sword","item_lesser_crit","item_silver_edge","item_ultimate_orb","item_skadi","item_blink","item_swift_blink","item_black_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -104,7 +104,8 @@ d = {
 							USE_ABILITY(gsiPlayer, gust, crowdedCenter, 400, nil)
 							return;
 						end
-					elseif HIGH_USE(gsiPlayer, gust, highUse, fhtHpp) then
+					elseif SPELL_SUCCESS(gsiPlayer, fht, gust)
+							and HIGH_USE(gsiPlayer, gust, highUse, fhtHpp) then
 						USE_ABILITY(gsiPlayer, gust, crowdedCenter, 400, nil)
 						return;
 					end
@@ -115,7 +116,16 @@ d = {
 				local crowdedCenter, crowdedRating = CROWDED_RATING(
 						nearbyEnemies[1].lastSeen.location, SET_HERO_ENEMY
 					)
-				if VEC_POINT_DISTANCE(playerLoc, crowdedCenter) < gust:GetCastRange()*0.9 then
+				local castSucceeds = false
+				for i=1,#nearbyEnemies do
+					if SPELL_SUCCESS(gsiPlayer, nearbyEnemies[i], gust) then
+						castSucceeds = true
+						break;
+					end
+				end
+				if castSucceeds
+						and VEC_POINT_DISTANCE(playerLoc, crowdedCenter)
+							< gust:GetCastRange()*0.9 then
 					USE_ABILITY(gsiPlayer, gust, crowdedCenter, 400, nil)
 					return;
 				end

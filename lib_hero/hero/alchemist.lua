@@ -1,12 +1,12 @@
 local hero_data = {
 	"alchemist",
-	{2, 1, 1, 1, 1, 4, 3, 3, 3, 3, 2, 4, 2, 2, 7, 6, 4, 9, 12},
+	{2, 1, 1, 3, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 7, 5, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_branches","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_magic_wand","item_soul_ring","item_relic","item_radiance","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_hyperstone","item_platemail","item_assault","item_orchid","item_cloak","item_quarterstaff","item_robe","item_bloodthorn","item_overwhelming_blink","item_aghanims_shard","item_point_booster","item_ultimate_scepter","item_abyssal_blade","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_ultimate_scepter","item_ultimate_scepter","item_moon_shard",
+		"item_ward_observer","item_enchanted_mango","item_tango","item_gauntlets","item_quelling_blade","item_bottle","item_boots","item_chainmail","item_bracer","item_phase_boots","item_relic","item_radiance","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_reaver","item_overwhelming_blink","item_relic","item_nullifier","item_bfury","item_moon_shard","item_ultimate_scepter","item_ultimate_scepter","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {1,1,1,3,2,}, {1,1,1,4,2,}, 0.1 },
 	{
-		"Acid Spray","Unstable Concoction","Greevil's Greed","Chemical Rage","+1 Acid Spray Armor Reduction","+125 Unstable Concoction Radius","Acid Spray grants armor to allies","+1 Damage per Greevil's Greed stack","-0.1s Chemical Rage Base Attack Time","+400 Unstable Concoction Max Damage","+50 Chemical Rage Movement Speed","+50 Chemical Rage Regeneration",
+		"Acid Spray","Unstable Concoction","Greevil's Greed","Chemical Rage","+1 Acid Spray Armor Reduction","+125 Unstable Concoction Radius","Acid Spray grants armor to allies","+1.5 Damage per Greevil's Greed stack","-0.1s Chemical Rage Base Attack Time","+400 Unstable Concoction Max Damage","+50 Chemical Rage Movement Speed","+50 Chemical Rage Regeneration",
 	}
 }
 --@EndAutomatedHeroData

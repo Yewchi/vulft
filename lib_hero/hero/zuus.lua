@@ -1,10 +1,10 @@
 local hero_data = {
 	"zuus",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 8, 3, 4, 9, 11},
+	{1, 3, 1, 3, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 7, 2, 4, 9, 11},
 	{
-		"item_branches","item_branches","item_faerie_fire","item_tango","item_branches","item_ward_observer","item_bottle","item_magic_wand","item_boots","item_arcane_boots","item_robe","item_kaya","item_arcane_boots","item_ogre_axe","item_kaya_and_sange","item_aghanims_shard","item_ogre_axe","item_staff_of_wizardry","item_point_booster","item_ultimate_scepter","item_blink","item_aeon_disk","item_void_stone","item_cyclone","item_wind_waker","item_refresher","item_void_stone","item_overwhelming_blink",
+		"item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_arcane_boots","item_wind_lace","item_magic_wand","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_staff_of_wizardry","item_kaya","item_aghanims_shard","item_kaya_and_sange","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_staff_of_wizardry","item_void_stone","item_cyclone","item_mystic_staff",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
 		"Arc Lightning","Lightning Bolt","Heavenly Jump","Thundergod's Wrath","-4s Heavenly Jump Cooldown","+250 Health","+30 Movement Speed after Heavenly Jump","+1 Heavenly Jump Target","+100 Thundergod's Wrath Damage","+0.4s Lightning Bolt Ministun","325 AOE Lightning Bolt","+100 Arc Lightning Damage",
 	}
@@ -50,7 +50,7 @@ local t_player_abilities = {}
 local ABILITY_USE_RANGE = 850
 local OUTER_RANGE = 1600
 
-local ARC_JUMP_DIST = 500
+local ARC_JUMP_DIST = 490
 local LB_ACQUISITION_RANGE = 325
 
 local fight_harass_handle = FightHarass_GetTaskHandle()
@@ -120,7 +120,7 @@ d = {
 						Math_PointToPointDistance2D(playerLoc, fhtLoc) < boltCastRange
 						and fhtLoc
 						or Vector_ScalePointToPointByFactor(playerLoc, fhtLoc, 1, boltCastRange)
-				USE_ABILITY(gsiPlayer, bolt, castLoc, 400, nil)
+				USE_ABILITY(gsiPlayer, bolt, castLoc, 400, nil, nil, nil, nil, gsiPlayer.hUnit.Action_UseAbilityOnLocation)
 				return;
 			end
 			if CAN_BE_CAST(gsiPlayer, arc) and not hUnitPlayer:GetAttackTarget()
@@ -180,7 +180,9 @@ d = {
 				end
 				if CAN_BE_CAST(gsiPlayer, bolt)
 						and HIGH_USE(gsiPlayer, bolt, highUse, playerHpp) then
-					USE_ABILITY(gsiPlayer, bolt, closestActive, 400, nil)
+					USE_ABILITY(gsiPlayer, bolt, closestActive.lastSeen.location, 400, nil,
+							nil, nil, nil, Action_UseAbilityOnLocation
+						)
 					return;
 				end
 			end

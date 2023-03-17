@@ -255,7 +255,7 @@ function FightClimate_GetIntent(gsiPlayer)
 		for i=1,#enemies do
 			local thisIntent = t_intent_recent_aggression[enemies[i]]
 			if thisIntent then 
-				DebugDrawText(1100, 770+i*8,
+				DebugDrawText(1100+(TEAM_IS_RADIANT and 0 or 200), 770+i*8,
 						string.format("%d %.4s %.2f",
 								i,
 								thisIntent[1] and thisIntent[1].shortName or "none",
@@ -372,6 +372,19 @@ end
 
 function FightClimate_HelpMeFightNow(gsiPlayer, nearbyAllies, nearbyEnemies)
 	
+end
+
+function FightClimate_InvolvedInAnyCombat(gsiPlayer)
+	local intent = FightClimate_GetIntent(gsiPlayer)
+	if intent then return true, intent end
+	local otherTeam = GSI_GetTeamPlayers(gsiPlayer.team == TEAM and ENEMY_TEAM or TEAM)
+	for i=1,#otherTeam do
+		local intent = FightClimate_GetIntent(otherTeam[i])
+		if intent then
+			return true, intent
+		end
+	end
+	return false
 end
 
 local MAX_INTERVENE_CONSIDER_TIME = 4

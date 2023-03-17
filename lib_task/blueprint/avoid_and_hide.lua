@@ -137,7 +137,7 @@ blueprint = {
 							behindTowerFromEnemy,
 							Vector_ScalarMultiply(
 									Vector_UnitDirectionalPointToPoint(behindTowerFromEnemy, escapeChannelHead),
-									min(900, Vector_PointDistance2D(gsiPlayer.lastSeen.location, behindTowerFromEnemy))
+									min(1100, Vector_PointDistance2D(gsiPlayer.lastSeen.location, behindTowerFromEnemy))
 								)
 						)
 					--[[DEBUG]]if DEBUG then DebugDrawLine(escapeChannelHead, behindTowerFromEnemy, 255, 150, 150) end
@@ -163,6 +163,7 @@ blueprint = {
 		if #knownEngageables + #theorizedEngageables == 0 then
 			local thisFearedScore = t_stay_feared_score[gsiPlayer.nOnTeam]
 			if thisFearedScore < -50 then
+	--[[DEV]]	if TEST and VERBOSE then DebugDrawText(400+TEAM*32,700+gsiPlayer.nOnTeam*24, string.format("%s", string.sub(gsiPlayer.shortName, 1, 3)), TEAM_IS_RADIANT and 0 or 255, TEAM_IS_RADIANT and 255 or 0, 100) end
 				t_stay_feared_score[gsiPlayer.nOnTeam] = XETA_SCORE_DO_NOT_RUN
 				return false, XETA_SCORE_DO_NOT_RUN
 			else

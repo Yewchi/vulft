@@ -1,8 +1,8 @@
 local hero_data = {
 	"terrorblade",
-	{3, 1, 3, 2, 2, 2, 2, 3, 3, 13, 5, 5, 1, 1, 8, 1, 5, 11},
+	{1, 3, 3, 2, 2, 2, 2, 1, 3, 5, 3, 5, 1, 11, 8},
 	{
-		"item_tango","item_branches","item_branches","item_quelling_blade","item_circlet","item_faerie_fire","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_boots_of_elves","item_ring_of_basilius","item_blade_of_alacrity","item_yasha","item_ogre_axe","item_belt_of_strength","item_sange_and_yasha","item_ultimate_orb","item_ultimate_orb","item_skadi","item_eagle","item_butterfly","item_demon_edge","item_monkey_king_bar","item_lifesteal","item_claymore","item_satanic","item_ultimate_scepter_2","item_swift_blink","item_aghanims_shard",
+		"item_branches","item_magic_stick","item_quelling_blade","item_tango","item_circlet","item_wraith_band","item_gloves","item_boots_of_elves","item_boots","item_power_treads","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_yasha","item_manta","item_ultimate_orb","item_skadi","item_hurricane_pike","item_claymore","item_void_stone","item_orchid","item_point_booster","item_ultimate_scepter","item_bloodthorn","item_ultimate_scepter_2","item_blink","item_lifesteal","item_claymore","item_satanic",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

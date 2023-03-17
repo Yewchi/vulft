@@ -166,15 +166,15 @@ end
 local function lane_curve_sigmoid_factor(progress)
 	return progress < 0.4 and 0.0 or progress > 0.6 and 1.0 or 1 / (1 + (16.32878^(13 - 26*progress)))
 end
-function lane_value_sigmoid_early(progress)
-	local factor = lane_curve_sigmoid_factor(progress)
+function lane_value_sigmoid_early(progress) -- *load the revolver*
+	local factor = lane_curve_sigmoid_factor(progress) -- *paint a target on my foot*
 	--print("early say", progress, 2*UNITS_SPAWNER_TO_ELL_BEND*(1-factor)*progress + factor*UNITS_SPAWNER_TO_ELL_BEND)
-	return 2*UNITS_SPAWNER_TO_ELL_BEND*((1-factor)^1.15)*progress + factor*UNITS_SPAWNER_EARLY_TO_END_OFFSET
+	return 2*UNITS_SPAWNER_TO_ELL_BEND*((1-factor)^1.15)*progress + factor*UNITS_SPAWNER_EARLY_TO_END_OFFSET -- *pass valve the gun*
 end
 function lane_value_sigmoid_late(progress)
 	local factor = lane_curve_sigmoid_factor(progress)
 	--print("late say", progress, 2*UNITS_SPAWNER_TO_ELL_BEND*(progress)*(factor) - factor*UNITS_SPAWNER_TO_ELL_BEND)
-	return 2*UNITS_SPAWNER_EARLY_TO_END_OFFSET*(factor^0.8)*progress - factor*UNITS_SPAWNER_TO_ELL_BEND
+	return 2*UNITS_SPAWNER_EARLY_TO_END_OFFSET*(factor^0.8)*progress - factor*UNITS_SPAWNER_TO_ELL_BEND 
 end
 -- Benchark: Using the pair of factor calculations 8000 times / frame represented a frame rate drop of 5-10 from 120 fps. This should be used about 6 times per frame. Representing a drop of ~0.0056 fps from 120 or 1/177 of a frame
 
@@ -403,7 +403,7 @@ local function update_last_seen(this, newLoc) -- TODO GameTime??
 	local currTime = GameTime()
 	if this.previousLocation and currTime - this.timeStamp > UPDATE_PREVIOUS_SEEN_LOC_DELTA then
 		--GetBot():ActionImmediate_Ping(newLoc.x, newLoc.y, true)
-		this.previousLocation = this.location
+		this.previousLocation = Vector(this.x, this.y, this.z)
 		this.previousTimeStamp = this.timeStamp
 	end
 	if this.location.x ~= newLoc.x or this.location.y ~= newLoc.y then
@@ -416,7 +416,7 @@ function Map_CreateLastSeenTable(location, trackPrevious)
 	local t = {}
 	t.GetTimeSinceLastSeen = time_since_last_seen
 	t.Update = update_last_seen
-	t.location = location
+	t.location = Vector(location.x, location.y, location.z)
 	t.timeStamp = GameTime()
 	if trackPrevious then
 		t.previousLocation = location
@@ -430,18 +430,26 @@ function Map_GetNearestPortableStructure(gsiPlayer, location)
 	return Map_LimitLaneLocationToLowTierTeamTower(gsiPlayer.team, laneApproximation, location)
 end
 
-local SAFER_TP_DISTANCE = 2200
-function Map_AdjustLocationForSaferPort(location)
+local SAFER_TP_DISTANCE = 1400
+function Map_AdjustLocationForSaferPort(location, safeDist)
+	local safeUnitVec = Vector_UnitDirectionalPointToPoint(
+			location,
+			TEAM_IS_RADIANT
+					and logical_points[MAP_POINT_RADIANT_FOUNTAIN_CENTER]
+					or logical_points[MAP_POINT_DIRE_FOUNTAIN_CENTER]
+		)
+	if TEAM_IS_RADIANT then
+		safeUnitVec.x = safeUnitVec.x - 0.33
+		safeUnitVec.y = safeUnitVec.y - 0.33
+	else
+		safeUnitVec.x = safeUnitVec.x + 0.33
+		safeUnitVec.y = safeUnitVec.y + 0.33
+	end
 	return Vector_Addition(
 			location,
 			Vector_ScalarMultiply(
-					Vector_UnitDirectionalPointToPoint(
-							location,
-							TEAM_IS_RADIANT
-									and logical_points[MAP_POINT_RADIANT_FOUNTAIN_CENTER]
-									or logical_points[MAP_POINT_DIRE_FOUNTAIN_CENTER]
-						),
-					SAFER_TP_DISTANCE
+					safeUnitVec,
+					(safeDist or SAFER_TP_DISTANCE) * 0.6818 -- 0.33 added reversed to back to unit vec
 				)
 		)
 end

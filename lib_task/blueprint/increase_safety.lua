@@ -15,6 +15,7 @@ local consumable_handle
 
 local blueprint
 
+local min = math.min
 local max = math.max
 local sqrt = math.sqrt
 
@@ -24,6 +25,8 @@ local mobility_in_use = {}
 local defensives_in_use = {}
 
 local team_fountain
+
+local TEAM_FOUNTAIN_LOC = Map_GetTeamFountainLocation()
 
 local next_player = 1
 local function estimated_time_til_completed(gsiPlayer, objective)
@@ -58,15 +61,53 @@ Blueprint_RegisterTask(task_init_func)
 
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
-		-- if not defensives_in_use[gsiPlayer.nOnTeam] then
-			-- local defensive = AbilityLogic_GetBestSurvivability(gsiPlayer)
-			-- if defensive then
-				-- print(gsiPlayer.shortName, "defensive found", defensive)
-				-- defensives_in_use[gsiPlayer.nOnTeam] = defensive
-				-- gsiPlayer.hUnit:Action_UseAbility(defensive)
-			-- end
-			gsiPlayer.hUnit:Action_MoveDirectly(Map_GetTeamFountainLocation())
-			return xetaScore
+		local nearestEnemyTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
+		local playerLoc = gsiPlayer.lastSeen.location
+		local towerLoc = nearestEnemyTower and nearestEnemyTower.lastSeen.location
+		local distToTower = nearestEnemyTower and Vector_PointDistance2D(playerLoc, towerLoc)
+		local moveTo = Vector_UnitDirectionalPointToPoint(playerLoc, TEAM_FOUNTAIN_LOC)
+		local moveToScalar = 3000
+		local adjustVector = nil
+
+		if nearestEnemyTower and distToTower < 2000 then
+			-- TODO check lower and higher tier towers, if also close, run the map towards the nearest
+			-- - TOP/MID or MID/BOT jungle
+
+			local adjustScalar = 0.9*(2000-distToTower)
+
+			moveToScalar = moveToScalar - adjustScalar
+
+			local awayFromTower = Vector_UnitDirectionalPointToPoint(towerLoc, playerLoc)
+			adjustVector = Vector_ScalarMultiply(
+					awayFromTower,
+					adjustScalar
+				)
+
+			if Positioning_MovingToLocationAgrosTower(gsiPlayer, moveTo, nearestEnemyTower) then
+			-- if not defensives_in_use[gsiPlayer.nOnTeam] then
+				-- local defensive = AbilityLogic_GetBestSurvivability(gsiPlayer)
+				-- if defensive then
+					-- print(gsiPlayer.shortName, "defensive found", defensive)
+					-- defensives_in_use[gsiPlayer.nOnTeam] = defensive
+					-- gsiPlayer.hUnit:Action_UseAbility(defensive)
+				-- end
+			end
+		end
+		moveTo = Vector_Addition(
+				playerLoc,
+				Vector_ScalarMultiply(
+						moveTo,
+						moveToScalar
+					)
+			)
+		if adjustVector then
+			moveTo = Vector_Addition(
+					moveTo,
+					adjustVector
+				)
+		end
+		gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
+		return xetaScore
 		-- else
 			-- --print(gsiPlayer.shortName, "ATTEMPTING DEFENSIVE", defensives_in_use[gsiPlayer.nOnTeam]:GetName() or Util_PrintableTable(defensives_in_use[gsiPlayer.nOnTeam]))
 			-- gsiPlayer.hUnit:Action_UseAbility(defensives_in_use[gsiPlayer.nOnTeam])
@@ -81,6 +122,7 @@ blueprint = {
 						+ gsiPlayer.hUnit:GetHealthRegen()
 						+ healthReplenish
 				) / gsiPlayer.maxHealth
+		--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DEBUG_print(string.format("[increase_safety] %s has hp values %.2f %.2f %.2f", gsiPlayer.shortName, gsiPlayer.lastSeenHealth/gsiPlayer.maxHealth, healthReplenish, healthPercent)) end
 		if healthPercent < 0.92 --[[and not Item_ItemOwnedAnywhere(gsiPlayer, "item_flask")]] then
 			local thisWalkBackScore = Xeta_EvaluateObjectiveCompletion(
 					XETA_RETURN_FOUNTAIN,
@@ -94,13 +136,19 @@ blueprint = {
 				local replenishPercent = healthReplenish/gsiPlayer.maxHealth
 				thisWalkBackScore = thisWalkBackScore*(1 - replenishPercent)
 				local incentiveCareful = replenishPercent*100*(1-healthPercent)
-				--DEBUG]]print(gsiPlayer.shortName, "INCENTIVISE FROM INCREASE SAFETY sees better leech/avoid", incentiveCareful, "against increase safety", thisWalkBackScore, "which lost %", (1-replenishPercent)*100)
+				--[[DEV]]if DEBUG then print(gsiPlayer.shortName, "INCENTIVISE FROM INCREASE SAFETY sees better leech/avoid", incentiveCareful, "against increase safety", thisWalkBackScore, "which lost %", (1-replenishPercent)*100) end
 				Task_IncentiviseTask(gsiPlayer, leech_exp_handle, incentiveCareful, healthTime)
 				Task_IncentiviseTask(gsiPlayer, avoid_hide_handle, incentiveCareful, healthTime)
 				Task_IncentiviseTask(gsiPlayer, consumable_handle, incentiveCareful, healthTime)
 			end
-			--[DEBUG]]]if DEBUG and DEBUG_IsBotTheIntern() then print("----increase_safety: moonwalk", gsiPlayer.shortName, thisWalkBackScore, Math_GetFastThrottledBounded(thisWalkBackScore, 250, 350, 800)) end
-			return gsiPlayer, thisWalkBackScore
+			local aliveAdvantageFactor = 1 - (
+						DotaTime() < 480 and 0
+							or DotaTime() < 960 and ((DotaTime()-480)/480) * max(-0.15, min(0.65, (-GSI_GetAliveAdvantageFactor())))
+							or max(-0.15, min(0.65, (-GSI_GetAliveAdvantageFactor())))
+					)
+			--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then print("----increase_safety", gsiPlayer.shortName, thisWalkBackScore, Math_GetFastThrottledBounded(thisWalkBackScore, 250, 350, 800)) end
+			--[[DEV]]if TEST then DebugDrawText(500, TEAM_IS_RADIANT and 450 or 460, string.format("AliveAdvantage %.2f %.2f", GSI_GetAliveAdvantageFactor(), aliveAdvantageFactor), TEAM_IS_RADIANT and 0 or 155, 255, 0) end
+			return gsiPlayer, thisWalkBackScore * aliveAdvantageFactor
 		end
 		local distanceToFountain = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, team_fountain)
 		if distanceToFountain < 1400 or Task_GetCurrentTaskHandle(gsiPlayer) == task_handle and distanceToFountain < 4000 then

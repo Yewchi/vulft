@@ -1,8 +1,8 @@
 local hero_data = {
 	"weaver",
-	{2, 3, 1, 2, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 3, 1, 2, 2, 4, 2, 3, 3, 5, 3, 4, 1, 1, 7, 1, 4, 9, 12},
 	{
-		"item_branches","item_branches","item_mantle","item_slippers","item_circlet","item_tango","item_faerie_fire","item_wraith_band","item_javelin","item_magic_wand","item_mithril_hammer","item_maelstrom","item_crown","item_crown","item_ring_of_health","item_rod_of_atos","item_gungir","item_pers","item_sphere","item_lesser_crit","item_greater_crit","item_gem","item_ultimate_orb","item_skadi","item_black_king_bar","item_gem","item_gem","item_aghanims_shard","item_rapier",
+		"item_circlet","item_slippers","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_wraith_band","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_javelin","item_mithril_hammer","item_maelstrom","item_ring_of_health","item_pers","item_sphere","item_magic_wand","item_blade_of_alacrity","item_dragon_lance","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_greater_crit","item_gem","item_helm_of_iron_will","item_relic","item_nullifier","item_hyperstone","item_mjollnir","item_aghanims_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -124,7 +124,7 @@ local d = {
 				USE_ABILITY(gsiPlayer, swarm, extrapolatedLoc, 500, nil)
 				return;
 			end
-			if fhtReal and (not geminate:IsCooldownReady() or
+			if fhtReal and (not geminate:GetCooldownTimeRemaining() == 0 or
 					Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
 						> gsiPlayer.attackRange
 					) then

@@ -15,6 +15,8 @@ local max = math.max
 local min = math.min
 local abs = math.abs
 
+local TEST = TEST and true
+
 local task_handle = Task_CreateNewTask()
 
 local FIGHT_HARASS_THROTTLE = 0.083
@@ -130,10 +132,13 @@ blueprint = {
 		if DEBUG and DEBUG_IsBotTheIntern() then
 			DebugDrawText(450, 860, string.format("%.1f;%.1f;%.1f;%.1f;%.1f", (creep_agro_reset_time[1] or -0.0), (creep_agro_reset_time[2] or -0.0), (creep_agro_reset_time[3] or -0.0), (creep_agro_reset_time[4] or -0.0), (creep_agro_reset_time[5] or -0.0)), 255, 255, 255)
 		end
-		if not creep_agro_reset_time[pnot] and creepPressure >= 0.75 then
-			if DEBUG and DEBUG_IsBotTheIntern() then
-				DebugDrawText(760, 860, string.format("avoid creep agro %s: %.2f", gsiPlayer.shortName, creepPressure), 255, 255, 255)
-			end
+
+		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		if not creep_agro_reset_time[pnot] and creepPressure >= 0.75
+				and danger > -0.8 then
+--[[DEV]]	if DEBUG and DEBUG_IsBotTheIntern() then
+--[[DEV]]		DebugDrawText(760, 660, string.format("avoid creep agro %s: %.2f", gsiPlayer.shortName, creepPressure), 255, 255, 255)
+--[[DEV]]	end
 			local highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer)
 			local attackDamage = hPlayer:GetAttackDamage()
 			if highRecentTakenType == UNIT_TYPE_CREEP and highRecentTaken > attackDamage then
@@ -156,12 +161,14 @@ blueprint = {
 								gsiPlayer, adjust_safer_avoid_agro, SET_HERO_ENEMY, 500
 							)
 					)
+				if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawCircle(moveSafe, 20, 0, 255, 0) end
 				moveSafe = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveSafe, SET_CREEP_ENEMY, 800)
+				if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawCircle(moveSafe, 20, 100, 255, 100) end
 	if abs(moveSafe.x) > 9000 or abs(moveSafe.y) > 9000 or abs(moveSafe.z) > 9000 then
 		WARN_print(string.format("[fight_harass] BIG DIST: %s", debug.traceback()));
 	end
 				hPlayer:Action_MoveToLocation(moveSafe)
-				if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveSafe, 80, 255, 180) end
+	--[[DEV]]	if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveSafe, 255, 50, 50) end
 				return xetaScore;
 			end
 		end
@@ -183,7 +190,7 @@ blueprint = {
 						-1, 
 						true, 
 						min(1.0, 
-								max(0.0, (1-Analytics_GetTheoreticalDangerAmount(gsiPlayer)) / 5)
+								max(0.0, (1-danger) / 5)
 							)
 					)
 			end
@@ -224,7 +231,7 @@ blueprint = {
 			if highRecentTaken*2 > 
 							math.max(
 									hUnitPlayer:GetAttackDamage()*2.5,
-									Analytics_GetTotalDamageInTimeline(prevObjective)
+									prevObjective and Analytics_GetTotalDamageInTimeline(prevObjective.hUnit) or 0
 								)
 					and FarmLane_UtilizingLaneSafety(gsiPlayer) then
 				return false, XETA_SCORE_DO_NOT_RUN

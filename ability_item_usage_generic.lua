@@ -93,7 +93,7 @@ local function bot_microthink__job(workingSet) -- The guts of our redefined Thin
 		if while_dead_behaviour_throttle:allowed() then
 			Player_InformDead(this_bot) -- TODO more abstraction
 			Task_InformDeadAndCancelAnyConfirmedDenial(this_bot)
-			Team_CheckBuybackDirective(this_bot)
+			Team_InformDeadTryBuyback(this_bot)
 		end
 	end
 	-- run this_bot's dominated units -- TODO global usage and redundant calls on consts indicate restructure of bot tables, or increasing this module's local-global scope; mess.

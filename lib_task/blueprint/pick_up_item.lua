@@ -60,9 +60,11 @@ blueprint = {
 	
 	score = function(gsiPlayer, prevObjective, prevScore)
 		local droppedItems = GetDroppedItemList()
+		--[[DEV]]if VERBOSE then print('pickupitem', gsiPlayer.shortName, droppedItems[1]) end
 		if not droppedItems or not droppedItems[1] then
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
+		--[[DEV]]if VERBOSE then print('pickupitem', gsiPlayer.shortName, gsiPlayer.hUnit:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)) end
 		--Util_TablePrint(table.sort(getmetatable(gsiPlayer.hUnit)))
 		if gsiPlayer.hUnit:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT) then
 			return false, XETA_SCORE_DO_NOT_RUN
@@ -75,6 +77,7 @@ blueprint = {
 		for i=1,#droppedItems do
 			local thisItem = droppedItems[i]
 			local thisDist = PointDistance(playerLoc, thisItem.location)
+			--[[DEV]]if VERBOSE then print(thisItem.item:GetName(), jungleItemKeys[thisItem.item:GetName()], thisDist) end
 			if jungleItemKeys[thisItem.item:GetName()] then
 				if thisDist < nearestItemDist then
 					nearestItemDist = thisDist
@@ -82,6 +85,7 @@ blueprint = {
 				end
 			end
 		end
+		--[[DEV]]if VERBOSE then print("pickupitem", gsiPlayer.shortName, nearestItemDist) end
 		if nearestItemDist > 700 then
 			return false, XETA_SCORE_DO_NOT_RUN
 		end

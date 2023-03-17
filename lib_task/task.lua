@@ -415,8 +415,9 @@ function Task_CurrentTaskContinue(gsiPlayer)
 	if thisPlayersCurrentTask and thisPlayersCurrentTask[TASK_I__OBJECTIVE] then
 		if VERBOSE then
 			local runnerUp = t_player_task_runner_up[pnot]
-			DebugDrawText(TEAM_IS_RADIANT and 650 or 1150, 830+pnot*15,
-					string.format("%.4s-I:%2d|%8.2f|%-18.18s II:%2d|%8.2f|%-18.18s", 
+			DebugDrawText(TEAM_IS_RADIANT and 640 or 1150, 830+pnot*15,
+					string.format("%d-%.4s-I:%2d|%8.2f|%-18.18s II:%2d|%8.2f|%-18.18s", 
+							Blueprint_GetCurrentTaskActivityType(gsiPlayer),
 							gsiPlayer.shortName, thisPlayersCurrentTask[TASK_I__HANDLE],
 							thisPlayersCurrentTask[TASK_I__SCORE],
 							thisPlayersCurrentTask[TASK_I__OBJECTIVE] and string.sub((thisPlayersCurrentTask[TASK_I__OBJECTIVE].shortName
@@ -429,10 +430,11 @@ function Task_CurrentTaskContinue(gsiPlayer)
 									) or "nil"
 						),
 					TEAM_IS_RADIANT and 170 or 250, TEAM_IS_RADIANT and 250 or 170 , 255)
-			--[[CRAZY_VERBOSE]]INFO_print(string.format("[Task_CurrentTaskContinue(%s)]: task: %d, objective: %s",
+			--[[CRAZY_VERBOSE]]INFO_print(string.format("[Task_CurrentTaskContinue(%s)]: task: %d, objective: %s, score: %.4f",
 							gsiPlayer.shortName,
 							thisPlayersCurrentTask[TASK_I__HANDLE],
-							tostring(thisPlayersCurrentTask[TASK_I__OBJECTIVE])
+							tostring(thisPlayersCurrentTask[TASK_I__OBJECTIVE]),
+							thisPlayersCurrentTask[TASK_I__SCORE]
 						)
 				)
 		end
@@ -450,8 +452,9 @@ function Task_CurrentTaskContinue(gsiPlayer)
 	elseif DEBUG then
 		local t = thisPlayersCurrenTask
 		local t2 = t_player_task_runner_up[pnot]
-		DebugDrawText(TEAM_IS_RADIANT and 650 or 1150, 830+pnot*15,
-				string.format("%s-I:ALL TASKS OFF|%s|%s|%s II:%s|%s|%s", 
+		DebugDrawText(TEAM_IS_RADIANT and 640 or 1150, 830+pnot*15,
+				string.format("%d-%s-I:ALL TASKS OFF|%s|%s|%s II:%s|%s|%s", 
+						Blueprint_GetCurrentTaskActivityType(gsiPlayer),
 						string.sub(gsiPlayer.shortName, 1, 4),
 						Util_Printable(t and t[TASK_I__HANDLE]), Util_Printable(t and t[TASK_I__OBJECTIVE]), Util_Printable(t and t[TASK_I__SCORE]),
 						Util_Printable(t2 and t2[TASK_I__HANDLE]), Util_Printable(t2 and t2[TASK_I__OBJECTIVE]), Util_Printable(t2 and t2[TASK_I__SCORE])

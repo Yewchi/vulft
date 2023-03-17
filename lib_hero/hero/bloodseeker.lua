@@ -1,10 +1,10 @@
 local hero_data = {
 	"bloodseeker",
-	{2, 3, 3, 1, 3, 5, 1, 1, 1, 6, 3, 5, 2, 2, 8, 2, 5, 10, 12, 13},
+	{2, 3, 3, 1, 3, 5, 3, 1, 1, 1, 6, 5, 2, 2, 8, 2},
 	{
-		"item_ward_observer","item_quelling_blade","item_tango","item_slippers","item_slippers","item_faerie_fire","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_javelin","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mithril_hammer","item_belt_of_strength","item_basher","item_hyperstone","item_mjollnir","item_aghanims_shard","item_blink","item_vanguard","item_abyssal_blade","item_pers","item_pers","item_refresher","item_swift_blink","item_invis_sword","item_broadsword","item_silver_edge","item_gem","item_rapier","item_boots","item_rapier",
+		"item_tango","item_quelling_blade","item_magic_stick","item_slippers","item_branches","item_faerie_fire","item_blades_of_attack","item_boots","item_chainmail","item_phase_boots","item_javelin","item_magic_wand","item_maelstrom","item_ultimate_orb","item_ring_of_health","item_sphere","item_crown","item_crown","item_gungir","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_basher","item_vanguard","item_abyssal_blade","item_mystic_staff","item_void_stone","item_sheepstick",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Bloodrage","Blood Rite","Thirst","Blood Mist","Rupture","+25 Bloodrage Attack Speed","+8% Bloodrage Spell Amplification","+8% Rupture Initial Damage","+85 Blood Rite Damage","+425 Rupture Cast Range","+15% Spell Lifesteal","+2 Rupture Charges","+18% Max Thirst MS",
 	}

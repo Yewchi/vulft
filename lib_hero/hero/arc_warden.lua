@@ -1,12 +1,12 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 3, 1, 3, 4, 1, 3, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
+	{3, 1, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 8, 2, 4, 9, 11},
 	{
-		"item_boots","item_ward_observer","item_circlet","item_tango","item_branches","item_faerie_fire","item_slippers","item_branches","item_gloves","item_hand_of_midas","item_maelstrom","item_boots","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_energy_booster","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_kaya","item_ghost","item_ethereal_blade","item_blink","item_reaver","item_overwhelming_blink","item_shivas_guard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_aghanims_shard","item_moon_shard",
+		"item_tango","item_magic_stick","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_magic_wand","item_gloves","item_boots","item_hand_of_midas","item_javelin","item_maelstrom","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_aether_lens","item_octarine_core","item_blink","item_overwhelming_blink","item_sheepstick","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_ultimate_scepter_2","item_staff_of_wizardry","item_wind_lace","item_wind_waker",
 	},
-	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
+	{ {2,2,2,1,1,}, {2,2,2,1,1,}, 0.1 },
 	{
-		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+225 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed","+125 Spark Wraith Damage","+40 Flux Damage","+50% Tempest Double Cooldown Reduction","+12s Tempest Double Duration",
+		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+200 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed","+125 Spark Wraith Damage","+40 Flux Damage","+40% Tempest Double Cooldown Reduction","+12s Tempest Double Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -97,10 +97,10 @@ local function tempest_double_think(genericAbilityThink)
 	if hTpScroll then
 		--print("zet double port vals:", t_tempest_port_state[pnot], castingTeleport, AbilityLogic_AbilityCanBeCast(tempestDouble, hTpScroll), Map_BaseLogicalLocationIsTeam(baseOrLaneLocation)--[[, not WP_AnyBaseDefence()]])
 		if castingTeleport or t_tempest_port_state[pnot] == WAITING_PORT_START
-				or ((AbilityLogic_AbilityCanBeCast(tempestDouble, hTpScroll) and Map_BaseLogicalLocationIsTeam(baseOrLaneLocation) and not ZoneDefend_AnyBuildingDefence())) then
+				or (AbilityLogic_AbilityCanBeCast(tempestDouble, hTpScroll) and Map_BaseLogicalLocationIsTeam(baseOrLaneLocation) and not ZoneDefend_AnyBuildingDefence()) then
 			if not castingTeleport or t_tempest_port_state[pnot] == WAITING_PORT_START then
 				local nearestCreeps = Set_GetNearestEnemyCreepSetToLocation(tempestDouble.lastSeen.location)
-				if not castingTeleport and Math_PointToPointDistance2D(tempestDouble.lastSeen.location, nearestCreeps.center) > 2000 and not Farm_AnyOtherCoresInLane(tempestDouble, nearestCreeps) then
+				if not castingTeleport and nearestCreeps and Math_PointToPointDistance2D(tempestDouble.lastSeen.location, nearestCreeps.center) > 2000 and not Farm_AnyOtherCoresInLane(tempestDouble, nearestCreeps) then
 					if t_tempest_port_state[pnot] == NOT_WAITING_PORT_START then
 						t_tempest_port_expiry[pnot] = GameTime() + 7
 					end
@@ -110,6 +110,7 @@ local function tempest_double_think(genericAbilityThink)
 			end
 			return;
 		end
+		-- TODO port to an actively defended defensible right as any aggresive behaviour begins while allies are behind the tower
 	end
 	if genericAbilityThink(tempestDouble) then
 		--print("non-ability")
@@ -147,7 +148,7 @@ end
 			end
 			local sparkWraith = hUnit:GetAbilityInSlot(2)
 			if hUnit:GetRemainingLifespan() < 0.67
-					and sparkWraith:IsCooldownReady()
+					and sparkWraith:GetCooldownTimeRemaining() == 0
 					and tempestDouble.lastSeenMana > sparkWraith:GetManaCost()
 					and not hUnit:IsSilenced()
 					and (lowestPlayer.lastSeenHealth > hUnit:GetAttackDamage()

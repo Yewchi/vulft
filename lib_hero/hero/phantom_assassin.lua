@@ -2,7 +2,7 @@ local hero_data = {
 	"phantom_assassin",
 	{1, 2, 1, 3, 1, 4, 2, 2, 2, 5, 1, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_tango","item_quelling_blade","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_ring_of_health","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_magic_wand","item_broadsword","item_bfury","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_desolator","item_aghanims_shard","item_basher","item_abyssal_blade","item_blitz_knuckles","item_claymore","item_orchid","item_cloak","item_bloodthorn","item_refresher","item_moon_shard","item_lifesteal","item_claymore","item_black_king_bar","item_black_king_bar","item_black_king_bar","item_ogre_axe",
+		"item_quelling_blade","item_slippers","item_circlet","item_tango","item_branches","item_branches","item_blight_stone","item_wraith_band","item_magic_wand","item_ring_of_health","item_power_treads","item_boots_of_elves","item_claymore","item_broadsword","item_bfury","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_desolator","item_mithril_hammer","item_belt_of_strength","item_basher","item_ultimate_orb","item_ultimate_orb","item_point_booster","item_skadi","item_vanguard","item_abyssal_blade","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_rapier",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

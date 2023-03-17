@@ -1,10 +1,10 @@
 local hero_data = {
 	"crystal_maiden",
-	{1, 2, 2, 3, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 2, 3, 2, 2, 4, 2, 1, 3, 5, 1, 4, 1, 3, 7, 3, 4, 10, 11},
 	{
-		"item_tango","item_ward_dispenser","item_clarity","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_branches","item_boots","item_ring_of_basilius","item_magic_wand","item_wind_lace","item_tranquil_boots","item_fluffy_hat","item_veil_of_discord","item_belt_of_strength","item_wind_lace","item_ancient_janggo","item_boots_of_bearing","item_gem","item_aghanims_shard",
+		"item_ward_sentry","item_enchanted_mango","item_enchanted_mango","item_tango","item_faerie_fire","item_wind_lace","item_boots","item_tranquil_boots","item_energy_booster","item_void_stone","item_fluffy_hat","item_aether_lens","item_staff_of_wizardry","item_force_staff","item_gem","item_gem","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_gem","item_ultimate_scepter",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Crystal Nova","Frostbite","Arcane Aura","Freezing Field","+250 Health","+125 Crystal Nova AoE","+125 Frostbite Cast Range","-3s Crystal Nova Cooldown","+200 Attack Speed","+50 Freezing Field Damage","+1.25s Frostbite Duration","+240 Crystal Nova Damage",
 	}

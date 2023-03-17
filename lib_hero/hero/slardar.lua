@@ -1,10 +1,10 @@
 local hero_data = {
 	"slardar",
-	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 8, 2, 4, 10, 12},
+	{3, 2, 3, 1, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 7, 6, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_circlet","item_gauntlets","item_branches","item_magic_stick","item_bracer","item_boots","item_power_treads","item_magic_wand","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_broadsword","item_invis_sword","item_hyperstone","item_buckler","item_assault","item_gem","item_desolator",
+		"item_quelling_blade","item_circlet","item_slippers","item_tango","item_branches","item_branches","item_wraith_band","item_boots","item_gloves","item_power_treads","item_magic_wand","item_blink","item_lifesteal","item_quarterstaff","item_mask_of_madness","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_talisman_of_evasion","item_sange","item_heavens_halberd","item_platemail","item_buckler","item_assault",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,3,1,}, 0.1 },
 	{
 		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+0.2s Slithereen Crush Stun Duration","+325 Health","+50 Bash of the Deep Damage","+150.0 Slithereen Crush Damage","-4 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
 	}

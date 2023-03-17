@@ -6,6 +6,8 @@ local task_handle = Task_CreateNewTask()
 
 local update_priority_throttle = 2.689
 
+local TPSCROLL_COST = GetItemCost("item_tpscroll")
+
 local avoid_hide_handle
 local avoid_hide_run
 local fight_harass_handle
@@ -45,7 +47,7 @@ end
 
 function ZoneDefend_AnyBuildingDefence()
 	-- TODO
-	return false
+	return t_wp_stored[1] and true, t_wp_stored[1]
 end
 
 -- ALL CODE BELOW IS PROOF OF WP DEFENCE CONCEPT -- COMPLETELY TRASH AND RESTRICTIVE TEST CODE
@@ -73,17 +75,17 @@ local function score_building_defence(gsiPlayer, objective, forTaskComparison)
 	local portArriveTime = tpScroll and tpScroll:GetCooldownTimeRemaining() + 4 or TPSCROLL_CD
 	local distToBuildingAtPort = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, objective.lastSeen.location)
 	local portIsLikely = distToBuildingAtPort - gsiPlayer.currentMovementSpeed*portArriveTime > MINIMUM_ALLOWED_USE_TP_INSTEAD
-	local costOfTravel = Xeta_CostOfWaitingSeconds(
-			gsiPlayer,
-			portIsLikely and portArriveTime or Math_ETA(gsiPlayer, objective.lastSeen.location)
-		)
+	local costOfTravel = 2*Xeta_CostOfWaitingSeconds(
+				gsiPlayer,
+				portIsLikely and portArriveTime or Math_ETA(gsiPlayer, objective.lastSeen.location)
+			) + (portIsLikely and TPSCROLL_COST*1.1 or 0)
 	local lostTowerCost = (objective.goldBounty or 500)/3
 	local freedomWhileDefending = forTaskComparison -- Decrement score when you're close, go nuts. x <= 0
 			and min(-CONSIDER_ACTIVE_DEFENDER_RANGE
 				+ distToBuildingAtPort*gsiPlayer.lastSeenHealth/gsiPlayer.maxHealth, 0)*3
 			or 0
 	local freedomWhileIntercepted = -0
-	if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "DEF", lostTowerCost - 2*costOfTravel + freedomWhileDefending + freedomWhileIntercepted, lostTowerCost, -2*costOfTravel, freedomWhileDefending, freedomWhileIntercepted) end
+	if VERBOSE then print("/VUL-FT/ <VERBOSE> [zone_defend]", gsiPlayer.shortName, "DEF", lostTowerCost - costOfTravel + freedomWhileDefending + freedomWhileIntercepted, lostTowerCost, costOfTravel, freedomWhileDefending, freedomWhileIntercepted) end
 	--print("freedom is", freedomWhileDefending)
 	return lostTowerCost - 2*costOfTravel + freedomWhileDefending + freedomWhileIntercepted
 end

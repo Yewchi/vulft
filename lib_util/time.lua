@@ -59,6 +59,13 @@ function Time_IndicateNewFrame(thisBot)
 	thisBot.time.frameElapsed = thisBot.time.currFrame - thisBot.time.prevFrame
 end
 
+function Time_Throttle(this)
+	if this.next and GameTime() > this.next then
+		this.next = GameTime() + this.c
+		return true
+	end
+end
+
 function Time_CreateThrottle(delta)
 	local new = {}
 	new.allowed = Time_Throttle
@@ -66,13 +73,6 @@ function Time_CreateThrottle(delta)
 	new.next = GameTime() + delta + (TEAM_DIRE and delta/2 or 0.0) -- Let the throttles flip between dire and radiant, to spread load.
 	new.c = delta
 	return new
-end
-
-function Time_Throttle(this)
-	if this.next and GameTime() > this.next then
-		this.next = GameTime() + this.c
-		return true
-	end
 end
 
 function Time_CreateModThrottle(delta, offset) -- (60, 54) triggers at x:54 Game Clock.

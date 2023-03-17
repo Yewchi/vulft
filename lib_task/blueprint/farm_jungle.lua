@@ -59,6 +59,10 @@ local t_spawner_status = {}
 
 local confirmed_request_denials_until_next_cycle = {} -- Don't farm that pack, it's mine!!
 
+local dawdle_handle
+
+local sqrt = math.sqrt
+
 local function register_set_farm_request_jungle(gsiPlayer, creepSet, extrapolatedXeta)
 	-- If Lion requests: Anti-Mage can foresee farming that within the next cycle: Deny request until next cycle.
 	-- If Lion requests: Anti-Mage is on the other side of the map, and is farming lane: Accept request.
@@ -81,6 +85,12 @@ end
 local function estimated_time_til_completed(gsiPlayer, objective)
 	return time_to_kill_jungle_objective(gsiPlayer, objective) + Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, objective.lastSeen.location)
 end
+
+function FarmJungle_Initialize()
+	dawdle_handle = Dawdle_GetTaskHandle()
+	FarmJungle_Init = nil
+end
+
 -- TODO
 -- TODO
 -- TODO Jungle objective MUST implement an iObjective.jugnleDifficulty flag
@@ -128,6 +138,49 @@ function Farm_CancelAnyConfirmedDenialsJungle(gsiPlayer)
 	for creepSet,tConfirmedDenial in pairs(confirmed_request_denials_until_next_cycle) do
 		if tConfirmedDenial.player == gsiPlayer then 
 			confirmed_request_denials_until_next_cycle[creepSet] = nil
+		end
+	end
+end
+
+local jungle_incentive_update = {}; for i=1,TEAM_NUMBER_OF_PLAYERS do jungle_incentive_update[i] = 0 end
+function FarmJungle_IncentiviseJungling(gsiPlayer, objective)
+	-- Funky, plausible flips TODO
+	if gsiPlayer.level < 5 then return; end
+	if jungle_incentive_update[gsiPlayer.nOnTeam] < GameTime() then
+		jungle_incentive_update[gsiPlayer.nOnTeam] = GameTime() + 0.897
+		if objective.type == UNIT_TYPE_BUILDING
+				or (objective.type ~= UNIT_TYPE_IMAGINARY
+					and Vector_PointDistance2D(
+						gsiPlayer.lastSeen.location,
+						objective.lastSeen and objective.lastSeen.location
+							or objective.center
+					) < 1100
+				) then
+			return;
+		end
+		local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 2200, true)
+		if #nearbyAllies > 1 then
+			local hpp = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
+			local effectiveHpp = hpp * gsiPlayer.hUnit:GetArmor() -- effective hit point >percent<
+			local allowed = (#nearbyAllies / 2) - 0.1
+			for i=1,#nearbyAllies do
+				local allied = nearbyAllies[i]
+				if allied ~= gsiPlayer
+						and effectiveHpp * gsiPlayer.hUnit:GetArmor() -- fast, w/e
+--[[PRIMITIVE]]					< allied.lastSeenHealth/allied.maxHealth -- flips on dmg taken BAD
+									* allied.hUnit:GetArmor() then
+					allowed = allowed - 1
+					if allowed < 0 then
+						return;
+					end
+				end
+			end
+			Task_IncentiviseTask(gsiPlayer, dawdle_handle,
+					gsiPlayer.level >= 20 and 70
+						or 18 * sqrt(5-gsiPlayer.level)
+							* gsiPlayer.lastSeenHealth/gsiPlayer.maxHealth,
+					14
+				)
 		end
 	end
 end

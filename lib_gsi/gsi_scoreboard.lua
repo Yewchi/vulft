@@ -1,10 +1,12 @@
 local min = math.min
-
 local max = math.max
 
 local scoreboard = {}
 local first_blood_taken = false
 local job_domain
+
+local t_team_players
+local t_enemy_players
 
 local function update_scoreboard_and_killstreaks__job(workingSet)
 	if workingSet.throttle:allowed() then
@@ -83,6 +85,31 @@ function GSI_KillstreakXP(thisPlayer)
 	return (scoreboard[thisPlayer.playerID].killstreak >= 3 and min(scoreboard[thisPlayer.playerID].killstreak, 10.0)*10*GetHeroLevel(thisPlayer.playerID) or 0.0)
 end
 
+local next_update_advantage = 0
+local advantage = 0
+function GSI_GetAliveAdvantageFactor()
+	-- Range -1 <> 1
+	if next_update_advantage > DotaTime() then
+		return advantage
+	end
+	local teamAlive = 0
+	local enemyAlive = 0
+	for i=1,#t_team_players do
+		if IsHeroAlive(t_team_players[i].playerID) then
+			teamAlive = teamAlive + 1
+		end
+	end
+	for i=1,#t_enemy_players do
+		if IsHeroAlive(t_enemy_players[i].playerID) then
+			enemyAlive = enemyAlive + 1
+		end
+	end
+	advantage = teamAlive >= enemyAlive and (teamAlive > 0 and 1-(enemyAlive/teamAlive) or -1)
+			or (enemyAlive > 0 and -1+(teamAlive/enemyAlive) or 1)
+	next_update_advantage = DotaTime()+1.01
+	return advantage
+end
+
 function GSI_CreateUpdateScoreboardAndKillstreaks()
 	job_domain:RegisterJob(
 			update_scoreboard_and_killstreaks__job,
@@ -92,5 +119,7 @@ function GSI_CreateUpdateScoreboardAndKillstreaks()
 end
 
 function GSI_RegisterGSIJobDomainToScoreboard(jobDomain)
+	t_team_players = GSI_GetTeamPlayers(TEAM)
+	t_enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
 	job_domain = jobDomain
 end

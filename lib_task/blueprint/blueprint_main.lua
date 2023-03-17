@@ -10,6 +10,8 @@ ACTIVITY_TYPE = { -- Ordered by reaction to additional aggressive behaviour whil
 	["FEAR"] = 9 -- Indiana Jones on 50 hp vs Godlike Pango on 100% HP.
 }
 
+COUNT_ACTIVITY_TYPES = ACTIVITY_TYPE.FEAR
+
 local ACTIVITY_TYPE = ACTIVITY_TYPE
 
 local t_task_activity_type
@@ -109,6 +111,12 @@ end
 
 function Blueprint_GetCurrentTaskActivityType(gsiPlayer)
 	return t_custom_activity_type[gsiPlayer.nOnTeam] or t_task_activity_type[Task_GetCurrentTaskHandle(gsiPlayer)] or ACTIVITY_TYPE.NOT_APPLICABLE
+end
+
+function Blueprint_TaskHandleIsFighting(taskHandle)
+	-- TODO
+	-- TEMP CODE
+	return taskHandle == FightHarass_GetTaskHandle()
 end
 
 function Blueprint_RegisterTaskActivityType(taskHandle, activityType)

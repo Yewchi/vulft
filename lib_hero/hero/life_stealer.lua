@@ -1,8 +1,8 @@
 local hero_data = {
 	"life_stealer",
-	{2, 3, 2, 1, 3, 4, 3, 3, 2, 1, 2, 4, 1, 1, 8, 6, 4, 10, 12},
+	{2, 3, 1, 2, 3, 4, 2, 3, 3, 1, 1, 1, 4, 2, 7, 6, 4, 10, 12},
 	{
-		"item_tango","item_branches","item_branches","item_quelling_blade","item_orb_of_venom","item_boots","item_blight_stone","item_fluffy_hat","item_orb_of_corrosion","item_chainmail","item_blades_of_attack","item_phase_boots","item_helm_of_iron_will","item_gloves","item_blades_of_attack","item_armlet","item_magic_wand","item_maelstrom","item_aghanims_shard","item_ultimate_orb","item_ring_of_health","item_sphere","item_mjollnir","item_mithril_hammer","item_basher","item_abyssal_blade",
+		"item_quelling_blade","item_circlet","item_gauntlets","item_tango","item_branches","item_branches","item_blades_of_attack","item_boots","item_phase_boots","item_helm_of_iron_will","item_blades_of_attack","item_gloves","item_armlet","item_blight_stone","item_magic_wand","item_mithril_hammer","item_mithril_hammer","item_desolator","item_sange","item_heavens_halberd","item_mithril_hammer","item_basher","item_aghanims_shard","item_hyperstone","item_buckler","item_platemail","item_assault",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

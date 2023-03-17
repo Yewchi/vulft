@@ -45,14 +45,14 @@ Blueprint_RegisterTask(task_init_func)
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
 		local checkLocation = t_player_check_location[gsiPlayer.nOnTeam]
-		if DEBUG and TEST then
-			INFO_print(string.format("[search_fog] %s searches for %s at %s.",
-						gsiPlayer.shortName, objective.shortName, 
-						objective.lastSeen.location
-					)
-				)
-			DebugDrawCircle(objective.lastSeen.location, 150*(GameTime()-objective.lastSeen.timeStamp), 220, 80, 80)
-		end
+--[[DEV]]if DEBUG and TEST then
+--[[DEV]]	INFO_print(string.format("[search_fog] %s searches for %s at %s.",
+--[[DEV]]				gsiPlayer.shortName, objective.shortName, 
+--[[DEV]]				objective.lastSeen.location
+--[[DEV]]			)
+--[[DEV]]		)
+--[[DEV]]	DebugDrawCircle(objective.lastSeen.location, 150*(GameTime()-objective.lastSeen.timeStamp), 220, 80, 80)
+--[[DEV]]end
 		if not checkLocation then
 			return XETA_SCORE_DO_NOT_RUN
 		end
@@ -66,7 +66,7 @@ blueprint = {
 		local lowestHealthPercent = 1.1
 		local lowestHealthEnemy
 		local lowestHealthCheckLocation
-		if danger > -0.5 or Task_GetCurrentTaskHandle(gsiPlayer) == fight_harass_handle then
+		if danger > -0.5 or Blueprint_GetCurrentTaskActivityType(gsiPlayer) >= ACTIVITY_TYPE.FEAR then
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
 		local timeStampConsiderUnknown = GameTime() - gsiPlayer.time.frameElapsed*3
@@ -75,15 +75,15 @@ blueprint = {
 		t_player_check_location[gsiPlayer.nOnTeam] = nil
 		for i=1,#t_enemy_players do
 			local thisEnemy = t_enemy_players[i]
-			if DEBUG and TEST then
-				print("search_fog", gsiPlayer.shortName, thisEnemy.shortName, Vector_PointDistance2D(gsiPlayer.lastSeen.location, thisEnemy.lastSeen.location),
-						GameTime() - thisEnemy.lastSeen.timeStamp
-					)
-			end
+--[[DEV]]	if TEST then
+--[[DEV]]		print("search_fog", gsiPlayer.shortName, thisEnemy.shortName, Vector_PointDistance2D(gsiPlayer.lastSeen.location, thisEnemy.lastSeen.location),
+--[[DEV]]				GameTime() - thisEnemy.lastSeen.timeStamp
+--[[DEV]]			)
+--[[DEV]]	end
 			local lastSeenTime = thisEnemy.lastSeen.timeStamp
-			if DEBUG and TEST then
-				print("search_fog", thisEnemy.playerID, thisEnemy.hUnit and not thisEnemy.hUnit:IsNull() and thisEnemy.hUnit:GetPlayerID(), IsHeroAlive(thisEnemy.playerID))
-			end
+--[[DEV]]	if TEST then
+--[[DEV]]		print("search_fog", thisEnemy.playerID, thisEnemy.hUnit and thisEnemy.hUnit.IsNull and not thisEnemy.hUnit:IsNull() and thisEnemy.hUnit:GetPlayerID(), IsHeroAlive(thisEnemy.playerID))
+--[[DEV]]	end
 			if IsHeroAlive(thisEnemy.playerID)
 					and lastSeenTime < timeStampConsiderUnknown and GameTime() - lastSeenTime < 8
 					and Vector_PointDistance2D(gsiPlayer.lastSeen.location, thisEnemy.lastSeen.location)
@@ -114,8 +114,9 @@ blueprint = {
 			end
 		end
 		if lowestHealthEnemy then
+			local earlyGameReduction = DotaTime() < 720 and 1+(720 - DotaTime())/720 or 1
 			t_player_check_location[gsiPlayer.nOnTeam] = lowestHealthCheckLocation
-			return lowestHealthEnemy, (30 - 2*(GameTime() - lowestHealthEnemy.lastSeen.timeStamp))*(-danger)*(lowestHealthPercent+0.33)
+			return lowestHealthEnemy, (30 - earlyGameReduction*2*(GameTime() - lowestHealthEnemy.lastSeen.timeStamp))*(-danger)*(lowestHealthPercent+0.33)
 		end
 		return false, XETA_SCORE_DO_NOT_RUN
 	end,

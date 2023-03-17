@@ -112,10 +112,22 @@ function Positioning_MovingToLocationAgrosTower(gsiPlayer, location, tower)
 	if Math_PointToPointDistance2D(location, tower.lastSeen.location) > tower.attackRange + 50 then
 		return false
 	end
-	local towerTarget = not bUnit_IsNullOrDead(tower) and tower.hUnit:GetAttackTarget() or nil
+	local towerTarget = not bUnit_IsNullOrDead(tower) and IsLocationVisible(tower.lastSeen.location)
+			and tower.hUnit:GetAttackTarget()
+			or nil
 	if towerTarget == gsiPlayer.hUnit then return true end
-	if towerTarget ~= nil and (towerTarget.creepType and towerTarget.creepType ~= CREEP_TYPE_SIEGE and towerTarget:GetHealth() < 2*BUILDING_T2_T4_ATTACK_DAMAGE) then
-		return false
+	if towerTarget ~= nil and towerTarget.IsNull and not towerTarget:IsNull() and towerTarget:IsAlive() then
+		towerTarget = towerTarget:IsCreep() and cUnit_NewSafeUnit(towerTarget)
+				or towerTarget:IsHero() and towerTarget.playerID and GSI_GetPlayerFromPlayerID(towerTarget.playerID)
+		if not towerTarget then
+			return false
+		end
+		if (towerTarget.creepType and towerTarget.creepType ~= CREEP_TYPE_SIEGE
+				and towerTarget.lastSeenHealth < 2*BUILDING_T2_T4_ATTACK_DAMAGE) then
+			return false
+		end
+		-- TODO Allied heroes under tower safety... Difficult because they might be
+		-- -| leaving the area, this bot then gets stuck under tower if passing through
 	end
 	--[[DEBUG]]if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, tower.lastSeen.location, 255, 0, 0) end
 	return true
@@ -134,11 +146,11 @@ function Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, location, setType, 
 					min(2000, careFactor*crowdingRating)
 				)
 			)
-		if DEBUG then 
-			-- DebugDrawCircle(crowdingCenter, 80, 180, 20, 255)
-			-- DebugDrawLine(location, adjustedLocation, 180, 20, 255)
-			--if crowdingRating > 0 and careFactor > 0 then print(GSI_GetBot().shortName, crowdingRating, careFactor, "=", min(700, 50*careFactor*crowdingRating), string.format("(%.2f, %.2f, %.2f)->(%.2f, %.2f, %.2f)", location.x, location.y, location.z, adjustedLocation.x, adjustedLocation.y, adjustedLocation.z)) end
-		end
+--[[DEV]]		if DEBUG then 
+--[[DEV]]			-- DebugDrawCircle(crowdingCenter, 80, 180, 20, 255)
+--[[DEV]]			-- DebugDrawLine(location, adjustedLocation, 180, 20, 255)
+--[[DEV]]			--if crowdingRating > 0 and careFactor > 0 then print(GSI_GetBot().shortName, crowdingRating, careFactor, "=", min(700, 50*careFactor*crowdingRating), string.format("(%.2f, %.2f, %.2f)->(%.2f, %.2f, %.2f)", location.x, location.y, location.z, adjustedLocation.x, adjustedLocation.y, adjustedLocation.z)) end
+--[[DEV]]		end
 
 		return adjustedLocation
 	else
@@ -161,7 +173,7 @@ function Positioning_AdjustToAvoidLocationFlipAggressive(location, currLocation,
 				avoidByDistance + HERO_TARGET_DIAMETER
 			)
 		)
---[[DEBUG]]if DEBUG then DebugDrawLine(location, locationAvoiding, 255, 20, 20) end
+	--[[DEBUG]]if DEBUG then DebugDrawLine(location, locationAvoiding, 255, 20, 20) end
 	return locationAvoiding
 end
 
@@ -177,7 +189,7 @@ function Positioning_AdjustToAvoidLocation(location, currLocation, avoidLocation
 				avoidByDistance + HERO_TARGET_DIAMETER
 			)
 		)
---[[DEBUG]]if DEBUG then DebugDrawLine(location, locationAvoiding, 255, 20, 20) end
+	--[[DEBUG]]if DEBUG then DebugDrawLine(location, locationAvoiding, 255, 20, 20) end
 	return locationAvoiding
 end
 
@@ -254,11 +266,11 @@ function Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, gsiUnit, location, r
 					)
 		if DEBUG then 
 			local outFromAvoid = Vector_Addition(location, Vector_ScalarMultiply(normalToMovement, d))
-			DebugDrawLine(playerLoc, outFromAvoid, 180, 180, 255)
+			if not TEAM_IS_RADIANT then DebugDrawLine(playerLoc, outFromAvoid, 180, 180, 255) end
 			--DebugDrawCircle(location, radius, 50, 50, 50)
 			DebugDrawCircle(testPassedPoint, 50, 255, 100, 100)
-			DebugDrawLine(location, outFromAvoid, gsiPlayer.nOnTeam*50, gsiPlayer.nOnTeam*50, 255)
-			DebugDrawLine(outFromAvoid, testPassedPoint, gsiPlayer.nOnTeam*50, gsiPlayer.nOnTeam*50, 255)
+			if not TEAM_IS_RADIANT then DebugDrawLine(location, outFromAvoid, gsiPlayer.nOnTeam*50, gsiPlayer.nOnTeam*50, 255) end
+			if not TEAM_IS_RADIANT then DebugDrawLine(outFromAvoid, testPassedPoint, gsiPlayer.nOnTeam*50, gsiPlayer.nOnTeam*50, 255) end
 		end
 
 		-- the kicker
@@ -334,18 +346,19 @@ end
 -- Move to a location casually, as if waiting for something
 -------- Positioning_ZSMoveCasual()
 function Positioning_ZSMoveCasual(gsiPlayer, moveTo, careFactor, maxActionDist, walkStraight)
+--[[DEV]]if VERBOSE then DebugDrawText(1400+(TEAM_IS_RADIANT and 0 or 50), gsiPlayer.nOnTeam*8, "MC", 180, 180, 180) end
 	local distToDest = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, moveTo)
 	local lowSweeperZ
 	local circularHelp
 	if not walkStraight then
-		lowSweeperZ = Vector_ScalarMultiply(gsiPlayer.zAxisMagnitudeVector, 0.33)
+		lowSweeperZ = Vector_ScalarMultiply(gsiPlayer.zAxisMagnitudeVector, 0.25)
 		circularHelp = Vector_CrossProduct(
 				HELPER_VECTOR_45_DEGREE,
 				lowSweeperZ
 			)
 	end
 	--circularHelp = Vector_ScalarMultiply(circularHelp, 1 - max(0.9, (distToDest / 1200)))
-	moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, 250)
+	moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, 400)
 	if maxActionDist then
 		local p2p = Vector_PointToPointLine(gsiPlayer.lastSeen.location, moveTo)
 		if Vector_LengthOfVector(p2p) > maxActionDist then
@@ -367,8 +380,8 @@ function Positioning_ZSMoveCasual(gsiPlayer, moveTo, careFactor, maxActionDist, 
 	-- if gsiPlayer.shortName == "void_spirit" then DebugDrawText(1000, 500, string.format("%f, %f, %f", plusCircularization.x, plusCircularization.y, plusCircularization.z), 255, 255, 0) end
 
 	if careFactor and careFactor > 0 then
-		moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ENEMY, 100*careFactor)
-		moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, 100*careFactor)
+		moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ENEMY, careFactor)
+		moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, careFactor)
 	end
 	local closestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
 	if DEBUG and DEBUG_IsBotTheIntern() and not closestTower then print(gsiPlayer.shortName, "No tower found move casual.") end
@@ -385,12 +398,13 @@ function Positioning_ZSMoveCasual(gsiPlayer, moveTo, careFactor, maxActionDist, 
 				)
 			)
 	end
-	--[[DEBUG]]if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveTo, 0, 0, 0) end
+	--[[DEBUG]if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveTo, 0, 0, 0) end --]]
 	Positioning_MoveDirectlyCheckPort(gsiPlayer, moveTo) -- TODO Doesn't account for ETA of objectives
 end
 
 -------- Positioning_ZSAttackRangeUnitHugTower()
 function Positioning_ZSAttackRangeUnitHugTower(gsiPlayer, locationOfUnit, timeTilAttackingTarget)
+--[[DEV]]if VERBOSE then DebugDrawText(1400+(TEAM_IS_RADIANT and 0 or 50), gsiPlayer.nOnTeam*8, "ARUHT", 180, 180, 180) end
 	local closestTower = gsiPlayer.hUnit:GetNearbyTowers(1600, false)
 	local saferTowardsLoc = 
 			closestTower and closestTower[1] and closestTower[1]:GetLocation() or
@@ -482,6 +496,8 @@ function Positioning_ZSAttackRangeUnitHugAllied(
 			gsiPlayer, locationOfUnit, unitSetToAvoid,
 			careFactor, timeTillStartAttack, forceAttackRange, aheadness
 		)
+	if true then gsiPlayer.hUnit:Action_MoveDirectly(locationOfUnit) end
+--[[DEV]]if VERBOSE then DebugDrawText(1400+(TEAM_IS_RADIANT and 0 or 50), gsiPlayer.nOnTeam*8, "ARUHA", 180, 180, 180) end
 	if Team_GetRoleBasedLane(gsiPlayer) ~= MAP_LOGICAL_MIDDLE_LANE and Map_GetLaneValueOfMapPoint(locationOfUnit) == MAP_LOGICAL_MIDDLE_LANE then
 --		print(gsiPlayer.shortName, "GOING TO MID FROM :: ", debug.traceback())
 	end
@@ -546,18 +562,17 @@ function Positioning_ZSAttackRangeUnitHugAllied(
 			Vector_ScalarMultiply2D(
 				Vector_CrossProduct(
 					targetToCloseAlliedCreepSetVector,
-					(gsiPlayer.isRanged and gsiPlayer.zAxisMagnitudeVector or Vector_ScalarMultiply2D(gsiPlayer.zAxisMagnitudeVector, math.log(1.05+timeTillStartAttack)/2))
+					(gsiPlayer.isRanged and gsiPlayer.zAxisMagnitudeVector or Vector_ScalarMultiply2D(gsiPlayer.zAxisMagnitudeVector, math.log(1.05+timeTillStartAttack)/2))*0.25
 				),
 				350	
 			)
 		)
-	--[[DEBUG]]if DEBUG then DebugDrawLine(locationOfUnit, location, 255, 200, 200) end
 	location = Positioning_AdjustToAvoidCrowdingSetType( 
-			gsiPlayer, location, SET_HERO_ALLIED, (gsiPlayer.isRanged and 120 or 50)*min(1, timeTillStartAttack)
+			gsiPlayer, location, SET_HERO_ALLIED, (gsiPlayer.isRanged and 550 or 250)*min(1, max(0.3, timeTillStartAttack))
 	-- ^^ i.e. range bots may go wide in a lane at attack range, and melee should have some knowledge of bumping, but don't get pushed below the creep wave by a range hero
 		)
 	if unitSetToAvoid ~= UNIT_TYPE_NONE then
-		careFactor = (careFactor and careFactor or 10000) * min(1, timeTillStartAttack)
+		careFactor = (careFactor and careFactor or 10000) * min(forceAttackRange and 0 or 1, timeTillStartAttack)
 		location = Positioning_AdjustToAvoidCrowdingSetType(
 				gsiPlayer, location, unitSetToAvoid ~= nil and unitSetToAvoid or SET_HERO_ENEMY, careFactor
 			)
@@ -580,6 +595,7 @@ function Positioning_ZSAttackRangeUnitHugAllied(
 						)
 				)
 		end
+--[[DEV]]if DEBUG then DebugDrawLine(location, gsiPlayer.lastSeen.location, gsiPlayer.DBGColor[1], gsiPlayer.DBGColor[2], gsiPlayer.DBGColor[3]) end
 		Positioning_MoveDirectlyCheckPort(gsiPlayer, location)
 	end
 end

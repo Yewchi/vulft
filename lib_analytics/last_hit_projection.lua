@@ -36,10 +36,10 @@ local DEAGRO_UPDATE_PRIORITY
 -- time-wise left to right. Units are indexed in another table to their node, for fast anim cycle comparison
 -- and
 
-local future_damage_lists = {}
+local future_damage_lists = {} -- all of the attacks in the future, (and 4 seconds past for analytics)
 local t_lists_with_recyclable_nodes = {}
 local t_next_recyclable_nodes = {}
-local t_attacker_to_future_damage_node = {}
+local t_attacker_to_future_damage_node = {} -- the current pre-attack-point attacking behaviour of a unit.
 
 local job_domain_analytics
 
@@ -49,6 +49,8 @@ local function get_dummy_projectile_hunit_ref()
 	return next_projectile_hunit_ref
 end
 
+
+
 local function indicate_far_past_is_for_recycling()
 	local deleteOlderThan = GameTime() - FAR_PAST_DELETE_DAMAGE_NODE
 	for atUnit,list in pairs(future_damage_lists) do
@@ -56,7 +58,7 @@ local function indicate_far_past_is_for_recycling()
 		local foundOlderThan
 		local n = 0
 		while(currNode and currNode.timeLanding < deleteOlderThan) do
-			n = n + 1 if n > 1000 then print("D", currNode) TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) future_damage_lists[atUnit] = nil return end
+			n = n + 1 if n > 1000 then ERROR_print(string.format("[LHP] '%s' infinite future damage list caught.", atUnit), true) if atUnit.IsNull and not atUnit:IsNull() then TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end return end
 			currNode.prevNode = nil
 			--future_damage_lists[atUnit].numAttacks = future_damage_lists[atUnit].numAttacks - 1
 			future_damage_lists[atUnit].totalDmgRecently = future_damage_lists[atUnit].totalDmgRecently - currNode.damage
@@ -85,6 +87,7 @@ local function recycle_or_create_node() -- Breaking this func taught me that Dot
 end
 
 local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit, attackPointPercent) -- Ensure nextNode, prevNode are set at least once (because recycling)
+	-- create a new potential attack node, to be confirmed by update_current_attacks__job
 	local new = recycle_or_create_node() 
 	new.damage = damage
 	new.timeLanding = timeLanding
@@ -109,7 +112,7 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 		local currNode = thisUnitDamageList.firstNodeFromNow or thisUnitDamageList.oldestNode
 		local n = 0
 		while(currNode) do
-			n = n + 1 if n > 1000 then print("A") TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) return end
+			n = n + 1 if n > 1000 then ERROR_print(string.format("[LHP] '%s' infinite future damage list caught.", atUnit), true) if atUnit.IsNull and not atUnit:IsNull() then TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end return end
 			if currNode.timeLanding >= timeLanding then
 				if currNode.prevNode then
 					currNode.prevNode.nextNode = new
@@ -140,7 +143,7 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 end
 
 -- --[[BENCH]]local benchThrottle = Time_CreateThrottle(10)
-local function update_current_vantage__job(workingSet) -- Shift to the current future, remove attacks that didn't complete their cycle.
+local function update_current_attacks__job(workingSet) -- Shift to the current future, remove attacks that didn't complete their cycle.
 	if workingSet.throttle:allowed() then
 		-- if benchThrottle:allowed() then
 			-- local sizeTable = 0
@@ -159,7 +162,7 @@ local function update_current_vantage__job(workingSet) -- Shift to the current f
 			local currNode = list.firstNodeFromNow
 			local n = 0
 			while(currNode) do
-				n = n + 1 if n > 1000 then print("B") TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) return end
+				n = n + 1 if n > 1000 then ERROR_print(string.format("[LHP] '%s' infinite future damage list caught.", atUnit), true) if atUnit.IsNull and not atUnit:IsNull() then TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end return end
 				if currNode.timeLanding + TRY_KEEP_NODE_AS_FUTURE_BEFORE_LANDING_BUFFER > currTime then
 					break
 				end
@@ -221,12 +224,13 @@ local function create_future_damage_lists__job(workingSet)
 		indicate_far_past_is_for_recycling()
 		
 		--if DEBUG and DEBUG_BotIsTheIntern and sets then Util_TablePrint(sets) DEBUG_KILLSWITCH = 0 end
-		local sendOneUnagroablePushAlert = true -- push_lane taking advantage of full attack check
 		local foundOneLowHealthAttackingTower = false
+		local fortHasNotAlerted = true
 		local DEBUGinternTarget = not TEAM_IS_RADIANT and
 				Task_GetTaskObjective(GSI_GetTeamPlayers(TEAM)[4], FarmLane_GetTaskHandle()) or {}
 --[DEBUG]]local n = 0
 		for i=1,#sets,1 do
+			local sendOneUnagroablePushAlert = true -- push_lane taking advantage of full attack check
 			local thisSetUnits = sets[i].units
 			local currTime = GameTime()
 			local setSize = #thisSetUnits
@@ -252,13 +256,24 @@ local function create_future_damage_lists__job(workingSet)
 --							--print("future damage3:", hUnitAttacked, timeTilAttackLands)
 --						end
 						if timeTilAttackLands then
-							if hUnitAttacked:IsBuilding() and sendOneUnagroablePushAlert and gsiUnit.team == TEAM and gsiUnit.creepType ~= CREEP_TYPE_SIEGE then
-								if setSize > 1
-										or setSize == 1 and gsiUnit.lastSeenHealth > hUnitAttacked:GetAttackDamage()*3 then
-									PushLane_InformUnagroablePush(hUnitAttacked)
-									sendOneUnagroablePushAlert = false
-								else
-									foundOneLowHealthAttackingTower = true
+							if hUnitAttacked:IsBuilding() then
+								-- buildings
+								if sendOneUnagroablePushAlert and gsiUnit.team == TEAM
+										and gsiUnit.creepType ~= CREEP_TYPE_SIEGE then
+									if setSize > 1
+											or setSize == 1 and gsiUnit.lastSeenHealth
+													> hUnitAttacked:GetAttackDamage()*3 then
+										PushLane_InformUnagroablePush(hUnitAttacked)
+										sendOneUnagroablePushAlert = false
+									else
+										foundOneLowHealthAttackingTower = true
+									end
+								end
+								if fortHasNotAlerted and hUnitAttacked:GetTeam() == TEAM
+										and string.find(hUnitAttacked:GetUnitName(), "fort") then
+									-- Alert fort under attack
+									Team_FortUnderAttack(gsiUnit)
+									fortHasNotAlerted = false
 								end
 							end
 							-- Inform friendly heroes to prioritize deagroing towers
@@ -302,13 +317,38 @@ function Analytics_RegisterAnalyticsJobDomainToLhp(analyticsJobDomain)
 	Analytics_RegisterAnalyticsJobDomainToLhp = nil
 end
 
-function Analytics_CreateUpdateLastHitProjectionCurrentVantage()
+function LHP_UpdateHunit(previousHunit, newHunit) -- New rule is no 
+--[[DEV]]DEBUG_KILLSWITCH = true
+-- This function is for accuracy of choices in the game, not for data safety
+-- -| because fromUnits would need to all be updated in all nodes, and it is
+-- -| faster to make the rule that none types are checked when accessing API
+-- -| functions anywhere in the code, and in fact, I don't know if the C state
+-- -| is in flight during Lua running. With Valve cracking down on hacking by
+-- -| obfuscating data, this is probably a good idea to always be checking
+-- -| none types before any use either way.
+	local attackNode = t_attacker_to_future_damage_node[previousHunit]
+	if attackNode then -- attacking?
+		-- update any pre attack-point attack by the unit
+		t_attacker_to_future_damage_node[newHunit] = attackNode
+		t_attacker_to_future_damage_node[previousHunit] = nil
+		attackNode.fromUnit = previousHunit
+	end
+	local attackedList = future_damage_lists[previousHunit]
+	if attackedList then -- attacked?
+		attackedList.atUnit = newHunit
+		future_damage_lists[newHunit] = attackedList
+	end
+	future_damage_lists[newHunit] = attackedList
+--[[DEV]]DEBUG_KILLSWITCH = false
+end
+
+function Analytics_CreateUpdateLastHitProjectionCurrentAttacks()
 	job_domain_analytics:RegisterJob(
-			update_current_vantage__job,
+			update_current_attacks__job,
 			{["throttle"] = Time_CreateThrottle(0.00)},
-			"JOB_UPDATE_LHP_CURRENT_VANTAGE"
+			"JOB_UPDATE_LHP_CURRENT_ATTACKS"
 		)
-	Analytics_CreateUpdateLastHitProjectionCurrentVantage = nil
+	Analytics_CreateUpdateLastHitProjectionCurrentAttacks = nil
 end
 
 function Analytics_CreateUpdateLastHitProjectionFutureDamageLists()
@@ -317,7 +357,7 @@ function Analytics_CreateUpdateLastHitProjectionFutureDamageLists()
 			{["throttle"] = Time_CreateThrottle(0.00)}, 
 			"JOB_UPDATE_LHP_FUTURE_DAMAGE_LISTS"
 		)
-	Analytics_CreateUpdateLastHitProjectionCurrentVantage = nil
+	Analytics_CreateUpdateLastHitProjectionFutureDamageLists = nil
 end
 
 local BFURY_CREEP_DMG_MELEE = 15
@@ -329,14 +369,14 @@ function Lhp_GetActualFromUnitToUnitAttackOnce(hUnitAttacking, hUnitAttacked) --
 		local attackDmg = hUnitAttacking:GetAttackDamage()
 		local itemSlot = hUnitAttacking:FindItemSlot("item_bfury")
 		if itemSlot >= 0 and itemSlot <= ITEM_END_INVENTORY_INDEX
-				and hUnitAttacking:GetItemInSlot(itemSlot):IsCooldownReady() then
+				and (hUnitAttacking:GetTeam() ~= TEAM or hUnitAttacking:GetItemInSlot(itemSlot):GetCooldownTimeRemaining() == 0) then
 			attackDmg = attackDmg + (hUnitAttacking:GetAttackRange() > 350
 					and BFURY_CREEP_DMG_RANGED or BFURY_CREEP_DMG_MELEE)
 			--print(hUnitAttacking:GetUnitName(), "has bfury dmg to", attackDmg)
 		else
 			itemSlot = hUnitAttacking:FindItemSlot("item_quelling_blade")
 			if itemSlot >= 0 and itemSlot <= ITEM_END_INVENTORY_INDEX
-						and hUnitAttacking:GetItemInSlot(itemSlot):IsCooldownReady() then
+						and (hUnitAttacking:GetTeam() ~= TEAM or hUnitAttacking:GetItemInSlot(itemSlot):GetCooldownTimeRemaining() == 0) then
 				attackDmg = attackDmg + (hUnitAttacking:GetAttackRange() > 350
 						and HATCHET_CREEP_DMG_RANGED or HATCHET_CREEP_DMG_MELEE)
 				--print(hUnitAttacking:GetUnitName(), "has hatchet dmg to", attackDmg)
@@ -366,13 +406,13 @@ function Lhp_AttackNowForBestLastHit(gsiPlayer, gsiUnit) -- Requires units are n
 	end
 	local n = 0
 	local m = 1
---[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() and gsiUnit.team == ENEMY_TEAM then DebugDrawText(0, 250, string.format(" %.3f-[%s]: %d, %d, %.3f", currTime, gsiPlayer.shortName, gsiUnit.lastSeenHealth, timeProgressedHealth, landingTimeOfAttackNow), 255, 255, 255) end
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() and gsiUnit.team == ENEMY_TEAM then DebugDrawText(0, 250, string.format(" %.3f-[%s]: %d, %d, %.3f", currTime, gsiPlayer.shortName, gsiUnit.lastSeenHealth, timeProgressedHealth, landingTimeOfAttackNow), 255, 255, 255) end
 	while(currNode) do
 		 n = n + 1 -- Running determine real future attacks (for a nasty est of how long till death if the target will not die from the future attacks plus our own)
---[DEBUG]]m = m + 1 if m > 1000 then print("C") TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit:GetLocation().x, gsiUnit:GetLocation().y, false) return end
+--[DEV]]m = m + 1 if m > 1000 then print("C") TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit:GetLocation().x, gsiUnit:GetLocation().y, false) return end
 		timeProgressedHealth = timeProgressedHealth - currNode.damage
 		if bUnit_IsTower(currNode.fromUnit) then anyTowersDecrement = -1.5 end
---[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() and gsiUnit.team == ENEMY_TEAM then DebugDrawText(0, 250 + 150*(currNode.timeLanding - currTime), string.format(" %.3f-[%s]: %d, %d, %s, %.2f", currNode.timeLanding, tostring(currNode.fromUnit), timeProgressedHealth, currNode.damage, currNode.fromUnit:GetUnitName(), currNode.fromUnit:GetAnimCycle()), (landingTimeOfAttackNow > currNode.timeLanding and 0 or 255), 255, 255) end
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() and gsiUnit.team == ENEMY_TEAM and not Unit_IsNullOrDead(currNode.fromUnit) then DebugDrawText(0, 250 + 150*(currNode.timeLanding - currTime), string.format(" %.3f-[%s]: %d, %d, %s, %.2f", currNode.timeLanding, tostring(currNode.fromUnit), timeProgressedHealth, currNode.damage, currNode.fromUnit:GetUnitName(), currNode.fromUnit:GetAnimCycle()), (landingTimeOfAttackNow > currNode.timeLanding and 0 or 255), 255, 255) end
 		if timeProgressedHealth < 0 then
 			if currNode.timeLanding < landingTimeOfAttackNow then -- Return AttackNow! if it leads to a future with a < 0 HP creep, and that future was before our attack would land
 				return true, 0
@@ -413,7 +453,7 @@ function Lhp_GetAnyLastHitsViableSimple(gsiPlayer)
 			for i=1,#creepSetUnits,1 do
 				local gsiEnemyCreep = creepSetUnits[i]
 				-- if DEBUG_IsBotTheIntern() then print("in creep", gsiEnemyCreep.shortName) print("dmg vs health one shot", Lhp_GetActualFromUnitToUnitAttackOnce(gsiPlayer.hUnit, gsiEnemyCreep.hUnit), ">", gsiEnemyCreep.lastSeenHealth) end
-				if Lhp_GetActualFromUnitToUnitAttackOnce(gsiPlayer.hUnit, gsiEnemyCreep.hUnit) > gsiEnemyCreep.lastSeenHealth then
+				if Lhp_GetActualFromUnitToUnitAttackOnce(gsiPlayer.hUnit, gsiEnemyCreep.hUnit) > gsiEnemyCreep.lastSeenHealth and not cUnit_IsNullOrDead(gsiEnemyCreep) then
 					-- if DEBUG_IsBotTheIntern() then print("returning" and creepSet.units or nil) end
 					return gsiEnemyCreep
 				end
@@ -486,7 +526,7 @@ function Analytics_GetTotalDamageNumberAttackers(gsiPlayer) -- for team players
 		local numHeroesAttackingFriendly = 0
 		while(currNode) do
 			local thisUnit = currNode.fromUnit
-			if not thisUnit:IsNull() and thisUnit:IsHero() then
+			if not Unit_IsNullOrDead(thisUnit) and thisUnit:IsHero() then
 				players_found[GSI_GetPlayerFromPlayerID(thisUnit:GetPlayerID()).nOnTeam] = true
 				numHeroesAttackingFriendly = numHeroesAttackingFriendly + 1
 			end
@@ -515,6 +555,7 @@ end
 
 local hait_platter = {}
 -- pnot indexed, contains damage list node
+-- NB DATA MUST NOT PROPEGATE TO HUNIT USE OF HEROES FROM THE HAIT_PLATTER TABLE
 function Analytics_HeroAttacksInTimeline(gsiUnit) 
 	local damageList = future_damage_lists[gsiUnit.hUnit]
 	if not damageList then return EMPTY_TABLE, false, false end
@@ -527,7 +568,8 @@ function Analytics_HeroAttacksInTimeline(gsiUnit)
 	local currNode = damageList.oldestNode
 	while(currNode) do
 		local thisUnit = currNode.fromUnit
-		if string.find(thisUnit:GetUnitName(), "hero") then
+		if not Unit_IsNullOrDead(thisUnit) and thisUnit:IsHero() and thisUnit.GetPlayerID then
+			thisUnit = GSI_GetPlayerFromPlayerID(thisUnit:GetPlayerID())
 			hait_platter[thisUnit.nOnTeam] = currNode.timeLanding
 			timesAttacked = timesAttacked + 1
 			if currNode.timeLanding > currTime then
@@ -538,14 +580,15 @@ function Analytics_HeroAttacksInTimeline(gsiUnit)
 		end
 		currNode = currNode.nextNode
 	end
+-- NB DATA MUST NOT PROPEGATE TO HUNIT USE OF HEROES FROM THE HAIT_PLATTER TABLE
 	return hait_platter, pastAttack, futureAttack
 end
 
 function Analytics_GetFutureDamageFromUnitType(hUnit, unitType)
 	local damageList = future_damage_lists[hUnit]
+	local totalDamage = 0
 	if damageList then
 		local currNode = damageList.oldestNode
-		local totalDamage = 0
 		local currTime = GameTime()
 		while(currNode) do
 			if currNode.timeLanding > currTime and Unit_GetUnitType(currNode.fromUnit) == unitType then

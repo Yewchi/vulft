@@ -159,14 +159,13 @@ function Analytics_GetKnownTheorizedEngageables(gsiPlayer, location)
 			gsiPlayer.time.data.theorizedEngageables = theorizedEng
 			gsiPlayer.time.data.theorizedAggressorAmount = theorizedAggressorAmount -- i.e. not a factor, score, nor ratio; it's the number of "mimics" in power level that could potentially engage the player
 		end
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1730 , 600, string.format("%d-%d", gameSpeedToSelf, visionScore), 255, 255, 255) end
 		-- DebugDrawText(1650, 620, string.format("%s %.2f", type(theorizedAggressorAmount), theorizedAggressorAmount), 255, 255, 255)
 		return knownEng, theorizedEng, theorizedAggressorAmount
 	end
-	-- if DEBUG and DEBUG_IsBotTheIntern() then 
-		-- DebugDrawText(1600, 600, tostring(#(gsiPlayer.time.data.knownEngageables)), 255, 255, 255)
-		-- DebugDrawText(1625, 600, tostring(#(gsiPlayer.time.data.theorizedEngageables)), 255, 255, 255)
-		-- DebugDrawText(1650, 600, type(gsiPlayer.time.data.theorizedAggressorAmount)..tostring(gsiPlayer.time.data.theorizedAggressorAmount), 255, 255, 255)
-	-- end
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then 
+--[[DEV]]	DebugDrawText(1600, 600, string.format("%d - %d - %.2f", #gsiPlayer.time.data.knownEngageables, #gsiPlayer.time.data.theorizedEngageables, gsiPlayer.time.data.theorizedAggressorAmount), 255, 255, 255)
+--[[DEV]]end
 	
 	return gsiPlayer.time.data.knownEngageables, gsiPlayer.time.data.theorizedEngageables, gsiPlayer.time.data.theorizedAggressorAmount
 end

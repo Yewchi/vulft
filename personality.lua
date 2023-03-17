@@ -10,7 +10,7 @@ BOT_PERSONALITIES = {
 	{"VUL-FT.ContextSwitch", 		false},
 	{"VUL-FT.DontGetJokes",		false},
 	{"VUL-FT.300LocalGlobalReferences",		false},
-	{"VUL-FT.CodingPracticeChugga",		false},
+	{"VUL-FT.OptimizeFirst",		false},
 	{"VUL-FT.RecursiveCall",		false},
 	{"VUL-FT.RecursiveRecursiveCallCall",	false},
 	{"VUL-FT.CompiledOnThaFly",		false},

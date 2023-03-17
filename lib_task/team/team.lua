@@ -12,13 +12,26 @@ require(GetScriptDirectory().."/lib_hero/ability_think_main")
 local max = math.max
 local min = math.min
 local abs = math.abs
+local sqrt = math.sqrt
 
 local team_players
+local enemy_players
 local role_assignments
 local player_disallowed_objective_targets
 local buyback_directive
 
 local t_present_or_committed = {} for i=1,3 do t_present_or_committed[i] = {} end -- state if pnot is at strategic lane
+
+local t_prev_strategic_lane = {}
+
+local Task_GetCurrentTaskHandle = Task_GetCurrentTaskHandle
+
+local zone_defend_handle
+local fight_harass_handle
+
+local ancient_on_ropes_fight_loc
+
+local fort_attacked_urgency = 0
 
 local function check_human_indicating_lane_choice(hUnitHuman)
 	local loc = hUnitHuman.hUnit:GetLocation()
@@ -138,7 +151,8 @@ function DeduceBestRolesAndLanes()
 		local thisPlayerLane = Team_GetRoleBasedLane(thisPlayer) -- TODO ignores trilane
 		thisPlayer.lane = thisPlayerLane
 		for k=1,TEAM_NUMBER_OF_PLAYERS do
-			if thisPlayerLane == teamPlayers[k].lane then
+			if teamPlayers[k] ~= thisPlayer
+					and thisPlayerLane == teamPlayers[k].lane then
 				thisPlayer.laningWith = teamPlayers[k]
 				teamPlayers[k].laningWith = thisPlayer
 			end
@@ -153,11 +167,17 @@ end
 
 function Team_Initialize()
 	team_players = GSI_GetTeamPlayers(TEAM)
+	enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
 	player_disallowed_objective_targets = {}
 	buyback_directive = {}
 	for i=1,#team_players,1 do
 		player_disallowed_objective_targets[i] = {}
 	end
+
+	zone_defend_handle = ZoneDefend_GetTaskHandle()
+	fight_harass_handle = FightHarass_GetTaskHandle()
+
+	ancient_on_ropes_fight_loc = Map_GetAncientOnRopesFightLocation(TEAM)
 end
 
 function Team_AmITheCaptain(thisBot)
@@ -171,12 +191,80 @@ function Team_GetRole(thisBot)
 	return role_assignments[thisBot.nOnTeam]
 end
 
-function Team_CheckBuybackDirective(thisBot)
-	if buyback_directive[thisBot.nOnTeam] then
-		thisBot.hUnit:ActionImmedaite_Buyback()
-	end
+local prev_fort_health = 0
+function Team_InformDeadTryBuyback(gsiPlayer)
+	-- assumes dead
 	for iLane=1,3 do
-		t_present_or_committed[iLane][thisBot.nOnTeam] = nil
+		t_present_or_committed[iLane][gsiPlayer.nOnTeam] = nil
+	end
+	local teamAncient = GSI_GetTeamAncient(TEAM)
+	local thisFortHealth = teamAncient.lastSeenHealth
+	local fortHasDroppedHp = prev_fort_health > thisFortHealth
+	prev_fort_health = thisFortHealth
+	t_prev_strategic_lane[gsiPlayer.nOnTeam] = nil
+	local team_players = team_players
+	local netDanger = 0
+	local aliveCount = 0
+	if gsiPlayer.hUnit:GetGold() > gsiPlayer.hUnit:GetBuybackCost()
+			and gsiPlayer.hUnit:GetRespawnTime() > 5 then
+		if buyback_directive[gsiPlayer.nOnTeam] then
+			gsiPlayer.hUnit:ActionImmediate_Buyback()
+			buyback_directive[gsiPlayer.nOnTeam] = false
+		end
+		if fortHasDroppedHp then
+			local enemy_players = enemy_players
+			for i=1,#enemy_players do
+				local thisEnemy = enemy_players[i]
+				if Vector_PointDistance(
+							thisEnemy.lastSeen.location,
+							teamAncient.lastSeen.location
+							) < 1600
+						and thisEnemy.hUnit:GetAttackTarget() == teamAncient.hUnit then
+					gsiPlayer.hUnit:ActionImmediate_Buyback()
+				end
+			end
+		end
+		local stakes = false
+		for i=1,#team_players do
+			local thisPlayer = team_players[i]
+			if thisPlayer.hUnit:IsAlive() then
+				aliveCount = aliveCount + 1
+				local playerTask = Task_GetCurrentTaskHandle(thisPlayer)
+				stakes = (playerTask == zone_defend_handle and thisPlayer) -- simplistic, misses sometimes
+						or stakes
+						or playerTask == Blueprint_TaskHandleIsFighting()
+				netDanger = netDanger + Analytics_GetTheoreticalDangerAmount(thisPlayer)
+			end
+		end
+		if not stakes or (aliveCount > 0 and math.abs(netDanger) > 1.2*aliveCount) then
+			return false
+		end
+		local defensible = stakes == true and false or select(2, ZoneDefend_AnyBuildingDefence()) -- assumes stakes is a hero if any defending
+		defensible = defensible and defensible[POSTER_I.OBJECTIVE]
+		if defensible and defensible.tier and defensible.tier > 1 then
+			local distOfEnemy = select(2, Set_GetNearestEnemyHeroToLocation(defensible.lastSeen.location, 8))
+			if distOfEnemy < 2400 then
+					-- just as I write this, the fact that the bot will probably tp to any low
+					-- -| danger farmable lane is an indication that that behaviour needs to be
+					-- -| fixed, not this working around it. TODO
+				if defensible.isAncient
+						and gsiPlayer.hUnit:GetRespawnTime() > 4 + distOfEnemy / 400 then
+					Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 80, 4)
+					gsiPlayer.hUnit:ActionImmediate_Buyback() 
+				end
+				if not defensible.tier or not Item_TownPortalScrollCooldown(gsiPlayer) then
+					ERROR_print(string.format("Found nils in TryBuyback (%s %s)", defensible.tier, Item_TownPortalScrollCooldown(gsiPlayer)))
+					return
+				end
+				if defensible.lastSeenHealth > 200
+						and (defensible.tier >= 3 or Item_TownPortalScrollCooldown(gsiPlayer) == 0) then
+					if RandomInt(1, max(16, (6 - defensible.tier)*100 / (gsiPlayer.hUnit:GetGold() - gsiPlayer.hUnit:GetBuybackCost()))) == 1 then
+						Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 80, 4)
+						gsiPlayer.hUnit:ActionImmediate_Buyback()
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -213,19 +301,28 @@ end
 function Team_GetStrategicLane(gsiPlayer)
 	local strategicLane = gsiPlayer.time.data.strategicLane
 	if not strategicLane then
+		local prevLane = t_prev_strategic_lane[gsiPlayer.nOnTeam]
 		local roleHelpWeight = gsiPlayer.role/5
 		local highestScore = -0xFFFF
 		-- TODO Include game-lateness allocation, or is it a push task alone when trying to counter-push / take obj?
 		-- - Should heroes locked to Push not try to achieve last hit timings? Why rely on farm lane only because
 		-- - of convenience.
+		local aliveAdvantage = 1 + GSI_GetAliveAdvantageFactor()
+		local role = gsiPlayer.role
 		for iLane=1,3 do
-			local safety, helpNeededScore = Analytics_SafetyOfLaneFarm(gsiPlayer, iLane, t_present_or_committed[iLane])
-			local thisScore = 1 - min(1, abs(safety)) + helpNeededScore*roleHelpWeight
+			local safety, helpNeededScore, pushingHasPressureScore, myFarmScore = Analytics_SafetyOfLaneFarm(gsiPlayer, iLane, t_present_or_committed[iLane])
+			pushingHasPressureScore = max(1.5, min(0.75, safety/(role*0.66)))
+					* pushingHasPressureScore * aliveAdvantage -- supports care more pushing when advtg
+					* max(1, (6-role)-(6-role)*abs(safety)) -- cores help push if pressure is high but edging dangerous
+			myFarmScore = myFarmScore / (0.452 + sqrt(0.3+aliveAdvantage)) -- cores care more solo farm when advtg
+			local thisScore = (prevLane == strategicLane and 1.2 or 1)
+					- min(1, abs(safety)) + pushingHasPressureScore + myFarmScore
 			if thisScore > highestScore then
 				highestScore = thisScore
 				strategicLane = iLane
 				-- nothing is scaled in minute detail, but the factors are correctly placed. TODO TEST STRATEGIC LANE
 			end
+--[[DEV]]	if VERBOSE then VEBUG_print(string.format("[team] GetStrategicLane(%s): Lane #%d has %.2f, %.2f, %.2f, %.2f -- score %.3f", gsiPlayer.shortName, iLane, safety, helpNeededScore, pushingHasPressureScore, myFarmScore, thisScore)) end
 		end
 	--	DebugDrawText(370, 150+gsiPlayer.nOnTeam*8, string.format("%d-strat:%d-safe:%.1f", gsiPlayer.nOnTeam,
 	--			strategicLane, gsiPlayer.time.data.safetyOfLane[strategicLane]), 255, 255, 255)
@@ -238,11 +335,61 @@ function Team_GetStrategicLane(gsiPlayer)
 --	else
 --		DebugDrawText(370, 150+gsiPlayer.nOnTeam*8, string.format("%d-strat:%d-safe:%.1f", gsiPlayer.nOnTeam,
 --				strategicLane, gsiPlayer.time.data.safetyOfLane[strategicLane]), 255, 255, 255)
+		t_prev_strategic_lane[gsiPlayer.nOnTeam] = strategicLane
 	end
 	return strategicLane
 end
 
 function Team_GetRoleBasedGreedRating(thisPlayer)
 	return 1.0 - (role_assignments[thisPlayer.nOnTeam] and (role_assignments[thisPlayer.nOnTeam]-1) / MAX_ROLE_TYPES or 0.5)
+end
+
+function Team_FortUnderAttack(gsiUnit)
+	local doCheapAssBuybacks = false
+	if GSI_CountTeamAlive(TEAM) == 0 then
+		doCheapAssBuybacks = true
+	else
+		local defenders = Set_GetAlliedHeroesInLocRadius(nil, ancient_on_ropes_fight_loc, 4000)
+		local attackers = Set_GetEnemyHeroesInLocRadOuter(ancient_on_ropes_fight_loc, 5000, 5000, 10)
+		local defensivePower = Analytics_GetTheoreticalEncounterPower(
+				defenders,
+				ancient_on_ropes_fight_loc,
+				2500, 4000
+			)
+		local offensivePower = Analytics_GetTheoreticalEncounterPower(
+				attackers,
+				ancient_on_ropes_fight_loc,
+				3000, 5000
+			)
+		if offensivePower / defensivePower < 2 then
+			doCheapAssBuybacks = true
+		end
+	end
+	if doCheapAssBuybacks then
+		for i=1,#team_players do
+			local hUnitAllied = team_players[i].hUnit
+			if hUnitAllied:IsBot() and not hUnitAllied:IsAlive()
+					and hUnitAllied:GetBuybackCost() < hUnitAllied:GetGold() then
+				if not buyback_directive[i] then
+					buyback_directive[i] = true
+				end
+				return;
+			end
+		end
+	end
+	local fortHpp = GSI_GetTeamAncient(TEAM)
+	fortHpp = fortHpp.lastSeenHealth / fortHpp.maxHealth
+	local fortDefBaseScore = (1 - fortHpp^2) * 1000
+	for i=1,#team_players do
+		local thisAllied = team_players[i]
+		local distToFort = Vector_PointDistance2D(thisAllied.lastSeen.location, ancient_on_ropes_fight_loc)
+		local distScoreFactor = max(0.33, min(1, 1.99 - 0.00066*distToFort))
+		local score = distScoreFactor * fortDefBaseScore
+		local decrement = score / 8
+		--[[DEV]]print("fort defend player", i, score)
+		Task_IncentiviseTask(team_players[i], fight_harass_handle, score, decrement)
+		Task_IncentiviseTask(team_players[i], UseItem_GetTaskHandle(), score, decrement)
+		Task_IncentiviseTask(team_players[i], UseAbility_GetTaskHandle(), score, decrement)
+	end
 end
 --[[ MicroThink() implemented in bot_generic as Think() = MicroThink() ]]--

@@ -1,10 +1,10 @@
 local hero_data = {
 	"venomancer",
-	{2, 1, 2, 1, 2, 3, 3, 5, 3, 3, 2, 5, 6, 1, 9, 1, 5, 11, 7, 13},
+	{1, 2, 2, 1, 3, 3, 3, 5, 3, 6, 2, 5, 2, 1, 9, 1, 5, 7, 13, 11},
 	{
-		"item_ring_of_protection","item_circlet","item_branches","item_branches","item_tango","item_faerie_fire","item_urn_of_shadows","item_boots","item_magic_wand","item_tranquil_boots","item_vitality_booster","item_spirit_vessel","item_cloak","item_headdress","item_hood_of_defiance","item_fluffy_hat","item_pipe","item_force_staff","item_ogre_axe","item_sange","item_kaya_and_sange","item_aghanims_shard","item_blink","item_hurricane_pike","item_boots","item_gem",
+		"item_quelling_blade","item_tango","item_branches","item_branches","item_circlet","item_slippers","item_boots","item_wind_lace","item_tranquil_boots","item_wraith_band","item_headdress","item_chainmail","item_mekansm","item_magic_wand","item_vanguard","item_helm_of_iron_will","item_crimson_guard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_boots","item_arcane_boots","item_buckler","item_guardian_greaves","item_aghanims_shard","item_buckler","item_ring_of_basilius","item_vladmir","item_wraith_pact","item_void_stone","item_ultimate_orb","item_gem","item_mystic_staff","item_sheepstick","item_ghost","item_ethereal_blade",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
 		"Venomous Gale","Poison Sting","Plague Ward","Latent Toxicity","Poison Nova","-5s Venomous Gale CD","+20% Poison Sting Health Regen Reduction","-1.0s Plague Ward Cooldown","-8% Poison Sting Slow","+5.0s Poison Nova Duration","Gale Creates Plague Wards","Poison Nova reduces +100 Attack Speed","2.5x Plague Ward HP/Damage",
 	}

@@ -1,10 +1,10 @@
 local hero_data = {
 	"bounty_hunter",
-	{2, 1, 2, 1, 2, 4, 2, 3, 1, 1, 6, 4, 3, 3, 3, 7, 4, 9, 11},
+	{2, 1, 2, 1, 2, 4, 2, 1, 1, 6, 3, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_slippers","item_tango","item_circlet","item_branches","item_quelling_blade","item_enchanted_mango","item_enchanted_mango","item_wraith_band","item_boots","item_chainmail","item_phase_boots","item_ring_of_health","item_ogre_axe","item_magic_wand","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_vanguard","item_aether_lens","item_octarine_core","item_lotus_orb","item_aghanims_shard","item_black_king_bar","item_mystic_staff","item_ultimate_orb",
+		"item_ward_observer","item_quelling_blade","item_slippers","item_circlet","item_tango","item_branches","item_branches","item_blight_stone","item_boots","item_magic_wand","item_phase_boots","item_orb_of_corrosion","item_cloak","item_ring_of_health","item_hood_of_defiance","item_black_king_bar","item_yasha","item_gem","item_manta","item_skadi","item_boots","item_nullifier","item_gem","item_gem","item_gem","item_gem","item_gem","item_gem","item_gem","item_moon_shard",
 	},
-	{ {3,3,3,3,1,}, {3,3,3,1,4,}, 0.1 },
+	{ {3,3,3,3,2,}, {4,4,4,3,3,}, 0.1 },
 	{
 		"Shuriken Toss","Jinada","Shadow Walk","Track","+10% Shadow Walk Slow","+40 Jinada Damage","+2s Silence on Hit With Shadow Walk","Half Track Bonus Speed to Allies","Track Grants 600 Ground Vision","+50 Jinada Gold Steal","2 Shuriken Toss Charges","+250 Track Gold",
 	}

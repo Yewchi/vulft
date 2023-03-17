@@ -1,8 +1,8 @@
 local hero_data = {
 	"sven",
-	{1, 3, 1, 2, 2, 4, 2, 2, 3, 6, 3, 4, 3, 1, 7, 1, 4, 10, 11},
+	{1, 3, 2, 2, 2, 4, 2, 3, 1, 6, 1, 4, 3, 3, 7, 1, 4, 10, 11},
 	{
-		"item_gauntlets","item_tango","item_enchanted_mango","item_circlet","item_gauntlets","item_bracer","item_lifesteal","item_mask_of_madness","item_belt_of_strength","item_gloves","item_belt_of_strength","item_power_treads","item_magic_wand","item_ogre_axe","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_ring_of_health","item_sphere","item_reaver","item_satanic","item_blitz_knuckles","item_claymore","item_cloak","item_bloodthorn","item_aghanims_shard","item_overwhelming_blink",
+		"item_quelling_blade","item_branches","item_tango","item_circlet","item_branches","item_slippers","item_wraith_band","item_boots","item_phase_boots","item_quarterstaff","item_lifesteal","item_mask_of_madness","item_oblivion_staff","item_magic_wand","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_mage_slayer","item_hyperstone","item_buckler","item_assault","item_void_stone","item_blitz_knuckles","item_claymore","item_bloodthorn","item_greater_crit","item_swift_blink",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
