@@ -76,7 +76,7 @@ end
 			--print("deagro", (3.0 - Analytics_GetNearFutureHealthPercent(gsiPlayer) - math.min(2.0, gsiPlayer.hUnit:TimeSinceDamagedByTower()))
 			--			* Xeta_EvaluateObjectiveCompletion(XETA_HEALTH_LOSS, 0, 2*Lhp_GetActualFromUnitToUnitAttackOnce(underTower.hUnit, gsiPlayer.hUnit), gsiPlayer, gsiPlayer))
 			return underTower, (3.0 - Analytics_GetNearFutureHealthPercent(gsiPlayer) - math.min(2.0, gsiPlayer.hUnit:TimeSinceDamagedByTower()))
-						* Xeta_EvaluateObjectiveCompletion(XETA_HEALTH_LOSS, 0, 2*Lhp_GetActualFromUnitToUnitAttackOnce(underTower.hUnit, gsiPlayer.hUnit), gsiPlayer, gsiPlayer)
+						* 4 * Xeta_EvaluateObjectiveCompletion(XETA_HEALTH_LOSS, 0, 2*Lhp_GetActualFromUnitToUnitAttackOnce(underTower.hUnit, gsiPlayer.hUnit), gsiPlayer, gsiPlayer)
 			end
 		end
 		--print("returning false deagro", underTower, underTower and underTower.hUnit:GetAttackTarget() and  underTower.hUnit:GetAttackTarget():GetUnitName() or "[no target]")

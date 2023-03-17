@@ -1,10 +1,10 @@
 local hero_data = {
 	"luna",
-	{3, 1, 1, 3, 1, 2, 2, 2, 2, 3, 1, 4, 4, 3, 7, 6, 4, 10, 11},
+	{1, 3, 3, 3, 3, 2, 2, 2, 2, 5, 4, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_slippers","item_slippers","item_quelling_blade","item_tango","item_branches","item_branches","item_magic_wand","item_lifesteal","item_mask_of_madness","item_boots_of_elves","item_gloves","item_boots","item_power_treads","item_yasha","item_ultimate_orb","item_manta","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_mithril_hammer","item_black_king_bar","item_eagle","item_talisman_of_evasion","item_quarterstaff","item_butterfly","item_reaver","item_claymore","item_satanic","item_demon_edge","item_lesser_crit","item_greater_crit",
+		"item_quelling_blade","item_circlet","item_slippers","item_tango","item_branches","item_branches","item_wraith_band","item_magic_wand","item_boots","item_boots_of_elves","item_power_treads","item_lifesteal","item_mask_of_madness","item_blade_of_alacrity","item_dragon_lance","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_claymore","item_satanic","item_ultimate_orb","item_ultimate_orb","item_skadi","item_silver_edge","item_blink","item_swift_blink","item_monkey_king_bar","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
 	{
 		"Lucent Beam","Moon Glaives","Lunar Blessing","Eclipse","-8% Moon Glaives Damage Reduction","+0.4s Lucent Beam Ministun","-2.0s Lucent Beam Cooldown","-25.0s Eclipse Cooldown","+500 Moon Glaives fired on Lucent Beam","+100 Lucent Beam Damage","+35 Lunar Blessing Damage","+0.25s Eclipse Lucent Ministun",
 	}

@@ -1,10 +1,10 @@
 local hero_data = {
 	"sven",
-	{1, 3, 2, 2, 2, 4, 2, 3, 3, 6, 1, 4, 1, 3, 7, 1, 4, 10, 11},
+	{1, 3, 2, 2, 2, 4, 2, 3, 1, 6, 1, 4, 3, 3, 7, 1, 4, 10, 11},
 	{
-		"item_tango","item_circlet","item_quelling_blade","item_slippers","item_branches","item_branches","item_wraith_band","item_gloves","item_boots","item_power_treads","item_quarterstaff","item_mask_of_madness","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_claymore","item_orchid","item_mage_slayer","item_bloodthorn","item_platemail","item_assault","item_satanic","item_swift_blink","item_basher","item_vanguard","item_abyssal_blade","item_boots",
+		"item_quelling_blade","item_branches","item_tango","item_circlet","item_branches","item_slippers","item_wraith_band","item_boots","item_phase_boots","item_quarterstaff","item_lifesteal","item_mask_of_madness","item_oblivion_staff","item_magic_wand","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_mage_slayer","item_hyperstone","item_buckler","item_assault","item_void_stone","item_blitz_knuckles","item_claymore","item_bloodthorn","item_greater_crit","item_swift_blink",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,5,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Storm Hammer","Great Cleave","Warcry","God's Strength","+3.0s Warcry Duration","+15 Attack Speed","-15s God's Strength Cooldown","+25% Great Cleave Damage","+8% Warcry Movement Speed","+10 Warcry Armor","+50% God's Strength Damage","+1.25s Storm Hammer Stun Duration",
 	}

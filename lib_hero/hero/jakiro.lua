@@ -1,10 +1,10 @@
 local hero_data = {
 	"jakiro",
-	{1, 3, 1, 2, 1, 4, 1, 3, 3, 5, 2, 4, 2, 3, 8, 2, 4, 9, 11},
+	{1, 3, 1, 3, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 8, 2, 4, 10},
 	{
-		"item_ward_dispenser","item_tango","item_branches","item_clarity","item_clarity","item_enchanted_mango","item_circlet","item_boots","item_arcane_boots","item_magic_wand","item_bracer","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_octarine_core","item_aeon_disk",
+		"item_null_talisman","item_ward_observer","item_faerie_fire","item_bottle","item_boots","item_arcane_boots","item_crown","item_staff_of_wizardry","item_crown","item_rod_of_atos","item_headdress","item_chainmail","item_hood_of_defiance","item_pipe","item_blitz_knuckles","item_robe","item_witch_blade","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance",
 	},
-	{ {1,1,1,4,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {3,3,1,2,1,}, {5,5,3,2,4,}, 0.1 },
 	{
 		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+275 Attack Range","-10%/-10 Dual Breath Movement/Attack Speed Slow","-50 Liquid Fire Attack Speed","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","+100%% Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
 	}

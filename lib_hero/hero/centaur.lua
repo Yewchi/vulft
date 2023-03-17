@@ -1,8 +1,8 @@
 local hero_data = {
 	"centaur",
-	{1, 2, 3, 3, 2, 5, 3, 3, 1, 2, 1, 5, 2, 1, 8, 6, 5, 11, 13, 9},
+	{1, 2, 2, 1, 2, 5, 2, 1, 1, 3, 6, 5, 3, 3, 8, 3, 5, 11, 13, 9},
 	{
-		"item_tango","item_branches","item_branches","item_branches","item_quelling_blade","item_ring_of_protection","item_ring_of_health","item_vanguard","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_blink","item_magic_wand","item_ring_of_health","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_platemail","item_aghanims_shard","item_void_stone","item_pers","item_lotus_orb","item_reaver","item_overwhelming_blink","item_reaver","item_heart",
+		"item_magic_stick","item_tango","item_enchanted_mango","item_ring_of_protection","item_ring_of_health","item_boots","item_arcane_boots","item_vanguard","item_cloak","item_hood_of_defiance","item_blink","item_headdress","item_pipe","item_aghanims_shard","item_fluffy_hat","item_magic_wand","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_heart","item_talisman_of_evasion","item_quarterstaff","item_butterfly",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

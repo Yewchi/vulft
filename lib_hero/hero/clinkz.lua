@@ -1,10 +1,10 @@
 local hero_data = {
 	"clinkz",
-	{2, 1, 2, 3, 1, 4, 1, 1, 3, 3, 3, 4, 6, 2, 7, 2, 4, 10, 11},
+	{2, 3, 2, 1, 1, 4, 1, 1, 3, 3, 3, 4, 6, 2, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_circlet","item_slippers","item_branches","item_quelling_blade","item_branches","item_blades_of_attack","item_falcon_blade","item_boots_of_elves","item_wraith_band","item_boots","item_gloves","item_power_treads","item_javelin","item_mithril_hammer","item_maelstrom","item_dragon_lance","item_crown","item_rod_of_atos","item_gungir","item_aghanims_shard","item_hurricane_pike","item_ultimate_orb","item_skadi","item_lesser_crit","item_greater_crit","item_pers","item_ultimate_orb","item_sphere","item_moon_shard",
+		"item_blades_of_attack","item_branches","item_branches","item_fluffy_hat","item_falcon_blade","item_javelin","item_boots","item_mithril_hammer","item_maelstrom","item_boots_of_elves","item_gloves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_lesser_crit","item_aghanims_shard","item_greater_crit","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar","item_sphere","item_blink","item_swift_blink","item_boots",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Burning Barrage","Searing Arrows","Skeleton Walk","Death Pact","+20 Searing Arrows Damage","-3.0s Skeleton Walk Cooldown","+20% Death Pact Health","Death Pact Steal creep abilities","+125 Attack Range","+3.0 Burning Barrage arrows","+25% Burning Barrage Damage","Searing Arrows Multishot",
 	}

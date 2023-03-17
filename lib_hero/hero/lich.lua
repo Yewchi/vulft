@@ -1,10 +1,10 @@
 local hero_data = {
 	"lich",
-	{1, 2, 1, 3, 1, 4, 1, 3, 2, 2, 5, 4, 3, 2, 8, 3, 4, 10, 11},
+	{1, 2, 1, 3, 1, 4, 1, 2, 3, 5, 3, 4, 3, 2, 7, 2, 4, 10},
 	{
-		"item_tango","item_branches","item_branches","item_branches","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_ward_sentry","item_ward_sentry","item_ward_sentry","item_enchanted_mango","item_boots","item_magic_wand","item_arcane_boots","item_wind_lace","item_void_stone","item_aether_lens","item_fluffy_hat","item_tranquil_boots","item_gem","item_gem","item_fluffy_hat","item_staff_of_wizardry","item_force_staff",
+		"item_tango","item_magic_stick","item_branches","item_branches","item_enchanted_mango","item_ward_sentry","item_tango","item_magic_wand","item_boots","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_shadow_amulet","item_glimmer_cape","item_aghanims_shard","item_ghost","item_staff_of_wizardry","item_point_booster",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,3,4,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Frost Blast","Frost Shield","Sinister Gaze","Chain Frost","+10% Frost Shield Damage Reduction","+150 Frost Blast Radius and Damage","+0.5s Sinister Gaze Duration","-3s Frost Blast Cooldown","+100 Chain Frost Damage","+4s Frost Shield Duration","Frost Shield Provides +50 HP Regen","Chain Frost Unlimited Bounces",
 	}

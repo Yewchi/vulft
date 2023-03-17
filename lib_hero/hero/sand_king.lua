@@ -1,10 +1,10 @@
 local hero_data = {
 	"sand_king",
-	{1, 3, 2, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 12},
+	{2, 3, 1, 2, 2, 4, 2, 1, 1, 5, 1, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_branches","item_tango","item_flask","item_enchanted_mango","item_gauntlets","item_ward_sentry","item_magic_wand","item_boots","item_blink","item_wind_lace","item_cyclone","item_aghanims_shard","item_platemail","item_pers","item_lotus_orb","item_platemail","item_mystic_staff","item_shivas_guard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_wind_waker","item_overwhelming_blink","item_ultimate_scepter_2","item_aeon_disk","item_refresher",
+		"item_quelling_blade","item_branches","item_branches","item_tango","item_circlet","item_enchanted_mango","item_bracer","item_boots","item_ring_of_health","item_cloak","item_magic_wand","item_cloak","item_hood_of_defiance","item_arcane_boots","item_blink","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_aghanims_shard","item_pipe","item_aether_lens","item_gem","item_energy_booster","item_octarine_core","item_gem","item_black_king_bar","item_overwhelming_blink",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,4,}, 0.1 },
 	{
 		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.3s Burrowstrike Stun","+125 Sand Storm Radius","+100.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
 	}
@@ -99,7 +99,7 @@ local d = {
 		local canCastBurrow = AbilityLogic_AbilityCanBeCast(gsiPlayer, burrow)
 			
 		if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION and fightHarassTarget then
-			if blink and blink:IsCooldownReady() and pUnit:HasModifier("modifier_sand_king_epicenter")
+			if blink and blink:GetCooldownTimeRemaining() == 0 and pUnit:HasModifier("modifier_sand_king_epicenter")
 					and fhtReal and distToFht > (canCastBurrow and burrow:GetCastRange() or 450) then
 				local toUnitVec = VEC_UNIT_DIRECTIONAL(playerLoc, fhtLoc)
 				local blinkTo = VEC_ADD(
@@ -127,8 +127,8 @@ local d = {
 								and afterEpicenterRemainingHpp > -(gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth)
 							)
 					) and Math_PointToPointDistance(gsiPlayer.lastSeen.location, fightHarassTarget.lastSeen.location)
-							< ( (blink and blink:IsCooldownReady() and blink:GetCastRange() or 0) +
-									(burrow:IsCooldownReady() and burrow:GetCastRange()*0.5 or 0) +
+							< ( (blink and blink:GetCooldownTimeRemaining() == 0 and blink:GetCastRange() or 0) +
+									(burrow:GetCooldownTimeRemaining() == 0 and burrow:GetCastRange()*0.5 or 0) +
 									EPICENTER_START_RANGE/2
 							)
 					and HIGH_USE(gsiPlayer, epicenter, highUse - epicenter:GetManaCost()*crowdedRating, fhtPercHp) then

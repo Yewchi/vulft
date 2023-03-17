@@ -21,7 +21,7 @@ function Captain_RegisterCaptain(thisBot, microThinkFunc, deleteThisFunc)
 	THIS_BOT.Chat = Captain_Chat
 	
 	generic_microthink = microThinkFunc
-	
+
 	if not job_domain.IsJobRegistered then
 		job_domain = Job_CreateDomain("DOMAIN_CAPTAIN")
 		job_domain:RegisterJob(
@@ -62,6 +62,35 @@ function Captain_RegisterCaptain(thisBot, microThinkFunc, deleteThisFunc)
 				{["throttle"] = Time_CreateThrottle(0.5), ["nextAdviseWaiting"] = GameTime() + 1, ["addAdviseWait"] = 2, ["printFuncEscalates"] = INFO_print},
 				"JOB_WAIT_FOR_GAME_INIT"
 			)
+		--[[
+		if GetBot():GetDifficulty() == 4 then
+			local team_humans = GSI_GetTeam
+			Communication_Question(
+				job_domain, 
+				1, 
+				{
+					[1] = {
+						"Bots default to drawing emotes under them for their current state in Easy mode. Turn off with !emote off", 
+						function(workingSet) 
+							local t
+
+								TEAM_CAPTAIN_UNIT.Chat("Emotes off", false)
+								return 2
+							end
+						end
+					},
+				}
+
+			InstallChatCallback(
+					function(event)
+						if not IsPlayerBot(event.player_id) then
+							humanPlayer.comms. = event.string
+							humanPlayer.comms.mostRecentChat = event
+						end
+					end
+				)
+			
+		end]]
 	else
 		Captain_RegisterCaptain = nil
 	end
@@ -81,14 +110,14 @@ function Captain_InitializeCaptain(thisBot) -- This is ran via job_domain:JOB_WA
 	GSI_CreateUpdateEnemyPlayersNoneTyped() -- Fast update null enemy players.
 	GSI_CreateUpdatePlayerDataJob() -- Update gsiUnit deductions about players
 	GSI_CreateUpdatePlayersLastSeen() -- Update last seen location of players
-	GSI_CreateUpdateScoreboardAndKillstreaks() -- Slow check for killstreak drops
 	GSI_CreateUpdateCreepUnits() -- Fast update null units and slow update HP/location
 	GSI_CreateUpdateUnitSets() -- Update location groupings of units
 	GSI_CreateUpdateBuildingUnits()
+	GSI_CreateUpdateScoreboardAndKillstreaks() -- Slow check for killstreak drops -- TODO Analytics, not GSI refactor
 	--
 	
 	-- Analytics jobs triggered from the CaptainThink()
-	Analytics_CreateUpdateLastHitProjectionCurrentVantage() -- Remove attacks that should've already occured
+	Analytics_CreateUpdateLastHitProjectionCurrentAttacks() -- Remove attacks that should've already occured
 	Analytics_CreateUpdateLastHitProjectionFutureDamageLists() -- Update unit's blow-landing list
 	Analytics_CreateUpdateFowMapPrediction()
 	Analytics_CreateUpdateLanePressure()
@@ -157,10 +186,6 @@ function Captain_CaptainThink()
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
 		
-		job_domain_gsi:DoJob("JOB_UPDATE_SCOREBOARD_AND_KILLSTREAKS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		
 		job_domain_gsi:DoJob("JOB_UPDATE_CREEP_UNITS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
@@ -172,11 +197,15 @@ function Captain_CaptainThink()
 		job_domain_gsi:DoJob("JOB_UPDATE_BUILDING_UNITS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
+		
+		job_domain_gsi:DoJob("JOB_UPDATE_SCOREBOARD_AND_KILLSTREAKS")
+		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
+		i = i + 1 DEBUG_fromTime = RealTime()
 	end
 	
 	if job_domain_analytics.active then
 		
-		job_domain_analytics:DoJob("JOB_UPDATE_LHP_CURRENT_VANTAGE")
+		job_domain_analytics:DoJob("JOB_UPDATE_LHP_CURRENT_ATTACKS")
 		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
 		i = i + 1 DEBUG_fromTime = RealTime()
 		
@@ -202,6 +231,7 @@ function Captain_CaptainThink()
 	end
 
 	if job_domain.active then
+		
 		
 		
 		

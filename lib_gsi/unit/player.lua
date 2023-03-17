@@ -11,7 +11,7 @@ local PLACEHOLDER_ATTACK_POINT = 0.5
 
 THROTTLE_PLAYERS_LAST_SEEN_UPDATE = 0.05
 local THROTTLE_PLAYERS_LAST_SEEN_UPDATE = THROTTLE_PLAYERS_LAST_SEEN_UPDATE
-local THROTTLE_PLAYERS_DATA_UPDATE = 1.0000000231481 -- An earth-rotation-speed accurate second (double)
+local THROTTLE_PLAYERS_DATA_UPDATE = 0.3049
 --
 
 local min = math.min
@@ -26,7 +26,7 @@ local t_named_players = {}
 
 local arc_tempest_double_player
 
-local TEST = TEST
+local TEST = TEST and true
 local DEBUG = DEBUG
 local VERBOSE = VERBOSE
 
@@ -90,6 +90,12 @@ local function handle_player_spell_or_item_cast(castInfo, abc)
 		
 		AbilityLogic_InformAbilityCast(thisPlayer, ability)
 		
+		if castInfo.location then
+			local enemy, enemyDist = Set_GetNearestEnemyHeroToLocation(castInfo.location)
+			if enemyDist < 50 then -- TODO check target types, ability behaviour, aoe is aggression to all
+				FightClimate_RegisterRecentHeroAggression(thisPlayer, enemy, true)
+			end
+		end
 	end
 	
 end
@@ -116,6 +122,11 @@ end
 
 local prev_seen = {}
 local function update_players_data()
+	-- I can't work out the cause of the rare crash. I don't want to get my steam account VAC
+	-- -| banned for analyzing the .exe to find the crash. It seems like Lua is obscured or even
+	-- -| unloaded after a crash. *panic* *panic*
+	-- ------ Also facing the possibility of running 40 matches and never using dota_bot_reload_scripts
+	-- ------ -| to see if that causes it
 	local enemyPlayerHeroUnits = GetUnitList(UNIT_LIST_ENEMY_HEROES)
 	local prevSeen = prev_seen
 	local numEnemies = #enemyPlayerHeroUnits
@@ -162,6 +173,17 @@ local function update_players_data()
 			thisPlayer.knownNonIllusionUnit = false
 		end
 		
+		if DEBUG and thisPlayer.hUnit ~= thisEnemyPlayerHeroUnit then
+			INFO_print(string.format("[player] Team %d Found new hunit for '%s'. %s -> %s", TEAM,
+							thisPlayer.shortName, thisPlayer.hUnit, thisEnemyPlayerHeroUnit
+						)
+					)
+		end
+
+		if thisPlayer.hUnit ~= thisEnemyPlayerHeroUnit and thisPlayer.hUnit then
+			LHP_UpdateHunit(thisPlayer.hUnit, thisEnemyPlayerHeroUnit)
+		end
+
 		thisPlayer.hUnit = thisEnemyPlayerHeroUnit -- n.b. this unlocks none-type checking. Get the most recent pointer, incase the bot was invisible recently
 		thisPlayer.level = thisEnemyPlayerHeroUnit:GetLevel()
 		thisPlayer.currentMovementSpeed = thisEnemyPlayerHeroUnit:GetCurrentMovementSpeed()
@@ -194,6 +216,12 @@ local function update_players_data()
 		local thisPlayer = t_team_players[i]
 		local thisPlayerHeroUnit = GetTeamMember(i)
 
+		if DEBUG and thisPlayer.hUnit ~= thisPlayerHeroUnit then
+			INFO_print(string.format("[player] Team %d Found new hunit for '%s'. %s -> %s", TEAM,
+							thisPlayer.shortName, thisPlayer.hUnit, thisPlayerHeroUnit
+						)
+					)
+		end
 		thisPlayer.hUnit = thisPlayerHeroUnit
 		
 		update_allied_hero_game_data(thisPlayer, thisPlayer.hUnit)
@@ -263,7 +291,7 @@ local function port_while_stuck(gsiPlayer)
 		end
 	end
 	local mobilityAbility = AbilityLogic_GetBestMobility(gsiPlayer)
-	if mobilityAbility and mobilityAbility:IsCooldownReady() then
+	if mobilityAbility and mobilityAbility:GetCooldownTimeRemaining() == 0 then
 		anyHope = true
 		if AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, mobilityAbility, ZEROED_VECTOR) then
 			DOMINATE_print(gsiPlayer, "Using random mobility ability.")
@@ -272,7 +300,7 @@ local function port_while_stuck(gsiPlayer)
 	end
 	local mobilityItem = blink and AbilityLogic_AbilityCanBeCast(gsiPlayer, blink) and blink
 			or forceStaff and AbilityLogic_AbilityCanBeCast(gsiPlayer, forceStaff) and forceStaff
-	if mobilityItem and mobilityItem:IsCooldownReady() then
+	if mobilityItem and mobilityItem:GetCooldownTimeRemaining() == 0 then
 		if AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, mobilityItem, ZEROED_VECTOR) then
 			DOMINATE_print(gsiPlayer, "Mobility item solution.")
 			return;
@@ -283,7 +311,13 @@ local function port_while_stuck(gsiPlayer)
 		hUnit:Action_MoveDirectly(vec)
 	end
 end
+local THROTTLE_ABSCOND_LOCATION = 0.99727 -- Earth's sidereal (rotation relative to the outer universe) second in seconds
+local abscond_location_throttle
 local function abscond_location_variation()
+	if not abscond_location_throttle:allowed() then
+		return;
+	end
+	--print("ABSCONDING at", GameTime())
 	local last_throttled_seen_loc = last_throttled_seen_loc
 	if last_throttled_seen_loc[1] == nil then
 		for i=1,TEAM_NUMBER_OF_BOTS do t_team_bots[i].locationVariation = 1000 last_throttled_seen_loc[i] = ZEROED_VECTOR end
@@ -304,7 +338,6 @@ local function abscond_location_variation()
 				abscondedShiftFactor = 0.13
 			else
 				abscondedShiftFactor = isIncreasing and (1.2 - 0.0006*currLocVariation)^2 or 0.2
-				--print(isIncreasing, (1.2 - 0.0006*currLocVariation)^2)
 			end
 			local abscondedAdd = thisPlayer.currentMovementSpeed*abscondedShiftFactor 
 			abscondedAdd = isIncreasing and abscondedAdd or -abscondedAdd
@@ -340,17 +373,45 @@ local function update_players_data__job(workingSet)
 	end
 end
 
-local function update_enemy_players_none_type__job(workingSet)
+local function update_players_none_type__job(workingSet)
+	local hUnitsTbl
+	local wontForceUpdate = true
 	for i=1,#t_enemy_players,1 do
+		local gsiEnemy = t_enemy_players[i]
+		if wontForceUpdate and (gsiEnemy.typeIsNone
+					or (gsiEnemy.hUnit and gsiEnemy.hUnit:IsNull()) -- illusion rune, faster than frame reaquisition of vision
+				) then
+			hUnitsTbl = hUnitsTbl or GetUnitList(UNIT_LIST_ENEMY_HEROES)
+			for k=1,#hUnitsTbl do
+				if hUnitsTbl[k].playerID == gsiEnemy.playerID and hUnitsTbl[k] ~= gsiEnemy.hUnit then
+					wontForceUpdate = false
+					print("Enemy team force update on ", gsiPlayer.shortName)
+				end
+			end
+		end
 		-- nb. t_enemy_players[i].hUnit is undeclared until update_player_data finds the hUnit, to make IsNull checks possible
 		t_enemy_players[i].typeIsNone = not t_enemy_players[i].hUnit or t_enemy_players[i].hUnit:IsNull()
 	end
-	-- local enemyPlayerUnits = GetUnitList(UNIT_LIST_ENEMY_HEROES)
-	-- for i=1,#enemyPlayerUnits,1 do
-		-- local thisEnemyPlayerNumberOnTeam = (GSI_GetPlayerNumberOnTeam(enemyPlayerUnits[i]:GetPlayerID()))
-		-- t_enemy_players[thisEnemyPlayerNumberOnTeam].hUnit = enemyPlayerUnits[i]
-		-- t_enemy_players[thisEnemyPlayerNumberOnTeam].typeIsNone = false
-	-- end
+	local alliedHunits
+	if wontForceUpdate then
+		-- Illusion rune pickups might change hUnit, anti-cheat obfuscation future proofing
+		hUnitsTbl = GetUnitList(UNIT_LIST_ALLIED_HEROES)
+		for i=1,#t_team_players,1 do
+			local gsiAllied = t_team_players[i]
+			if gsiAllied.hUnit and wontForceUpdate then
+				for k=1,#hUnitsTbl do
+					if hUnitsTbl[k].playerID == gsiAllied.playerID and hUnitsTbl[k] ~= gsiAllied.hUnit then
+						wontForceUpdate = false
+						print("Team force update on ", gsiPlayer.shortName)
+						break;
+					end
+				end
+			end
+		end
+	end
+	if not wontForceUpdate then
+		update_players_data() -- fix hUnits
+	end
 end
 
 function Player_CacheTeamBots()
@@ -379,10 +440,21 @@ function pUnit_IsNullOrDead(gsiPlayer)
 end
 
 function GSI_IsHeroDead(gsiPlayer)
-	return IsHeroDead(gsiPlayer.playerID)
+	return not IsHeroAlive(gsiPlayer.playerID)
+end
+
+function GSI_CountTeamAlive(team)
+	local heroes = GSI_GetTeamPlayers(team)
+	local count = 0
+	for i=1,#heroes do
+		local thisHero = heroes[i]
+		count = count + (IsHeroAlive(thisHero.playerID) and 1 or 0)
+	end
+	return count
 end
 
 function GSI_CreateUpdatePlayerDataJob()
+	abscond_location_throttle = Time_CreateThrottle(THROTTLE_ABSCOND_LOCATION)
 	GSI_GetGSIJobDomain():RegisterJob(
 			update_players_data__job,
 			{["throttle"] = Time_CreateThrottle(THROTTLE_PLAYERS_DATA_UPDATE)},
@@ -445,7 +517,7 @@ end
 -- If a hUnit known points to an enemy unit that is no longer visible, under-the-hood that bot is now a [none] type object pointer with all original function references intact, but once those functions are passed their own [none]-type owner object, they will raise an incorrect parameter error
 function GSI_CreateUpdateEnemyPlayersNoneTyped() -- Synonymous with an enemy player being visible to our team
 	GSI_GetGSIJobDomain():RegisterJob(
-			update_enemy_players_none_type__job,
+			update_players_none_type__job,
 			nil,
 			"JOB_UPDATE_ENEMY_PLAYERS_NONE_TYPED"
 		)
@@ -460,7 +532,7 @@ function GSI_CreateUpdatePlayersLastSeen()
 end
 
 function pUnit_UpdatePlayersData()
-	update_enemy_players_none_type__job()
+	update_players_none_type__job()
 	update_players_data()
 	update_players_last_seen()
 end
@@ -516,7 +588,7 @@ function insert_player_data(thisPlayer, hUnit)
 	thisPlayer.shortName = GSI_GetHeroShortName(thisPlayer)
 	thisPlayer.isCaptain = Team_AmITheCaptain(thisPlayer)
 	thisPlayer.attackRange = hUnit:GetAttackRange()
---[[PRIMATIVE]]thisPlayer.isRanged = thisPlayer.attackRange > MINIMUM_RANGE_UNIT_RANGE -- Needs check table
+--[[PRIMATIVE]]thisPlayer.isRanged = thisPlayer.attackRange > MINIMUM_RANGE_UNIT_RANGE -- Needs check table	
 end
 
 local recyclable_dominated_units = {}
@@ -532,6 +604,7 @@ local function delete_dominated_unit_node(gsiPlayer, gsiDominated)
 	gsiDominated.prevUnit = nil
 	gsiDominated.nextUnit = nil
 	table.insert(recyclable_dominated_units, gsiDominated)
+	
 	gsiPlayer.dominatedUnitsIndex[gsiDominated.hUnit] = nil
 end
 local function create_dominated_unit(gsiPlayer, priorGsiUnit)

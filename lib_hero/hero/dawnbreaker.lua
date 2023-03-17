@@ -1,10 +1,10 @@
 local hero_data = {
 	"dawnbreaker",
-	{2, 1, 2, 3, 2, 4, 2, 1, 1, 5, 1, 4, 3, 3, 7, 3, 4, 10, 11},
+	{1, 2, 2, 3, 2, 4, 2, 1, 3, 1, 1, 4, 3, 3, 7, 5, 4, 10, 11},
 	{
-		"item_branches","item_branches","item_tango","item_orb_of_venom","item_enchanted_mango","item_ward_dispenser","item_wind_lace","item_boots","item_magic_wand","item_orb_of_corrosion","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_aghanims_shard","item_headdress","item_fluffy_hat","item_holy_locket","item_tranquil_boots","item_mekansm","item_energy_booster","item_arcane_boots","item_guardian_greaves","item_gem","item_point_booster","item_ultimate_scepter",
+		"item_gauntlets","item_quelling_blade","item_circlet","item_tango","item_branches","item_bracer","item_soul_ring","item_boots","item_chainmail","item_phase_boots","item_magic_wand","item_blight_stone","item_mithril_hammer","item_mithril_hammer","item_desolator","item_aghanims_shard","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blink","item_platemail","item_buckler","item_assault","item_basher","item_reaver","item_overwhelming_blink",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+12% Celestial Hammer Slow","+50% Luminosity Crit","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","2 Starbreaker Charges","+1100 Celestial Hammer Cast Range",
 	}
@@ -205,7 +205,7 @@ end
 			end
 		end
 		if currTask == push_handle and AbilityLogic_AbilityCanBeCast(gsiPlayer, fireWreath)
-				and HIGH_USE(gsiPlayer, fireWreath, (highUse - fireWreath:GetManaCost())*2.5, 1-playerHealthPercent)
+				and HIGH_USE(gsiPlayer, fireWreath, (highUse - fireWreath:GetManaCost())*3, 1-playerHealthPercent)
 				and (not gsiPlayer.theoreticalDanger or gsiPlayer.theoreticalDanger < 0) then
 			local nearbyCreeps = Set_GetNearestEnemyCreepSetAtLaneLoc(
 					gsiPlayer.lastSeen.location, Map_GetBaseOrLaneLocation(gsiPlayer.lastSeen.location)
@@ -221,7 +221,7 @@ end
 		local harmIntendedToMe = FightClimate_AnyIntentToHarm(gsiPlayer, enemyPlayers, intentsTbl)
 		local alliedInDangerInAirQuotes
 		for i=1,#intentsTbl do
-			if intentsTbl[i] and intentsTbl[i].hUnit:IsAlive() then
+			if intentsTbl[i] and not pUnit_IsNullOrDead(intentsTbl[i]) then
 				alliedInDangerInAirQuotes = intentsTbl[i]
 				break;
 			end

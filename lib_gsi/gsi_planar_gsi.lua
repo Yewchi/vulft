@@ -111,6 +111,8 @@ function GSI_Initialize()
 	-- Handle Humans
 	Task_PopulatePlaceholdersForHumans(GSI_GetTeamPlayers(TEAM))
 	Player_CacheTeamBots()
+
+	if DEBUG then DEBUG_Init() end
 	
 	GSI_READY = true
 	GSI_Initialize = nil

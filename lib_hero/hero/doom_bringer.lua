@@ -1,10 +1,10 @@
 local hero_data = {
 	"doom_bringer",
-	{1, 2, 2, 1, 1, 4, 2, 2, 1, 3, 3, 4, 3, 3, 7, 6, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 1, 6, 1, 3, 3, 3, 7, 4, 4, 10, 11},
 	{
-		"item_faerie_fire","item_tango","item_ward_observer","item_branches","item_branches","item_quelling_blade","item_bottle","item_magic_wand","item_boots","item_gloves","item_hand_of_midas","item_phase_boots","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_energy_booster","item_aether_lens","item_octarine_core","item_platemail","item_shivas_guard","item_ultimate_scepter","item_aghanims_shard","item_overwhelming_blink","item_boots","item_refresher","item_ultimate_scepter_2",
+		"item_quelling_blade","item_circlet","item_slippers","item_branches","item_branches","item_tango","item_ward_observer","item_wraith_band","item_boots","item_magic_wand","item_phase_boots","item_wind_lace","item_gloves","item_hand_of_midas","item_blink","item_black_king_bar","item_aghanims_shard","item_aether_lens","item_octarine_core","item_boots","item_refresher","item_reaver","item_overwhelming_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
-	{ {3,3,3,2,1,}, {3,3,3,2,1,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
 		"Devour","Scorched Earth","Infernal Blade","Doom","Devour grants +15% Magic Resistance","+20 Scorched Earth Damage","+10% Scorched Earth Movement Speed","Devour Can Target Ancients","-12.0s Scorched Earth Cooldown","-35s Doom Cooldown","+2.1% Infernal Blade Damage","Doom applies Break",
 	}
@@ -38,10 +38,12 @@ local HEALTH_PERCENT = Unit_GetHealthPercent
 local SET_ENEMY_HERO = SET_ENEMY_HERO
 local ABILITY_LOCKED = UseAbility_IsPlayerLocked
 local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
+local HANDLE_AUTOCAST_GENERIC = AbilityLogic_HandleAutocastGeneric
 local NEARBY_OUTER = Set_GetEnemyHeroesInPlayerRadiusAndOuter
 local NEARBY_ENEMY = Set_GetEnemyHeroesInPlayerRadius
 local HIGH_USE = AbilityLogic_HighUseAllowOffensive
 local SPELL_SUCCESS = AbilityLogic_CastOnTargetWillSucceed
+local DETECT_NEUTRALS_ABILITY = AbilityLogic_DetectValidNeutralsAbilityUse
 local max = math.max
 local min = math.min
 local sqrt = math.sqrt
@@ -51,6 +53,8 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 local ANCIENT_DEVOUR_TALENT_SLOT = 9
 
 local t_player_abilities = {}
+
+local next_score_dooming = 0
 
 local d
 d = {
@@ -110,7 +114,7 @@ d = {
 		local acquired1 = gsiPlayer.hUnit:GetAbilityInSlot(3)
 		local acquired2 = gsiPlayer.hUnit:GetAbilityInSlot(4)
 
-		local highUse = gsiPlayer.highUseManaSimple
+		local highUse = gsiPlayer.highUseManaSimple * (aquired1 and 0.75 or 1)
 		local currentTask = CURRENT_TASK(gsiPlayer)
 		local currentActivityType = CURRENT_ACTIVITY_TYPE(gsiPlayer)
 		local fht = TASK_OBJECTIVE(gsiPlayer, fight_harass_handle)
@@ -132,6 +136,8 @@ d = {
 		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 
 		local arbitraryEnemy = nearbyEnemies[1] or outerEnemies[1]
+
+		HANDLE_AUTOCAST_GENERIC(gsiPlayer, lvlDeath)
 
 		if CAN_BE_CAST(gsiPlayer, devour) and not isLocked then
 			local difficultyLimit = playerHUnit:GetAbilityInSlot(ANCIENT_DEVOUR_TALENT_SLOT)
@@ -218,12 +224,6 @@ d = {
 				return;
 			end
 		end
-		if CAN_BE_CAST(gsiPlayer, lvlDeath) then
-			-- TODO
-			if not lvlDeath:GetAutoCastState() then
-				lvlDeath:ToggleAutoCast()
-			end
-		end
 		--print("DOOM")
 		if CAN_BE_CAST(gsiPlayer, doom) and nearbyEnemies[1] then
 			local bestScore = 0
@@ -240,7 +240,6 @@ d = {
 							* thisEnemy.lastSeenMana
 							* Analytics_GetPowerLevel(thisEnemy)
 						- distanceDanger
-				--print(thisScore, distanceDanger)
 				if thisScore > bestScore then
 					bestScore = thisScore
 					bestTarget = thisEnemy
@@ -249,9 +248,30 @@ d = {
 			end
 			if bestTarget and bestDistance < doom:GetCastRange()*1.1
 					and HIGH_USE(gsiPlayer, doom, highUse,
-							bestTarget.lastSeenHealth / bestTarget.maxHealth
+							 bestTarget.lastSeenHealth / bestTarget.maxHealth
+								- (#nearbyEnemies+#outerEnemies)/10
 						) then
 				USE_ABILITY(gsiPlayer, doom, bestTarget, 500, nil, nil, true)
+				return;
+			end
+		end
+		
+		if acquired1 then
+			
+			local neutralsTarget = DETECT_NEUTRALS_ABILITY(gsiPlayer, acquired1)
+			
+			if neutralsTarget and HIGH_USE(gsiPlayer, acquired1, highUse*1.5, playerHpp) then
+				USE_ABILITY(gsiPlayer, acquired1,
+						neutralsTarget ~= true and neutralsTarget or nil, 400, nil, nil, true)
+				return;
+			end
+		end
+		
+		if acquired2 then
+			local neutralsTarget = DETECT_NEUTRALS_ABILITY(gsiPlayer, acquired2)
+			if neutralsTarget and HIGH_USE(gsiPlayer, acquired1, highUse*1.5, playerHpp) then
+				USE_ABILITY(gsiPlayer, acquired1,
+						neutralsTarget ~= true and neutralsTarget or nil, 400, nil, nil, true)
 				return;
 			end
 		end

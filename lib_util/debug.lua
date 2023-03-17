@@ -1,16 +1,40 @@
 -- EPILEPSY AND SEIZURE WARNING when DEBUG == true -- 
 
-if DEBUG then 
+if DEBUG
+
+	then
 	PRINT_ANALYSIS = Time_CreateThrottle(10.0) or nil
 	
 	DEBUG_KILLSWITCH = nil
-	
+
+	TEAM_COLORS = {
+			[TEAM_RADIANT] = {
+				{20, 20, 220}, {20,220,200}, {145, 60, 150}, {200, 210, 30}, {230, 130, 20}
+			},
+			[TEAM_DIRE] = {
+				{250, 110, 230}, {140, 235, 75}, {30, 175, 230}, {75, 160, 70}, {170, 100, 50}
+			}
+		}
+
 	ARC_DISABLE_FRAMES = 0
 
-	DEBUG_SHORTNAME = "chaos_knight"
+	DEBUG_SHORTNAME = "doom_bringer"
 	
 	MAP_COORDS_TO_SCREEN_SCALE = 0.08
 	MAP_COORDS_TO_MINIMAP_SCALE = 0.015
+
+	function DEBUG_Init()
+		local team = GSI_GetTeamPlayers(TEAM_RADIANT)
+		for i=1,5 do
+			team[i].DBGColor = TEAM_COLORS[TEAM_RADIANT][i]
+		end
+		team = GSI_GetTeamPlayers(TEAM_DIRE)
+		for i=1,5 do
+			team[i].DBGColor = TEAM_COLORS[TEAM_DIRE][i]
+		end
+
+		DEBUG_Init = nil
+	end
 
 	function DEBUG_print(str)
 		print("/VUL-FT/ <DEBUG> "..str)
@@ -50,7 +74,8 @@ if DEBUG then
 			table.insert(task_store[i][j], {0, 0, 0})
 		end
 	end
-	function VEBUG_PlayerFrameProgressBarStart(pnot, offsetx, offsety)
+	function VEBUG_PlayerFrameProgressBarStart(pnot, offsetx, offsety, force)
+		if not DEBUG and not force then return end
 		offsety = (offsety or 230) + (pnot-1)*10
 		if TEAM_IS_RADIANT then
 			DebugDrawText((offsetx or 300), offsety, "[", 100, 255, 100)
@@ -59,6 +84,7 @@ if DEBUG then
 		end
 	end
 	function VEBUG_PlayerFrameProgressBar(pnot, progress, offsetx, offsety)
+		if not DEBUG and not force then return end
 		offsety = (offsety or 230) + (pnot-1)*10
 		if TEAM_IS_RADIANT then
 			offsetx = (offsetx or 300) + 8 + progress
@@ -513,5 +539,28 @@ if DEBUG then
 	end
 	
 	function DEBUG_DevBehaviourOverride()
+	end
+
+	NastyCheck = {}
+	--[[]]
+	NastyCheck["TaskScoring"] = {
+			function(stage, ...)
+				args={...}
+				if TEAM_IS_RADIANT then
+					return
+				end
+				local enemies = GSI_GetTeamPlayers(ENEMY_TEAM)
+				for i=1,5 do
+					print(args[1], test_wtf[i], enemies[i].lastSeen.location)
+				end
+			end,
+			nil -- if any relevant data tbl
+		}
+	--]]
+	function DEBUG_NastyCheck(key, stage, ...)
+		if NastyCheck[key] then
+			if VERBOSE then VEBUG_print("NastyCheck '"..key.."'#"..(stage or 'n/a')) end
+			NastyCheck[key][1](stage, ...)
+		end
 	end
 end

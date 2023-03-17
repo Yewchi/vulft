@@ -1,8 +1,8 @@
 local hero_data = {
 	"sniper",
-	{1, 2, 1, 3, 1, 2, 1, 5, 3, 3, 3, 2, 2, 6, 8, 5, 5, 10, 12, 13},
+	{2, 1, 1, 3, 1, 2, 1, 3, 2, 2, 5, 3, 3, 5, 8, 13, 5, 10, 12},
 	{
-		"item_branches","item_branches","item_circlet","item_quelling_blade","item_tango","item_slippers","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_javelin","item_maelstrom","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_staff_of_wizardry","item_hurricane_pike","item_lesser_crit","item_blitz_knuckles","item_javelin","item_monkey_king_bar","item_aghanims_shard","item_lifesteal","item_greater_crit","item_satanic","item_black_king_bar","item_blink","item_swift_blink","item_mjollnir",
+		"item_quelling_blade","item_tango","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_wraith_band","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_maelstrom","item_magic_wand","item_force_staff","item_dragon_lance","item_hurricane_pike","item_aghanims_shard","item_mjollnir","item_lifesteal","item_claymore","item_satanic","item_demon_edge","item_javelin","item_monkey_king_bar","item_black_king_bar","item_black_king_bar","item_blink","item_swift_blink","item_moon_shard","item_armlet","item_armlet",
 	},
 	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
 	{

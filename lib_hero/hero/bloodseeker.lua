@@ -1,8 +1,8 @@
 local hero_data = {
 	"bloodseeker",
-	{2, 3, 3, 1, 3, 5, 1, 1, 1, 6, 3, 5, 2, 2, 8, 2, 5, 10, 12},
+	{2, 3, 3, 1, 3, 5, 3, 1, 1, 1, 6, 5, 2, 2, 8, 2},
 	{
-		"item_branches","item_slippers","item_slippers","item_magic_stick","item_branches","item_blades_of_attack","item_boots","item_phase_boots","item_javelin","item_maelstrom","item_mithril_hammer","item_magic_wand","item_ogre_axe","item_black_king_bar","item_belt_of_strength","item_mithril_hammer","item_basher","item_quarterstaff","item_talisman_of_evasion","item_butterfly","item_mjollnir","item_gem","item_pers","item_refresher","item_abyssal_blade","item_eagle","item_blink","item_swift_blink",
+		"item_tango","item_quelling_blade","item_magic_stick","item_slippers","item_branches","item_faerie_fire","item_blades_of_attack","item_boots","item_chainmail","item_phase_boots","item_javelin","item_magic_wand","item_maelstrom","item_ultimate_orb","item_ring_of_health","item_sphere","item_crown","item_crown","item_gungir","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_basher","item_vanguard","item_abyssal_blade","item_mystic_staff","item_void_stone","item_sheepstick",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

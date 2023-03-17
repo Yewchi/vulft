@@ -1,8 +1,8 @@
 local hero_data = {
 	"dark_seer",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 1, 1, 4, 7, 5, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 9, 11},
 	{
-		"item_mantle","item_circlet","item_enchanted_mango","item_enchanted_mango","item_branches","item_branches","item_branches","item_null_talisman","item_boots","item_arcane_boots","item_magic_wand","item_staff_of_wizardry","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_platemail","item_shivas_guard","item_glimmer_cape","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_desolator","item_mask_of_madness",
+		"item_quelling_blade","item_tango","item_enchanted_mango","item_enchanted_mango","item_magic_stick","item_branches","item_enchanted_mango","item_branches","item_ring_of_health","item_arcane_boots","item_magic_wand","item_chainmail","item_buckler","item_mekansm","item_guardian_greaves","item_hood_of_defiance","item_staff_of_wizardry","item_pipe","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_mystic_staff","item_void_stone",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

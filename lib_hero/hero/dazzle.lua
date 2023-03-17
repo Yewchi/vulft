@@ -1,10 +1,10 @@
 local hero_data = {
 	"dazzle",
-	{1, 3, 1, 2, 1, 5, 1, 3, 3, 3, 2, 5, 2, 2, 8, 6, 5, 10, 13, 11},
+	{1, 3, 1, 2, 1, 5, 1, 3, 3, 2, 2, 5, 2, 3, 8, 6, 5, 10, 4},
 	{
-		"item_ward_sentry","item_tango","item_branches","item_branches","item_faerie_fire","item_magic_stick","item_enchanted_mango","item_wind_lace","item_magic_wand","item_boots","item_tranquil_boots","item_aghanims_shard","item_energy_booster","item_aether_lens","item_blink","item_energy_booster","item_point_booster","item_vitality_booster","item_octarine_core","item_mekansm","item_buckler","item_arcane_boots","item_gem","item_guardian_greaves","item_desolator",
+		"item_ward_observer","item_tango","item_branches","item_branches","item_faerie_fire","item_bottle","item_magic_wand","item_arcane_boots","item_blitz_knuckles","item_witch_blade","item_fluffy_hat","item_force_staff","item_aghanims_shard","item_aether_lens","item_point_booster","item_vitality_booster","item_energy_booster","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,2,}, {5,5,5,5,2,}, 0.1 },
 	{
 		"Poison Touch","Shallow Grave","Shadow Wave","Good Juju","Bad Juju","+50 Damage","+1.75 Mana Regen","+45 Shadow Wave Heal / Damage","+350 Poison Touch Attack Range","+200 Heal On Shallow Grave End","+45 Poison Touch DPS","-40% Poison Touch Slow","+0.5 Bad Juju Armor Reduction",
 	}

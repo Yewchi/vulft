@@ -262,7 +262,7 @@ local function update_creep_set_type(creepSetType)
 		local thisCreepPlayerID = thisCreep.hUnit.GetPlayerID and thisCreep.hUnit:GetPlayerID() or CREEP_IS_NOT_CONTROLLED_PLAYER_ID
 --[[DEBUG]]if DEBUG and creepSetType == SET_CREEP_ALLIED then DEBUG_DrawCreepData(thisCreep) end
 		if thisCreepPlayerID ~= CREEP_IS_NOT_CONTROLLED_PLAYER_ID then -- Add the player controlled unit
-			table.insert(thisCreep, t_sets[sameReactPlayerCreepSetType])
+			table.insert(t_sets[sameReactPlayerCreepSetType], thisCreep)
 			if creepSetType == SET_CREEP_ALLIED then
 				pUnit_CreateDominatedUnit(thisCreepPlayerID, thisCreep)
 			end
@@ -475,7 +475,26 @@ function Set_GetSetUnitNearestToLocation(loc, set)
 	return nearestUnit, nearestDist
 end
 
+function Set_GetSetUnitFarthestToLocation(loc, set)
+	local units = set.units or set
+	local farthestUnit
+	local farthestDist = 0
+	for i=1,#units do
+		local dist = Math_PointToPointDistance2D(loc, units[i].lastSeen.location)
+		if dist > farthestDist then
+			farthestUnit = units[i]
+			farthestDist = dist
+		end
+	end
+	return farthestUnit, farthestDist
+end
+
 function Set_GetCrowdedRatingToSetTypeAtLocation(location, setType, checkSet, maxRange)
+	-- Units may be randomly excluded via the maxRange based on the order of the
+	-- -| checkSet table. As such, this should only be used when ensuring all
+	-- -| possible units are included in an AoE cast that prioritizes a
+	-- -| specific unit (like the FHT), or that *self* is far enough away from
+	-- -| allies, etc.  However, it is good enough and as fast as possible.
 	local list = checkSet or GetUnitList(setType)
 	local maxRange = maxRange or 1400
 	local crowdingRating = 0
@@ -506,6 +525,9 @@ function Set_GetCenterOfSetUnits(set)
 	if set and set[1] then
 		local crowdingCenter = set[1].lastSeen and set[1].lastSeen.location
 				or set[1]:GetLocation() 
+		-- <LINE OF DEATH>
+		crowdingCenter = Vector(crowdingCenter.x, crowdingCenter.y, crowdingCenter.z)
+		-- </LINE OF DEATH>
 		local totalCrowdingUnits = 1
 		for i=2,#set,1 do
 			local thisLocationOfCrowding = set[i].lastSeen and set[i].lastSeen.location
@@ -528,41 +550,47 @@ function Set_GetEnemiesInRectangle(baseLoc, topLoc, delta, s1, s2, bailIfCreep) 
 	local units = recycle_empty or {}
 	local directional = Vector_PointToPointLine(baseLoc, topLoc)
 	local unitNormal = Vector_ToDirectionalUnitVector(Vector_CrossProduct(directional, ORTHOGONAL_Z))
-	local leftP1 = Vector(baseLoc.x+delta*unitNormal.x, baseLoc.y+delta*unitNormal.y, 0)
+	local leftP1 = Vector(baseLoc.x+(-delta*unitNormal.x), baseLoc.y+(-delta*unitNormal.y), 0)
 	local leftP2 = Vector(leftP1.x+directional.x, leftP1.y+directional.y, 0)
-	local rightP1 = Vector(baseLoc.x+(-delta*unitNormal.x), baseLoc.y+(-delta*unitNormal.y), 0)
+	local rightP1 = Vector(baseLoc.x+delta*unitNormal.x, baseLoc.y+delta*unitNormal.y, 0)
 	local rightP2 = Vector(rightP1.x+directional.x, rightP1.y+directional.y, 0)
-	DebugDrawCircle(leftP1, 50, 100, 0, 0)
-	DebugDrawCircle(leftP2, 50, 100, 0, 0)
---	DebugDrawCircle(rightP1, 50, 100, 0, 0)
---	DebugDrawCircle(rightP2, 50, 100, 0, 0)
-	DebugDrawLine(leftP1, leftP2, 255, 255, 255)
-	DebugDrawLine(leftP2, rightP2, 255, 255, 255)
---	DebugDrawLine(rightP2, rightP1, 255, 255, 255)
---	DebugDrawLine(rightP1, leftP1, 255, 255, 255)
 
-	if s1 and s1.units then
-		local s1Units = s1.units
+
+
+
+
+
+
+
+
+	local s1Units = s1 and (s1.units or (s1[1] and s1) or (s1.shortName and {s1}))
+	local s2Units = s2 and (s2.units or (s2[1] and s2) or (s1.shortName and {s2}))
+	if s1Units then
 		for i=1,#s1Units do
 			local unitLoc = s1Units[i].lastSeen.location
-			-- Clock-wise encased
-			if Vector_SideOfPlane(unitLoc, leftP1, rightP1) > 0 and Vector_SideOfPlane(unitLoc, rightP1, rightP2) > 0
-					and Vector_SideOfPlane(unitLoc, rightP2, leftP2) > 0 and Vector_SideOfPlane(unitLoc, leftP2, leftP1) > 0 then
+			-- Counter clock-wise (postive) encased
+			if Vector_SideOfPlane(unitLoc, leftP1, rightP1) > 0
+					and Vector_SideOfPlane(unitLoc, rightP1, rightP2) > 0
+					and Vector_SideOfPlane(unitLoc, rightP2, leftP2) > 0
+					and Vector_SideOfPlane(unitLoc, leftP2, leftP1) > 0 then
 				table.insert(units, s1Units[i])
 				-- DebugDrawCircle(unitLoc, 60, 0, 0, 255)
 				if bailIfCreep and s1Units[i].type == UNIT_TYPE_CREEP then
 					goto RETURN
 				end
+			else
+				DebugDrawCircle(unitLoc, 15, 255, 0, 0)
 			end
 		end
 	end
-	if s2 then
-		local s2Units = s2.units
+	if s2Units then
 		for i=1,#s2Units do
-			local unitLoc = units[i].lastSeen.location
+			local unitLoc = s2Units[i].lastSeen.location
 			-- Clock-wise encased
-			if Vector_SideOfPlane(unitLoc, leftP1, rightP1) > 0 and Vector_SideOfPlane(unitLoc, rightP1, rightP2) > 0
-					and Vector_SideOfPlane(unitLoc, rightP2, leftP2) > 0 and Vector_SideOfPlane(unitLoc, leftP2, leftP1) > 0 then
+			if Vector_SideOfPlane(unitLoc, leftP1, rightP1) > 0
+					and Vector_SideOfPlane(unitLoc, rightP1, rightP2) > 0
+					and Vector_SideOfPlane(unitLoc, rightP2, leftP2) > 0
+					and Vector_SideOfPlane(unitLoc, leftP2, leftP1) > 0 then
 				table.insert(units, s2Units[i])
 			end
 		end
@@ -832,9 +860,6 @@ function Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, radius, forAnalyticsTime)
 	return EMPTY_TABLE
 end
 
-function Set_GetEnemyHeroesInLocRadOuter(loc, radius, outerRadius, forAnalyticsTime)
-	return Set_GetEnemyHeroesInPlayerRadiusAndOuter(loc, radius, outerRadius, forAnalyticsTime)
-end
 -- TODO Depreciate
 function Set_GetEnemyHeroesInPlayerRadiusAndOuter(location, radius, outer, forAnalyticsTime) -- Used when we're going to iterate over the heroes, but may need outer if radius is empty (Cold Snap a close target? None. Use my invoked Tornado)
 	local tEnemyHeroes = GSI_GetTeamPlayers(ENEMY_TEAM)
@@ -871,6 +896,7 @@ function Set_GetEnemyHeroesInPlayerRadiusAndOuter(location, radius, outer, forAn
 		return EMPTY_TABLE, EMPTY_TABLE
 	end
 end
+Set_GetEnemyHeroesInLocRadOuter = Set_GetEnemyHeroesInPlayerRadiusAndOuter
 
 function Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, radius, includeSelf)
 	local tAlliedHeroes = GSI_GetTeamPlayers(TEAM)

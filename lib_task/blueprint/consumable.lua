@@ -78,6 +78,7 @@ local TASK_PRIORITY_TOP = TASK_PRIORITY_TOP
 local Task_GetCurrentTaskHandle = Task_GetCurrentTaskHandle
 local max = math.max
 local min = math.min
+local abs = math.abs
 
 local increase_safety_task_handle
 
@@ -91,6 +92,7 @@ local task_handle = Task_CreateNewTask()
 
 local WARD_LOCS -- nb. may be empty
 local ENEMY_FOUNTAIN
+local TEAM_FOUNTAIN_SUM
 
 local DEBUG = DEBUG
 local TEST = TEST
@@ -123,6 +125,9 @@ local function task_init_func(taskJobDomain)
 		p_increased_bag_clearing_zealotry[i] = Item_NumberItemsCarried(teamPlayers[i]) > 8
 	end
 
+	TEAM_FOUNTAIN_SUM = Map_GetTeamFountainLocation()
+	TEAM_FOUNTAIN_SUM = TEAM_FOUNTAIN_SUM.x + TEAM_FOUNTAIN_SUM.y
+
 	taskJobDomain:RegisterJob(
 			function(workingSet)
 				if workingSet.throttle:allowed() then
@@ -134,6 +139,7 @@ local function task_init_func(taskJobDomain)
 			"JOB_TASK_SCORING_PRIORITY_CONSUMABLE"
 		)
 	Blueprint_RegisterTaskActivityType(task_handle, ACTIVITY_TYPE["NOT_APPLICABLE"])
+
 	task_init_func = nil
 	return task_handle, estimated_time_til_completed
 end
@@ -277,7 +283,9 @@ end
 
 local function check_flask(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, beatScore)
 	if gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.45 or playerHealthAfterPassiveRegenBuffer + FLASK_BASIC_HEALTH_GAIN < gsiPlayer.maxHealth then
-		if not gsiPlayer.hUnit:HasModifier("modifier_flask_healing") then
+		local playerLoc = gsiPlayer.lastSeen.location
+		if abs(playerLoc.x + playerLoc.y - TEAM_FOUNTAIN_SUM) > 3200
+				and not gsiPlayer.hUnit:HasModifier("modifier_flask_healing") then
 			local score = Xeta_EvaluateObjectiveCompletion(XETA_HEALTH_GAIN, 0, FLASK_BASIC_HEALTH_GAIN, gsiPlayer, gsiPlayer)
 			--if DEBUG_IsBotTheIntern() then print("scored use flask", score) end 
 			if score > beatScore then
@@ -294,7 +302,9 @@ end
 
 local function check_tango(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, beatScore)
 	if hItem:GetCooldownTimeRemaining() == 0 and not gsiPlayer.hUnit:HasModifier("modifier_tango_heal") then
-		if playerHealthAfterPassiveRegenBuffer + TANGO_BASIC_HEALTH_GAIN < gsiPlayer.maxHealth then
+		local playerLoc = gsiPlayer.lastSeen.location
+		if abs(playerLoc.x + playerLoc.y - TEAM_FOUNTAIN_SUM) > 2400
+				and playerHealthAfterPassiveRegenBuffer + TANGO_BASIC_HEALTH_GAIN < gsiPlayer.maxHealth then
 			local treesNearby = gsiPlayer.hUnit:GetNearbyTrees(MAX_TREE_FIND_RADIUS)
 			if treesNearby then
 				local safeTree = false
@@ -305,7 +315,10 @@ local function check_tango(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer
 					local towerAttackTarget = nearestEnemyTower.hUnit:GetAttackTarget()
 					local towerConsideredSafe = towerAttackTarget and towerAttackTarget ~= gsiPlayer.hUnit and true or false
 					local towerAttackDistance = nearestEnemyTower.attackRange+HERO_TARGET_DIAMETER
-					local playerCoordsAddedAllowed = gsiPlayer.lastSeen.location.x+gsiPlayer.lastSeen.location.y + (TEAM==TEAM_RADIANT and 150 or -150)
+					local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+					local allowedMovingDanger = 150 - 160*min(1.0, danger)
+					local playerCoordsAddedAllowed = gsiPlayer.lastSeen.location.x+gsiPlayer.lastSeen.location.y
+							+ (TEAM==TEAM_RADIANT and allowedMovingDanger or -allowedMovingDanger)
 					if playerIsUnderEnemyTower then
 						safeTree = treesNearby[1] -- Debatable
 					else
@@ -344,7 +357,9 @@ end
 -- TODO TEST Make sure they don't stand still due to cooldown stuff, otherwise. Not sure.
 local function check_stick(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, playerManaAfterPassiveRegenBuffer, beatScore, isMagicStick)
 	local currCharges = hItem:GetCurrentCharges()
-	if hItem:GetCooldownTimeRemaining() == 0 and currCharges > 0 then
+	local playerLoc = gsiPlayer.lastSeen.location
+	if (abs(playerLoc.x + playerLoc.y - TEAM_FOUNTAIN_SUM) > 2400 or #gsiPlayer.hUnit:GetNearbyHeroes(1600, true, BOT_MODE_NONE))
+			and hItem:GetCooldownTimeRemaining() == 0 and currCharges > 0 then
 		local stickPoolGain = 15 * currCharges
 		local efficacy = ( ( 
 					gsiPlayer.maxHealth - playerHealthAfterPassiveRegenBuffer)/stickPoolGain 
@@ -394,7 +409,9 @@ local function check_faerie_fire(gsiPlayer, hItem, playerHealthAfterPassiveRegen
 end
 
 local function check_clarity(gsiPlayer, hItem, playerManaAfterPassiveRegenBuffer, beatScore)
-	if not gsiPlayer.hUnit:HasModifier("modifier_clarity_potion") then
+	local playerLoc = gsiPlayer.lastSeen.location
+	if (abs(playerLoc.x + playerLoc.y - TEAM_FOUNTAIN_SUM) > 2400 or #gsiPlayer.hUnit:GetNearbyHeroes(1600, true, BOT_MODE_NONE))
+			and not gsiPlayer.hUnit:HasModifier("modifier_clarity_potion") then
 		local manaPercent = Unit_GetManaPercent(gsiPlayer)
 		local currentTask = Task_GetCurrentTaskHandle(gsiPlayer)
 		if manaPercent < CLARITY_USE_ON_MANA_PERCENT or gsiPlayer.maxMana-gsiPlayer.lastSeenMana > CLARITY_USE_ON_MANA_MISSING then

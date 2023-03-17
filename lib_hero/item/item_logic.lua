@@ -376,10 +376,15 @@ function Item_GetTreeCuttingItem(gsiPlayer)
 			or select(2, Item_ItemOwnedAnywhere(gsiPlayer, "item_bfury"))
 end
 
+function Item_GetForceStaffItem(gsiPlayer)
+	return select(2, Item_ItemOwnedAnywhere(gsiPlayer, "item_force_staff"))
+			or select(2, Item_ItemOwnedAnywhere(gsiPlayer, "item_hurricane_pike"))
+end
+
 function Item_UseBottleIntelligently(gsiPlayer, forceHold)
 	local _, bottle = Item_ItemInHeroStorage(gsiPlayer, "item_bottle")
 	if not bottle then return end
-	local couldUse = bottle:GetCurrentCharges() > 0 and bottle:IsCooldownReady()
+	local couldUse = bottle:GetCurrentCharges() > 0 and bottle:GetCooldownTimeRemaining() == 0
 	if forceHold or couldUse then 
 		Item_LockInventorySwitching(gsiPlayer, 3)
 		if couldUse and Item_EnsureCarriedItemInInventory(gsiPlayer, bottle) == ITEM_ENSURE_RESULT_READY then
@@ -1180,6 +1185,7 @@ end
 local sorted_platter = {}
 function Item_SortHeldByValue(gsiPlayer, highToLow)
 	local sorted_platter = sorted_platter
+	local ITEMS_BOOTS = ITEMS_BOOTS
 	local itemsHeld = 0
 	local hUnit = gsiPlayer.hUnit
 	for i=0,ITEM_END_BACKPACK_INDEX do
@@ -1194,8 +1200,13 @@ function Item_SortHeldByValue(gsiPlayer, highToLow)
 	sorted_platter[itemsHeld+2] = nil -- #arr works
 	for i=0,itemsHeld-1 do
 		for j=itemsHeld-1,i+1,-1 do
-			local upperIsHigher = GetItemCost(sorted_platter[j-1]:GetName())
-					> GetItemCost(sorted_platter[j]:GetName()) 
+			local itemPrev = sorted_platter[j-1]
+			local itemCurr = sorted_platter[j]
+			local upperIsHigher =
+					GetItemCost(itemPrev:GetName())
+						+ ( ITEMS_BOOTS[itemPrev:GetName()] and 2000 or 0)
+					> GetItemCost(itemCurr:GetName()) 
+						+ ( ITEMS_BOOTS[itemPrev:GetName()] and 2000 or 0)
 			if upperIsHigher and highToLow
 					or not (upperIsHigher or highToLow) then
 				local temp = sorted_platter[j-1]
@@ -1377,6 +1388,11 @@ function Item_TownPortalScrollsOwned(gsiPlayer)
 	return scrollCount
 end
 
+function Item_TownPortalScrollCooldown(gsiPlayer)
+	local tpScroll = gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT)
+	return tpScroll and tpScroll:GetCooldownTimeRemaining() or 80
+end
+
 function Item_IsConsumable(itemString)
 	for i=1,#CONSUMABLE_ITEM_SEARCH,1 do
 		if string.find(itemString, CONSUMABLE_ITEM_SEARCH[i], ITEM_NAME_SEARCH_START) then
@@ -1474,10 +1490,17 @@ function Item_RAUCMitigateDelivery(gsiPlayer)
 		end
 	end
 	local courierUnit = gsiPlayer.hCourier
-	if courierUnit then
-		local courierDeliveryMitigate =
+	if courierUnit and GetCourierState(courierUnit) ~= COURIER_STATE_DEAD then
+		--[[ Look at this stupid code that's been in the script for half a year
+				local courierDeliveryMitigate =
 				Vector_PointDistance(gsiPlayer.lastSeen.location, courierUnit:GetLocation())
 						* max(0, Vector_UnitFacingUnit(courierUnit, gsiPlayer))
+		]]
+		local courierDeliveryMitigate =
+				max(0.25, 
+					1 - 0.005*Vector_PointDistance(gsiPlayer.lastSeen.location, courierUnit:GetLocation())
+						/ courierUnit:GetCurrentMovementSpeed() 
+					)
 		for i=0,ITEM_MAX_PLAYER_STORAGE-1,1 do
 			hItem = hUnit:GetItemInSlot(i)
 			resourceFuncs = hItem and RESOURCE_VALUE_OF_ITEM[hItem:GetName()]

@@ -1,10 +1,10 @@
 local hero_data = {
 	"silencer",
-	{2, 1, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 7, 2, 4, 10, 12},
+	{2, 1, 1, 3, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_ward_sentry","item_tango","item_magic_stick","item_tango","item_faerie_fire","item_faerie_fire","item_enchanted_mango","item_boots","item_tranquil_boots","item_magic_wand","item_wind_lace","item_robe","item_ancient_janggo","item_fluffy_hat","item_gem","item_gem","item_staff_of_wizardry","item_force_staff","item_gem","item_boots_of_bearing","item_ghost","item_gem","item_sheepstick",
+		"item_tango","item_enchanted_mango","item_branches","item_branches","item_sobi_mask","item_branches","item_ward_dispenser","item_ring_of_basilius","item_boots","item_magic_wand","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_aether_lens","item_aghanims_shard","item_pers","item_energy_booster","item_arcane_boots","item_lotus_orb","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_octarine_core",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {3,3,3,1,2,}, {4,4,4,5,2,}, 0.1 },
 	{
 		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+12 Arcane Curse Damage","+20 Attack Speed","-25.0s Global Silence Cooldown","+0.8x Last Word Int Multiplier","+10% Glaives of Wisdom Damage","Arcane Curse Undispellable","+2 Glaives of Wisdom Bounces","Last Word Mutes",
 	}

@@ -1,10 +1,10 @@
 local hero_data = {
 	"enchantress",
-	{1, 2, 1, 2, 1, 5, 1, 3, 3, 6, 3, 2, 3, 12, 8, 2, 5, 10},
+	{1, 6, 2, 1, 1, 5, 1, 3, 3, 3, 3, 5, 2, 2, 8, 2, 5, 10, 12},
 	{
-		"item_tango","item_magic_stick","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_branches","item_branches","item_boots","item_magic_wand","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_cloak","item_headdress","item_hood_of_defiance","item_pipe","item_belt_of_strength","item_dragon_lance","item_force_staff","item_hurricane_pike","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_hyperstone","item_moon_shard",
+		"item_smoke_of_deceit","item_ward_observer","item_blight_stone","item_tango","item_branches","item_branches","item_branches","item_branches","item_boots","item_gloves","item_robe","item_power_treads","item_fluffy_hat","item_magic_wand","item_belt_of_strength","item_cloak","item_blade_of_alacrity","item_dragon_lance","item_quarterstaff","item_mage_slayer","item_wraith_band","item_force_staff","item_hurricane_pike","item_blitz_knuckles","item_bloodthorn","item_wraith_band","item_black_king_bar","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_basher","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar",
 	},
-	{ {3,3,3,4,2,}, {3,3,4,5,2,}, 0.1 },
+	{ {3,3,3,1,2,}, {3,3,4,2,5,}, 0.1 },
 	{
 		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+10% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","-65 Untouchable Slow","Enchant Affects Ancients","+6.5% Impetus Damage","+20 Nature's Attendants Heal",
 	}
@@ -64,6 +64,7 @@ d = {
 		if sproink:GetCooldownTimeRemaining() > 0 or gsiPlayer.sproinkTryExpiry < RealTime() then
 			gsiPlayer.sproinkDesiredFacing = nil
 			gsiPlayer.sproinkMovementVector = nil
+			DOMINATE_SetDominateFunc(gsiPlayer, "LibHero_EnchantressCastSproink", d.SproinkDominateFunc, false)
 			-- keep the expiry to avoid repeated locking
 			return;
 		end
@@ -122,10 +123,12 @@ d = {
 			local impetus = thisPlayerAbilities[1]
 			HANDLE_AUTOCAST_GENERIC(gsiPlayer, impetus)
 			local fightHarassTarget = Task_GetTaskObjective(gsiPlayer, fight_harass_task_handle)
+			local fhtReal = fightHarassTarget and fightHarassTarget.hUnit and not fightHarassTarget.hUnit:IsNull()
+					and fightHarassTarget.hUnit:IsAlive()
 			local currentTask = CURRENT_TASK(gsiPlayer)
 			local currentActivityType = CURRENT_ACTIVITY_TYPE(gsiPlayer)
 
-			if fightHarassTarget and currentActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then 
+			if fhtReal and currentActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then 
 				local fightHarassPercentHealth = fightHarassTarget.lastSeenHealth / fightHarassTarget.maxHealth
 				-- enchant player
 				local enchant = thisPlayerAbilities[2]
@@ -137,7 +140,11 @@ d = {
 					Task_IncentiviseTask(gsiPlayer, fight_harass_task_handle, 15, 3)
 				end
 			end
-			if not sproink:IsHidden() and currentActivityType > ACTIVITY_TYPE.CAREFUL then
+			if not sproink:IsHidden() and currentActivityType > ACTIVITY_TYPE.CAREFUL
+					and fightHarassTarget and sproink:GetCooldownTimeRemaining() == 0
+					and AbilityLogic_HighUseAllowOffensive(gsiPlayer, sproink,
+							HIGH_USE_ENC_REMAINING_MANA, currHealthPercent
+						) then
 				d.StartCastSproink(gsiPlayer, ENEMY_FOUNTAIN)
 			end
 		end

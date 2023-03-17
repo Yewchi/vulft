@@ -43,12 +43,12 @@ blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
 		if gsiPlayer.time.data.theorizedDanger and gsiPlayer.time.data.theorizedDanger < 0.5 then -- TODO do it properly
 
-			-- Stand near allies. Decide on highground locations
+			-- Stand near allies. TODO Decide on highground locations
 			if FarmJungle_SimpleRunLimitTime(gsiPlayer, 30) then
 				return xetaScore
 			end
 
-			local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 8000)
+			local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 2400)
 			local moveTo = Positioning_AdjustToAvoidCrowdingSetType(
 					gsiPlayer,
 					gsiPlayer.lastSeen.location,
@@ -58,9 +58,6 @@ blueprint = {
 
 			local crowdingRating
 			moveTo, crowdingRating = CROWDED_RATING(moveTo, SET_HERO_ALLIED, nearbyAllies, 8000)
-			if DEBUG and DEBUG_IsBotTheIntern() then
-				print("[dawdle] crowdingRating", crowdingRating)
-			end
 			moveTo = Vector_ScalePointToPointByFactor(moveTo, TEAM_FOUNTAIN, 0.1)
 			if crowdingRating > 1 then
 				local farmLaneObjective = Task_GetTaskObjective(gsiPlayer, farm_lane_handle)
@@ -77,7 +74,10 @@ blueprint = {
 						)
 				end
 			end
+			
 			moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ENEMY, 1200)
+			
+			
 			gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
 		end
 		return xetaScore

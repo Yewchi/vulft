@@ -1,12 +1,12 @@
 local hero_data = {
 	"lion",
-	{1, 2, 1, 2, 1, 4, 1, 3, 3, 3, 3, 4, 2, 2, 8, 6, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 3, 2, 6, 2, 4, 2, 3, 8, 3, 4, 9, 11},
 	{
-		"item_faerie_fire","item_magic_stick","item_tango","item_faerie_fire","item_enchanted_mango","item_ward_sentry","item_boots","item_wind_lace","item_tranquil_boots","item_magic_wand","item_blink","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_aghanims_shard","item_gem","item_staff_of_wizardry","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem",
+		"item_tango","item_mantle","item_branches","item_faerie_fire","item_branches","item_circlet","item_null_talisman","item_boots","item_magic_wand","item_blink","item_gloves","item_robe","item_power_treads","item_ghost","item_staff_of_wizardry","item_robe","item_kaya","item_ethereal_blade","item_aghanims_shard","item_ultimate_scepter","item_energy_booster","item_void_stone","item_aether_lens","item_octarine_core",
 	},
-	{ {1,1,1,4,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,2,3,3,}, {5,5,2,4,4,}, 0.1 },
 	{
-		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-2s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
+		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-3s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
 	}
 }
 --@EndAutomatedHeroData
@@ -58,7 +58,7 @@ local d = {
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
 			local currActiveAbility = gsiPlayer.hUnit:GetCurrentActiveAbility()
 			if currActiveAbility and currActiveAbility:GetName() == "lion_mana_drain" then
-				if Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit) > gsiPlayer.lastSeenHealth/20
+				if Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit) > gsiPlayer.lastSeenHealth/10
 						and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.8 then
 					UseAbility_ClearQueuedAbilities(gsiPlayer)
 				end
@@ -115,8 +115,12 @@ local d = {
 				)
 			if nearbyCreeps then
 				-- TODO USE_ABILITY queue with move to loc facing from vector between two random creeps
-				USE_ABILITY(gsiPlayer, earthSpike, nearbyCreeps.center, 400, nil)
-				return;
+				local crowdingCenter, crowdedRating
+						= CROWDED_RATING(nearbyCreeps.center, SET_CREEP_ENEMY, nearbyCreeps, 190)
+				if crowdedRating > 2 then
+					USE_ABILITY(gsiPlayer, earthSpike, crowdingCenter, 400, nil)
+					return;
+				end
 			end
 		end
 		local foDKillCounterIndex = gsiPlayer.hUnit:GetModifierByName("modifier_lion_finger_of_death_kill_counter")
@@ -132,6 +136,14 @@ local d = {
 						foD:GetDamageType()
 					) then
 			USE_ABILITY(gsiPlayer, foD, fightHarassTarget, 400, nil)
+			return;
+		end
+		if currActivityType > ACTIVITY_TYPE.CAREFUL
+				and nearbyEnemies[1] and AbilityLogic_AbilityCanBeCast(gsiPlayer, hex)
+				and HIGH_USE(gsiPlayer, hex, highUse - hex:GetManaCost(), playerHealthPercent)
+				and not pUnit_IsNullOrDead(nearbyEnemies[1])
+				and not nearbyEnemies[1].hUnit:IsStunned() then
+			USE_ABILITY(gsiPlayer, hex, nearbyEnemies[1], 400, nil)
 			return;
 		end
 		if currActivityType <= ACTIVITY_TYPE.CAREFUL

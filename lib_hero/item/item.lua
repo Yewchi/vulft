@@ -242,6 +242,18 @@ INVIS_ITEMS = {
 	"item_silver_edge"
 }
 
+ITEMS_BOOTS = {
+	["item_boots"] = true,
+	["item_phase_boots"] = true,
+	["item_arcane_boots"] = true,
+	["item_guardian_greaves"] = true,
+	["item_tranquil_boots"] = true,
+	["item_tranquil_boots2"] = true,
+	["item_travel_boots"] = true,
+	["item_travel_boots_2"] = true,
+	["item_boots_of_bearing"] = true,
+}
+
 ITEMS_JUNGLE = {
 	["item_keen_optic"] = true,
 	["item_grove_bow"] = true,
@@ -325,7 +337,9 @@ ITEMS_JUNGLE = {
 	["item_star_mace"] = true,
 	["item_penta_edged_sword"] = true,
 	["item_vambrace"] = true,
-	["item_witless_shako"] = true
+	["item_witless_shako"] = true,
+	["item_ring_of_aquila"] = true,
+	["item_lance_of_pursuit"] = true,
 }
 
 require(GetScriptDirectory().."/lib_hero/item/item_logic")

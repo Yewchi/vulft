@@ -3,7 +3,7 @@ MINIMUM_ALLOWED_USE_TP_INSTEAD = 5500
 local MINIMUM_ALLOWED_USE_TP_INSTEAD = MINIMUM_ALLOWED_USE_TP_INSTEAD
 local SCORED_TO_RUN_FRAME_SHIFT_LIMIT = 1400
 
-local SAFE_TO_TP_DANGER = -0.4
+local SAFE_TO_TP_DANGER = 0.0
 
 local CHANNELING = 1
 local CHECK_PORT_NEEDED = 2
@@ -34,6 +34,10 @@ function Port_CheckPortNeeded(gsiPlayer, location) -- Checks for good ports are 
 	if not tpScroll or tpScroll:GetCooldownTimeRemaining() > 0 then 
 		return
 	end
+	local nearbyEnemyTower, nearbyTowerDist = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
+	if nearbyTowerDist < 1700 then
+		return
+	end
 	local playerLoc = gsiPlayer.lastSeen.location
 	local actualPortLocation = Map_GetNearestPortableStructure(gsiPlayer, location)
 	--local distancePlayerToPort = Math_PointToPointDistance2D(playerLoc, actualPortLocation)
@@ -48,7 +52,7 @@ function Port_CheckPortNeeded(gsiPlayer, location) -- Checks for good ports are 
 			and port_state[nOnTeam] == NO_CHECK_PORT_NEEDED
 			and distancePlayerToDestination-distancePortToDestination
 				> MINIMUM_ALLOWED_USE_TP_INSTEAD then -- Can we just walk there; Is the port a shortcut?
-		--print("\nTELEPORT\nTELEPORT\nTELEPORT\nTELEPORT\n\n\n\n\n\n\n", gsiPlayer.shortName, "TELEPORT :: ", location, actualPortLocation, debug.traceback())
+		
 		desired_locations[nOnTeam] = location
 		port_state[nOnTeam] = CHECK_PORT_NEEDED
 		Task_SetTaskPriority(task_handle, nOnTeam, TASK_PRIORITY_TOP)
@@ -114,7 +118,7 @@ end
 		if port_state[pnot] == NO_CHECK_PORT_NEEDED then return prevObjective, prevScore or XETA_SCORE_DO_NOT_RUN end
 		if port_state[pnot] == CHECK_PORT_NEEDED then
 			port_state[pnot] = NO_CHECK_PORT_NEEDED
-			if desired_locations[pnot] and gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT) and gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT):IsCooldownReady() then 
+			if desired_locations[pnot] and gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT) and gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT):GetCooldownTimeRemaining() == 0 then 
 				return gsiPlayer, Xeta_CostOfTravelToLocation(gsiPlayer, desired_locations[pnot]) + (Task_GetCurrentTaskHandle(gsiPlayer) ~= task_handle and math.max(0, Task_GetCurrentTaskScore(gsiPlayer)) or 0)
 			else
 				desired_locations[pnot] = nil

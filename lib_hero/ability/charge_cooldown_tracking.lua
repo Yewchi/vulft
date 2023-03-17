@@ -19,7 +19,7 @@ local function update_charges(gsiPlayer, hAbility)
 	--if not thisChargeCd then Util_TablePrint(t_charges) Util_TablePrint(gsiPlayer.hUnit:GetAbilityByName("void_spirit_astral_step")) end
 	local maxCharges = thisChargeCd[3](gsiPlayer, hAbility)
 	if thisChargeCd[1] < maxCharges
-			and GameTime() > thisChargeCd[2] then
+			and thisChargeCd[2] and GameTime() > thisChargeCd[2] then
 		--print("update_charges will increment", hAbility:GetName(), thisChargeCd[1], "next increment would be", GameTime() + thisChargeCd[4](gsiPlayer, hAbility))
 		--DebugDrawText(1000, 700, string.format("%s %s +1", gsiPlayer.shortName, hAbility:GetName()), 80, 80, 255)
 		thisChargeCd[1] = thisChargeCd[1] + 1

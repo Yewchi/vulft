@@ -68,6 +68,8 @@ Blueprint_RegisterTask(task_init_func)
 
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
+		FarmJungle_IncentiviseJungling(gsiPlayer, objective)
+		
 		if objective.type == UNIT_TYPE_IMAGINARY then
 			Positioning_ZSAttackRangeUnitHugAllied(gsiPlayer, objective.lastSeen.location, nil, nil, 0)
 			return;
@@ -96,7 +98,7 @@ blueprint = {
 	
 	score = function(gsiPlayer, prevObjective, prevScore)
 		local playerLoc = gsiPlayer.lastSeen.location
-		local theoreticalDanger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local theoreticalDanger, knownEngage, theorizedEngage = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 		local attackTarget = gsiPlayer.hUnit:GetAttackTarget()
 		local finishAttack = attackTarget and attackTarget:IsBuilding() and 50 or 0
 		local underAttack = FightClimate_AnyIntentToHarm(gsiPlayer, Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1350))
@@ -115,12 +117,12 @@ blueprint = {
 								or (building.isTower and building.tier > 1))) then
 					--[DEBUG]]print("removing old tower won't agro")
 					t_tower_wont_agro[building] = nil
-				else
+				elseif IsLocationVisible(building.lastSeen.location) then
 					if building.hUnit:HasModifier("modifier_fountain_glyph") then
 						break;
 					end
 					--[DEBUG]]print("checking range", Math_PointToPointDistance2D(playerLoc, tower.lastSeen.location))
-					if Math_PointToPointDistance2D(playerLoc, building.lastSeen.location) < 2400 then -- TODO simplistic, while enemy creeps are dead, and our creeps go into the enemy base, need to ensure lane crash is stated as our allied creep set itself 
+					if Math_PointToPointDistance2D(playerLoc, building.lastSeen.location) < 4000 then -- TODO simplistic, while enemy creeps are dead, and our creeps go into the enemy base, need to ensure lane crash is stated as our allied creep set itself 
 						local nearbyCreeps = Set_GetNearestAlliedCreepSetInLane(gsiPlayer, building.lane)
 						local numAlliedCreeps = nearbyCreeps and #(nearbyCreeps.units) or 0
 						local increasingDanger = 0
@@ -140,13 +142,13 @@ blueprint = {
 									building
 								), gsiPlayer.shortName, "push 01", underAttack, finishAttack, increasingDanger)
 						end
-						return building, Xeta_EvaluateObjectiveCompletion(
+						return building, Math_GetFastThrottledBounded(Xeta_EvaluateObjectiveCompletion(
 								XETA_PUSH,
 								Math_ETA(gsiPlayer, building.lastSeen.location),
 								1.0,
 								gsiPlayer,
 								building
-							) - underAttack + finishAttack - min(0, increasingDanger)
+							), 100, 510, 1200)  - underAttack + finishAttack - min(0, increasingDanger)
 					end
 				end
 			end
@@ -195,6 +197,7 @@ blueprint = {
 					and Unit_GetArmorPhysicalFactor(gsiPlayer) * nearestTower.hUnit:GetAttackDamage()
 							* 6 * (1+#Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1800, 16))
 								> gsiPlayer.lastSeenHealth then
+				-- Do not run if tower is high health, dangerous and we are under it
 				return false, XETA_SCORE_DO_NOT_RUN
 			end
 		end
@@ -227,19 +230,27 @@ blueprint = {
 		if not enemy or not enemy.units then 
 			if allied and allied.lane == baseToCheck then
 				if VERBOSE then INFO_print("returning allied set during no enemy push") end
-				return allied, -theoreticalDanger*30 -- Allied creeps are connecting to enemy buildings
+				return allied, max(-5, (GSI_GetAliveAdvantageFactor()*30))-theoreticalDanger*30 -- Allied creeps are connecting to enemy buildings
 			end
 			local farmLaneObjective = Task_GetTaskObjective(gsiPlayer, FarmLane_GetTaskHandle())
 			if farmLaneObjective and farmLaneObjective.type == UNIT_TYPE_IMAGINARY then
 				local _, crashTime = Set_GetPredictedLaneFrontLocation(farmLaneObjective.lane)
-				crashTime = GameTime() - crashTime
+				crashTime = DotaTime() - crashTime
+				crashTime = crashTime < 0 and 10 or crashTime
 				local exposesToTowerDanger = nearestTower and Positioning_WillAttackCmdExposeToLocRad(
 						gsiPlayer, farmLaneObjective,
 						nearestTower.lastSeen.location, nearestTower.attackRange + 200
 					) and -50 or 0
-				if TEST then INFO_print(string.format("push returning no enemy no allied imaginary %.2f", crashTime)) end
+
+
+
+
+
+
+
+
 				return farmLaneObjective,
-						min(50, -theoreticalDanger*100) - Xeta_CostOfWaitingSeconds(gsiPlayer, crashTime or 5)
+						min(50, max(-15, (GSI_GetAliveAdvantageFactor()*30))-theoreticalDanger*100) - Xeta_CostOfWaitingSeconds(gsiPlayer, crashTime or 5)
 								+ exposesToTowerDanger
 			end
 			return false, XETA_SCORE_DO_NOT_RUN
@@ -266,11 +277,12 @@ blueprint = {
 							/ (gsiPlayer.lastSeenHealth*0.01) -- "30 points per dps per 10th of health = 0.01"
 
 				return arbitraryUnit,
-						min(gsiPlayer.level*2,
-								-40*(theoreticalDanger)
+						min(gsiPlayer.level*3,
+								max(-10, (GSI_GetAliveAdvantageFactor()*50))-40*(theoreticalDanger)
 							)
 						- Xeta_CostOfTravelToLocation(gsiPlayer, enemy.center)
 						+ underAttack + finishAttack + attackStraysScore
+						- #knownEngage * 40 + #theorizedEngage * 10
 						- potentialDpsToMeIsBad
 			end
 		end

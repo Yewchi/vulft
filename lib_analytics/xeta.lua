@@ -132,7 +132,7 @@ XETA_RETURN_FOUNTAIN = function(p, t)
 		local timeSinceHeroDamage = p.hUnit:TimeSinceDamagedByAnyHero()
 		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(p, 1350, 8)
 		local nNearbyEnemies = #nearbyEnemies
-		local extrapolatedHealthPercent = (p.lastSeenHealth + p.hUnit:GetHealthRegen()*min(8, timeSinceHeroDamage)) / p.maxHealth -- basic checks for debuffs are good here to reduce regen benefit
+		local extrapolatedHealthPercent = (p.lastSeenHealth + p.hUnit:GetHealthRegen()*max(min(8, timeSinceHeroDamage), tripToFountainTime)) / p.maxHealth -- basic checks for debuffs are good here to reduce regen benefit
 		local theoreticalDangerScore = Analytics_GetTheoreticalDangerAmount(p)
 		--[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then print(string.format("%.2f + %.2f*%.2f - %.2f*%.2f*%.2f/%.2f", tripToLaneCost, max(0, (1 - sqrt(extrapolatedHealthPercent))), max(0, (Xeta_SelfKillStored(p) - tripToFountainCost)), VALUE_OF_LANING_STAGE_CREEP_SET, tripToFountainTime/30, max(0.65, min(extrapolatedHealthPercent, -nNearbyEnemies + timeSinceHeroDamage/2)), max(0.85,Analytics_GetTheoreticalDangerAmount(p)))) end
 		return tripToLaneCost 
@@ -168,3 +168,45 @@ XETA_PUSH = function(p, t)
 XETA_TASK_TYPE_NOT_FOUND = function() 
 		return 0.127 
 	end
+
+local named_score_tbl = {--[[{min, avg, max, age, nextallowedabscondtime, deltaallowed}]]}
+local function abscond_named_score(name, score)
+	local thisScoreTbl = named_score_tbl[name]
+	if score < thisScoreTbl[1] then
+		thisScoreTbl[1] = thisScoreTbl[1] - min(thisScoreTbl[1] - score, (thisScoreTbl[2] - thisScoreTbl[1]))/3
+	elseif score > thisScoreTbl[3] then
+		thisScoreTbl[3] = thisScoreTbl[3] + min(score - thisScoreTbl[3], (thisScoreTbl[3] - thisScoreTbl[2]))/3
+	end
+	thisScoreTbl[1] = thisScoreTbl[1] + (thisScoreTbl[2] - thisScoreTbl[1]) / 30
+	thisScoreTbl[3] = thisScoreTbl[3] - (thisScoreTbl[3] - thisScoreTbl[2]) / 30
+	thisScoreTbl[2] = thisScoreTbl[2] + (score - thisScoreTbl[2])/thisScoreTbl[4]
+	thisScoreTbl[4] = thisScoreTbl[4] + 2 / thisScoreTbl[4]
+	thisScoreTbl[5] = DotaTime() + thisScoreTbl[6]
+
+	if thisScoreTbl[1] > thisScoreTbl[2] then
+		thisScoreTbl[1] = thisScoreTbl[1] - 1.05*(thisScoreTbl[1] - thisScoreTbl[2])
+	end
+	if thisScoreTbl[3] < thisScoreTbl[2] then
+		thisScoreTbl[3] = thisScoreTbl[3] + 1.05*(thisScoreTbl[2] - thisScoreTbl[3])
+	end
+
+	return thisScoreTbl[2]
+end
+
+function Xeta_RegisterAbscondScore(name, reasonableMin, reasonableAvg, reasonableMax, deltaAllowedTime)
+	thisScoreTbl = {reasonableMin, reasonableAvg, reasonableMax, 1, DotaTime()+(nextAbscond or 0.167), nextAbscond or 0.167}
+	named_score_tbl[name] =  thisScoreTbl
+end
+
+-- Return the score divided by the average score, the minimum seen, the maximum seen
+-- - NB comparison data can be poisoned by poorly written/bounded algorithms e.g. 1/x
+function Xeta_AbscondCompareNamedScore(name, score)
+	local thisScoreTbl = named_score_tbl[name]
+	if thisScoreTbl[5] < DotaTime() then
+		abscond_named_score(name, score)
+
+	end
+	return 0.5 + (score < thisScoreTbl[2]
+			and -0.5*(thisScoreTbl[2] - score)/(thisScoreTbl[2]-thisScoreTbl[1])
+			or 0.5*(score - thisScoreTbl[2])/(thisScoreTbl[3]-thisScoreTbl[2]))
+end

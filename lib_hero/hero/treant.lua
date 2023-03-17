@@ -1,8 +1,8 @@
 local hero_data = {
 	"treant",
-	{2, 1, 2, 3, 3, 4, 3, 3, 2, 2, 5, 4, 1, 1, 7, 1, 4, 9},
+	{2, 1, 2, 1, 3, 4, 3, 3, 1, 3, 2, 4, 1, 2, 5, 8, 4, 9, 11},
 	{
-		"item_tango","item_ring_of_protection","item_faerie_fire","item_enchanted_mango","item_branches","item_branches","item_faerie_fire","item_boots","item_tranquil_boots","item_headdress","item_chainmail","item_chainmail","item_mekansm","item_blink","item_crown","item_meteor_hammer","item_ghost",
+		"item_ring_of_protection","item_tango","item_magic_stick","item_branches","item_branches","item_boots","item_energy_booster","item_arcane_boots","item_blink","item_gem","item_aghanims_shard","item_magic_wand","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_refresher","item_gem",
 	},
 	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{

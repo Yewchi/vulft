@@ -1,12 +1,12 @@
 local hero_data = {
 	"razor",
-	{2, 1, 1, 2, 1, 4, 1, 3, 3, 5, 3, 4, 3, 2, 8, 2, 4, 10, 11},
+	{2, 1, 2, 1, 1, 4, 1, 3, 3, 5, 3, 4, 3, 2, 8, 2, 4, 9, 11},
 	{
-		"item_tango","item_magic_stick","item_circlet","item_branches","item_branches","item_branches","item_wraith_band","item_boots","item_magic_wand","item_boots_of_elves","item_power_treads","item_falcon_blade","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_sange_and_yasha","item_aghanims_shard","item_blink","item_nullifier","item_refresher","item_swift_blink","item_vitality_booster","item_energy_booster","item_sheepstick","item_aeon_disk","item_moon_shard","item_invis_sword","item_gem","item_silver_edge",
+		"item_tango","item_circlet","item_circlet","item_slippers","item_branches","item_wraith_band","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_falcon_blade","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_sange_and_yasha","item_reaver","item_lifesteal","item_satanic","item_ultimate_orb","item_ultimate_orb","item_skadi","item_lesser_crit","item_greater_crit",
 	},
-	{ {3,3,3,1,1,}, {3,3,3,1,1,}, 0.1 },
+	{ {1,1,1,3,3,}, {1,1,1,3,3,}, 0.1 },
 	{
-		"Plasma Field","Static Link","Storm Surge","Eye of the Storm","+30 Plasma Field Damage","+9 Agility","+5 Static Link Damage Steal","+14 Strength","+21% Storm Surge Move Speed","0.1s Eye of the Storm Strike Interval","Creates A Second Plasma Field Delayed By +0.8s","Static Link Steals Attack Speed",
+		"Plasma Field","Static Link","Storm Surge","Eye of the Storm","+30 Plasma Field Damage","+12 Agility","+5 Static Link Damage Steal","+14 Strength","+21% Storm Surge Move Speed","0.1s Eye of the Storm Strike Interval","Creates A Second Plasma Field Delayed By +0.8s","Static Link Steals Attack Speed",
 	}
 }
 --@EndAutomatedHeroData

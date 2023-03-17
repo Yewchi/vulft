@@ -1,8 +1,8 @@
 local hero_data = {
 	"antimage",
-	{1, 2, 3, 1, 2, 4, 2, 2, 1, 5, 3, 4, 3, 3, 7, 1, 4, 10, 12},
+	{1, 2, 1, 3, 1, 4, 2, 2, 2, 6, 1, 4, 3, 3, 7, 3, 4, 10, 12},
 	{
-		"item_tango","item_branches","item_branches","item_quelling_blade","item_circlet","item_slippers","item_wraith_band","item_ring_of_health","item_boots_of_elves","item_gloves","item_power_treads","item_broadsword","item_pers","item_claymore","item_bfury","item_boots_of_elves","item_magic_wand","item_yasha","item_ultimate_orb","item_manta","item_ultimate_orb","item_ultimate_orb","item_skadi","item_eagle","item_talisman_of_evasion","item_quarterstaff","item_butterfly","item_mithril_hammer","item_belt_of_strength","item_basher","item_abyssal_blade","item_aghanims_shard","item_black_king_bar",
+		"item_quelling_blade","item_tango","item_branches","item_branches","item_orb_of_venom","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_ring_of_health","item_blight_stone","item_orb_of_corrosion","item_magic_wand","item_vanguard","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_ultimate_orb","item_manta","item_basher","item_abyssal_blade","item_quarterstaff","item_eagle","item_butterfly","item_platemail","item_buckler","item_assault","item_helm_of_iron_will","item_nullifier",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

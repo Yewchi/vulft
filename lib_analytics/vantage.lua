@@ -98,7 +98,7 @@ end
 					-- Is it a ward pillar?
 					if (GetHeightLevel(thisConsiderVec) == 1) then
 						-- Was the previous check a ward pillar?
-						GetBot():ActionImmediate_Ping(thisConsiderVec.x, thisConsiderVec.y, true)
+						
 						if not knownNearIndex then
 							for i=1,count_reserve_ward_spots do
 								-- Is it close enough to a previously known height one?
@@ -456,7 +456,7 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 		end
 		DebugDrawLine(t_ward_loc[wardIndex], correctedVec, 0, 255, 255)
 		gsiPlayer.hUnit:Action_UseAbilityOnLocation(hItem, correctedVec)
-		gsiPlayer.hUnit:ActionImmediate_Ping(correctedVec.x, correctedVec.y, true)
+		
 
 		return true;
 	end
@@ -593,9 +593,9 @@ function VAN_GuideWardAtIndexKillDevalued(gsiPlayer, wardIndex, hItem)
 				string.format(
 					"[vantage] no ward at %d. Found: %d %d %d.",
 					wardIndex,
-					t_preferred_ward_index_cache[1],
-					t_preferred_ward_index_cache[2],
-					t_preferred_ward_index_cache[3]
+					t_preferred_ward_index_cache[1] or -0,
+					t_preferred_ward_index_cache[2] or -0,
+					t_preferred_ward_index_cache[3] or -0
 				)
 			)
 	end

@@ -1,12 +1,12 @@
 local hero_data = {
 	"death_prophet",
-	{1, 3, 1, 3, 3, 4, 1, 1, 3, 2, 4, 2, 2, 7, 2, 4, 10, 12, 5},
+	{1, 3, 3, 1, 3, 4, 3, 5, 1, 1, 2, 4, 2, 2, 7, 2, 4, 9, 11},
 	{
-		"item_faerie_fire","item_tango","item_mantle","item_ward_observer","item_branches","item_circlet","item_bottle","item_boots","item_null_talisman","item_robe","item_power_treads","item_robe","item_staff_of_wizardry","item_wind_lace","item_kaya","item_staff_of_wizardry","item_void_stone","item_staff_of_wizardry","item_cyclone","item_blink","item_ogre_axe","item_kaya_and_sange","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_platemail","item_mystic_staff","item_shivas_guard","item_mystic_staff","item_sheepstick","item_ultimate_scepter_2","item_boots","item_wind_waker","item_pers","item_ring_of_health","item_refresher",
+		"item_branches","item_branches","item_branches","item_tango","item_faerie_fire","item_bottle","item_null_talisman","item_magic_wand","item_boots","item_gloves","item_robe","item_power_treads","item_staff_of_wizardry","item_robe","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_blink","item_platemail","item_mystic_staff","item_shivas_guard","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_gem","item_aether_lens","item_soul_booster","item_octarine_core","item_boots","item_reaver","item_overwhelming_blink",
 	},
 	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
-		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+30 Spirit Siphon Damage/Heal","-2.0s Crypt Swarm Cooldown","20.0% Spirit Siphon Move Speed Slow","+400 Health","-20s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
+		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","special_bonus_magic_resistance_14","+30 Spirit Siphon Damage/Heal","-2.0s Crypt Swarm Cooldown","20.0% Spirit Siphon Move Speed Slow","+400 Health","-20s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
 	}
 }
 --@EndAutomatedHeroData

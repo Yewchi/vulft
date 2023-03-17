@@ -5,7 +5,6 @@ local TEAM_NUMBER_OF_PLAYERS = TEAM_NUMBER_OF_PLAYERS
 local Task_SetTaskPriority = Task_SetTaskPriority
 local XETA_SCORE_DO_NOT_RUN = XETA_SCORE_DO_NOT_RUN
 local Math_GetFastThrottledBounded = Math_GetFastThrottledBounded
-local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
 local CURRENT_TASK = Task_GetCurrentTaskHandle
 local Vector_PointDistance2D = Vector_PointDistance2D
 local NEAREST_UNIT = Vector_GetNearestToUnitForUnits
@@ -13,6 +12,7 @@ local Set_GetEnemyHeroesInPlayerRadius = Set_GetEnemyHeroesInPlayerRadius
 local Set_GetAlliedHeroesInPlayerRadius = Set_GetAlliedHeroesInPlayerRadius
 local ACTUAL_ATTACK = Lhp_GetActualFromUnitToUnitAttackOnce
 local ACTIVITY_TYPE = ACTIVITY_TYPE
+local COUNT_ACTIVITY_TYPES = COUNT_ACTIVITY_TYPES
 local CURR_ACTIVITY_TYPE = Blueprint_GetCurrentTaskActivityType
 local TASK_OBJ = Task_GetTaskObjective
 local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
@@ -65,7 +65,7 @@ local t_player_current_ward_index = {}
 
 local USE_WITHOUT_TARGET_TYPE = EMPTY_TABLE
 
-local INSTANT_NO_TURNING_SCORE = 500
+local INSTANT_NO_TURNING_SCORE = 1000 -- lame
 
 local function generic_run_func(gsiPlayer, target, hItem)
 	if target.hUnit then
@@ -104,7 +104,7 @@ function generic_on_entity_func(gsiPlayer, target, hItem)
 end
 function generic_avoid_magical_dmg_score(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 	-- FUNCTION IS TEMP SOLN
-	if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()
+	if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()
 			and HIGH_USE(
 					gsiPlayer, hItem, gsiPlayer.highUseManaSimple,
 					gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
@@ -113,7 +113,7 @@ function generic_avoid_magical_dmg_score(gsiPlayer, hItem, nearbyEnemies, nearby
 		if TEST then print("can't use generic") end
 		return false, XETA_SCORE_DO_NOT_RUN
 	end
-	if TEST then print(gsiPlayer.shortName, hItem:IsCooldownReady(), hItem:IsFullyCastable(), hItem:GetCooldownTimeRemaining()) end
+	if TEST then print(gsiPlayer.shortName, hItem:GetCooldownTimeRemaining() == 0, hItem:IsFullyCastable(), hItem:GetCooldownTimeRemaining()) end
 	local projectilesTbl = gsiPlayer.hUnit:GetIncomingTrackingProjectiles()
 	if TEST then
 		print("Printing projectiles:")
@@ -162,6 +162,10 @@ function generic_avoid_magical_dmg_score(gsiPlayer, hItem, nearbyEnemies, nearby
 	end
 	return false, XETA_SCORE_DO_NOT_RUN
 end
+function generic_self_avoid_magical_dmg_score(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
+	local target, score = generic_avoid_magical_dmg_score(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
+	return target and gsiPlayer or target, score
+end
 function use_ward_func(gsiPlayer, targetLoc, hItem)
 	local itemCarriedResult = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
 	if itemCarriedResult == ITEM_NOT_FOUND
@@ -192,8 +196,73 @@ function use_ward_func(gsiPlayer, targetLoc, hItem)
 	return gsiPlayer.usableItemCache.wards
 end
 
+local printed_fs_err_count = 0
+local end_print_fs_err_count = 5
+local FSTUT_TARGET_INDEX = 1
+local FSTUT_GIVEUP_TIME_INDEX = 2
+local FSTUT_DELAY_IF_UNSTABLE = 3
+local force_staff_to_unit_tbls = {}
+local function force_staff_to_unit_dominate()
+	-- Fill force_staff_to_unit_tbls for the player, set dominate. Has timeout / impossible kill.
+	local gsiPlayer = GSI_GetBot()
+	local fstut_tbl = force_staff_to_unit_tbls[gsiPlayer.nOnTeam]
+	if DEBUG then DebugDrawText(500, 530, gsiPlayer.shortName, 255, 255, 0) end
+	if not fstut_tbl or not fstut_tbl[1] then
+		if printed_fs_err_count < end_print_fs_err_count then
+			printed_fs_err_count = printed_fs_err_count + 1
+			Util_TablePrint(fstut_tbl)
+			ERROR_print(string.format("'%s' dominate func had no data!!!%s",
+						gsiPlayer.shortName or "???",
+						printed_fs_err_count < end_print_fs_err_count and "" or "-- SQUELCHING PRINT"
+					)
+				)
+		end
+		if fstut_tbl then
+			fstut_tbl[1] = false
+			fstut_tbl[2] = 0
+			fstut_tbl[3] = GameTime() + 40 + RandomInt(0,300) -- + REDUCE_BUGS_TIME_DEF
+		end
+		if DEBUG then DebugDrawText(500, 540, gsiPlayer.shortName, 255, 255, 0) end
+		return
+	end
 
-
+	local target = fstut_tbl[1]
+	local giveUp = fstut_tbl[2]
+	local forceStaffItemWithinTime = giveUp > GameTime() and Item_GetForceStaffItem(gsiPlayer) or false
+	if not forceStaffItemWithinTime then
+		
+		-- reduce bugs, if applicable, randomly so the player mightn't notice
+		if DEBUG then DebugDrawText(500, 540, gsiPlayer.shortName, 255, 0, 0) end
+		DOMINATE_SetDominateFunc(gsiPlayer, "DIRECTLY_FS", nil, false)
+		fstut_tbl[3] = GameTime() + 40 + RandomInt(0,300) -- + REDUCE_BUGS_TIME_DEF
+		return
+	end
+	local distanceToTarget = pUnit_IsNullOrDead(target)
+			and false or Vector_PointDistance2D(gsiPlayer.lastSeen.location, target.lastSeen.location)
+	if not forceStaffItemWithinTime or not distanceToTarget
+			or distanceToTarget < min(400, gsiPlayer.attackRange*0.95) or distanceToTarget > 1400
+			or forceStaffItemWithinTime:GetCooldownTimeRemaining() > 0.1 then
+		fstut_tbl[1] = false
+		fstut_tbl[2] = 0
+		fstut_tbl[3] = 0
+		DOMINATE_SetDominateFunc(gsiPlayer, "DIRECTLY_FS", nil, false)
+		if DEBUG then DebugDrawText(500, 540, gsiPlayer.shortName, 255, 0, 255) end
+		return
+	end
+	if Vector_UnitFacingUnit(gsiPlayer, target) > 0.9 then
+		gsiPlayer.hUnit:Action_UseAbilityOnEntity(forceStaffItemWithinTime, gsiPlayer.hUnit)
+		if DEBUG then DebugDrawText(500, 540, gsiPlayer.shortName, 0, 255, 255) end
+		return
+	end
+	local playerLoc = gsiPlayer.hUnit:GetLocation()
+	local moveTo = Vector_UnitDirectionalPointToPoint(playerLoc, target.lastSeen.location)
+	if DEBUG then DebugDrawText(500, 550, gsiPlayer.shortName, 255, 255, 255) end
+	moveTo = Vector_ScalarMultiply(moveTo, 10)
+	moveTo = Vector_Addition(playerLoc, moveTo)
+	DebugDrawLine(playerLoc, moveTo, 255, 0, 0)
+	DebugDrawCircle(target.lastSeen.location, 180, 255, 0, 0)
+	gsiPlayer.hUnit:Action_MoveToLocation(moveTo)
+end
 
 local ITEM_FUNCS_I__SCORE_FUNC = 1
 local ITEM_FUNCS_I__RUN_FUNC = 2
@@ -207,7 +276,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 				-- NB. urn // vessel generic
 				if hItem:GetCurrentCharges() > 0
-						and hItem:IsCooldownReady() and hItem:IsFullyCastable() then
+						and hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable() then
 					local bestTarget, score = UrnLogic_ScoreUrnVessel(gsiPlayer, nearbyEnemies, nearbyAllies)
 					if bestTarget
 							and Vector_PointDistance2D(gsiPlayer.lastSeen.location, bestTarget.lastSeen.location)
@@ -224,7 +293,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_phase_boots"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if hItem:IsCooldownReady() and hItem:IsFullyCastable() then
+				if hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable() then
 					local activityType = Blueprint_GetCurrentTaskActivityType(gsiPlayer)
 					if activityType >= ACTIVITY_TYPE.FEAR
 							or activityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then
@@ -237,7 +306,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_glimmer_cape"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if hItem:IsCooldownReady() and hItem:IsFullyCastable()
+				if hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()
 						and HIGH_USE(
 								gsiPlayer, hItem, gsiPlayer.highUseManaSimple,
 								gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
@@ -256,12 +325,12 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_invis_sword"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if TEST then print(hItem:IsCooldownReady(), hItem:IsFullyCastable(), HIGH_USE(
+				if TEST then print(hItem:GetCooldownTimeRemaining() == 0, hItem:IsFullyCastable(), HIGH_USE(
 							gsiPlayer, hItem,
 							gsiPlayer.highUseManaSimple, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 						)
 					) end
-				if hItem:IsCooldownReady() and hItem:IsFullyCastable() 
+				if hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable() 
 						and HIGH_USE(
 								gsiPlayer, hItem, gsiPlayer.highUseManaSimple,
 								gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
@@ -291,10 +360,14 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 			end,
 			generic_no_target_func
 	},
+	["item_lotus_orb"] = nil, --[[{
+			generic_self_avoid_magical_dmg_score,
+			generic_on_entity_func
+	},]]
 	["item_hand_of_midas"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 				local castRange = hItem:GetCastRange()
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()) then
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				local activityType = CURR_ACTIVITY_TYPE(gsiPlayer)
@@ -346,6 +419,41 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 			generic_avoid_magical_dmg_score,
 			generic_no_target_func
 	},
+	["item_soul_ring"] = {
+			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
+				-- TODO simplistic for now -- rather per-ability checks registered, or use to allow a stun if trying to escape
+				local hUnitPlayer = gsiPlayer.hUnit
+				local qAbility = hUnitPlayer:GetAbilityInSlot(0)
+				local wAbility = hUnitPlayer:GetAbilityInSlot(1)
+				local eAbility = hUnitPlayer:GetAbilityInSlot(2)
+				
+				if nearbyEnemies[1] and gsiPlayer.lastSeenMana < gsiPlayer.highUseManaSimple * 2.5
+						and ( (not qAbility:IsPassive() and qAbility:GetCooldownTimeRemaining() == 0)
+							or (not wAbility:IsPassive() and wAbility:GetCooldownTimeRemaining() == 0)
+							or (not eAbility:IsPassive() and eAbility:GetCooldownTimeRemaining() == 0)
+						) then
+					local playerHpp = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
+					local activityType = CURR_ACTIVITY_TYPE(gsiPlayer)
+					local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+					if activityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+							and danger < (-2.0 + 1.5*(playerHpp)) then
+						return gsiPlayer, INSTANT_NO_TURNING_SCORE
+					else
+						local nearestEnemy, nearestEnemyDist
+								= Set_GetNearestEnemyHeroToLocation(gsiPlayer.lastSeen.location)
+						if activityType >= ACTIVITY_TYPE.CAREFUL
+							and nearestEnemy and gsiPlayer.lastSeenMana < gsiPlayer.highUseManaSimple/2
+							and gsiPlayer.lastSeenHealth > (pUnit_IsNullOrDead(nearestEnemy) and 120 or nearestEnemy.hUnit:GetAttackDamage()*#nearbyEnemies)
+							and playerHpp < abs(danger)^3 then -- If your health is less than extreme danger or extreme non-danger -- i.e. hero is probably dead either way, or very doubtful to be caught anyways
+							if nearestEnemyDist < nearestEnemy.attackRange*1.5 then
+								return gsiPlayer, INSTANT_NO_TURNING_SCORE
+							end
+						end
+					end
+				end
+			end,
+			generic_no_target_func
+	},
 	["item_black_king_bar"] = {
 			generic_avoid_magical_dmg_score,
 			generic_no_target_func
@@ -353,7 +461,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	["item_blink"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 				-- TODO 
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()) then
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				local currTaskHandle = CURRENT_TASK(gsiPlayer)
@@ -416,7 +524,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 				--TODO TEMP
 				local playerHpp = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()
 							and HIGH_USE(gsiPlayer, hItem, gsiPlayer.highUseManaSimple, playerHpp)
 						) then
 					return false, XETA_SCORE_DO_NOT_RUN
@@ -456,7 +564,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_rod_of_atos"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()) then
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				-- TODO TEMP
@@ -480,7 +588,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_cyclone"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()
 							and HIGH_USE(gsiPlayer, hItem, gsiPlayer.highUseManaSimple,
 									gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 								)
@@ -531,7 +639,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_meteor_hammer"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()) then
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				local activityType = CURR_ACTIVITY_TYPE(gsiPlayer)
@@ -578,7 +686,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 				--TODO TEMP
 				local playerHpp = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()
 							and HIGH_USE(gsiPlayer, hItem, gsiPlayer.highUseManaSimple, playerHpp)
 						) then
 					return false, XETA_SCORE_DO_NOT_RUN
@@ -612,8 +720,13 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 				-- TODO TEMP			
 				local playerHpp = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()
-							and HIGH_USE(gsiPlayer, hItem, gsiPlayer.highUseManaSimple, playerHpp)
+				local activityType = CURR_ACTIVITY_TYPE(gsiPlayer)
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()
+							and HIGH_USE(gsiPlayer, hItem,
+									gsiPlayer.highUseManaSimple
+										* (1 + (activityType-COUNT_ACTIVITY_TYPES) * 0.5 / COUNT_ACTIVITY_TYPES),
+									playerHpp
+								)
 						) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
@@ -633,10 +746,10 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 				local fhtInRange = Vector_PointDistance2D(playerLoc, fht.lastSeen.location)
 						< hItem:GetCastRange()*1.1
 				if usingNearest then
-					if fhtInRange and Vector_UnitFacingUnit(fht, gsiPlayer) > 0.85 then
+				--[[	if fhtInRange and Vector_UnitFacingUnit(fht, gsiPlayer) > 0.85 then
 						return fht, INSTANT_NO_TURNING_SCORE
 						-- Bugged if we are between scary unit and more enemies
-					end
+					end	--]]
 					if Vector_UnitFacingUnit(gsiPlayer, GSI_GetTeamFountainUnit(TEAM)) > 0.8
 							and Analytics_GetTheoreticalDangerAmount(gsiPlayer,
 									nearbyAllies,
@@ -653,12 +766,39 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 						return gsiPlayer, INSTANT_NO_TURNING_SCORE
 					end
 				end
-				if fht and activityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then
-					if Vector_UnitFacingUnit(fht, gsiPlayer) >= 0.85 then
-						return fht, INSTANT_NO_TURNING_SCORE
-					elseif Analytics_GetTheoreticalDangerAmount(gsiPlayer) < -2
-							and Vector_UnitFacingUnit(gsiPlayer, fht) then
-						return gsiPlayer, INSTANT_NO_TURNING_SCORE
+				if fht and activityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+						and (1.25-fht.lastSeenHealth/fht.maxHealth) * danger < -0.5 then
+					if DEBUG then DebugDrawText(500, 510, gsiPlayer.shortName, 255, 255, 255) end
+					local distanceToFht = Vector_PointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
+					if distanceToFht < max(200, gsiPlayer.attackRange*0.8) or distanceToFht > 1400 then
+						if DEBUG then DebugDrawText(550, 510, gsiPlayer.shortName, 255, 255, 255) end
+						return false, XETA_SCORE_DO_NOT_RUN
+					end
+					local facingAmount = Vector_UnitFacingUnit(fht, gsiPlayer)
+					if facingAmount >= 0.75 then
+						if DEBUG then DebugDrawText(500, 520, gsiPlayer.shortName, 255, 255, 255) end
+						if facingAmount > 0.95 then
+							if DEBUG then DebugDrawText(550, 520, gsiPlayer.shortName, 255, 255, 255) end
+							return fht, INSTANT_NO_TURNING_SCORE
+						end
+						-- Dominate a direct force staff move
+						if DEBUG then
+							INFO_print(string.format("%s is being dominated for force staff move.", gsiPlayer.shortName))
+						end
+						local fstut_tbl = force_staff_to_unit_tbls[gsiPlayer.nOnTeam]
+						if not fstut_tbl then
+							fstut_tbl = {}
+							force_staff_to_unit_tbls[gsiPlayer.nOnTeam] = fstut_tbl
+						elseif fstut_tbl[FSTUT_DELAY_IF_UNSTABLE] > GameTime() then
+							if DEBUG then DebugDrawText(750, 520, gsiPlayer.shortName, 255, 255, 255) end
+							return false, XETA_SCORE_DO_NOT_RUN
+						end
+						fstut_tbl[1] = fht
+						fstut_tbl[2] = GameTime() + 0.5
+						fstut_tbl[3] = 0
+
+						DOMINATE_SetDominateFunc(gsiPlayer, "DIRECTLY_FS", force_staff_to_unit_dominate, true)
+						return false, XETA_SCORE_DO_NOT_RUN -- It is not ready for use, technically
 					end
 				end
 				return false, XETA_SCORE_DO_NOT_RUN
@@ -667,8 +807,8 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_orchid"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if TEST then print(hItem:IsCooldownReady(), hItem:IsFullyCastable()) end
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()) then
+				if TEST then print(hItem:GetCooldownTimeRemaining() == 0, hItem:IsFullyCastable()) end
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				-- TODO TEMP
@@ -694,8 +834,8 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_satanic"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if TEST then print(hItem:IsCooldownReady(), hItem:IsFullyCastable()) end
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable())
+				if TEST then print(hItem:GetCooldownTimeRemaining() == 0, hItem:IsFullyCastable()) end
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable())
 						or gsiPlayer.hUnit:IsDisarmed()
 						or Analytics_GetNearFutureHealth(gsiPlayer) > gsiPlayer.maxHealth / 2 then
 					return false, XETA_SCORE_DO_NOT_RUN
@@ -717,7 +857,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_dagon"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()) then
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				-- TODO TEMP
@@ -742,7 +882,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 	["item_sheepstick"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
-				if not (hItem:IsCooldownReady() and hItem:IsFullyCastable()) then
+				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				-- TODO TEMP
@@ -845,6 +985,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	},
 }
 -- functional copies TODO temp
+T_ITEM_FUNCS["item_force_staff"] = T_ITEM_FUNCS["item_hurricane_pike"]
 T_ITEM_FUNCS["item_spirit_vessel"] = T_ITEM_FUNCS["item_urn_of_shadows"]
 T_ITEM_FUNCS["item_silver_edge"] = T_ITEM_FUNCS["item_invis_sword"]
 T_ITEM_FUNCS["item_dagon_2"] = T_ITEM_FUNCS["item_dagon"]
@@ -853,6 +994,9 @@ T_ITEM_FUNCS["item_dagon_4"] = T_ITEM_FUNCS["item_dagon"]
 T_ITEM_FUNCS["item_dagon_5"] = T_ITEM_FUNCS["item_dagon"]
 T_ITEM_FUNCS["item_ward_observer"] = T_ITEM_FUNCS["item_ward_dispenser"]
 T_ITEM_FUNCS["item_ward_sentry"] = T_ITEM_FUNCS["item_ward_dispenser"]
+T_ITEM_FUNCS["item_overwhelming_blink"] = T_ITEM_FUNCS["item_blink"]
+T_ITEM_FUNCS["item_swift_blink"] = T_ITEM_FUNCS["item_blink"]
+T_ITEM_FUNCS["item_arcane_blink"] = T_ITEM_FUNCS["item_blink"]
 local ITEM_FUNCS_I__SCORE_FUNC = ITEM_FUNCS_I__SCORE_FUNC
 local ITEM_FUNCS_I__RUN_FUNC = ITEM_FUNCS_I__RUN_FUNC
 local T_ITEM_FUNCS = T_ITEM_FUNCS
@@ -908,7 +1052,7 @@ blueprint = {
 			return xetaScore
 		end
 		itemToUse = gsiPlayer.hUnit:GetItemInSlot(gsiPlayer.hUnit:FindItemSlot(itemToUse:GetName()))
-		if itemToUse and not itemToUse:IsNull() and itemToUse:IsFullyCastable() and itemToUse:IsCooldownReady()
+		if itemToUse and not itemToUse:IsNull() and itemToUse:IsFullyCastable() and itemToUse:GetCooldownTimeRemaining() == 0
 				and not gsiPlayer.hUnit:IsStunned() and not gsiPlayer.hUnit:IsMuted() then
 			if T_ITEM_FUNCS[itemToUse:GetName()][ITEM_FUNCS_I__RUN_FUNC](gsiPlayer, objective, itemToUse) then
 				return xetaScore
@@ -993,8 +1137,8 @@ blueprint = {
 			end
 		end
 		if VERBOSE and TEST then
-			INFO_print( string.format("[use_item]: %s highest target %s", gsiPlayer.shortName,
-					Util_Printable(highestTarget) )
+			INFO_print( string.format("[use_item]: %s highest target %s using %s", gsiPlayer.shortName,
+					Util_Printable(highestTarget), highestItem and highestItem:GetName())
 				)
 		end
 		if highestTarget then

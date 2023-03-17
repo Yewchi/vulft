@@ -10,13 +10,17 @@ VERBOSE = true and DEBUG
 TEST = true and DEBUG
 
 RELEASE_STAGE = "Alpha"
-VERSION = "v0.4-221202"
+VERSION = "v0.5-230317"
 
-VULFT_VERSION = RELEASE_STAGE..(DEBUG and "-Dev" or "")..(TEST and "-Test" or "").." "..VERSION
+VULFT_VERSION = RELEASE_STAGE
+		
+		..(DEBUG and "-Debug" or "")..(TEST and "-Test" or "").." "..VERSION
 
 VULFT_STR = "/VUL-FT/"
 ALERT_STR = "[!]"
 INFO_STR = "[#]"
+
+DRAW_EMOTES = false
 
 require(GetScriptDirectory().."/lib_util/time")
 
@@ -28,8 +32,11 @@ function INFO_print(str)
 end
 
 local ERROR_PRE = VULFT_STR.." "..ALERT_STR.." <ERROR> "
-function ERROR_print(str)
+function ERROR_print(str, printTraceback)
 	print(ERROR_PRE..str)
+	if printTraceback then
+		print(debug.traceback())
+	end
 end
 
 local ALERT_PRE = VULFT_STR.." "..ALERT_STR.." "
@@ -100,10 +107,16 @@ function Util_Printable(val)
 	return "[WHAT THE F***]"
 end
 
-function Util_PrintableTable(tbl, depthAllowed)
+local table_print_time_limit = 0
+local exiting_time_limit = false
+function printable_table(tbl, depthAllowed)
 	if depthAllowed == nil then depthAllowed = 7 
 	elseif depthAllowed <= 0 then 
 		return Util_Printable(tbl)..", "
+	elseif exiting_time_limit then return "&"
+	elseif RealTime() > table_print_time_limit then
+		exiting_time_limit = true
+		return "&!!!!!!WOOOO DATA!&&&&&"
 	end
 	if type(tbl) ~= "table" then
 		return Util_Printable(tbl)..",\n"
@@ -121,6 +134,12 @@ function Util_PrintableTable(tbl, depthAllowed)
 	end
 	if depthAllowed ~= 1 then str = str..theseTabs end -- once for everything but final depth inline close block
 	return str.."}\n"
+end
+
+function Util_PrintableTable(tbl, depthAllowed)
+	table_print_time_limit = RealTime() + 0.0001
+	exiting_time_limit = false
+	return printable_table(tbl, depthAllowed)
 end
 
 function Util_TablePrint(tbl, depth)
@@ -189,7 +208,9 @@ function Util_CauseError(msg)
 	local throws=0+nil
 end
 
-if DEBUG then 
+if DEBUG
+
+		then
 	require(GetScriptDirectory().."/lib_util/debug")
 end
 

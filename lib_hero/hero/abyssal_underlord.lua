@@ -1,10 +1,10 @@
 local hero_data = {
 	"abyssal_underlord",
-	{3, 1, 1, 3, 1, 4, 1, 2, 3, 3, 2, 4, 2, 2, 8, 5, 4, 9, 11},
+	{1, 3, 1, 3, 1, 4, 1, 2, 2, 2, 2, 4, 3, 5, 8, 3, 4, 9, 11},
 	{
-		"item_quelling_blade","item_gauntlets","item_gauntlets","item_tango","item_branches","item_branches","item_soul_ring","item_boots","item_energy_booster","item_arcane_boots","item_cloak","item_ring_of_health","item_hood_of_defiance","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_aghanims_shard","item_headdress","item_pipe","item_aghanims_shard","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aether_lens","item_vitality_booster","item_energy_booster","item_energy_booster","item_octarine_core",
+		"item_quelling_blade","item_tango","item_branches","item_gauntlets","item_gauntlets","item_branches","item_magic_wand","item_ring_of_health","item_soul_ring","item_boots","item_arcane_boots","item_vanguard","item_cloak","item_hood_of_defiance","item_aghanims_shard","item_helm_of_iron_will","item_crimson_guard","item_headdress","item_pipe","item_platemail","item_ring_of_health","item_lotus_orb","item_ogre_axe","item_mask_of_madness","item_mithril_hammer","item_black_king_bar","item_moon_shard","item_moon_shard",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
 		"Firestorm","Pit of Malice","Atrophy Aura","Fiend's Gate","+5 Armor","+100 Firestorm Radius","+75 Pit of Malice AoE","-4s Firestorm Cooldown","+1% Firestorm Burn Damage","+15% Atrophy Aura Attack Damage Reduction","+0.65s Pit of Malice Root","+50% Atrophy Allied Hero Bonus",
 	}

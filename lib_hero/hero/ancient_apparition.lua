@@ -1,10 +1,10 @@
 local hero_data = {
 	"ancient_apparition",
-	{3, 1, 3, 2, 3, 4, 1, 2, 2, 5, 2, 4, 3, 1, 7, 1, 4, 9, 12},
+	{3, 1, 3, 1, 2, 4, 2, 2, 2, 6, 1, 4, 1, 3, 7, 3, 4, 9, 11},
 	{
-		"item_flask","item_tango","item_clarity","item_enchanted_mango","item_faerie_fire","item_branches","item_ward_dispenser","item_ward_dispenser","item_branches","item_wind_lace","item_magic_wand","item_boots","item_tranquil_boots","item_robe","item_aghanims_shard","item_staff_of_wizardry","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_void_stone","item_refresher","item_glimmer_cape",
+		"item_tango","item_enchanted_mango","item_enchanted_mango","item_flask","item_faerie_fire","item_branches","item_branches","item_branches","item_ward_sentry","item_magic_wand","item_boots","item_tranquil_boots","item_shadow_amulet","item_aghanims_shard","item_fluffy_hat","item_shadow_amulet","item_cloak","item_glimmer_cape","item_staff_of_wizardry","item_force_staff","item_gem","item_sheepstick",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {1,1,1,1,4,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+200 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+200 Cold Feet Breaking distance","-5% Ice Vortex Slow/Resistance","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
 	}
@@ -192,7 +192,7 @@ d = {
 					--print("aa stability cf", targetStability, fightHarassTarget.shortName)
 					local targetHealthPercent = Unit_GetHealthPercent(fightHarassTarget)
 					if AbilityLogic_AbilityCanBeCast(gsiPlayer, coldFeet) and targetStability < 0.2 and AbilityLogic_HighUseAllowOffensive(gsiPlayer, coldFeet, HIGH_USE_C_F_REMAINING_MANA, targetHealthPercent) then
-						print(gsiPlayer.hUnit.Action_UseAbilityOnEntity)
+						--print(gsiPlayer.hUnit.Action_UseAbilityOnEntity)
 						USE_ABILITY(gsiPlayer, coldFeet, fightHarassTarget, 400, nil, nil, nil, nil,
 								gsiPlayer.hUnit.Action_UseAbilityOnEntity)
 						return

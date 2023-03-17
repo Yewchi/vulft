@@ -1,10 +1,10 @@
 local hero_data = {
 	"ogre_magi",
-	{2, 1, 2, 1, 2, 4, 2, 3, 1, 5, 3, 4, 3, 3, 1, 8, 4, 10, 12},
+	{2, 1, 2, 3, 2, 4, 2, 1, 1, 5, 3, 4, 3, 1, 8, 3, 4, 10},
 	{
-		"item_quelling_blade","item_tango","item_sobi_mask","item_circlet","item_enchanted_mango","item_urn_of_shadows","item_boots","item_arcane_boots","item_spirit_vessel","item_ring_of_basilius","item_crown","item_veil_of_discord","item_aether_lens","item_aghanims_shard","item_void_stone","item_mystic_staff","item_sheepstick","item_blink","item_vitality_booster","item_arcane_boots","item_aeon_disk","item_point_booster","item_ultimate_scepter","item_soul_booster","item_octarine_core",
+		"item_enchanted_mango","item_faerie_fire","item_tango","item_faerie_fire","item_clarity","item_ward_sentry","item_boots","item_energy_booster","item_arcane_boots","item_wind_lace","item_magic_wand","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_void_stone","item_aether_lens","item_arcane_boots","item_platemail","item_void_stone","item_lotus_orb",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
+	{ {3,3,5,4,4,}, {4,4,1,5,5,}, 0.1 },
 	{
 		"Fireblast","Ignite","Bloodlust","Multicast","+16 Ignite DPS","-1.0s Fireblast Cooldown","+80 Damage","+250 Health","+30 Strength","+25 Bloodlust AS","17% Fireblast chance on attack","+240 Fireblast Damage",
 	}

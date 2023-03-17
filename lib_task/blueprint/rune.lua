@@ -74,6 +74,7 @@ local GetRuneStatus = GetRuneStatus
 local GetRuneSpawnLocation = GetRuneSpawnLocation
 local max = math.max
 local min = math.min
+local abs = math.abs
 
 local RECHARGED_BOTTLE_CHARGES = 3
 
@@ -289,8 +290,9 @@ local function score_bounty_rune(gsiPlayer, objective, forTaskComparison, wpHand
 	local bottleSlot = gsiPlayer.hUnit:FindItemSlot("item_bottle")
 	local bottleValue = bottleSlot ~= ITEM_NOT_FOUND and max(0, (RECHARGED_BOTTLE_CHARGES - gsiPlayer.hUnit:GetItemInSlot(bottleSlot):GetCurrentCharges())) * BOTTLE_CHARGE_VALUE or 0
 	local taskComparisonFactor = 1
+	local dotaTime = DotaTime()
 	if forTaskComparison then
-		local timeTilNextBounties = BOUNTY_SPAWN_INTERVAL - DotaTime() % BOUNTY_SPAWN_INTERVAL
+		local timeTilNextBounties = BOUNTY_SPAWN_INTERVAL - dotaTime % BOUNTY_SPAWN_INTERVAL
 		local preSpawnPeriod = timeTilNextBounties < BOUNTY_RUNE_PREP_TIME + 5
 		if preSpawnPeriod then
 			local extraTime = max(0, timeTilNextBounties - Math_ETA(gsiPlayer, objective.lastSeen.location))
@@ -334,7 +336,8 @@ end
 			end
 		end
 	end
-	taskComparisonFactor = taskComparisonFactor
+	local throwFactor = (1.0 - min(0.92, max(0.0, (dotaTime - 1000)/2000)))
+	taskComparisonFactor = taskComparisonFactor*throwFactor
 	local healthDiff = FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
 	local healthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 	if VERBOSE then print("/VUL-FT/", "score_bounty_rune", gsiPlayer.shortName, objective.runeHandle, taskComparisonFactor, bounty_rune_basic_value, (4*gsiPlayer.vibe.greedRating), (1+TOTAL_BARRACKS_TEAM-NUM_BARRACKS_UP_TEAM), Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location), (3*(2-healthPercent)), bottleValue, NUM_BARRACKS_UP_TEAM) end
@@ -344,8 +347,8 @@ end
 				- 4 * (1 + gsiPlayer.vibe.greedRating)
 				* (1 + TOTAL_BARRACKS_TEAM - NUM_BARRACKS_UP_TEAM)
 				* Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location)*(2-healthPercent)
-				* (DotaTime() < 80 and 0.5 or 1)
-				+ bottleValue
+				* (dotaTime < 80 and 0.5 or 1)
+				+ bottleValue - (dotaTime > 1500 and 200 - min(200, (dotaTime/10 - 150) * Vector_PointDistance2D(gsiPlayer.lastSeen.location, objective.lastSeen.location)/3000) or 0)
 			)
 end
 local function score_power_rune(gsiPlayer, objective, forTaskComparison)
@@ -399,6 +402,8 @@ end
 		taskComparisonFactor = taskComparisonFactor *
 				(0.4 - max(0.39, (4000 - distanceToRune) / 4000))
 	end
+	local throwFactor = (1.0 - min(0.92, max(0.0, (DotaTime() - 1000)/2000)))
+	taskComparisonFactor = taskComparisonFactor*throwFactor
 	local healthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 	if VERBOSE then print("/VUL-FT/", "score_power_rune", gsiPlayer.shortName, objective.runeHandle, taskComparisonFactor, Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location), (1-healthPercent), (TOTAL_BARRACKS_TEAM - NUM_BARRACKS_UP_TEAM), bottleValue) end
 	return taskComparisonFactor
@@ -722,7 +727,11 @@ blueprint = {
 					and tryWaitingAvailablePickups then
 				-- Stop trying to pick up the singular available rune during preSpawn.
 				if not alerted_unable_to_pickup_old_runes then
-					gsiPlayer.hUnit:ActionImmediate_Chat("Full-takeover bots cannot pickup stacked runes. I'll try to grab the new spawn.", false)
+					if RandomInt(1,111) == 11 then
+						gsiPlayer.hUnit:ActionImmediate_Chat("So the data is like \"rune here!\" right? and I go, and I click, and nothing happens...", false)
+					else
+						gsiPlayer.hUnit:ActionImmediate_Chat("Full-takeover bots cannot pickup stacked runes. I'll try to grab the new spawn.", false)
+					end
 					alerted_unable_to_pickup_old_runes = true
 				end
 				thisRune[RUNE_I__WHILE_WAITING_TEST_PICKUP] = false
@@ -870,11 +879,29 @@ end
 			if GetGameState() > GAME_STATE_PRE_GAME and abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpForBotTask) then
 				return false, XETA_SCORE_DO_NOT_RUN
 			end
+			local allies = t_team_members
+			local playerLoc = gsiPlayer.lastSeen.location
+			local fightingCare = 0
+			local distToRune = Vector_PointDistance2D(wpForBotTask[POSTER_I.OBJECTIVE].lastSeen.location, playerLoc)
+			if distToRune > 1600 then
+				for i=1,#t_team_members do
+					local thisAllied = t_team_members[i]
+					if thisAllied ~= gsiPlayer and not pUnit_IsNullOrDead(thisAllied)
+							and (FightClimate_InvolvedInAnyCombat(thisAllied)
+							or Blueprint_TaskHandleIsFighting(Task_GetCurrentTaskHandle(thisAllied))) then
+						local distToAllied = Vector_PointDistance2D(t_team_members[i].lastSeen.location, playerLoc)
+						if distToAllied < 3600 then
+							fightingCare = fightingCare + 200 * (2 - abs(Analytics_GetTheoreticalDangerAmount(thisAllied)))*max(0, 2300 - min(0, distToAllied-900))/2300
+						end
+					end
+				end
+				fightingCare = fightingCare * min(1, max(0, distToRune/800 - 2)) -- dist 1600 -> 2400 = 0 -> 1
+			end
 			return wpForBotTask[POSTER_I.OBJECTIVE],
 					THROTTLED_BOUNDED(
 							WP_ScorePoster(gsiPlayer, wpForBotTask, true),
 							80, 180, 700
-						)
+						) - fightingCare
 
 		end
 		return false, XETA_SCORE_DO_NOT_RUN

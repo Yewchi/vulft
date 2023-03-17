@@ -1,0 +1,63 @@
+
+v0.5-230316 (11th March meta)
+Improved combat, increased tempo, improved item use, muerta
+
+> Added fast picking command '/all !fast' in chat
+
+> ADDED HERO: Muerta
+	-| Finds shots based on the average shot value she sees while able to shoot, scoring for accuracy, hitting two, hitting fighting intent target, getting a fear (tree shots), and reducing the shot length to disallow dodging
+	-| The Calling usage unfinished
+	-| Physical damage incoming detection may be bugged for triggering ultimate.
+	-| Does not yet know she may attack ethereal units
+> ADDED TEST HERO: Tidehunter
+	-| Generic ability use (based on ability flags, cast at targets intelligently, but the abilities are not hard-coded)
+
+> Enchantress
+	-| Sproink is now used defensively
+
+> Many other hero tweaks
+
+> Fixed a location data bug that made bots sometimes think one enemy was in at the location which was an average of the locations of enemies nearby 
+	-| Improved aggressive fighting
+	-| Improved early game laning and early game group fighting
+	-| Less shaky movement during and before fights
+	-| More accurate danger/safety assessment
+
+> Fixed heroes being picked multiple times
+
+> Buyback: Added simplistic check, has false positives and surious behaviour after buying back, like teleporting to a place not related to the objective/fight under pressure
+
+> Fort under attack: Heroes may become ridiculously aggressive when the fort is under attack. Temperory behaviour, but better than wandering.
+
+> Jungle abilities: Added simplistic jungle ability handling, e.g. doom secondary abilities
+
+> Push: Fixed a bug with game pausing reducing push scores when enemy creeps are not visible in the lane
+
+> Push: Fixed a bug where towers that weren't visible would lock heroes into an impossible push task, immobilizing them, mainly/only on Tier-1s.
+
+> Map positioning and grand strategy: When choosing a good lane to aim to operate in, bots now take more care of each other,
+	flip flop less, push as a team, and cores may push alone if the lane seems safe.
+
+> Increased use of danger analysis for avoiding farming behaviour
+
+> Introduced some bugs where heroes will TP to the wrong lane in the early game
+
+> Enabled the use of force staff (only hurricane pike was enabled)
+
+> Will now sometimes use force_staff/hurricane_pike aggressively with direct movement
+
+> Very basic soul_ring use, tries to avoid any unwanted health loss
+
+> Reduced tendancy of returning to fountain when low health if not in immediate danger or expected danger and more enemy players are dead than allies
+
+> Boots are now evaluated as much more valuable for selling junk
+
+> Fixed a bug where only one tower at a time were able to be known as safe to attack without drawing agro. Technically if an allied creeps close to other creeps is attacking a shrine like an idiot while the rest of the set attacks a tower, it may cause the tower to be missed, but screw that creep anyways
+
+> Added some test increases to pushing behaviour when enemies are dead.
+
+> Many other minor fixes and tweaks. Some are test behaviour and might be changed back or removed, like jungling while pushing a lane with teammates.
+
+> Stability: Application crash every so often.
+
+> Updated meta

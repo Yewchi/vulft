@@ -1,8 +1,8 @@
 local hero_data = {
 	"medusa",
-	{2, 3, 2, 1, 2, 1, 1, 1, 2, 5, 4, 3, 3, 3, 7, 4, 4, 10, 12},
+	{2, 3, 2, 1, 2, 1, 2, 1, 1, 3, 4, 3, 3, 4, 7, 6, 4, 10, 12},
 	{
-		"item_magic_stick","item_quelling_blade","item_tango","item_branches","item_branches","item_faerie_fire","item_magic_wand","item_gloves","item_boots","item_boots_of_elves","item_wind_lace","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_manta","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_ultimate_orb","item_ultimate_orb","item_skadi","item_aghanims_shard","item_lesser_crit","item_demon_edge","item_greater_crit","item_butterfly","item_swift_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_moon_shard","item_moon_shard",
+		"item_quelling_blade","item_circlet","item_slippers","item_tango","item_branches","item_branches","item_wraith_band","item_boots_of_elves","item_magic_wand","item_boots","item_power_treads","item_blade_of_alacrity","item_dragon_lance","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_ultimate_orb","item_ultimate_orb","item_skadi","item_demon_edge","item_javelin","item_monkey_king_bar","item_lesser_crit","item_invis_sword","item_silver_edge","item_aghanims_shard","item_ultimate_scepter_2",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

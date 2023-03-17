@@ -5,14 +5,17 @@
 
 local FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST = 150
 
+if not GetBot():IsHero() then
+	INFO_print(string.format(
+			"Not creating nor running a full-takeover for non-hero unit '%s'",
+			GetBot():GetUnitName()
+			)
+		)
+	return;
+end
+
 _G = nil
 _ENV = nil
-
-if DEBUG then -- (pre-defined)
-	-- test benching
-	if GetBot():GetPlayerID() == 8 then
-	end
-end
 
 require(GetScriptDirectory().."/lib_util/util")
 require(GetScriptDirectory().."/lib_job/job_manager")
@@ -80,6 +83,7 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 	
 	
 	
+--	print("bot_generic", 5, TEAM, this_bot.nOnTeam, this_bot.shortName)
 		Task_CurrentTaskContinue(this_bot)
 	
 	
@@ -90,7 +94,7 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 			Player_InformDead(this_bot) -- TODO more abstraction
 			Task_InformDeadAndCancelAnyConfirmedDenial(this_bot)
 			Blueprint_InformDead(this_bot)
-			Team_CheckBuybackDirective(this_bot)
+			Team_InformDeadTryBuyback(this_bot)
 		end
 	end
 	-- run this_bot's dominated units -- TODO global usage and redundant calls on consts indicate restructure of bot tables, or increasing this module's local-global scope; mess.
@@ -121,6 +125,9 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 --	end
 --if TEAM_IS_RADIANT then	this_bot.hUnit:Action_MoveDirectly(Vector_Addition(Map_GetTeamFountainLocation(), Vector(-400, 1500, 0))) end -- dominate stuck test
 --if not TEAM_IS_RADIANT then	this_bot.hUnit:Action_MoveDirectly(Vector_Addition(Map_GetTeamFountainLocation(), Vector(400, -1000, 0))) end
+	--[[if DRAW_EMOTES and this_bot.hUnit:GetDifficult() == 0 then
+		Util_DrawActivityEmotion
+	end]]
 	if 1 then
 		err_flag = 0
 	end

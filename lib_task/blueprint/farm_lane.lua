@@ -10,7 +10,7 @@ EXP_VALUE_OF_LANING_STAGE_CREEP_SET = 180
 local BREAK_FARM_SEAL_POWER_LEVEL = Analytics_GetPerfectKDAPowerLevel(6)
 
 ---- farm_lane constants --
-local DISCOURAGE_FACTOR = 10
+local DISCOURAGE_FACTOR = 80
 local UNIT_TYPE_CREEP = UNIT_TYPE_CREEP
 local UNIT_TYPE_IMAGINARY = UNIT_TYPE_IMAGINARY
 local PLAYERS_ALL = PLAYERS_ALL
@@ -121,6 +121,8 @@ local function task_init_func(taskJobDomain)
 			{["throttle"] = Time_CreateThrottle(0.0)},
 			"JOB_TASK_FARM_LANE_GET_LANING_STAGE_CREEP_SET_BOUNTY"
 		)
+
+	FarmJungle_Initialize()
 		
 	Blueprint_RegisterTaskActivityType(task_handle, ACTIVITY_TYPE["COLLECTING"])
 	task_init_func = nil
@@ -162,8 +164,12 @@ function Farm_GetMostSuitedLane(gsiPlayer, localCreepSet)
 			and (
 				localCreepSet and Farm_AnyOtherCoresInLane(gsiPlayer, localCreepSet)
 			) then
+		-- hindsight: If you are... assisting a core, while in any role yourself, then
+		-- -| stay in lane if you are being aggressive... If it is a support then you're
+		-- -| quite welcome to TP away
 		return localCreepSet.lane
 	end
+
 	return Team_GetStrategicLane(gsiPlayer)
 end
 
@@ -202,6 +208,9 @@ blueprint_farm_lane = {
 		local attackNowForBestLastHit = false
 		local timeTillStartAttack = 0
 		--print(GameTime(), gsiPlayer.shortName, "trying farm lane")
+		if not t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] then
+			FarmJungle_IncentiviseJungling(gsiPlayer, objective)
+		end
 		if objective.type == UNIT_TYPE_CREEP and GSI_UnitCanStartAttack(gsiPlayer) then
 			if objective.team == TEAM then
 				if try_deny_creep(gsiPlayer, objective) then -- Objective is a deny
@@ -277,7 +286,7 @@ blueprint_farm_lane = {
 				)
 			if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(950, 524, "attaViableWalkAway", 255, 0, 0) end
 			-- TODO Test set 1300 range tower dist
-			Positioning_ZSMoveCasual(gsiPlayer, moveTo, 120*(damageTaken / gsiPlayer.lastSeenHealth) / Unit_GetHealthPercent(gsiPlayer)^3, towerDist < 1400 and 1300 or nil)
+			Positioning_ZSMoveCasual(gsiPlayer, moveTo, 120*(damageTaken / gsiPlayer.lastSeenHealth) / Unit_GetHealthPercent(gsiPlayer)^3, towerDist < 2200 and 1300 or nil)
 		else
 			-- if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1500, 800, string.format("%f", timeTillStartAttack), 255, 255, 0) end
 			local nearFutureHealth = Analytics_GetNearFutureHealthPercent(objective)
@@ -305,7 +314,7 @@ blueprint_farm_lane = {
 		
 	score = function(gsiPlayer, prevObjective, prevScore)
 		if t_fighting_no_farming_expiry[gsiPlayer.nOnTeam] > GameTime() then
-			return false, XETA_SCORE_DO_NOT_RUN
+			return prevObjective, XETA_SCORE_DO_NOT_RUN
 		end
 		-- Will attempt to babysit creep-wave obssessed morons that want to dive towers
 		-- -| before farm lane's lane-lock power seal is broken
@@ -325,9 +334,9 @@ blueprint_farm_lane = {
 		end
 		
 		local alliedCreepSet = Set_GetAlliedCreepSetLaneFront(thisPlayerRoleBasedLane)
-		local recentDamageTakenCare = Analytics_GetTotalDamageInTimeline(gsiPlayer)*VALUE_OF_ONE_HEALTH
+		local recentDamageTakenCare = Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit)*VALUE_OF_ONE_HEALTH
 		local playerAttackDamage = gsiPlayer.hUnit:GetAttackDamage() -- nb. this is only to avoid a non-check on creeps not being damaged but very low health
-		if recentDamageTakenCare > gsiPlayer.maxHealth*0.065 then LeechExp_UpdatePriority(gsiPlayer) end
+		--if recentDamageTakenCare > gsiPlayer.maxHealth*0.065 then LeechExp_UpdatePriority(gsiPlayer) end DEPRECIATE
 
 		local alliedCreepSetLoc = alliedCreepSet and alliedCreepSet.center
 		local danger = Analytics_GetTheoreticalDangerAmount(
@@ -343,7 +352,9 @@ blueprint_farm_lane = {
 							)
 					)
 			)
-		local dangerOfLaneScore = max(0, danger * DISCOURAGE_FACTOR)
+		local dangerOfLaneScore = max(0, danger * DISCOURAGE_FACTOR
+					* (1 + 2.5*(1 - (gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth)) )
+				)
 
 		local powerLevel = Analytics_GetPowerLevel(gsiPlayer)
 		local awayFromLaneCareFactor = powerLevel < 4.5
@@ -533,7 +544,7 @@ blueprint_farm_lane = {
 				iobj_lane_creep_sets[laneToFarm].lastSeen.location = updatedPredictedLaneFront
 			end
 			if DEBUG and DEBUG_IsBotTheIntern() then
-				print("farm_lane::score() returning 5", crashIsDeep)
+				print("farm_lane::score() returning 5", crashIsDeep, laneToFarm)
 				print(Math_ETA(gsiPlayer, iobj_lane_creep_sets[laneToFarm].lastSeen.location), 
 									iobj_lane_creep_wave_crash_time[laneToFarm] - GameTime()
 								, awayFromLaneCareFactor)
@@ -599,7 +610,7 @@ function Farm_AnyOtherCoresInLane(gsiPlayer, creepSet)
 	for i=1,#units do
 		local confirmedDenial = confirmed_last_hit_request_denials[units[i]]
 		if confirmedDenial and confirmedDenial.player ~= gsiPlayer and confirmedDenial.player.role <= 3 then
-			if DEBUG then print("I should leave lane for other cores", creepSet.lane, gsiPlayer.shortName) end
+			--if DEBUG then print("I should leave lane for other cores", creepSet.lane, gsiPlayer.shortName) end -- what? no
 			return true, confirmedDenial.player
 		end
 	end

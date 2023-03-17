@@ -2,7 +2,7 @@ local hero_data = {
 	"slark",
 	{3, 2, 1, 1, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_magic_stick","item_circlet","item_tango","item_branches","item_branches","item_faerie_fire","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_magic_wand","item_falcon_blade","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_blade_of_alacrity","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_mithril_hammer","item_black_king_bar","item_gem","item_ultimate_orb","item_ultimate_orb","item_skadi","item_ultimate_orb","item_gem","item_sphere","item_refresher","item_monkey_king_bar",
+		"item_circlet","item_quelling_blade","item_branches","item_tango","item_branches","item_slippers","item_wraith_band","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_diffusal_blade_2","item_quarterstaff","item_robe","item_echo_sabre","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_aghanims_shard","item_gem","item_mage_slayer","item_mithril_hammer","item_gem","item_ogre_axe","item_black_king_bar","item_blitz_knuckles","item_claymore","item_bloodthorn","item_gem","item_ultimate_scepter_2","item_skadi",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

@@ -1,8 +1,8 @@
 local hero_data = {
 	"magnataur",
-	{1, 3, 1, 3, 1, 4, 1, 2, 2, 3, 2, 4, 3, 2, 8, 5, 4, 10, 12},
+	{1, 3, 1, 3, 1, 4, 1, 2, 2, 3, 2, 4, 2, 5, 8, 3, 4, 10, 12},
 	{
-		"item_quelling_blade","item_branches","item_branches","item_branches","item_gauntlets","item_tango","item_magic_wand","item_ring_of_health","item_soul_ring","item_boots","item_hood_of_defiance","item_gloves","item_headdress","item_pipe","item_blink","item_ogre_axe","item_power_treads","item_belt_of_strength","item_sange","item_heavens_halberd","item_aether_lens","item_aghanims_shard","item_black_king_bar",
+		"item_quelling_blade","item_circlet","item_slippers","item_tango","item_branches","item_branches","item_wraith_band","item_ring_of_health","item_boots","item_arcane_boots","item_chainmail","item_mekansm","item_blink","item_guardian_greaves","item_aghanims_shard","item_pers","item_platemail","item_energy_booster","item_lotus_orb","item_void_stone","item_energy_booster","item_gem","item_aether_lens",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

@@ -1,10 +1,10 @@
 local hero_data = {
 	"ember_spirit",
-	{3, 2, 2, 1, 2, 4, 2, 1, 1, 1, 4, 3, 3, 3, 7, 5, 4, 10, 11},
+	{2, 3, 2, 3, 2, 4, 2, 3, 3, 1, 1, 1, 1, 6, 7, 4, 4, 10, 11},
 	{
-		"item_quelling_blade","item_branches","item_ward_observer","item_tango","item_branches","item_faerie_fire","item_branches","item_bottle","item_boots","item_blight_stone","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_javelin","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_belt_of_strength","item_sange","item_robe","item_staff_of_wizardry","item_kaya_and_sange","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_aghanims_shard","item_sphere","item_gungir",
+		"item_quelling_blade","item_tango","item_faerie_fire","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_orb_of_corrosion","item_magic_wand","item_chainmail","item_phase_boots","item_javelin","item_mithril_hammer","item_maelstrom","item_platemail","item_ogre_axe","item_mithril_hammer","item_shivas_guard","item_ogre_axe","item_black_king_bar","item_aghanims_shard","item_sange","item_robe","item_kaya_and_sange","item_ultimate_scepter","item_gungir","item_pers","item_ring_of_health","item_refresher",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{
 		"Searing Chains","Sleight of Fist","Flame Guard","Fire Remnant","+15 Damage","+200 Flame Guard Absorption","+50 Flame Guard DPS","+1.0s Searing Chains Duration","+1 Searing Chains Target","+65 Sleight of Fist Hero Damage","2 Sleight of Fist Charges","-12s Remnant Charge Restore Time",
 	}
