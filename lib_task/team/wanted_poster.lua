@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 	-- Tasks that are only worth it when allies collaborate.
 
 -- Register a task and it's Utopia Xeta
@@ -557,7 +583,7 @@ function WP_AllocateToHighestScores(wpHandle, ignorePower)
 		end
 		currHighIndex = currHighIndex+1
 		if currHighIndex > TEAM_NUMBER_OF_PLAYERS then
-			INFO_print(string.format("[wp] currHighIndex > TNOP, %.2f, %.2f, %.2f, %.2f", currObjectivePowerLevel, objectivePowerLevel, posterTotalScore, currTaskTotalScore))
+			
 			set_next_try_alloc_allowed(wpHandle)
 			break;
 		end
@@ -673,4 +699,31 @@ end
 
 function WP_GetPlayerTaskPoster(gsiPlayer, taskHandle)
 	return t_player_task_wanted_poster[gsiPlayer.nOnTeam][taskHandle]
+end
+
+if DEBUG then
+	function WP_DEBUG_Display()
+		local thisWp = wanted_poster_head
+		local n = 1
+		while (thisWp) do
+			if n > 20 then
+				WARN_print("[wanted_poster] > 20 wanted posters active")
+				return;
+			end
+			local obj = thisWp[POSTER_I__OBJECTIVE]
+			local com = thisWp[POSTER_I__COMMIT_TYPES]
+			local pre = thisWp[POSTER_I__PRE_COMMIT_TYPES]
+			DebugDrawText(80, 480+8*n,
+					string.format("%-18.18s|%d[%d]|%d[%d]|%d[%d]|%d[%d]|%d[%d]",
+						string.sub(not obj and "none"
+								or (type(obj) == "table" and obj.shortName or obj.hUnit
+									and obj.hUnit.GetUnitName and not obj.hUnit:IsNull() and obj.hUnit:GetUnitName()
+								) or tostring(obj), -18),
+					com[1] or -0,pre[1] or -0,com[2] or -0,pre[2] or -0,com[3] or -0,pre[3] or -0,
+					com[4] or -0,pre[4] or -0,com[5] or -0,pre[5] or -0
+				), 110, 190, 255)
+			thisWp = thisWp[POSTER_I__NEXT_POSTER]
+			n=n+1
+		end
+	end
 end

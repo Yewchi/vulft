@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- The cause of verbosity is due to an "AVAILABLE" rune being an unreliable status
 -- - for full-takeover bots (we cannot pickup an old rune, if the minute 0:00 river
 -- - bounties are not picked up before bot_generic handover, they can never be picked
@@ -488,10 +514,10 @@ end
 				-- Nipple / small hill in a field shape, 3 meaning 1/3 odds available if perfect fit to rune movement
 				-- -| 1/6 odds for two , etc.
 				addedDivisor = addedDivisor + 3 / (runeIncludedInTravelFit^2 - 2*runeIncludedInTravelFit + 2)
-				if VERBOSE then print("/VUL-FT/", thisEnemy.shortName, "added total:", addedDivisor) end
+				if VERBOSE then VEBUG_print(string.format("[rune] update_rune_odds_avail %s added total %.4f", thisEnemy.shortName, addedDivisor)) end
 			elseif DEBUG then
 				DebugDrawText(1000+thisEnemy.nOnTeam, 500, "Y", 255, 0, 0)
-				if VERBOSE then print("/VUL-FT/ [rune]", thisEnemy.shortName, "ignoring approx distance as low", runeIncludedInTravelFit, approxTravelDistance) end
+				if VERBOSE then VEBUG_print(string.format("[rune] update_rune_odds_avail %s ignoring approx distance as low %.3f %.3f", thisEnemy.shortName, runeIncludedInTravelFit, approxTravelDistance)) end
 			end
 		end
 	end
@@ -604,6 +630,7 @@ end
 
 -- // Init //
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "rune")
 	if VERBOSE then VEBUG_print(string.format("rune: Initialized with handle #%d.", task_handle)) end
 
 	t_team_members = GSI_GetTeamPlayers(TEAM)
@@ -650,14 +677,14 @@ local function task_init_func(taskJobDomain)
 	taskJobDomain:RegisterJob(
 			function(workingSet)
 				if DEBUG then
-					DebugDrawText(380, 400, string.format("BconsidT:%.2f", next_bounty_rune_posters-GameTime()), 255, 255, 255)
-					DebugDrawText(380, 408, string.format("PconsidT:%.2f", next_power_rune_posters-GameTime()), 255, 255, 255)
+					DebugDrawText(270, 400, string.format("BconsidT:%.2f", next_bounty_rune_posters-GameTime()), 255, 255, 255)
+					DebugDrawText(270, 408, string.format("PconsidT:%.2f", next_power_rune_posters-GameTime()), 255, 255, 255)
 					--DebugDrawText(500, 400, "|x,y |status |dotaStatus |wpActive", 255, 255, 255)
 					for i=1,4 do
 						local thisRuneLoc = RUNE_LOCATIONS[i]
 						local thisWp = thisRuneLoc[RUNE_I__WANTED_POSTER]
 						local thisLoc = thisRuneLoc[RUNE_I__LOC]
-						DebugDrawText(486 + (TEAM_IS_RADIANT and 0 or 216), 391 + i*9,
+						DebugDrawText(386 + (TEAM_IS_RADIANT and 0 or 300), 391 + i*9,
 								string.format("|%5d,%5d |%d |%d |%.1s |%.1s |oddsAvail:%.2f", thisLoc.x, thisLoc.y,
 										thisRuneLoc[RUNE_I__STATUS],
 										GetRuneStatus(thisRuneLoc[RUNE_I__HANDLE]),
@@ -879,10 +906,19 @@ end
 			if GetGameState() > GAME_STATE_PRE_GAME and abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpForBotTask) then
 				return false, XETA_SCORE_DO_NOT_RUN
 			end
+			local distToRune = Vector_PointDistance2D(wpForBotTask[POSTER_I.OBJECTIVE].lastSeen.location, gsiPlayer.lastSeen.location)
+			local defOn, defWp = ZoneDefend_AnyBuildingDefence()
+			local defObj = defWp and defWp[POSTER_I.OBJECTIVE] 
+			local runeObjective
+			local defImportance = 0
+			if defObj then
+				defImportance = max(0, min(200, -150 +
+						150 * Vector_PointDistance2D(gsiPlayer.lastSeen.location, defWp[POSTER_I.LOCATION])
+							/ Vector_PointDistance2D(gsiPlayer.lastSeen.location, defObj.lastSeen.location)))
+			end
 			local allies = t_team_members
 			local playerLoc = gsiPlayer.lastSeen.location
 			local fightingCare = 0
-			local distToRune = Vector_PointDistance2D(wpForBotTask[POSTER_I.OBJECTIVE].lastSeen.location, playerLoc)
 			if distToRune > 1600 then
 				for i=1,#t_team_members do
 					local thisAllied = t_team_members[i]
@@ -891,17 +927,20 @@ end
 							or Blueprint_TaskHandleIsFighting(Task_GetCurrentTaskHandle(thisAllied))) then
 						local distToAllied = Vector_PointDistance2D(t_team_members[i].lastSeen.location, playerLoc)
 						if distToAllied < 3600 then
-							fightingCare = fightingCare + 200 * (2 - abs(Analytics_GetTheoreticalDangerAmount(thisAllied)))*max(0, 2300 - min(0, distToAllied-900))/2300
+							fightingCare = fightingCare + 200 * (2 - min(1.875, abs(Analytics_GetTheoreticalDangerAmount(thisAllied))))*max(0, 2300 - max(0, distToAllied-900))/2300
 						end
 					end
 				end
+				
+				fightingCare = max(0, fightingCare)
 				fightingCare = fightingCare * min(1, max(0, distToRune/800 - 2)) -- dist 1600 -> 2400 = 0 -> 1
+				
 			end
 			return wpForBotTask[POSTER_I.OBJECTIVE],
 					THROTTLED_BOUNDED(
 							WP_ScorePoster(gsiPlayer, wpForBotTask, true),
 							80, 180, 700
-						) - fightingCare
+						) - fightingCare - defImportance
 
 		end
 		return false, XETA_SCORE_DO_NOT_RUN

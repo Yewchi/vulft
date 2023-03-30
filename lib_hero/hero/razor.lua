@@ -1,12 +1,12 @@
 local hero_data = {
 	"razor",
-	{2, 1, 2, 1, 1, 4, 1, 3, 3, 5, 3, 4, 3, 2, 8, 2, 4, 9, 11},
+	{1, 2, 1, 2, 1, 4, 1, 3, 3, 5, 3, 4, 3, 2, 8, 2, 4, 10, 11},
 	{
-		"item_tango","item_circlet","item_circlet","item_slippers","item_branches","item_wraith_band","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_falcon_blade","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_sange_and_yasha","item_reaver","item_lifesteal","item_satanic","item_ultimate_orb","item_ultimate_orb","item_skadi","item_lesser_crit","item_greater_crit",
+		"item_tango","item_branches","item_branches","item_branches","item_circlet","item_slippers","item_wraith_band","item_boots","item_boots_of_elves","item_gloves","item_power_treads","item_falcon_blade","item_ogre_axe","item_mithril_hammer","item_magic_wand","item_black_king_bar","item_blade_of_alacrity","item_ogre_axe","item_yasha","item_sange_and_yasha","item_ultimate_orb","item_sphere","item_pers","item_refresher","item_lifesteal","item_claymore",
 	},
 	{ {1,1,1,3,3,}, {1,1,1,3,3,}, 0.1 },
 	{
-		"Plasma Field","Static Link","Storm Surge","Eye of the Storm","+30 Plasma Field Damage","+12 Agility","+5 Static Link Damage Steal","+14 Strength","+21% Storm Surge Move Speed","0.1s Eye of the Storm Strike Interval","Creates A Second Plasma Field Delayed By +0.8s","Static Link Steals Attack Speed",
+		"Plasma Field","Static Link","Storm Surge","Eye of the Storm","+30 Plasma Field Damage","+12 Agility","+5 Static Link Damage Steal","+14 Strength","+21% Storm Surge Move Speed","-0.1s Eye of the Storm Strike Interval","Creates A Second Plasma Field Delayed By +0.8s","Static Link Steals Attack Speed",
 	}
 }
 --@EndAutomatedHeroData
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -56,7 +58,7 @@ local d = {
 local hero_access = function(key) return d[key] end
 
 do
-	HeroData_SetHeroData(hero_data, abilities, hero_access)
+	HeroData_SetHeroData(hero_data, abilities, hero_access, true)
 end
 
 

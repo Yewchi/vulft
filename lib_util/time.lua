@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 ---- time constants --
 TIMED_AVOID_RECALCULATE_THROTTLE = 0.173
 --
@@ -97,17 +123,6 @@ end
 -- Frame Throttle: 
 -- These do not use a standard parent bot, they simply take the most recent bot that hit the throttle allowed() (usually the captain) and add the previous frame-to-frame time for the bot that triggers.
 -- Not to be confused with a guarenteed and reliable run-once flag.
-function Time_CreateOneFrameGoThrottle(delta)
-	local new = {}
-	new.allowed = Time_OneFrameGoThrottle
-	new.delete = Time_DeleteThrottle
-	new.next = GameTime() + delta + (TEAM_DIRE and delta/2 or 0.0)
-	new.allowedUntil = 0.0
-	new.c = delta
-	
-	return new
-end
-
 function Time_OneFrameGoThrottle(this)
 	local currTime = GameTime()
 	if currTime < this.allowedUntil then
@@ -118,6 +133,18 @@ function Time_OneFrameGoThrottle(this)
 		this.allowedUntil = currTime + thisBot.time.frameElapsed
 		return true
 	end
+end
+local Time_OneFrameGoThrottle = Time_OneFrameGoThrottle
+
+function Time_CreateOneFrameGoThrottle(delta)
+	local new = {}
+	new.allowed = Time_OneFrameGoThrottle
+	new.delete = Time_DeleteThrottle
+	new.next = GameTime() + delta + (TEAM_DIRE and delta/2 or 0.0)
+	new.allowedUntil = 0.0
+	new.c = delta
+	
+	return new
 end
 
 function Time_DeleteThrottle(this)

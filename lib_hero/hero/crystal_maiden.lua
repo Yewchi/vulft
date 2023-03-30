@@ -1,10 +1,10 @@
 local hero_data = {
 	"crystal_maiden",
-	{1, 2, 3, 2, 2, 4, 2, 1, 3, 5, 1, 4, 1, 3, 7, 3, 4, 10, 11},
+	{1, 2, 3, 2, 2, 4, 2, 1, 3, 5, 1, 4, 3, 3, 7, 1, 4, 10, 11},
 	{
-		"item_ward_sentry","item_enchanted_mango","item_enchanted_mango","item_tango","item_faerie_fire","item_wind_lace","item_boots","item_tranquil_boots","item_energy_booster","item_void_stone","item_fluffy_hat","item_aether_lens","item_staff_of_wizardry","item_force_staff","item_gem","item_gem","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_gem","item_ultimate_scepter",
+		"item_ward_sentry","item_faerie_fire","item_tango","item_branches","item_clarity","item_enchanted_mango","item_boots","item_tranquil_boots","item_blink","item_magic_wand","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_point_booster","item_ultimate_scepter","item_staff_of_wizardry","item_robe","item_kaya",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Crystal Nova","Frostbite","Arcane Aura","Freezing Field","+250 Health","+125 Crystal Nova AoE","+125 Frostbite Cast Range","-3s Crystal Nova Cooldown","+200 Attack Speed","+50 Freezing Field Damage","+1.25s Frostbite Duration","+240 Crystal Nova Damage",
 	}
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

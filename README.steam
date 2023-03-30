@@ -1,4 +1,4 @@
-VUL - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 11/03/23. Requires manual install into vscripts/bots folder (same as Phalanx Bot, and other recent bots, due to a Dota workshop bug). VUL-FT has no affiliation with DotaBuff.
+VUL - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 19/03/23. Requires manual install into vscripts/bots folder (same as Phalanx Bot, and other recent bots, due to a Dota workshop bug). VUL-FT has no affiliation with DotaBuff.
 
 == Manually installing ==
 VUL-FT currently will not work via subscription. It will revert to the default bots, it seems other recent bots have the same issue. I'm still investigating what is going wrong there. For now, it's necessary to manually install the bots.
@@ -17,7 +17,7 @@ and copy the contents of that folder to the bots folder at
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
 -- Via Github: (updated by the creator)
-If you know how to use github you can manually download the bots from the [url=https://github.com/Yewchi/vulft]official VUL-FT Github[/url] and put them in
+If you know how to use git you can manually download the bots from the [url=https://github.com/Yewchi/vulft]official VUL-FT Github[/url] and put them in
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
 -- Running:
@@ -55,8 +55,8 @@ In addition. I promise this project's code is 100% functional offline and will s
 [url=https://github.com/Yewchi/vulft]VUL-FT source code[/url] -- Public github
 
 ==Not yet implemented==
-Player lane choices. The bots will currently calculate where they think you should go.
-Macro fight behaviour, initiator choice, grander strats like cutting losses, trading towers. They will assess the current aggressive plays being made and see if they think it's worth it for themselves.
+The player can only choose their lane and role in the first 30 seconds of a match.
+Macro fight behaviour, initiator choice, grander strats like cutting losses, trading towers. They will assess the current aggressive plays being made and see if they think it's worth it for themselves, if an enemy is occupied attacking someone else. Enemy fight intent is tracked and loses magnitude based on facing direction, this allows allies to recognize trading without being attacked.
 Player-to-bot ping communication.
 Enemy vision assessments.
 Dewarding.
@@ -72,8 +72,8 @@ Roshan.
 Denying towers.
 
 ==Known issues==
-There may be a game crash while bots are engaged in combat, under investigation.
-Bots may teleport back to the wrong lane in the early game.
+Picking may over-select for core roles.
+Middle lane may have a difficult time outplaying the opposing mid -- much better in safe or offlane where they can trade.
 Some tasks are not well informed by threat analytics code, not all tasks use intelligent movement functions to adjust vectors around dangerous areas.
 Junk is not correctly sold (DotaBuff meta parser is not complete, and there may be additional junk buys incorrectly parsed into the build, item builds are calculated for their combines, however, the junk is incorrectly evaluated and the wrong item may be sold when 9-slotted).
 
@@ -87,8 +87,8 @@ These three rune issues are all technically true, but there is a workaround in p
 
 ==Project State==
 Alpha version. Please give feedback.
-Is the project currently stable: Unstable. 1/4 games resulting in a crash for me (needs confirmation from others). 17/03/23 (March 17)
-Last DotaBuff meta update: 11/03/23
+Is the project currently stable: Stable, no game crashes or script breaking over 10 matches 30/03/23 (March 30)
+Last DotaBuff meta update: 19/03/23
 
 ==Dev contact==
 zyewchi@gmail.com

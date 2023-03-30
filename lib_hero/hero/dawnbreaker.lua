@@ -1,12 +1,12 @@
 local hero_data = {
 	"dawnbreaker",
-	{1, 2, 2, 3, 2, 4, 2, 1, 3, 1, 1, 4, 3, 3, 7, 5, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 3, 1, 3, 1, 4, 5, 1, 7, 3, 4, 10, 11},
 	{
-		"item_gauntlets","item_quelling_blade","item_circlet","item_tango","item_branches","item_bracer","item_soul_ring","item_boots","item_chainmail","item_phase_boots","item_magic_wand","item_blight_stone","item_mithril_hammer","item_mithril_hammer","item_desolator","item_aghanims_shard","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blink","item_platemail","item_buckler","item_assault","item_basher","item_reaver","item_overwhelming_blink",
+		"item_tango","item_branches","item_faerie_fire","item_branches","item_quelling_blade","item_gauntlets","item_magic_wand","item_soul_ring","item_boots","item_chainmail","item_phase_boots","item_quarterstaff","item_oblivion_staff","item_echo_sabre","item_blight_stone","item_mithril_hammer","item_mithril_hammer","item_desolator","item_aghanims_shard","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_belt_of_strength","item_basher","item_abyssal_blade",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,3,1,}, 0.1 },
 	{
-		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+12% Celestial Hammer Slow","+50% Luminosity Crit","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","2 Starbreaker Charges","+1100 Celestial Hammer Cast Range",
+		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+12% Celestial Hammer Slow","+50% Luminosity Critical Strike Damage","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","2 Starbreaker Charges","+1100 Celestial Hammer Cast Range",
 	}
 }
 --@EndAutomatedHeroData
@@ -66,7 +66,8 @@ local function catch_hammer_cast(gsiPlayer, ability, cast_info)
 				/ CELESTIAL_HAMMER_THROW_SPEED
 end
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
@@ -74,6 +75,7 @@ local d = {
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
 		UseAbility_RegisterCallbackFunc(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam][2], catch_hammer_cast)
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -205,8 +207,8 @@ end
 			end
 		end
 		if currTask == push_handle and AbilityLogic_AbilityCanBeCast(gsiPlayer, fireWreath)
-				and HIGH_USE(gsiPlayer, fireWreath, (highUse - fireWreath:GetManaCost())*3, 1-playerHealthPercent)
-				and (not gsiPlayer.theoreticalDanger or gsiPlayer.theoreticalDanger < 0) then
+				and HIGH_USE(gsiPlayer, fireWreath, (highUse - fireWreath:GetManaCost())*3, 1.67 - playerHealthPercent)
+				and (gsiPlayer.time.data.theoreticalDanger and gsiPlayer.time.data.theoreticalDanger < 0) then
 			local nearbyCreeps = Set_GetNearestEnemyCreepSetAtLaneLoc(
 					gsiPlayer.lastSeen.location, Map_GetBaseOrLaneLocation(gsiPlayer.lastSeen.location)
 				)

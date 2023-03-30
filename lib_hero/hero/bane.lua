@@ -1,10 +1,10 @@
 local hero_data = {
 	"bane",
-	{3, 2, 2, 3, 2, 4, 2, 3, 3, 1, 1, 4, 1, 1, 7, 6, 4, 9},
+	{2, 3, 2, 3, 2, 4, 3, 2, 3, 1, 1, 4, 1, 1, 7, 6, 4, 9},
 	{
-		"item_branches","item_tango","item_branches","item_faerie_fire","item_enchanted_mango","item_ward_sentry","item_magic_wand","item_boots","item_tranquil_boots","item_aghanims_shard","item_fluffy_hat","item_force_staff","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_aether_lens","item_blink",
+		"item_tango","item_tango","item_enchanted_mango","item_enchanted_mango","item_ward_sentry","item_ward_sentry","item_branches","item_branches","item_faerie_fire","item_boots","item_void_stone","item_aether_lens","item_wind_lace","item_tranquil_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_glimmer_cape","item_blink",
 	},
-	{ {3,3,3,1,1,}, {4,4,4,5,5,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Enfeeble","Brain Sap","Nightmare","Fiend's Grip","Nightmare Damage Heals Bane","+20% Enfeeble Cast Range Reduction","-3s Brain Sap Cooldown","+5% Fiend's Grip Max Mana Drain","-3s Nightmare Cooldown","+30 Movement Speed","+200 Brain Sap Damage/Heal","+5s Fiend's Grip Duration",
 	}
@@ -66,6 +66,7 @@ d = {
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
 		team_players = GSI_GetTeamPlayers(TEAM)
 		gsiPlayer.imBane = true
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

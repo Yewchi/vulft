@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- EPILEPSY AND SEIZURE WARNING when DEBUG == true -- 
 
 if DEBUG
@@ -12,13 +38,13 @@ if DEBUG
 				{20, 20, 220}, {20,220,200}, {145, 60, 150}, {200, 210, 30}, {230, 130, 20}
 			},
 			[TEAM_DIRE] = {
-				{250, 110, 230}, {140, 235, 75}, {30, 175, 230}, {75, 160, 70}, {170, 100, 50}
+				{250, 120, 240}, {140, 235, 75}, {30, 175, 230}, {75, 160, 70}, {170, 100, 50}
 			}
 		}
 
 	ARC_DISABLE_FRAMES = 0
 
-	DEBUG_SHORTNAME = "doom_bringer"
+	DEBUG_SHORTNAME = "windrunner"
 	
 	MAP_COORDS_TO_SCREEN_SCALE = 0.08
 	MAP_COORDS_TO_MINIMAP_SCALE = 0.015
@@ -49,7 +75,8 @@ if DEBUG
 	end
 	
 	function DEBUG_IsBotTheIntern()
-		return GSI_GetBot().shortName == DEBUG_SHORTNAME
+		return true
+		--return GSI_GetBot().shortName == DEBUG_SHORTNAME
 	end
 	
 	function DEBUG_PrintUntilErroredNone(gsiUnit)
@@ -137,13 +164,13 @@ if DEBUG
 						local thisLocation = humanPlayer.hUnit:GetMostRecentPing().location
 						if thisLocation.x ~= PASSABLE_most_recent_player_ping.x
 								or thisLocation.y ~= PASSABLE_most_recent_player_ping.y then
-							ARC_DISABLE_FRAMES = 100
-							TEAM_CAPTAIN_UNIT.Chat(string.format("%s: v(%.2f, %.2f, %.2f), ht-%d",
+							TEAM_CAPTAIN_UNIT.Chat(string.format("%s: v(%.2f, %.2f, %.2f), ht-%d, lane-%d",
 										(IsLocationPassable(thisLocation) and "Passable" or "Impassable"), 
 										thisLocation.x,
 										thisLocation.y,
 										thisLocation.z,
-										GetHeightLevel(thisLocation)
+										GetHeightLevel(thisLocation),
+										Map_GetLaneValueOfMapPoint(thisLocation)
 									),
 									false
 								)
@@ -181,7 +208,7 @@ if DEBUG
 				function(event)
 					if event.player_id == humanPlayer.playerID then
 						humanPlayer.comms.intern = event.string
-						humanPlayer.comms.mostRecentChat = event
+						humanPlayer.comms.mostRecentChatText = event
 					end
 				end
 			)
@@ -215,7 +242,7 @@ if DEBUG
 		InstallChatCallback(
 				function(event)
 					if event.player_id == humanPlayer.playerID then
-						humanPlayer.comms.mostRecentChat = event
+						humanPlayer.comms.mostRecentChatText = event
 						if type(event.string) == "string"
 								and string.find(string.lower(event.string), "debug") then
 							humanPlayer.comms.debugMsg = event.string

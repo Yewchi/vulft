@@ -1,16 +1,43 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 require(GetScriptDirectory().."/lib_util/string")
 
 CPP_TO_LUA_ARRAY_OFFSET = 1
 HIGH_32_BIT = 0x80000000
 LOW_32_BIT = -0x80000000
-EMPTY_TABLE = {}
+_G.EMPTY_TABLE = {}
 
 DEBUG = false
 VERBOSE = true and DEBUG
 TEST = true and DEBUG
 
 RELEASE_STAGE = "Alpha"
-VERSION = "v0.5-230317"
+VERSION = "v0.6-230330"
+META_DATE = "19 March 2023"
 
 VULFT_VERSION = RELEASE_STAGE
 		
@@ -60,6 +87,38 @@ function DOMINATE_print(gsiPlayer, str)
 	ALERT_print(string.format("%s(%s) \"%s\"", gsiPlayer.disabledAndDominatedFuncName, gsiPlayer.shortName, str))
 end
 
+function Util_TableAlphabeticalSortValue(tbl)
+	Util_TablePrint({"shorted", tbl})
+	for i=1,#tbl-1 do
+		local lowestIndex = i
+		local thisLowest = tbl[i]
+		local thisCompare
+		local thisCompareLen
+		for k=i+1,#tbl do
+			thisCompare = tbl[k]
+			thisCompareLen = string.len(thisCompare)
+			for cN=1,string.len(thisLowest) do
+				local diff = string.byte(thisCompare, cN) - string.byte(thisLowest, cN)
+				local shortCompare = cN == thisCompareLen
+				if diff < 0 or shortCompare then
+					thisLowest = thisCompare
+					lowestIndex = k
+					if shortCompare then
+						goto UTASV_NEXT_COMPARE;
+					end
+				elseif diff > 0 then
+					goto UTASV_NEXT_COMPARE;
+				end
+			end
+			::UTASV_NEXT_COMPARE::
+		end
+		local switch = thisLowest
+		tbl[lowestIndex] = tbl[i]
+		tbl[i] = thisLowest
+	end
+	Util_TablePrint({"sorted", tbl})
+end
+
 function Util_TableRemoveUnordered(tbl, i)
 	tbl[i] = tbl[#tbl]
 	tbl[#tbl] = nil
@@ -81,7 +140,7 @@ end
 function Util_ShiftElementsToLowerTblsOfTbl(tbl, startIndex, endIndex)
 	startIndex = startIndex or 1
 	endIndex = endIndex or #tbl
-	if TEST then print("shift elements", startIndex, endIndex) end
+	--if TEST then print("shift elements", startIndex, endIndex) end
 	if endIndex - startIndex < 2 then return false end
 	draw_from_table(tbl[startIndex+1], tbl[startIndex]) -- (t1[] -->> t2[])
 	for i=startIndex+1,endIndex-1 do
@@ -91,20 +150,27 @@ function Util_ShiftElementsToLowerTblsOfTbl(tbl, startIndex, endIndex)
 end
 
 function Util_Printable(val)
+	
 	local t = type(val)
 	if val == nil then return "nil"
 	elseif t == "number" then return val
 	elseif t == "string" then return string.format('"%s"', val)
 	elseif t == "boolean" then return (val and "true" or "false")
 	elseif t == "table" then
-		return tostring(val)..(type(val.shortName) == "string"
-				and ": '"..val.shortName.."'" or ""
-			)
+		return tostring(val)..": '"..((type(val.shortName) == "string"
+				and val.shortName)
+				or (type(val.name) == "string" and val.name)
+				or (type(val.x) == "number" and string.format("(%d,%d,%d)", val.x or -0, val.y or -0, val.z or -0))
+				or "?").."'"
 	elseif t == "function" then return "[func]"
 	elseif t == "userdata" then return "[ud]"
 	elseif t == "thread" then return "[thread]"
 	end
 	return "[WHAT THE F***]"
+end
+
+function roon(gsiPlayer, rune)
+	gsiPlayer.hUnit:Action_PickUpRune(rune)
 end
 
 local table_print_time_limit = 0

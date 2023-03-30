@@ -1,12 +1,12 @@
 local hero_data = {
 	"oracle",
-	{1, 3, 3, 2, 3, 5, 3, 2, 2, 2, 7, 5, 1, 1, 9, 1, 5, 12},
+	{1, 3, 3, 2, 3, 4, 3, 1, 2, 1, 1, 4, 2, 2, 8, 5, 4, 9, 11},
 	{
-		"item_sobi_mask","item_branches","item_branches","item_tango","item_ward_sentry","item_ring_of_basilius","item_boots","item_energy_booster","item_arcane_boots","item_aether_lens","item_tranquil_boots","item_gem","item_gem","item_blink","item_aghanims_shard","item_gem","item_aeon_disk","item_force_staff","item_gem","item_gem","item_octarine_core","item_gem","item_gem","item_ancient_janggo","item_boots_of_bearing",
+		"item_tango","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_branches","item_bottle","item_boots","item_arcane_boots","item_void_stone","item_aether_lens","item_point_booster","item_vitality_booster","item_octarine_core","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_blink","item_reaver",
 	},
-	{ {1,1,1,3,4,}, {5,5,5,5,3,}, 0.1 },
+	{ {1,1,1,1,2,}, {5,5,5,5,2,}, 0.1 },
 	{
-		"Fortune's End","Fate's Edict","Purifying Flames","Rain of Destiny","False Promise","+0.5s Fortune's End Duration","+10 Armor False Promise","+80 Fortune's End Damage","-1.25s Purifying Flames Cooldown","-20s False Promise Cooldown","+30% Purifying Flames Enemy Damage","Instant Fortune's End","+1.5s False Promise Duration",
+		"Fortune's End","Fate's Edict","Purifying Flames","False Promise","+0.5s Fortune's End Duration","+10 Armor False Promise","+80 Fortune's End Damage","-1.25s Purifying Flames Cooldown","-20s False Promise Cooldown","+30% Purifying Flames Enemy Damage","Instant Fortune's End","+1.5s False Promise Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

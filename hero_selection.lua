@@ -1,5 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
 
-require(GetScriptDirectory().."/personality")
 
 local APIGameTime = GameTime
 local GameTime = GameTime
@@ -25,7 +49,7 @@ local t_heroes_implemented = {
 		"npc_dota_hero_bristleback",
 		--"npc_dota_hero_centaur",
 		"npc_dota_hero_chaos_knight",
-		--"npc_dota_hero_crystal_maiden",
+		"npc_dota_hero_crystal_maiden",
 		"npc_dota_hero_dawnbreaker",
 		"npc_dota_hero_death_prophet",
 		"npc_dota_hero_doom_bringer",
@@ -60,7 +84,7 @@ local t_heroes_implemented = {
 		"npc_dota_hero_viper",
 		"npc_dota_hero_warlock",
 		"npc_dota_hero_weaver",
-		--"npc_dota_hero_windrunner",
+		"npc_dota_hero_windrunner",
 		"npc_dota_hero_zuus",
 		--"npc_dota_hero_clinkz",
 		--"npc_dota_hero_dark_seer",
@@ -80,6 +104,7 @@ local pick_pool = {} -- heroes will be randomly loaded and considered for pickin
 -- TODO Include a synergy_and_counters.lua to inform picking, automating data. Increasingly random for bot difficulty levels dropped.
 
 function GetBotNames()
+	require(GetScriptDirectory().."/personality")
 	local playerNameOfBots = {}
 	for i=0,MAX_PLAYERS-1,1 do
 		local randomBotPersonalityN = RandomInt(1, #BOT_PERSONALITIES)
@@ -438,12 +463,36 @@ end
 function Think()
 	-- Check TeamPlayers data ready and init
 	if not next_turn_to_pick_time then
+		team_members = GetTeamPlayers(GetTeam())
+		enemy_members = GetTeamPlayers(GetOpposingTeam())
+		if not team_members or not enemy_members then return end
+		for i=1,#team_members do
+			print("/VUL-FT/ [hero_selection] Found team member", team_members[i])
+			if not IsPlayerBot(team_members[i]) then
+				table.insert(players_to_watch, team_members[i])
+			end
+		end
+		if #team_members < 5 then
+			print("/VUL-FT/ [!] WARNING - Unexpected number of team players, picking will probably fail. Suggest all players pick to trigger a forced load of bot players.")
+			print("/VUL-FT/ [!] Ensure script is ran from local server host \"CREATE LOBBY\" button from the main menu of dota. Set the server as the local host (your computer).")
+			print("/VUL-FT/ [!] Select the LOCAL DEV SCRIPT as the bot to play with, with the vulft files placed in %Steam Directory%/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/")
+		end
+		next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0, 6)
+		next_pick_pool_addition = GameTime() + NEXT_PICK_POOL_ADDITION_WAIT
+		turn_to_pick = 1
+
+
+
+
+
+
+
 		InstallChatCallback(
 			function(event)
 				if not FAST_PICK_ON then 
 					FAST_PICK_ON = true
 					print(event.string)
-					if event.string == "!fastpick" or event.string == "!goo" or event.string == "!..bruh" or event.string == "!skettit" or event.string == "!fast" or event.string == "!pickfast" then
+					if event.string == "!fastpick" or event.string == "!goo" or event.string == "!bruh" or event.string == "!skettit" or event.string == "!fast" or event.string == "!pickfast" then
 						print("Picking speed increased...")
 						if not event.team_only then
 							print("-- Make sure to type the command like '/all !fast' to have both teams increase speed")
@@ -457,25 +506,6 @@ function Think()
 				end
 			end
 		)
-
-		team_members = GetTeamPlayers(GetTeam())
-		enemy_members = GetTeamPlayers(GetOpposingTeam())
-		print(#team_members, #enemy_members, team_members[1], team_members[4], enemy_members[1], enemy_members[4], "members")
-		if not team_members or not enemy_members then return end
-		for i=1,#team_members do
-			print("/VUL-FT/ [hero_selection] Found team member", team_members[i])
-			if not IsPlayerBot(team_members[i]) then
-				table.insert(players_to_watch, team_members[i])
-			end
-		end
-		next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0, 6)
-		next_pick_pool_addition = GameTime() + NEXT_PICK_POOL_ADDITION_WAIT
-		turn_to_pick = 1
-
-
-
-
-
 		return
 	end
 	-- Speed up the picks if the enemy finished picking

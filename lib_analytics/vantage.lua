@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 
 --- Ideas (probably not implmented because I can half-arse it and move onto something else):
 -- - Iterate over the map in distance steps, determine edges of the height differnces in the
@@ -431,6 +457,7 @@ local t_player_check_index = {}
 local t_player_check_limit = {}
 local MINIMUM_ASSUME_ACTION_TYPE_CORRECTED = 0.1
 local MIN_SUCCESS_WARD = 5
+-------- VAN_GuideWardAtIndex()
 function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 	local correctedVec = t_ward_correction[wardIndex]
 	local isCorrected = t_ward_is_corrected[wardIndex]
@@ -439,7 +466,6 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 				string.format(
 					"%s wardIndex is out-of-range. Was previously in range: %s",
 					Util_ParamString("VAN_GuideWardAtIndex", gsiPlayer, wardIndex, hItem),
-					wardIndex,
 					Util_Printable(isCorrected ~= nil)
 				)
 			)
@@ -455,7 +481,11 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 				)
 		end
 		DebugDrawLine(t_ward_loc[wardIndex], correctedVec, 0, 255, 255)
-		gsiPlayer.hUnit:Action_UseAbilityOnLocation(hItem, correctedVec)
+		if Vector_PointDistance2D(gsiPlayer.lastSeen.location, correctedVec) > 1600 then
+			Positioning_ZSMoveCasual(gsiPlayer, correctedVec, 150, 900, false, false)
+		else
+			gsiPlayer.hUnit:Action_UseAbilityOnLocation(hItem, correctedVec)
+		end
 		
 
 		return true;

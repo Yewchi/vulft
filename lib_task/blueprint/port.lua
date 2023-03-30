@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Used to raise teleport abilities if possible
 MINIMUM_ALLOWED_USE_TP_INSTEAD = 5500
 local MINIMUM_ALLOWED_USE_TP_INSTEAD = MINIMUM_ALLOWED_USE_TP_INSTEAD
@@ -20,8 +46,9 @@ local port_state = {}
 
 function Port_BuyPortScrollsIfNeeded(gsiPlayer)
 	-- 12/10/22 buying behaviour should mostly trigger from port.score()
+	
 	if Item_TownPortalScrollsOwned(gsiPlayer) < 2 and gsiPlayer.hUnit:GetGold() > GetItemCost("item_tpscroll") then
-		--print("purchasing tp", gsiPlayer.shortname)
+		
 		gsiPlayer.hUnit:ActionImmediate_PurchaseItem("item_tpscroll")
 		return true
 	else
@@ -31,7 +58,9 @@ end
 
 function Port_CheckPortNeeded(gsiPlayer, location) -- Checks for good ports are above
 	local tpScroll = gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT)
-	if not tpScroll or tpScroll:GetCooldownTimeRemaining() > 0 then 
+	local taskStartTime = Task_GetCurrentTaskStartTime(gsiPlayer)
+	if not tpScroll or tpScroll:GetCooldownTimeRemaining() > 0 
+			or taskStartTime == 0 or GameTime() - taskStartTime < 0.15 then 
 		return
 	end
 	local nearbyEnemyTower, nearbyTowerDist = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
@@ -48,7 +77,7 @@ function Port_CheckPortNeeded(gsiPlayer, location) -- Checks for good ports are 
 	if Analytics_GetTheoreticalDangerAmount(gsiPlayer, nil, location) < SAFE_TO_TP_DANGER then
 		location = Map_AdjustLocationForSaferPort(location)
 	end
-	if Vector_WithinWorldBounds(location, 500)
+	if Vector_WithinWorldBounds(location, 900)
 			and port_state[nOnTeam] == NO_CHECK_PORT_NEEDED
 			and distancePlayerToDestination-distancePortToDestination
 				> MINIMUM_ALLOWED_USE_TP_INSTEAD then -- Can we just walk there; Is the port a shortcut?
@@ -63,6 +92,7 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 	return 2 -- don't care
 end
 local function task_init_func()
+	Blueprint_RegisterTaskName(task_handle, "port")
 	if VERBOSE then VEBUG_print(string.format("port: Initialized with handle #%d.", task_handle)) end
 
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
@@ -132,6 +162,7 @@ end
 		if not desired_locations[gsiPlayer.nOnTeam] then
 			return false
 		end
+		Task_IndicateSuccessfulInitShortTask(gsiPlayer, task_handle)
 		return extrapolatedXeta
 	end
 }

@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 local TEST = TEST
 
 local task_handle = Task_CreateNewTask()
@@ -14,6 +40,7 @@ local CHECK_FOR_BASE_CONNECTIONS_RANGE = 5000
 local SET_BUILDING_ENEMY = SET_BUILDING_ENEMY
 local max = math.max
 local min = math.min
+local sqrt = math.sqrt
 local DEBUG = DEBUG
 local VERBOSE = VERBOSE
 local TEST = TEST
@@ -21,6 +48,8 @@ local TEST = TEST
 local ENEMY_FOUNTAIN_UNIT
 
 local t_tower_wont_agro = {}
+
+local farm_lane_handle
 
 local blueprint
 function PushLane_InformUnagroablePush(hUnit)
@@ -31,8 +60,8 @@ function PushLane_InformUnagroablePush(hUnit)
 	end
 end
 
-function PushLane_NextTowerAgroIsCreep(hUnit)
-	return t_tower_wont_ago[hUnit] and true or false
+function PushLane_IsTowerFightingCreeps(gsiUnit)
+	return t_tower_wont_agro[gsiUnit] and true or false, t_tower_wont_agro[gsiUnit]
 end
 
 function PushLane_RegisterHighPressureOption(building, pressure)
@@ -44,12 +73,15 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 	return 3 -- don't care
 end
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "push")
 	if VERBOSE then VEBUG_print(string.format("push: Initialized with handle #%d.", task_handle)) end
+
+	farm_lane_handle = FarmLane_GetTaskHandle()
 
 	ENEMY_FOUNTAIN_UNIT = GSI_GetTeamFountainUnit(ENEMY_TEAM)
 	
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
-	
+
 	taskJobDomain:RegisterJob(
 			function(workingSet)
 				if workingSet.throttle:allowed() then
@@ -129,9 +161,9 @@ blueprint = {
 						if building.isTower then
 							local towerCageFightBot = Lhp_CageFightKillTime(building, gsiPlayer) 
 							local dangerCoefficientOfCageFight = 4/(1+2^(theoreticalDanger))
-							increasingDanger = (100 - 4*towerCageFightBot
+							increasingDanger = max(0, (100 - 4*towerCageFightBot
 										- dangerCoefficientOfCageFight*towerCageFightBot
-									) / max(1, numAlliedCreeps)
+									) / max(1, numAlliedCreeps))
 						end
 						if TEST then
 							print(Xeta_EvaluateObjectiveCompletion(
@@ -148,7 +180,7 @@ blueprint = {
 								1.0,
 								gsiPlayer,
 								building
-							), 100, 510, 1200)  - underAttack + finishAttack - min(0, increasingDanger)
+							), 50, 250, 2000)  - underAttack + finishAttack - min(0, increasingDanger)
 					end
 				end
 			end
@@ -172,10 +204,14 @@ blueprint = {
 					playerAttackDmg,
 					towerHealth,
 					nearestTower.attackRange,
-					Unit_GetArmorPhysicalFactor(gsiPlayer) * nearestTower.hUnit:GetAttackDamage()
+					Unit_GetArmorPhysicalFactor(gsiPlayer) * nearestTower.attackDamage
 						* 6 * (1+#Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1800, 16))
 				) end
 			
+			local attackNowSafety = max(0, (#Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 1200, false)*0.25
+					- theoreticalDanger*0.25)
+				)
+
 			if towerHealth > 0 
 					and nearestTowerDist < max(1200, gsiPlayer.attackRange*1.5) 
 					and (nearestTower.tier == 1 or not nearestTower.hUnit:HasModifier("modifier_backdoor_protection")
@@ -190,11 +226,13 @@ blueprint = {
 													* Unit_GetArmorPhysicalFactor(gsiPlayer)
 								)
 						)
-					and towerHealth < playerAttackDmg*0.413 then
+					and towerHealth < playerAttackDmg*(0.4 + attackNowSafety) then
 				if VERBOSE then print("return finish tower push") end
 				return nearestTower, nearestTower.goldBounty
+						* (gsiPlayer.currentMovementSpeed < gsiPlayer.hUnit:GetBaseMovementSpeed() and 1
+							or 0.33 * gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth)
 			elseif nearestTowerDist < nearestTower.attackRange+200
-					and Unit_GetArmorPhysicalFactor(gsiPlayer) * nearestTower.hUnit:GetAttackDamage()
+					and Unit_GetArmorPhysicalFactor(gsiPlayer) * nearestTower.attackDamage
 							* 6 * (1+#Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1800, 16))
 								> gsiPlayer.lastSeenHealth then
 				-- Do not run if tower is high health, dangerous and we are under it
@@ -215,6 +253,7 @@ blueprint = {
 				not enemy or (enemyEnemyBase and Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, enemyEnemyBase.center)
 					< Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, enemy.center))
 			) and enemyEnemyBase or enemy
+		
 		local checkForBaseConnections = Vector_PointDistance2D(gsiPlayer.lastSeen.location, ENEMY_FOUNTAIN)
 				< CHECK_FOR_BASE_CONNECTIONS_RANGE
 		local allied = checkForBaseConnections
@@ -227,12 +266,12 @@ blueprint = {
 								or Team_GetStrategicLane(gsiPlayer)
 					)
 		-- This will find a flip between base creeps and lane creeps. Whatever we're closer to is our considered current creep set.
+		local farmLaneObjective = Task_GetTaskObjective(gsiPlayer, FarmLane_GetTaskHandle())
 		if not enemy or not enemy.units then 
 			if allied and allied.lane == baseToCheck then
 				if VERBOSE then INFO_print("returning allied set during no enemy push") end
 				return allied, max(-5, (GSI_GetAliveAdvantageFactor()*30))-theoreticalDanger*30 -- Allied creeps are connecting to enemy buildings
 			end
-			local farmLaneObjective = Task_GetTaskObjective(gsiPlayer, FarmLane_GetTaskHandle())
 			if farmLaneObjective and farmLaneObjective.type == UNIT_TYPE_IMAGINARY then
 				local _, crashTime = Set_GetPredictedLaneFrontLocation(farmLaneObjective.lane)
 				crashTime = DotaTime() - crashTime
@@ -266,7 +305,10 @@ blueprint = {
 						) and 0 or 30
 			if not Positioning_WillAttackCmdExposeToLocRad(
 						gsiPlayer, arbitraryUnit,
-						nearestTower.lastSeen.location, nearestTower.attackRange + 200
+						nearestTower.lastSeen.location, nearestTower.attackRange + 100
+					) or (not nearestTower.hUnit:IsNull()
+						and IsLocationVisible(nearestTower.lastSeen.location)
+						and nearestTower.hUnit:GetAttackTarget() and nearestTower.hUnit:GetAttackTarget():IsCreep()
 					) then
 				if VERBOSE then print("returning last push") end
 
@@ -276,6 +318,17 @@ blueprint = {
 							* Unit_GetArmorPhysicalFactor(gsiPlayer)
 							/ (gsiPlayer.lastSeenHealth*0.01) -- "30 points per dps per 10th of health = 0.01"
 
+				local farmTaskScore = Task_GetTaskScore(gsiPlayer, farm_lane_handle)
+				local farmLaneLoc = farmLaneObjective and (farmLaneObjective.center or farmLaneObjective.lastSeen
+						and farmLaneObjective.lastSeen.location)
+
+				local farmLaneDist = farmLaneLoc
+						and sqrt((farmLaneLoc.x - playerLoc.x)^2 + (farmLaneLoc.y - playerLoc.y)^2)
+				local farmTaskScoreGetLastHit = farmLaneDist and max(0, farmTaskScore*2 - 40)
+						/ sqrt(0.05*max(1, farmLaneDist-max(700, gsiPlayer.attackRange*1.33))) or 0
+
+				
+
 				return arbitraryUnit,
 						min(gsiPlayer.level*3,
 								max(-10, (GSI_GetAliveAdvantageFactor()*50))-40*(theoreticalDanger)
@@ -283,7 +336,7 @@ blueprint = {
 						- Xeta_CostOfTravelToLocation(gsiPlayer, enemy.center)
 						+ underAttack + finishAttack + attackStraysScore
 						- #knownEngage * 40 + #theorizedEngage * 10
-						- potentialDpsToMeIsBad
+						- potentialDpsToMeIsBad - farmTaskScoreGetLastHit
 			end
 		end
 		return false, XETA_SCORE_DO_NOT_RUN

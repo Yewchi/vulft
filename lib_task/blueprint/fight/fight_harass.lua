@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 local XETA_SCORE_DO_NOT_RUN = XETA_SCORE_DO_NOT_RUN
 local Math_PointToPointDistance2D = Math_PointToPointDistance2D
 local Set_GetEnemyHeroesInPlayerRadius = Set_GetEnemyHeroesInPlayerRadius
@@ -63,6 +89,7 @@ local function task_init_func(taskJobDomain)
 	farm_lane_task_handle = FarmLane_GetTaskHandle()
 	leech_exp_task_handle = LeechExperience_GetTaskHandle()
 	
+	Blueprint_RegisterTaskName(task_handle, "fight_harass")
 	if VERBOSE then VEBUG_print(string.format("fight_harass: Initialized with handle #%d.", task_handle)) end
 
 	t_team_players = GSI_GetTeamPlayers(TEAM)
@@ -234,10 +261,10 @@ blueprint = {
 									prevObjective and Analytics_GetTotalDamageInTimeline(prevObjective.hUnit) or 0
 								)
 					and FarmLane_UtilizingLaneSafety(gsiPlayer) then
-				return false, XETA_SCORE_DO_NOT_RUN
+				return prevObjective, XETA_SCORE_DO_NOT_RUN
 			elseif highRecentTakenType == UNIT_TYPE_CREEP and highRecentTaken > hUnitPlayer:GetAttackDamage()*0.1
 					and FarmJungle_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) < 1 then
-				return false, XETA_SCORE_DO_NOT_RUN
+				return prevObjective, XETA_SCORE_DO_NOT_RUN
 			elseif highRecentTakenType == UNIT_TYPE_BUILDING
 					and (
 							hUnitPlayer:GetAttackDamage()*1.5 < max(
@@ -246,7 +273,7 @@ blueprint = {
 							or 150 + highRecentTaken*2 > (gsiPlayer.lastSeenHealth - (prevObjective and prevObjective.lastSeenHealth*0.75 or 0))
 						) then
 				Task_CreateUpdatePriorityDeagroJob(gsiPlayer)
-				return false, XETA_SCORE_DO_NOT_RUN
+				return prevObjective, XETA_SCORE_DO_NOT_RUN
 			end
 		end
 		team_player_targetted[gsiPlayer.nOnTeam][1] = highRecentTakenType
@@ -273,7 +300,7 @@ blueprint = {
 		FightClimate_AnyIntentToHarm(gsiPlayer, nearbyAllies, friendly_intents)
 		local numEnemyIntent = #enemy_intents
 		local numFriendlyIntent = #friendly_intents
-		--[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1600, 620, string.format("friendly_intents:%s %s", tostring(friendly_intents[1]), tostring(friendly_intents[2])), 255, 255, 255) DebugDrawText(1600, 630, string.format("enemy_intents:%s %s", tostring(enemy_intents[1]), tostring(enemy_intents[2])), 255, 255, 255) end
+		--[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1600, 680, string.format("friendly_intents:%s %s", tostring(friendly_intents[1]), tostring(friendly_intents[2])), 255, 255, 255) DebugDrawText(1600, 690, string.format("enemy_intents:%s %s", tostring(enemy_intents[1]), tostring(enemy_intents[2])), 255, 255, 255) end
 		local netPowerStruggle = 0 -- Used to inform the final score. If their Godlike Mid is in lane with MeatSim, we should know that attacking MeatSim might be a very bad idea.
 		
 		-- create data for targetting based on positioning
@@ -412,12 +439,12 @@ blueprint = {
 		netPowerStruggle = 50*(-Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies))
 --[[]]end
 		t_health_diff_outnumbered_factor[gsiPlayer.nOnTeam] = netPowerStruggle
-		-- if mostHarassableEnemy then
-			-- print(gsiPlayer.shortName, -netPowerStruggle, "given to leech exp")
-			-- LeechExp_UpdatePriority(gsiPlayer, -netPowerStruggle) -- If we got a very low -ve score, we should probably be much more careful in lane
-		-- else
-			-- LeechExp_UpdatePriority(gsiPlayer, 0) -- Will rescore once for this player (to inform low score)
-		-- end
+	--	if mostHarassableEnemy then
+	--		-- print(gsiPlayer.shortName, -netPowerStruggle, "given to leech exp")
+	--		LeechExp_UpdatePriority(gsiPlayer, -netPowerStruggle) -- If we got a very low -ve score, we should probably be much more careful in lane
+	--	else
+	--		LeechExp_UpdatePriority(gsiPlayer, 0) -- Will rescore once for this player (to inform low score)
+	--	end
 		
 		-- if DEBUG and DEBUG_IsBotTheIntern() then print("intern returns", mostHarassableEnemy and mostHarassableEnemy.shortName, mostHarassableEnemyValue) end
 		if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(650, 650, string.format("harass: %.2f", netPowerStruggle), 255, 255, 255) end

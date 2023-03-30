@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Keep a bounty rune spawning soon safe, do not allow an enemy to steal a power rune.
 
 local TEMP_WP_EXPIRY_TIME = 20
@@ -83,11 +109,11 @@ local function score_building_defence(gsiPlayer, objective, forTaskComparison)
 	local freedomWhileDefending = forTaskComparison -- Decrement score when you're close, go nuts. x <= 0
 			and min(-CONSIDER_ACTIVE_DEFENDER_RANGE
 				+ distToBuildingAtPort*gsiPlayer.lastSeenHealth/gsiPlayer.maxHealth, 0)*3
-			or 0
+				or 0
 	local freedomWhileIntercepted = -0
-	if VERBOSE then print("/VUL-FT/ <VERBOSE> [zone_defend]", gsiPlayer.shortName, "DEF", lostTowerCost - costOfTravel + freedomWhileDefending + freedomWhileIntercepted, lostTowerCost, costOfTravel, freedomWhileDefending, freedomWhileIntercepted) end
+	if VERBOSE then print("/VUL-FT/ <VERBOSE> [zone_defend]", gsiPlayer.shortName, "DEF", lostTowerCost - 1.5*costOfTravel + freedomWhileDefending + freedomWhileIntercepted, lostTowerCost, 1.5*costOfTravel, freedomWhileDefending, freedomWhileIntercepted) end
 	--print("freedom is", freedomWhileDefending)
-	return lostTowerCost - 2*costOfTravel + freedomWhileDefending + freedomWhileIntercepted
+	return lostTowerCost - 1.5*costOfTravel + freedomWhileDefending + freedomWhileIntercepted
 end
 
 local function get_defence_required_power_level(building, pressure)
@@ -121,7 +147,7 @@ function ZoneDefend_TakeCreepAggroTowerToHeroDownLane(gsiPlayer, objective)
 				or (attackTarget and attackTarget:IsCreep() and attackTarget:GetTeam() ~= TEAM)
 			) and distToSet < gsiPlayer.attackRange + (-currDanger*300) then
 		local pullUnit = Set_GetSetUnitNearestToLocation(gsiPlayer.lastSeen.location, enemyCreeps)
-		if pullUnit then
+		if pullUnit and pullUnit.creepType ~= CREEP_TYPE_SIEGE then
 			
 			gsiPlayer.hUnit:Action_AttackUnit(pullUnit.hUnit, true)
 			return true
@@ -154,6 +180,7 @@ function ZoneDefend_RegisterBuildingDefenceBlip(building, pressure)
 end
 
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "zone_defend")
 	if VERBOSE then VEBUG_print(string.format("zone_defend: Initialized with handle #%d.", task_handle)) end
 	avoid_hide_handle = AvoidHide_GetTaskHandle()
 	avoid_hide_run = Task_GetTaskRunFunc(avoid_hide_handle)
@@ -311,6 +338,12 @@ blueprint = {
 				end
 			end
 		end
+
+
+
+
+
+
 		if wpForBotTask and WP_CommitIsCommit(gsiPlayer, wpForBotTask) then
 			local distToObj = Vector_PointDistance2D(
 					gsiPlayer.lastSeen.location,
@@ -356,6 +389,7 @@ blueprint = {
 				-- TODO hack temporary while fight.lua not implmnt.
 				--Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 5*(#Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 2400))^2, 3)
 			end
+			
 			return wpForBotTask[POSTER_I.OBJECTIVE], posterScore/(1+harmsIntended)
 		end
 		return false, XETA_SCORE_DO_NOT_RUN

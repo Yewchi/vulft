@@ -1,3 +1,31 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
+-- 22/03/23 unextensible code is my own fault, being fixed gradually.
+-- TODO Wouldn't even notice a map-changing patch.
 local TEAM = TEAM
 local TEAM_RADIANT = TEAM_RADIANT
 local TEAM_DIRE = TEAM_DIRE
@@ -154,11 +182,12 @@ local ward_locations = {
 }
 
 local function is_location_bottom_lane(p)
-	return p.y < 0.0000887007*p.x^2 + 0.839767*p.x - 3721
+	return p.x > 4440 and p.y < 2531 + 1.33*(p.x-4440)
+			or p.x <= 4440 and p.y < -10120 - 67672295/(p.x - 9761)
 end
 
 local function is_location_top_lane(p)
-	return p.y > -0.000131991*p.x^2 + 0.663002*p.x + 3715
+	return p.y > 9305 - 55392793/(9711 + p.x)
 end
 
 -- Returns a factor 0.0 - 1.0 of the amount to multiply one of either side of an equation for z-progress. e.g. as progress grows from radiant top spawner, only the y-value should increase until it hits the curve
@@ -187,6 +216,10 @@ local function Map_LaneProgressAtCoordinates(team, lane, x, y)
 	
 	end
 	return -1.0
+end
+
+function Map_IsAboveMiddleLine(loc)
+	return loc.y > 0.873489 * loc.x - 223
 end
 
 function Map_GetAncientOnRopesFightLocation(team)
@@ -395,28 +428,34 @@ end
 	end
 end
 
-local UPDATE_PREVIOUS_SEEN_LOC_DELTA = THROTTLE_PLAYERS_LAST_SEEN_UPDATE*2
+UPDATE_PREVIOUS_SEEN_LOC_DELTA = THROTTLE_PLAYERS_LAST_SEEN_UPDATE*2
+local UPDATE_PREVIOUS_SEEN_LOC_DELTA = UPDATE_PREVIOUS_SEEN_LOC_DELTA
 local function time_since_last_seen(this)
 	return this.timeStamp and GameTime() - this.timeStamp or -1.0
 end
-local function update_last_seen(this, newLoc) -- TODO GameTime??
+local function update_last_seen(this, newLoc, facingDegrees)
 	local currTime = GameTime()
-	if this.previousLocation and currTime - this.timeStamp > UPDATE_PREVIOUS_SEEN_LOC_DELTA then
+	if this.previousLocation
+			and currTime - this.previousTimeStamp > UPDATE_PREVIOUS_SEEN_LOC_DELTA then
 		--GetBot():ActionImmediate_Ping(newLoc.x, newLoc.y, true)
-		this.previousLocation = Vector(this.x, this.y, this.z)
+		this.previousLocation = Vector(this.location.x, this.location.y, this.location.z)
 		this.previousTimeStamp = this.timeStamp
 	end
 	if this.location.x ~= newLoc.x or this.location.y ~= newLoc.y then
 		this.location = Vector(newLoc.x, newLoc.y, newLoc.z)
 	end
+	if facingDegrees then
+		this.facingDegrees = facingDegrees
+	end
 	this.timeStamp = currTime
 end
-function Map_CreateLastSeenTable(location, trackPrevious)
+function Map_CreateLastSeenTable(location, trackPrevious, facingDegrees)
 	local currTime = GameTime()
 	local t = {}
 	t.GetTimeSinceLastSeen = time_since_last_seen
 	t.Update = update_last_seen
 	t.location = Vector(location.x, location.y, location.z)
+	t.facingDegrees = facingDegrees or -0
 	t.timeStamp = GameTime()
 	if trackPrevious then
 		t.previousLocation = location

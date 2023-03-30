@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 RESPONSE_TYPES = {
 	["RESPONSE_TYPE_CUSTOM_FUNC"] = 0,
 	["RESPONSE_TYPE_STUN"] = 1,
@@ -38,6 +64,9 @@ RESPONSE_SEVERITY = {
 	["CUSTOM_FUNC"] = 0 -- increasing severity shadow poison, don't look at dusa unless you have the kill
 }
 
+FIGHT_INTENT_I__AT_PLAYER = 1
+FIGHT_INTENT_I__LAST_UPDATE = 2
+FIGHT_INTENT_I__HEAT = 3
 
 local max = math.max
 local min = math.min
@@ -235,32 +264,40 @@ end
 -- Intent data update func used by LHP.
 function FightClimate_RegisterRecentHeroAggression(gsiPlayer, gsiTarget, isAbilityUse)
 	local playersIntent = t_intent_recent_aggression[gsiPlayer]
-	if playersIntent then
-		playersIntent[1] = gsiTarget
-		playersIntent[2] = GameTime()
-		playersIntent[3] = 1
+	if gsiTarget.team ~= gsiPlayer.team then
+		-- Process aggression
+		if playersIntent then
+			playersIntent[1] = gsiTarget
+			playersIntent[2] = GameTime()
+			playersIntent[3] = 1
+		else
+			t_intent_recent_aggression[gsiPlayer] = 
+					create_or_recycle_pair(gsiTarget, GameTime() + AGGRESSIVE_BEHAVIOR_EXPIRY)
+		end
 	else
-		t_intent_recent_aggression[gsiPlayer] = 
-				create_or_recycle_pair(gsiTarget, GameTime() + AGGRESSIVE_BEHAVIOR_EXPIRY)
+		-- Process friendly ability casts
+
 	end
+
 end
 
 local state = 0
 local fight_harass_handle
 -- Get the intent to harass / harm of the gsiPlayer. Updates per team.
+-- TODO NaN intents sometimes, with no error
 function FightClimate_GetIntent(gsiPlayer)
 	if VERBOSE then
 		local enemies = GSI_GetTeamPlayers(ENEMY_TEAM)
-		DebugDrawText(1068, 762, "intents", 255, 255, 205)
+		DebugDrawText(1068, 782, "intents", 255, 255, 205)
 		for i=1,#enemies do
 			local thisIntent = t_intent_recent_aggression[enemies[i]]
 			if thisIntent then 
-				DebugDrawText(1100+(TEAM_IS_RADIANT and 0 or 200), 770+i*8,
+				DebugDrawText(1100+(TEAM_IS_RADIANT and 0 or 200), 800+i*8,
 						string.format("%d %.4s %.2f",
 								i,
 								thisIntent[1] and thisIntent[1].shortName or "none",
 								thisIntent[3]
-							), 255, 255, 100+thisIntent[3]*155
+							), 255, 100, 45+thisIntent[3]*210
 					)
 			end
 		end
@@ -279,12 +316,14 @@ function FightClimate_GetIntent(gsiPlayer)
 			local playerIntent = t_intent_recent_aggression[allies[i]]
 			if playerIntent and playerIntent[3] > 0 then
 				if not playerIntent[1].typeIsNone then
-					playerIntent[3] = playerIntent[3]
+					playerIntent[3] = max(0, playerIntent[3]
 							- 0.1 * (currTime - playerIntent[2])
 									* (1-Vector_UnitFacingUnit(allies[i], playerIntent[1]))
+						)
 				else
-					playerIntent[3] = playerIntent[3]
+					playerIntent[3] = max(0, playerIntent[3]
 							- 0.1 * (currTime - playerIntent[2])
+						)
 				end
 				playerIntent[2] = currTime
 			end
@@ -294,12 +333,14 @@ function FightClimate_GetIntent(gsiPlayer)
 			local playerIntent = t_intent_recent_aggression[thisEnemy]
 			if playerIntent and playerIntent[3] > 0 then
 				if not thisEnemy.typeIsNone then
-					playerIntent[3] = playerIntent[3]
+					playerIntent[3] = max(0, playerIntent[3]
 							- 0.1 * (currTime - playerIntent[2])
 									* (1-Vector_UnitFacingUnit(enemies[i], playerIntent[1]))
+						)
 				else
-					playerIntent[3] = playerIntent[3]
+					playerIntent[3] = max(0, playerIntent[3]
 							- 0.1 * (currTime - playerIntent[2])
+						)
 				end
 				playerIntent[2] = currTime
 			end
@@ -340,6 +381,37 @@ function FightClimate_GetIntent(gsiPlayer)
 	return t_intent[gsiPlayer]
 end
 
+function FightClimate_GreatestEnemiesThreatToPlayer(gsiPlayer, enemyTbl)
+	local playerLoc = gsiPlayer.lastSeen.location
+	local greatestThreat
+	local greatestIntent = 0
+	local greatestPower = 0
+	local greatestThreatScore = 0
+	for i=1,#enemyTbl do
+		local thisEnemy = enemyTbl[i]
+		local thisIntent = t_intent_recent_aggression[thisEnemy]
+		local thisEnemyLoc = thisEnemy.lastSeen.location
+		if thisIntent and thisIntent[1] == gsiPlayer and thisIntent[3] then
+			local distToEnemy = sqrt((playerLoc.x-thisEnemyLoc.x)^2 + (playerLoc.y-thisEnemyLoc.y)^2)
+			local extendedAttackRange = max(900, gsiPlayer.attackRange*1.5)
+			local thisEnemyPower = Analytics_GetPowerLevel(thisEnemy)
+			local thisThreatScore =  max(0.15, thisIntent[3] -- (intended target intensity
+						+ min(1, max(0.1, 0.66*(extendedAttackRange - distToEnemy)
+									/ extendedAttackRange
+								) -- + within attack rangeness)
+						)
+				) * sqrt(thisEnemyPower) -- * sqrt(power)
+			if thisThreatScore > greatestThreatScore then
+				greatestThreat = thisEnemy
+				greatestThreatScore = thisThreatScore
+				greatestPower = thisEnemyPower
+				greatestIntent = thisIntent[3]
+			end
+		end
+	end
+	return greatestThreat, greatestIntent, greatestPower, greatestThreatScore
+end
+
 local valid_garbage = {} -- see "set correct #intentsTbl" below
 -- gsiPlayer == the player to return if any harm was intended to (e.g. if they are on the same team, it will never be true unless we are denying QoP Q), playerTbl == a tbl of any of the players in the game, to check their intent
 -- returned table is TODO currently just a list of each hero intended to be harmed for each intent.
@@ -363,7 +435,7 @@ function FightClimate_AnyIntentToHarm(gsiPlayer, playerTbl, intentsTbl)
 		end
 		-- set correct #intentsTbl
 		for nils=i,i+1 do intentsTbl[nils] = nil end -- to detect correct array size
-		if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(playerTbl[1].team == gsiPlayer.team and 1600 or 1700, 610, string.format("%d %d %d", #playerTbl, #intentsTbl, numPlayers), 255, 255, 255) end
+		if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(playerTbl[1].team == gsiPlayer.team and 1600 or 1700, 820, string.format("%d %d %d", #playerTbl, #intentsTbl, numPlayers), 255, 255, 255) end
 		return harmIntended > 0, intentsTbl, harmIntended
 	end
 	intentsTbl[1] = nil; intentsTbl[2] = nil
@@ -405,11 +477,11 @@ function FightClimate_GetIntentCageFightSaveJIT(gsiPlayer, nearbyAllies, nearbyE
 	local bestSaveTime = 0xFFFF
 	--print("SaveJIT", gsiPlayer.shortName, #nearbyEnemies)
 	for i=1,#nearbyEnemies do
-		local enemy = nearbyEnemies[i]
+		local thisEnemy = nearbyEnemies[i]
 		local hUnitEnemy = thisEnemy.hUnit
 		--print(hUnitEnemy, hUnitEnemy and hUnitEnemy.IsNull and not hUnitEnemy:IsNull())
 		if hUnitEnemy and hUnitEnemy.IsNull and not hUnitEnemy:IsNull() and hUnitEnemy:IsAlive() then
-			local enemyIntent = GetIntent(enemy)
+			local enemyIntent = GetIntent(thisEnemy)
 			if enemyIntent then -- bugged for hero denies
 				local secondsSurviving = enemyIntent.lastSeenHealth
 						/ ( Armor(enemyIntent)
@@ -425,7 +497,7 @@ function FightClimate_GetIntentCageFightSaveJIT(gsiPlayer, nearbyAllies, nearbyE
 					--print("\tarrive", secondsToArrive)
 					if secondsSurviving > secondsToArrive then
 						bestSave = enemyIntent
-						bestSaveFrom = enemy
+						bestSaveFrom = thisEnemy
 						bestSaveTime = secondsSurviving
 					end
 				end
@@ -433,6 +505,24 @@ function FightClimate_GetIntentCageFightSaveJIT(gsiPlayer, nearbyAllies, nearbyE
 		end
 	end
 	return bestSaveFrom, bestSave, bestSaveTime
+end
+
+function FightClimate_GetEnemiesTotalHeat(enemyTbl)
+	local heat = 0
+	local countEnemies = #enemyTbl
+	local currTime = GameTime()
+	for i=1,countEnemies do
+		local thisEnemy = enemyTbl[i]
+		local hUnitEnemy = thisEnemy.hUnit
+		if hUnitEnemy and hUnitEnemy.IsNull and not hUnitEnemy:IsNull() and IsHeroAlive(thisEnemy.playerID) then
+			-- "thisRecentAggression" rather than "thisIntent" which are wrongly named throughout file TODO
+			local thisRecentAggression = t_intent_recent_aggression[thisEnemy]
+			if thisRecentAggression and thisRecentAggression[3] and thisRecentAggression[2] < currTime then
+				heat = heat + thisRecentAggression[3] / countEnemies
+			end
+		end
+	end
+	return heat*countEnemies, heat
 end
 
 -- returns if any player is attacking another players in the area

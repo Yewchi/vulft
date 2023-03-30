@@ -1,10 +1,10 @@
 local hero_data = {
 	"doom_bringer",
-	{2, 1, 2, 3, 2, 4, 2, 1, 1, 6, 1, 3, 3, 3, 7, 4, 4, 10, 11},
+	{2, 1, 2, 1, 2, 4, 2, 1, 1, 6, 3, 3, 3, 3, 7, 4, 4, 10, 12},
 	{
-		"item_quelling_blade","item_circlet","item_slippers","item_branches","item_branches","item_tango","item_ward_observer","item_wraith_band","item_boots","item_magic_wand","item_phase_boots","item_wind_lace","item_gloves","item_hand_of_midas","item_blink","item_black_king_bar","item_aghanims_shard","item_aether_lens","item_octarine_core","item_boots","item_refresher","item_reaver","item_overwhelming_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
+		"item_quelling_blade","item_slippers","item_circlet","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_wraith_band","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_gloves","item_hand_of_midas","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_aghanims_shard","item_energy_booster","item_aether_lens","item_octarine_core","item_overwhelming_blink","item_staff_of_wizardry","item_ogre_axe",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Devour","Scorched Earth","Infernal Blade","Doom","Devour grants +15% Magic Resistance","+20 Scorched Earth Damage","+10% Scorched Earth Movement Speed","Devour Can Target Ancients","-12.0s Scorched Earth Cooldown","-35s Doom Cooldown","+2.1% Infernal Blade Damage","Doom applies Break",
 	}
@@ -97,6 +97,7 @@ d = {
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

@@ -9,6 +9,11 @@ BARRACKS_TYPE_MELEE = 6
 BARRACKS_TYPE_RANGE = 7
 FOUNTAIN_TIER = 5
 
+DOTA_TOWER_NUM_TIERS = 5
+local UNLIKELY_CHOICE = 69 -- default, valid, reasonable, but least likely tower damage as patched
+TOWER_TIER_ATTACK_DAMAGE = {UNLIKELY_CHOICE, UNLIKELY_CHOICE, UNLIKELY_CHOICE, UNLIKELY_CHOICE, UNLIKELY_CHOICE}
+TOWER_TIER_ATTACK_DPS = {UNLIKELY_CHOICE, UNLIKELY_CHOICE, UNLIKELY_CHOICE, UNLIKELY_CHOICE, UNLIKELY_CHOICE}
+
 local INVALID_TOWER_HEALTH = -1
 
 TOTAL_BARRACKS_TEAM = 6
@@ -133,6 +138,22 @@ function GSI_AnyTierUnderHealthPercent(tier, percent)
 			end
 		end
 	end
+end
+
+function GSI_LowestTierHealthPercentWithDead(tier)
+	local lowest = 1.0
+	for iLane=1,3 do
+		local thisTower = t_buildings_index[TEAM][iLane][tier]
+		if thisTower then
+			local towerHpp = thisTower.lastSeenHealth / thisTower.maxHealth
+			if towerHpp < lowest then
+				lowest = towerHpp
+			end
+		else
+			return 0.0
+		end
+	end
+	return lowest
 end
 
 function GSI_GetApproxNearestPortableStructure(team, loc)
@@ -334,7 +355,7 @@ local function assign_to_building_index(gsiBuilding) -- Initialization only
 	end
 end
 
-function bUnit_NewSafeUnit(hUnit, dontIndex)
+local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 	if not hUnit or not hUnit:IsAlive() then return nil end
 	if t_buildings[hUnit:GetTeam()][hUnit] then return t_buildings[hUnit:GetTeam()][hUnit] end
 	local maxHealth = hUnit:GetMaxHealth()
@@ -342,6 +363,8 @@ function bUnit_NewSafeUnit(hUnit, dontIndex)
 	local newSafeUnit = {}
 	local unitLocation = hUnit:GetLocation()
 	
+	
+
 	newSafeUnit.hUnit = hUnit
 	newSafeUnit.isNull = hUnit.IsNull
 	newSafeUnit.name = hUnit:GetUnitName()
@@ -359,7 +382,6 @@ function bUnit_NewSafeUnit(hUnit, dontIndex)
 	newSafeUnit.attackRange = newSafeUnit.isTower and BUILDING_TOWER_ATTACK_RANGE
 			or newSafeUnit.isFountain and FOUNTAIN_ATTACK_RANGE
 			or hUnit:GetAttackRange()
-	newSafeUnit.attackDamage = newSafeUnit.isTower and 90 or 0 -- Arbitrary, updated on seen
 	newSafeUnit.Key = Unit_Key
 	-- newSafeUnit.tier = 1234
 	
@@ -385,6 +407,44 @@ function bUnit_NewSafeUnit(hUnit, dontIndex)
 			assign_to_building_index(newSafeUnit)
 		end
 	end
+
+	-- updated on seen
+	newSafeUnit.attackDamage = not (newSafeUnit.isTower or newSafeUnit.isFountain) and 0
+			or newSafeUnit.team == TEAM and hUnit:GetAttackDamage()
+			or newSafeUnit.tier and TOWER_TIER_ATTACK_DAMAGE[newSafeUnit.tier]
+			or BUILDING_T1_ATTACK_DAMAGE
 	
 	return newSafeUnit
 end
+local function bunit_new_safe_unit_scan_data(hUnit, dontIndex)
+	local newSafeUnit = bunit_new_safe_unit_no_scan(hUnit, dontIndex)
+
+	if newSafeUnit.team == TEAM and newSafeUnit.tier
+			and (newSafeUnit.isTower or newSafeUnit.isFountain) then
+		TOWER_TIER_ATTACK_DAMAGE[newSafeUnit.tier] = newSafeUnit.attackDamage
+		TOWER_TIER_ATTACK_DPS[newSafeUnit.tier] =
+				newSafeUnit.attackDamage / newSafeUnit.hUnit:GetAttackSpeed()
+	end
+	
+	local handover = true
+	for i=1,DOTA_TOWER_NUM_TIERS do
+		if TOWER_TIER_ATTACK_DAMAGE[i] == UNLIKELY_CHOICE then
+			handover = false
+			break;
+		end
+	end
+	if handover then
+		bUnit_NewSafeUnit = bunit_new_safe_unit_no_scan
+		INFO_print(string.format("[building] Found all attack values for %d tower types (+fountain):",
+					DOTA_TOWER_NUM_TIERS
+				)
+			)
+		Util_TablePrint(TOWER_TIER_ATTACK_DAMAGE)
+		bunit_new_safe_unit_scan_data = nil
+	end
+	return newSafeUnit
+end
+
+-- bUnit_NewSafeUnit(hUnit, dontIndex)
+bUnit_NewSafeUnit = bunit_new_safe_unit_scan_data
+

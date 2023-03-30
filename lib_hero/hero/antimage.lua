@@ -1,8 +1,8 @@
 local hero_data = {
 	"antimage",
-	{1, 2, 1, 3, 1, 4, 2, 2, 2, 6, 1, 4, 3, 3, 7, 3, 4, 10, 12},
+	{1, 2, 1, 3, 2, 4, 1, 2, 2, 6, 1, 4, 3, 3, 7, 3, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_branches","item_orb_of_venom","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_ring_of_health","item_blight_stone","item_orb_of_corrosion","item_magic_wand","item_vanguard","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_ultimate_orb","item_manta","item_basher","item_abyssal_blade","item_quarterstaff","item_eagle","item_butterfly","item_platemail","item_buckler","item_assault","item_helm_of_iron_will","item_nullifier",
+		"item_slippers","item_circlet","item_tango","item_tango","item_quelling_blade","item_wraith_band","item_boots","item_ring_of_health","item_gloves","item_boots_of_elves","item_power_treads","item_claymore","item_broadsword","item_bfury","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_point_booster","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_ultimate_orb","item_skadi","item_butterfly","item_ultimate_scepter_2","item_basher","item_abyssal_blade","item_moon_shard","item_moon_shard","item_moon_shard","item_reaver","item_vitality_booster","item_heart",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -35,13 +35,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

@@ -1,8 +1,8 @@
 local hero_data = {
 	"bloodseeker",
-	{2, 3, 3, 1, 3, 5, 3, 1, 1, 1, 6, 5, 2, 2, 8, 2},
+	{3, 2, 3, 1, 3, 5, 1, 1, 1, 6, 3, 5, 2, 2, 8, 2, 5, 10, 12, 13},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_slippers","item_branches","item_faerie_fire","item_blades_of_attack","item_boots","item_chainmail","item_phase_boots","item_javelin","item_magic_wand","item_maelstrom","item_ultimate_orb","item_ring_of_health","item_sphere","item_crown","item_crown","item_gungir","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_basher","item_vanguard","item_abyssal_blade","item_mystic_staff","item_void_stone","item_sheepstick",
+		"item_tango","item_quelling_blade","item_slippers","item_slippers","item_slippers","item_branches","item_branches","item_branches","item_faerie_fire","item_boots","item_gloves","item_boots_of_elves","item_magic_wand","item_power_treads","item_javelin","item_maelstrom","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_ogre_axe","item_sange_and_yasha","item_mithril_hammer","item_black_king_bar","item_lifesteal","item_mjollnir","item_claymore","item_satanic","item_basher",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

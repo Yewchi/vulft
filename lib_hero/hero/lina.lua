@@ -1,12 +1,12 @@
 local hero_data = {
 	"lina",
-	{2, 3, 3, 1, 3, 5, 3, 2, 2, 6, 2, 5},
+	{2, 3, 1, 1, 3, 4, 3, 2, 2, 5, 2, 4, 1, 1, 7, 3, 9, 4, 12},
 	{
-		"item_blades_of_attack","item_quelling_blade","item_ward_observer","item_branches","item_fluffy_hat","item_fluffy_hat","item_fluffy_hat","item_falcon_blade","item_boots","item_javelin","item_maelstrom","item_staff_of_wizardry","item_crown","item_rod_of_atos","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_ultimate_orb","item_ultimate_orb","item_skadi","item_eagle","item_quarterstaff","item_butterfly","item_reaver","item_satanic",
+		"item_ward_observer","item_tango","item_branches","item_branches","item_faerie_fire","item_branches","item_sobi_mask","item_magic_stick","item_bottle","item_boots","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_magic_wand","item_blink","item_maelstrom","item_rod_of_atos","item_gungir","item_ultimate_orb","item_sphere","item_lifesteal","item_satanic",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
 	{
-		"Dragon Slave","Light Strike Array","Fiery Soul","Flame Cloak","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+350 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure and pierces Spell Immunity",
+		"Dragon Slave","Light Strike Array","Fiery Soul","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+250 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure and pierces Spell Immunity",
 	}
 }
 --@EndAutomatedHeroData
@@ -29,6 +29,7 @@ local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 local INCENTIVISE = Task_IncentiviseTask
 local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint
 local POINT_DISTANCE = Vector_PointDistance
+local POINT_DISTANCE_2D = Vector_PointDistance2D
 local ACTIVITY_TYPE = ACTIVITY_TYPE
 local currentActivityType = Blueprint_GetCurrentTaskActivityType
 local currentTask = Task_GetCurrentTaskHandle
@@ -45,14 +46,17 @@ local LSA_CAST_TIME = 0.45 + 0.5
 local LSA_EXTRAPOLATE = LSA_CAST_TIME - (0.35 + 0.15) -- time to decypher animation type, time to react
 local LSA_RADIUS = 250
 local DRAGON_SLAVE_EXTRAPOLATED = 0.45 + 0.5*1275 / 1075
+local DRAGON_SLAVE_HIT_RANGE = 1225
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -124,7 +128,7 @@ local d = {
 			local nearbyCreeps = Set_GetNearestEnemyCreepSetAtLaneLoc(
 					gsiPlayer.lastSeen.location, Map_GetBaseOrLaneLocation(gsiPlayer.lastSeen.location)
 				)
-			if nearbyCreeps then
+			if nearbyCreeps and POINT_DISTANCE_2D(playerLoc, nearbyCreeps.center) < DRAGON_SLAVE_HIT_RANGE then
 				USE_ABILITY(gsiPlayer, dragonSlave, nearbyCreeps.center, 400, nil)
 				return;
 			end

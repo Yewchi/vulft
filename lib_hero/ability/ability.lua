@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- As gsiPlayer is to hPlayerUnit, gsiAbility is to a set of hAbilities, usually 1. This gives: Bane may hold a gsiAbility
 --- to abilities={"brai" for nuking heroes. 
 MAX_ABILITY_SLOT = 23
@@ -38,11 +64,24 @@ local function resolve_skill_build_string_indices_to_slot_build(gsiPlayer)
 	local numFound = 0
 	local specialBonusIndex = HIGH_32_BIT
 	local checkSpecialBonus = false
+
+	local preSpecialReadable = #playerAbilityNameIndices - 8
+
+	local backupIndex = {}
 	local n=1
+	for i=0,MAX_ABILITY_SLOT do
+		local ability = hUnit:GetAbilityInSlot(i)
+		if ability and string.find(ability:GetName(), gsiPlayer.shortName) then
+			backupIndex[n] = i
+			n = n + 1
+		end
+	end
 
 	if playerSkillBuild[I_SKILL_BUILD_RESOLVED] then
 		return true -- The hero must've been selected twice for some reason
 	end
+
+	n=1
 	-- Check regular abilities
 	while(n<=#playerAbilityNameIndices) do -- iterate all abilities/talents that have been selected for the skill build
 		if not checkSpecialBonus then
@@ -71,20 +110,37 @@ local function resolve_skill_build_string_indices_to_slot_build(gsiPlayer)
 					end
 				end
 			end
-			if highestMatchingName == nil then return false end
-			abilityNameIndexToDotaSlot[n] = iHighestMatch -- save the true InSlot# -> (readable) AbilityName
-			numFound = numFound + 1
-			if numFound == 4 or gsiPlayer.shortName == "invoker" and numFound == 3 then -- MAGIC_INVOKER
-				n = n + 1
-				break
+			if not highestMatchingName then
+				-- Try an index guess based on the internal ability names with the heroes name
+				iHighestMatch = backupIndex[n]
+				if iHighestMatch then
+					highestMatchingName = hUnit:GetAbilityInSlot(iHighestMatch):GetName()
+					WARN_print(string.format("[ability] %s unable to find internal name for readable '%s'. Using guessed index: %d, '%s'",
+								gsiPlayer.shortName, abilityName, backupIndex[n], highestMatchingName
+							)
+						)
+				end
+			end
+			if highestMatchingName then
+				abilityNameIndexToDotaSlot[n] = iHighestMatch -- save the true InSlot# -> (readable) AbilityName
+				numFound = numFound + 1
+				if numFound == preSpecialReadable
+						or gsiPlayer.shortName == "invoker" and numFound == 3 then -- MAGIC_INVOKER (remove? TODO)
+					n = n + 1
+					break
+				end
 			end
 		end
 		n = n + 1
 	end
 	local endSpecialBonus = specialBonusIndex+7
-	if not playerAbilityNameIndices[n+7] or not hUnit:GetAbilityInSlot(endSpecialBonus) then 
-		WARN_print("[ability]: name index or ability slot out-of-bounds.") 
-		return 
+	if endSpecialBonus > MAX_ABILITY_SLOT or not playerAbilityNameIndices[n+7]
+			or not hUnit:GetAbilityInSlot(endSpecialBonus) then 
+		WARN_print(string.format("[ability]: name index or ability slot out-of-bounds. %d %s %s %s",
+				n, endSpecialBonus, Util_Printable(playerAbilityNameIndices[n+7]),
+				Util_Printable(hUnit:GetAbilityInSlot(endSpecialBonus)))
+			)
+		return false
 	end
 	while(specialBonusIndex<endSpecialBonus+7) do
 		abilityNameIndexToDotaSlot[n] = specialBonusIndex
@@ -108,6 +164,7 @@ local function resolve_skill_build_string_indices_to_slot_build(gsiPlayer)
 		-- specialBonusIndex = specialBonusIndex + 2
 		-- n = n + 2
 	end
+	
 	for i=1,#playerSkillBuild,1 do 	-- allocate the dota ability slots to our name indicies skill build
 		playerSkillBuild[i] = abilityNameIndexToDotaSlot[playerSkillBuild[i]]
 	end

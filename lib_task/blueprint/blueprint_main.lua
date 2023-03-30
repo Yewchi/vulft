@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 ACTIVITY_TYPE = { -- Ordered by reaction to additional aggressive behaviour while in the activity type (i.e. the name is not the reaction itself). Examples are listed below
 	["DEATH_WISH"] = 1, -- Pango with only swashbuckle up, vs Godlike Lina on 50 hp at T4.
 	["KILL"] = 2, -- Mid-fight, ganking.
@@ -26,8 +52,14 @@ local t_inform_dead_funcs = {}
 
 local t_custom_activity_type = {} -- override for current task type. Cleared by task.lua on switching current task
 
+local t_named_handles = {}
+
 function Blueprint_RegisterTask(taskInitFunc)
 	table.insert(task_init_funcs, taskInitFunc)
+end
+
+function Blueprint_RegisterTaskName(taskHandle, taskName)
+	t_named_handles[taskName] = taskHandle
 end
 
 if IsNotJustAnExample then
@@ -107,6 +139,16 @@ end
 
 function Blueprint_TaskOfHandleIsActivityType(taskHandle, activityType)
 	return t_task_activity_type[taskHandle] == activityType
+end
+
+function Blueprint_IncentiviseHighStakesTasks(gsiPlayer, incentiveAmount, decrementDelta)
+	-- TODO pass the incentive kit to Blueprint
+	Task_IncentiviseTask(gsiPlayer, t_named_handles.fight_harass, incentiveAmount, decrementDelta)
+	Task_IncentiviseTask(gsiPlayer, t_named_handles.avoid_and_hide, incentiveAmount, decrementDelta)
+	Task_IncentiviseTask(gsiPlayer, t_named_handles.increase_safety, incentiveAmount, decrementDelta)
+	Task_IncentiviseTask(gsiPlayer, t_named_handles.use_ability, incentiveAmount, decrementDelta)
+	Task_IncentiviseTask(gsiPlayer, t_named_handles.use_item, incentiveAmount, decrementDelta)
+	Task_IncentiviseTask(gsiPlayer, t_named_handles.deagro, incentiveAmount, decrementDelta)
 end
 
 function Blueprint_GetCurrentTaskActivityType(gsiPlayer)

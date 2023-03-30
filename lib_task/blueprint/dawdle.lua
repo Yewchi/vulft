@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- In-between tasks task. A fall-back, never to be assumed to be active
 local TEAM_NUMBER_OF_PLAYERS = TEAM_NUMBER_OF_PLAYERS
 local Task_SetTaskPriority = Task_SetTaskPriority
@@ -18,6 +44,7 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 	return 0
 end
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "dawdle")
 	if VERBOSE then VEBUG_print(string.format("dawdle: Initialized with handle #%d.", task_handle)) end
 
 	farm_lane_handle = FarmLane_GetTaskHandle()
@@ -88,9 +115,6 @@ blueprint = {
 	end,
 	
 	init = function(gsiPlayer, objective, extrapolatedXeta)
-		if DEBUG then
-			DEBUG_print(string.format("[dawdle] %s inits dawdle - score: %.2f", gsiPlayer.shortName, extrapolatedXeta))
-		end
 		return extrapolatedXeta
 	end
 }

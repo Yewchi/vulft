@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 local TEAM_NUMBER_OF_PLAYERS = TEAM_NUMBER_OF_PLAYERS
 local Task_SetTaskPriority = Task_SetTaskPriority
 local XETA_SCORE_DO_NOT_RUN = XETA_SCORE_DO_NOT_RUN
@@ -17,10 +43,14 @@ local team_players
 local MIN_NEUTRAL_DIE_TIME = 26
 local limit_chat_expiry = {}
 
+local ITEM_NOT_FOUND = ITEM_NOT_FOUND
+
 local random_die_chat = {
 		"Calculated.",
-		"Worth, I guess.",
+		"worth, I guess.",
 		"brb.. -.-",
+		":(",
+		"ow"
 	}
 
 local level_to_time_dead = {
@@ -60,6 +90,7 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 	return 0
 end
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "die_to_neutrals")
 	if VERBOSE then VEBUG_print(string.format("die_to_neutrals: Initialized with handle #%d.", task_handle)) end
 
 	use_ability = UseAbility_GetTaskHandle()
@@ -133,10 +164,12 @@ blueprint = {
 	score = function(gsiPlayer, prevObjective, prevScore)
 		local flaskOwned, _, flaskItemSlot = Item_ItemOwnedAnywhere(gsiPlayer, "item_flask")
 		--Util_TablePrint(flaskItemSlot)
-		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 800, 3)
+		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1100, 6)
 		if gsiPlayer.dyingIsntDying -- NB. reincarn-is-up heroes must register in their ability file
-				or gsiPlayer.hUnit:FindItemSlot("item_aegis") >= 0
-				or gsiPlayer.hUnit:FindItemSlot("item_cheese") >= 0
+				or gsiPlayer.hUnit:FindItemSlot("item_aegis") ~= ITEM_NOT_FOUND
+				or gsiPlayer.hUnit:FindItemSlot("item_cheese") ~= ITEM_NOT_FOUND -- can be stashed?
+				or ( gsiPlayer.hUnit:FindItemSlot("item_tranquil_boots") ~= ITEM_NOT_FOUND
+					and not nearbyEnemies[1] )
 				or gsiPlayer.hUnit:HasModifier("modifier_satanic") -- TODO VRF
 				or gsiPlayer.hUnit:HasModifier("modifier_bloodstone") -- TODO VRF
 				or ( not nearbyEnemies[1]
@@ -156,12 +189,12 @@ blueprint = {
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
 		local healthGain = Item_RAUCMitigateDelivery(gsiPlayer)
-		local hpp = (gsiPlayer.lastSeenHealth + healthGain + gsiPlayer.hUnit:GetHealthRegen()*3)
+		local hpp = (gsiPlayer.lastSeenHealth + healthGain + gsiPlayer.hUnit:GetHealthRegen()*6)
 				/ gsiPlayer.maxHealth
 		local dieDecided = limit_chat_expiry[gsiPlayer.nOnTeam] -- temp expiry val
 		local currTime = GameTime() 
 		dieDecided = dieDecided and dieDecided > currTime or false
-		if dieDecided and hpp < 0.3 or hpp < 0.25 then
+		if dieDecided and hpp < 0.3 or hpp < 0.25 + #nearbyEnemies*0.03 then
 			if not dieDecided then
 				repeat
 					if Vector_PointDistance(
@@ -198,7 +231,10 @@ blueprint = {
 				if not dieDecided then
 					limit_chat_expiry[gsiPlayer.nOnTeam] = currTime + MIN_NEUTRAL_DIE_TIME
 					if Vector_PointDistance2D(gsiPlayer.lastSeen.location, spawnerLoc) < 600 then
-						gsiPlayer.hUnit:ActionImmediate_Chat(random_die_chat[RandomInt(1,4)], DEBUG or false)
+						local chat = random_die_chat[RandomInt(1,8)]
+						if chat then
+							gsiPlayer.hUnit:ActionImmediate_Chat(chat, DEBUG or false)
+						end
 					end
 				end
 				return creeps and creeps[1] and creeps or spawnerLoc, max(

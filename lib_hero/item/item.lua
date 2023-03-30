@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 ITEM_MAX_PLAYER_STORAGE = 16
 ITEM_INVENTORY_AND_BACKPACK_STORAGE = 9
 ITEM_MAX_COURIER_STORAGE = ITEM_INVENTORY_AND_BACKPACK_STORAGE
@@ -53,8 +79,7 @@ ITEM_UPGRADES = {
 	"item_helm_of_the_dominator",
 	"item_helm_of_the_overlord",
 	"item_holy_locket",
-	"item_hood_of_defiance",
-	"item_hurricane_pike",
+	"item_hood_of_defiance", "item_hurricane_pike",
 	"item_invis_sword",
 	"item_kaya",
 	"item_kaya_and_sange",
@@ -252,94 +277,114 @@ ITEMS_BOOTS = {
 	["item_travel_boots"] = true,
 	["item_travel_boots_2"] = true,
 	["item_boots_of_bearing"] = true,
+	["item_power_treads"] = true
 }
 
 ITEMS_JUNGLE = {
-	["item_keen_optic"] = true,
-	["item_grove_bow"] = true,
-	["item_quickening_charm"] = true,
-	["item_philosophers_stone"] = true,
-	["item_force_boots"] = true,
-	["item_desolator_2"] = true,
-	["item_seer_stone"] = true,
-	["item_greater_mango"] = true,
-	["item_elixer_healing"] = true,
-	["item_vampire_fangs"] = true,
-	["item_craggy_coat"] = true,
-	["item_timeless_relic"] = true,
-	["item_mirror_shield"] = true,
-	["item_ironwood_tree"] = true,
-	["item_royal_jelly"] = true,
-	["item_pupils_gift"] = true,
-	["item_repair_kit"] = true,
-	["item_mind_breaker"] = true,
-	["item_third_eye"] = true,
-	["item_spell_prism"] = true,
-	["item_horizon"] = true,
-	["item_princes_knife"] = true,
-	["item_spider_legs"] = true,
-	["item_helm_of_the_undying"] = true,
-	["item_mango_tree"] = true,
-	["item_imp_claw"] = true,
-	["item_flicker"] = true,
-	["item_spy_gadget"] = true,
-	["item_ocean_heart"] = true,
-	["item_broom_handle"] = true,
-	["item_trusty_shovel"] = true,
-	["item_nether_shawl"] = true,
-	["item_dragon_scale"] = true,
-	["item_essence_ring"] = true,
-	["item_clumsy_net"] = true,
-	["item_enchanted_quiver"] = true,
-	["item_ninja_gear"] = true,
-	["item_illusionsts_cape"] = true, -- as spelt
-	["item_havoc_hammer"] = true,
-	["item_panic_button"] = true,
-	["item_apex"] = true,
-	["item_ballista"] = true,
-	["item_woodland_striders"] = true,
-	["item_trident"] = true,
-	["item_demonicon"] = true,
-	["item_fallen_sky"] = true,
-	["item_pirate_hat"] = true,
-	["item_dimentional_doorway"] = true,
-	["item_ex_machina"] = true,
-	["item_faded_broach"] = true,
-	["item_paladin_sword"] = true,
-	["item_minotaur_horn"] = true,
-	["item_orb_of_destruction"] = true,
-	["item_the_leveller"] = true,
-	["item_titan_sliver"] = true,
-	["item_chipped_vest"] = true,
-	["item_wizard_glass"] = true,
-	["item_gloves_of_travel"] = true,
-	["item_sorcerers_staff"] = true,
-	["item_elven_tunic"] = true,
-	["item_cloak_of_flames"] = true,
-	["item_venom_gland"] = true,
-	["item_trickster_cloak"] = true,
-	["item_gladiator_helm"] = true,
-	["item_possessed_mask"] = true,
-	["item_force_field"] = true,
-	["item_black_powder_bag"] = true,
-	["item_ascetic_cap"] = true,
-	["item_pogo_stick"] = true,
-	["item_paintball"] = true,
-	["item_heavy_blade"] = true,
-	["item_unstable_wand"] = true,
-	["item_misericorde"] = true,
-	["item_ancient_perseverance"] = true,
-	["item_oakheart"] = true,
-	["item_stormcrafter"] = true,
-	["item_overflowing_elixir"] = true,
-	["item_mysterious_hat"] = true,
-	["item_satchel"] = true,
-	["item_star_mace"] = true,
-	["item_penta_edged_sword"] = true,
-	["item_vambrace"] = true,
-	["item_witless_shako"] = true,
-	["item_ring_of_aquila"] = true,
-	["item_lance_of_pursuit"] = true,
+	["item_keen_optic"] = 1,
+	["item_grove_bow"] = 2,
+	["item_quickening_charm"] = 3,
+	["item_black_powder_bag"] = 3, -- Blast Rig
+	["item_philosophers_stone"] = 2,
+	["item_dagger_of_ristul"] = 2, -- Dagger of Ristul
+	["item_specialists_array"] = 2, -- Specialist's Array
+	["item_force_boots"] = 5,
+	["item_desolator_2"] = 5, -- Stygian Desolator
+	["item_seer_stone"] = 5,
+	["item_greater_mango"] = 1,
+	["item_elixer_healing"] = 1,
+	["item_vampire_fangs"] = 1,
+	["item_craggy_coat"] = 1,
+	["item_timeless_relic"] = 4,
+	["item_mirror_shield"] = 5,
+	["item_ironwood_tree"] = 1,
+	["item_royal_jelly"] = 1,
+	["item_pupils_gift"] = 2,
+	["item_repair_kit"] = 1,
+	["item_mind_breaker"] = 3,
+	["item_third_eye"] = 1,
+	["item_spell_prism"] = 4,
+	["item_horizon"] = 1,
+	["item_bullwhip"] = 2,
+	["item_princes_knife"] = 1,
+	["item_spider_legs"] = 1,
+	["item_helm_of_the_undying"] = 1,
+	["item_mango_tree"] = 1,
+	["item_imp_claw"] = 1,
+	["item_flicker"] = 4,
+	["item_spy_gadget"] = 1,
+	["item_ocean_heart"] = 1,
+	["item_broom_handle"] = 1,
+	["item_trusty_shovel"] = 1,
+	["item_nether_shawl"] = 2,
+	["item_dragon_scale"] = 2,
+	["item_essence_ring"] = 1,
+	["item_clumsy_net"] = 1,
+	["item_enchanted_quiver"] = 3,
+	["item_ninja_gear"] = 4,
+	["item_spy_gadget"] = 4, -- Telescope
+	["item_illusionsts_cape"] = 1, -- as spelt
+	["item_havoc_hammer"] = 4,
+	["item_panic_button"] = 1,
+	["item_apex"] = 5,
+	["item_demonicon"] = 5, -- Book of the Dead
+	["item_ballista"] = 1,
+	["item_woodland_striders"] = 1,
+	["item_trident"] = 1,
+	["item_fallen_sky"] = 5,
+	["item_force_field"] = 5, -- Arcanist's Armor
+	["item_pirate_hat"] = 5, -- Pirate Hat
+	["item_ex_machina"] = 5, -- Ex Machina
+	["item_giants_ring"] = 5, -- Giant's Ring
+	["item_book_of_shadows"] = 5, -- Book of Shadows
+	["item_heavy_blade"] = 5, -- Witchbane
+	["item_pirate_hat"] = 5,
+	["item_dimentional_doorway"] = 1,
+	["item_faded_broach"] = 1,
+	["item_paladin_sword"] = 3,
+	["item_minotaur_horn"] = 1,
+	["item_orb_of_destruction"] = 1,
+	["item_the_leveller"] = 1,
+	["item_titan_sliver"] = 3,
+	["item_chipped_vest"] = 1,
+	["item_wizard_glass"] = 1,
+	["item_gloves_of_travel"] = 1,
+	["item_sorcerers_staff"] = 1,
+	["item_ceremonial_robe"] = 3, -- Ceremonial Robe
+	["item_psychic_headband"] = 3, -- Psychic Headband
+	["item_ogre_seal_totem"] = 3, -- Ogre Seal Totem
+	["item_elven_tunic"] = 3,
+	["item_cloak_of_flames"] = 3,
+	["item_venom_gland"] = 1,
+	["item_trickster_cloak"] = 4,
+	["item_gladiator_helm"] = 1,
+	["item_possessed_mask"] = 1,
+	["item_force_field"] = 1,
+	["item_force_boots"] = 5, -- Force Boots
+	["item_black_powder_bag"] = 1,
+	["item_ascetic_cap"] = 4,
+	["item_pogo_stick"] = 1, -- Tumbler's Toy
+	["item_seeds_of_serenity"] = 1,
+	["item_lance_of_pursuit"] = 1,
+	["item_occult_bracelet"] = 1, -- Occult Bracelet
+	["item_paintball"] = 1,
+	["item_heavy_blade"] = 1,
+	["item_unstable_wand"] = 1, -- Pig Pole
+	["item_misericorde"] = 1,
+	["item_ancient_perseverance"] = 1,
+	["item_oakheart"] = 1,
+	["item_stormcrafter"] = 4,
+	["item_overflowing_elixir"] = 1,
+	["item_mysterious_hat"] = 1, -- Fairy's Trinket
+	["item_satchel"] = 1,
+	["item_star_mace"] = 1,
+	["item_penta_edged_sword"] = 4,
+	["item_vambrace"] = 2,
+	["item_misericorde"] = 2, -- Brigand's Blade
+	["item_eye_of_the_vizier"] = 2, -- Eye of the Vizier
+	["item_witless_shako"] = 1,
+	["item_ring_of_aquila"] = 2,
+	["item_lance_of_pursuit"] = 1,
 }
 
 require(GetScriptDirectory().."/lib_hero/item/item_logic")

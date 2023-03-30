@@ -1,10 +1,10 @@
 local hero_data = {
 	"treant",
-	{2, 1, 2, 1, 3, 4, 3, 3, 1, 3, 2, 4, 1, 2, 5, 8, 4, 9, 11},
+	{2, 3, 2, 3, 1, 4, 1, 1, 3, 5, 3, 4, 1, 2, 8, 2, 4, 9, 11},
 	{
-		"item_ring_of_protection","item_tango","item_magic_stick","item_branches","item_branches","item_boots","item_energy_booster","item_arcane_boots","item_blink","item_gem","item_aghanims_shard","item_magic_wand","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_refresher","item_gem",
+		"item_tango","item_wraith_band","item_enchanted_mango","item_ring_of_health","item_pers","item_meteor_hammer","item_boots","item_staff_of_wizardry","item_wind_lace","item_force_staff","item_aghanims_shard","item_blink","item_void_stone","item_sheepstick","item_refresher",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,3,}, 0.1 },
 	{
 		"Nature's Grasp","Leech Seed","Living Armor","Overgrowth","+2 Living Armor Heal Per Second","-5.0s Nature's Grasp Cooldown","+15% Leech Seed Movement Slow","+30 Nature's Grasp Damage","+8 Living Armor Bonus Armor","+40 Leech Seed Damage/Heal","Overgrowth Undispellable","450 AoE Living Armor",
 	}
@@ -66,7 +66,8 @@ local N_G_PATH_LENGTH = 1500
 local N_G_EXTRAPOLATE = 0.8 + 135 / 500 -- Full path creation + upper mvspeed enemy time to get through radius
 local OVERGROWTH_RADIUS = 900
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
@@ -76,6 +77,7 @@ local d = {
 		t_enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
 		t_team_players = GSI_GetTeamPlayers(TEAM)
 
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

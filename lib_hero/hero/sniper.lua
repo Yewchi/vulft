@@ -1,12 +1,12 @@
 local hero_data = {
 	"sniper",
-	{2, 1, 1, 3, 1, 2, 1, 3, 2, 2, 5, 3, 3, 5, 8, 13, 5, 10, 12},
+	{2, 3, 1, 1, 1, 4, 1, 3, 3, 2, 2, 3, 6, 2, 7, 4, 4, 9, 11},
 	{
-		"item_quelling_blade","item_tango","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_wraith_band","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_maelstrom","item_magic_wand","item_force_staff","item_dragon_lance","item_hurricane_pike","item_aghanims_shard","item_mjollnir","item_lifesteal","item_claymore","item_satanic","item_demon_edge","item_javelin","item_monkey_king_bar","item_black_king_bar","item_black_king_bar","item_blink","item_swift_blink","item_moon_shard","item_armlet","item_armlet",
+		"item_magic_stick","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_quarterstaff","item_lifesteal","item_mask_of_madness","item_blade_of_alacrity","item_dragon_lance","item_magic_wand","item_broadsword","item_blades_of_attack","item_lesser_crit","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_invis_sword","item_silver_edge","item_ultimate_orb","item_skadi","item_eagle","item_butterfly","item_aghanims_shard","item_claymore","item_satanic",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
 	{
-		"Shrapnel","Headshot","Take Aim","Concussive Grenade","Assassinate","+1.0s Take Aim Duration","+30 Headshot Damage","+30 Attack Speed","-14% Shrapnel Slow","+28 Knockback Distance Headshot","+24 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
+		"Shrapnel","Headshot","Take Aim","Assassinate","+1.0s Take Aim Duration","+30 Headshot Damage","+30 Attack Speed","+-14% Shrapnel Slow","+28 Knockback Distance Headshot","+24 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
 	}
 }
 --@EndAutomatedHeroData
@@ -137,6 +137,7 @@ d = {
 				d.ShrapnelMaxCharges,
 				d.ShrapnelChargeRestoreTime
 			)
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

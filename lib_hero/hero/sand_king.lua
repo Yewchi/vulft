@@ -1,12 +1,12 @@
 local hero_data = {
 	"sand_king",
-	{2, 3, 1, 2, 2, 4, 2, 1, 1, 5, 1, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 3, 2, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_branches","item_branches","item_tango","item_circlet","item_enchanted_mango","item_bracer","item_boots","item_ring_of_health","item_cloak","item_magic_wand","item_cloak","item_hood_of_defiance","item_arcane_boots","item_blink","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_aghanims_shard","item_pipe","item_aether_lens","item_gem","item_energy_booster","item_octarine_core","item_gem","item_black_king_bar","item_overwhelming_blink",
+		"item_quelling_blade","item_tango","item_ward_observer","item_branches","item_branches","item_ring_of_health","item_pers","item_crown","item_meteor_hammer","item_boots","item_magic_wand","item_blink","item_void_stone","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_aghanims_shard","item_ogre_axe","item_belt_of_strength","item_sange","item_staff_of_wizardry","item_robe","item_kaya_and_sange","item_platemail",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,4,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.3s Burrowstrike Stun","+125 Sand Storm Radius","+100.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
+		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.5s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Base Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
 	}
 }
 --@EndAutomatedHeroData
@@ -54,13 +54,15 @@ local push_handle = Push_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

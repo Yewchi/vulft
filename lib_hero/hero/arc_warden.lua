@@ -1,10 +1,10 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 8, 2, 4, 9, 11},
+	{3, 1, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
 	{
-		"item_tango","item_magic_stick","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_magic_wand","item_gloves","item_boots","item_hand_of_midas","item_javelin","item_maelstrom","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_aether_lens","item_octarine_core","item_blink","item_overwhelming_blink","item_sheepstick","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_ultimate_scepter_2","item_staff_of_wizardry","item_wind_lace","item_wind_waker",
+		"item_tango","item_faerie_fire","item_branches","item_branches","item_ward_observer","item_magic_stick","item_enchanted_mango","item_magic_wand","item_boots","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_rod_of_atos","item_gungir","item_ultimate_orb","item_void_stone","item_sphere","item_aether_lens","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_black_king_bar","item_aghanims_shard","item_ultimate_scepter_2","item_sheepstick","item_moon_shard","item_moon_shard",
 	},
-	{ {2,2,2,1,1,}, {2,2,2,1,1,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
 		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+200 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed","+125 Spark Wraith Damage","+40 Flux Damage","+40% Tempest Double Cooldown Reduction","+12s Tempest Double Duration",
 	}
@@ -63,6 +63,9 @@ do
 	end
 end
 
+local saved_abilities_arc
+local saved_abilities_tempest
+
 local function tempest_double_cast(gsiTempest, ability, target)
 	local f = AbilityLogic_DeduceTargetTypeCastFunc(gsiTempest, target)
 	--print(ability, ability:GetName(), gsiTempest.hUnit:GetAbilityByName(ability:GetName()))
@@ -77,7 +80,22 @@ end
 local function tempest_double_think(genericAbilityThink)
 	local tempestDouble = GSI_GetZetTempestGsiUnit()
 	if DEBUG then DEBUG_print(string.format("tempest_double_think: %s", Util_Printable(tempestDouble))) end
-	if tempestDouble == nil then return end -- Relevent for reloads // persistent job or player.lua data
+	if tempestDouble == nil or pUnit_IsNullOrDead(tempestDouble) then return end -- Relevent for reloads // persistent job or player.lua data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	local hUnit = tempestDouble.hUnit
 	local gsiPlayer = GSI_GetPlayerFromPlayerID(tempestDouble.playerID)
 	local pnot = gsiPlayer.nOnTeam
@@ -219,6 +237,7 @@ d = {
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["TempestDoubleThink"] = function() tempest_double_think(d.AbilityThink) end,
 	["AbilityThink"] = function(gsiPlayer)
@@ -228,6 +247,20 @@ d = {
 		if gsiPlayer.isTempest then -- Are we in a deeper stack with a tempest from tempest_double_think()? (the else code-block)
 			USE_ABILITY = tempest_double_cast
 		else
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 		end
 
@@ -339,7 +372,7 @@ d = {
 			end
 		end
 		return true
-	end,
+	end
 }
 local hero_access = function(key) return d[key] end
 

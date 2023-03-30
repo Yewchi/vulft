@@ -1,10 +1,10 @@
 local hero_data = {
 	"necrolyte",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 5, 2, 7, 2, 4, 10, 11},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_ward_observer","item_faerie_fire","item_tango","item_mantle","item_circlet","item_branches","item_branches","item_magic_wand","item_null_talisman","item_cloak","item_boots","item_hood_of_defiance","item_robe","item_staff_of_wizardry","item_kaya","item_belt_of_strength","item_ogre_axe","item_kaya_and_sange","item_aghanims_shard","item_reaver","item_vitality_booster","item_heart","item_voodoo_mask","item_eternal_shroud","item_platemail","item_energy_booster","item_pers","item_lotus_orb","item_mystic_staff","item_shivas_guard",
+		"item_tango","item_faerie_fire","item_circlet","item_mantle","item_ward_observer","item_branches","item_branches","item_null_talisman","item_cloak","item_boots","item_relic","item_radiance","item_magic_wand","item_hood_of_defiance","item_eternal_shroud","item_aghanims_shard","item_platemail","item_arcane_boots","item_lotus_orb","item_soul_booster","item_energy_booster","item_void_stone","item_octarine_core","item_blink","item_overwhelming_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_heart",
 	},
-	{ {2,2,2,3,1,}, {2,2,2,3,1,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
 	{
 		"Death Pulse","Ghost Shroud","Heartstopper Aura","Reaper's Scythe","+100 Reaper's Scythe Cast Range","+2s Heartstopper Aura Stack Duration","+24% Ghost Shroud Slow","+32 Death Pulse Heal","+15% Ghost Shroud Self Restoration Amp","+32% Heartstopper Regen Reduction","+0.5% Heartstopper Aura Damage","-2.5s Death Pulse Cooldown",
 	}
@@ -36,13 +36,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -62,6 +64,6 @@ local d = {
 local hero_access = function(key) return d[key] end
 
 do
-	HeroData_SetHeroData(hero_data, abilities, hero_access)
+	HeroData_SetHeroData(hero_data, abilities, hero_access, true)
 end
 

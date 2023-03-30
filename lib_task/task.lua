@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Tasks are abstractions of a set of actions. The current (and list of recently considered) tasks to enact and re-evaluate. 
 -- Tasks associate Xeta-score-functions to the entities or abstract entities that define an objective.
 -- Task blueprints determine how a task may be completed, and what to consider.
@@ -13,7 +39,8 @@ TASK_PRIORITY_TOP = 1
 TASK_PRIORITY_FORGOTTEN = 10
 PLAYERS_ALL = 0xFFFE
 
-FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK = 1.25 -- Stubbornness here greatly reduces analytical 'true-value-of-because' code.
+-- 28/03/23 Not liking this for leech_exp / avoid_hide farming switch. 
+FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK = 1.15 -- Stubbornness here greatly reduces analytical 'true-value-of-because' code. ... 28/03/23 Maths is generally a slider score via min/max anyways.
 local FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK = FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK
 
 require(GetScriptDirectory().."/lib_gsi/gsi_gpm")
@@ -65,11 +92,15 @@ local t_player_disallowed_objective_targets -- Check my own index regularly and 
 
 local t_player_tasks_failing_inits
 
+local t_check_revert_from_short
+
 local t_tasks
 local t_priority_list
 
 local t_task_incentives
 local t_task_incentives_size
+
+local t_task_start_time
 
 local t_custom_activity_type -- from blueprint_main init
 
@@ -82,16 +113,19 @@ do
 	t_priority_list = {}
 	t_task_incentives = {}
 	t_task_incentives_size = {}
+	t_task_start_time = {}
 	t_task_incentive_handle_index = {}
 	t_player_task_current = {}
 	t_player_task_runner_up = {}
 	t_player_tasks_failing_inits = {}
+	t_check_revert_from_short = {}
 	for i=1,TEAM_NUMBER_OF_PLAYERS,1 do
 		t_player_disallowed_objective_targets[i] = {}
 		t_tasks[i] = {}
 		t_priority_list[i] = {}
 		t_task_incentives[i] = {}
 		t_task_incentives_size[i] = 0
+		t_task_start_time[i] = 0
 		t_task_incentive_handle_index[i] = {}
 		t_player_task_current[i] = {} -- init handling
 		t_player_tasks_failing_inits[i] = {}
@@ -118,6 +152,7 @@ do
 		)
 end
 
+-------------- take_and_stitch_nodes()
 local function take_and_stitch_nodes(priorityList, taskTaken)
 	local prevNode = taskTaken[TASK_I__PREV_NODE]
 	local nextNode = taskTaken[TASK_I__NEXT_NODE]
@@ -135,6 +170,7 @@ local function take_and_stitch_nodes(priorityList, taskTaken)
 	end
 end
 
+-------------- ammend_node()
 local function ammend_node(priorityList, taskAmmended)
 	local lastNode = priorityList[LIST_I__LAST_NODE]
 	if lastNode then
@@ -148,6 +184,14 @@ local function ammend_node(priorityList, taskAmmended)
 	end
 	priorityList[LIST_I__LAST_NODE] = taskAmmended
 	taskAmmended[TASK_I__CURR_PRIORITY] = priorityList[LIST_I__PRIORITY_LIST_INDEX]
+end
+
+-------------- end_current_task()
+local function end_current_task(gsiPlayer)
+	if t_check_revert_from_short[gsiPlayer.nOnTeam] then
+		Task_SetTaskPriority(t_check_revert_from_short[gsiPlayer.nOnTeam], gsiPlayer.nOnTeam, TASK_PRIORITY_TOP)
+		t_check_revert_from_short[gsiPlayer.nOnTeam] = false
+	end
 end
 
 -------------- handle_failed_initialize()
@@ -176,7 +220,7 @@ local function score_task(gsiPlayer, task)
 	local prevObjective = task[TASK_I__OBJECTIVE]
 	
 	task[TASK_I__OBJECTIVE], task[TASK_I__SCORE] = task[TASK_I__SCORING_FUNC](gsiPlayer, task[TASK_I__OBJECTIVE], task[TASK_I__SCORE])
-	if not task[TASK_I__SCORE] then DEBUG_print("\n\n           CULPRIT WAS:", task[TASK_I__HANDLE]) end
+	if not task[TASK_I__SCORE] then DEBUG_print("\n\n           CULPRIT WAS: %d", task[TASK_I__HANDLE]) end
 	task[TASK_I__SCORE] = task[TASK_I__SCORE] + t_task_incentives[gsiPlayer.nOnTeam][task[TASK_I__HANDLE]][1] -- TODO Need to change prevScore return behaviour for this
 	return task[TASK_I__OBJECTIVE] ~= prevObjective
 end
@@ -340,8 +384,8 @@ function Task_HighestPriorityTaskScoringContinue(gsiPlayer)
 	-- Handle task switching and update task information
 	local prevCurrentScore = prevCurrent[TASK_I__SCORE]
 	local prevCurrentBeatScore = prevCurrentScore
-			and (prevCurrentScore > 0 and prevCurrentScore * FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK
-					or prevCurrentScore / FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK
+			and (prevCurrentScore > 0 and prevCurrentScore * FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK + 2.5
+					or prevCurrentScore / FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK -- TODO YIKES.. no imaginable standardization of task scoring behavioiur would make this good.
 			) or XETA_SCORE_DO_NOT_RUN
 	if prevCurrent == taskScoringHighest and taskScoringHighestHasObjectiveChange
 			or ( highestTaskScore > (prevCurrentBeatScore * FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK )
@@ -364,7 +408,9 @@ function Task_HighestPriorityTaskScoringContinue(gsiPlayer)
 			handle_failed_initialize(gsiPlayer, taskScoringHighest)
 		else -- Task init success
 			if DEBUG and DEBUG_IsBotTheIntern() then print(gsiPlayer.shortName, "score switch", taskScoringHighest[TASK_I__SCORE], taskScoringHighest[TASK_I__HANDLE], ">", prevCurrentScore, prevCurrent[TASK_I__HANDLE]) end
+			end_current_task(gsiPlayer)
 			t_player_task_current[nOnTeam] = taskScoringHighest
+			t_task_start_time[nOnTeam] = GameTime()
 			taskScoringHighest[TASK_I__SCORE] = initializationSuccessOrScore
 			if prevCurrent and prevRunnerUp then
 				local prevCurrentScore = prevCurrentScore
@@ -439,6 +485,7 @@ function Task_CurrentTaskContinue(gsiPlayer)
 				)
 		end
 		--[[BENCH]]if TEST then runTaskBench:BenchStart() end
+		-- Run task
 		thisPlayersCurrentTask[TASK_I__SCORE] = 
 			thisPlayersCurrentTask[TASK_I__RUN_FUNC](
 					gsiPlayer, 
@@ -448,6 +495,7 @@ function Task_CurrentTaskContinue(gsiPlayer)
 		--[[BENCH]]if TEST then runTaskBench:BenchEnd(true, "Task_CurrentTaskContinue total.") end
 		if thisPlayersCurrentTask[TASK_I__SCORE] == XETA_SCORE_DO_NOT_RUN then
 			thisPlayersCurrentTask[TASK_I__OBJECTIVE] = false
+			end_current_task(gsiPlayer)
 		end
 	elseif DEBUG then
 		local t = thisPlayersCurrenTask
@@ -476,6 +524,7 @@ function Task_CurrentTaskContinue(gsiPlayer)
 	end
 end
 
+-------- Task_RunSecondaryTaskWithLimitations()
 function Task_RunSecondaryTaskWithLimitations()
 	-- This function might be impossible to write without changing every task to check limitations before using any ActionImmediate_X()
 	-- Also, TODO limitation.lua. -- The idea is that this returns false if we break a limitation, the calling function then needs to
@@ -509,6 +558,8 @@ end
 
 -------- Task_InformDeadAndCancelAnyConfirmedDenial()
 function Task_InformDeadAndCancelAnyConfirmedDenial(gsiPlayer)
+	t_player_task_current[gsiPlayer.nOnTeam][TASK_I__SCORE] = XETA_SCORE_DO_NOT_RUN
+	t_task_start_time[gsiPlayer.nOnTeam] = 0
 	if gsiPlayer.isAlive then
 		gsiPlayer.isAlive = false
 		gsiPlayer.lastSeen:Update(Map_GetTeamFountainLocation(TEAM))
@@ -518,10 +569,12 @@ function Task_InformDeadAndCancelAnyConfirmedDenial(gsiPlayer)
 	end
 end
 
+-------------- index_incentivized_task()
 local function index_incentivized_task(pnot, taskHandle)
 	t_task_incentives_size[pnot] = t_task_incentives_size[pnot] + 1
 	t_task_incentive_handle_index[pnot][t_task_incentives_size[pnot]] = t_task_incentives[pnot][taskHandle]
 end
+-------------- collapse_incentivized_list()
 local function collapse_incentivized_list(incentiveList, indexToRemove, pnot)
 	local temp = table.remove(incentiveList, indexToRemove)
 	temp[1] = 0
@@ -539,7 +592,7 @@ function Task_TryDecrementIncentives()
 			while(currIndex <= t_task_incentives_size[pnot]) do
 				i = i+1 if i > 100 then for i=1, 10 do ERROR_print("DECREMENT WTF") end local a = nilled + 1 end
 				local thisIncentive = thisPlayerIncentives[currIndex]
-				if VERBOSE then VEBUG_print("decrement inc. ", pnot, i, thisIncentive[1], thisIncentive[2]) end
+				if VERBOSE then VEBUG_print(string.format("decrement inc. %d, %d, %.2f, %.2f", pnot, i, thisIncentive[1], thisIncentive[2])) end
 				thisIncentive[1] = max(0, thisIncentive[1] - thisIncentive[2])
 				if thisIncentive[1] == 0 then
 					collapse_incentivized_list(thisPlayerIncentives, currIndex, pnot)
@@ -576,19 +629,26 @@ function Task_GetCurrentTaskHandle(gsiPlayer)
 	return t_player_task_current[gsiPlayer.nOnTeam][TASK_I__HANDLE]
 end
 
+-------- Task_GetCurrentTaskScore()
 function Task_GetCurrentTaskScore(gsiPlayer)
 	return t_player_task_current[gsiPlayer.nOnTeam][TASK_I__SCORE] or 0
 end
 
+-------- Task_IsGreaterTaskScore()
 function Task_IsGreaterTaskScore(gsiPlayer, handleU, handleV)
 	return (t_tasks[gsiPlayer.nOnTeam][handleU][TASK_I__SCORE] or 0) 
 			> (t_tasks[gsiPlayer.nOnTeam][handleV][TASK_I__SCORE] or 0)
 end
 
+-------- Task_IndicateSuccessfulInitShortTask()
+function Task_IndicateSuccessfulInitShortTask(gsiPlayer, taskHandle)
+	t_check_revert_from_short[gsiPlayer.nOnTeam] = t_player_task_current[gsiPlayer.nOnTeam][TASK_I__HANDLE]
+end
+
 function Task_IncentiviseTask(gsiPlayer, taskHandle, additionalScore, decreaseIncentivePerSecond, force) -- Use this when other logic realizes that things aren't what they seem. (I'm 50% HP enchantress with full mana and 600 heal natures attendants and fight_harass is scoring low)
 	local pnot = gsiPlayer.nOnTeam
 	local thisTaskIncentive = t_task_incentives[pnot][taskHandle]
-	--if DEBUG then DEBUG_print(string.format("%s incentivises %d with + %.2f %.2f %s", gsiPlayer.shortName, taskHandle, additionalScore, decreaseIncentivePerSecond, force)) end
+	
 	if thisTaskIncentive[1] < additionalScore or force then
 		-- index for decrements, if new
 		if thisTaskIncentive[1] == 0 then
@@ -599,6 +659,7 @@ function Task_IncentiviseTask(gsiPlayer, taskHandle, additionalScore, decreaseIn
 	end
 end
 
+-------- Task_GetTaskScore()
 function Task_GetTaskScore(gsiPlayer, taskHandle)
 	if not t_tasks[gsiPlayer.nOnTeam] or not t_tasks[gsiPlayer.nOnTeam][taskHandle] then
 		return XETA_SCORE_DO_NOT_RUN -- TODO invalid current task may need to be stamped out
@@ -606,18 +667,27 @@ function Task_GetTaskScore(gsiPlayer, taskHandle)
 	return t_tasks[gsiPlayer.nOnTeam][taskHandle][TASK_I__SCORE] or 0
 end
 
+-------- Task_GetCurrentTaskStartTime()
+function Task_GetCurrentTaskStartTime(gsiPlayer)
+	return t_task_start_time[gsiPlayer.nOnTeam]
+end
+
+-------- Task_GetCurrentTaskScore()
 function Task_GetCurrentTaskScore(gsiPlayer)
 	return t_player_task_current[gsiPlayer.nOnTeam][TASK_I__SCORE] or XETA_SCORE_DO_NOT_RUN
 end
 
+-------- Task_GetCurrentTaskObjective()
 function Task_GetCurrentTaskObjective(gsiPlayer)
 	return t_player_task_current[gsiPlayer.nOnTeam][TASK_I__OBJECTIVE] or nil
 end
 
+-------- Task_GetTaskObjective()
 function Task_GetTaskObjective(gsiPlayer, taskHandle)
 	return t_tasks[gsiPlayer.nOnTeam][taskHandle][TASK_I__OBJECTIVE] or nil
 end
 
+-------- Task_GetTaskRunFunc()
 function Task_GetTaskRunFunc(taskHandle)
 	if VERBOSE then VEBUG_print(GSI_GetBot().nOnTeam, taskHandle) end
 	return t_tasks[GSI_GetBot().nOnTeam][taskHandle][TASK_I__RUN_FUNC]
@@ -629,6 +699,7 @@ function Task_RotatePlayerOnTeam(n)
 end
 
 local empty_func = function() end
+-------- Task_PopulatePlaceholdersForHumans()
 function Task_PopulatePlaceholdersForHumans(team)
 	for pnot=1,#team do 
 		if not team[pnot].hUnit:IsBot() then

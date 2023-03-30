@@ -1,12 +1,12 @@
 local hero_data = {
 	"techies",
-	{1, 3, 1, 3, 1, 5, 1, 3, 3, 2, 6, 5, 2, 2, 8, 2, 5, 11, 13},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_wind_lace","item_ring_of_regen","item_ward_observer","item_boots","item_tranquil_boots","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_aghanims_shard","item_mystic_staff","item_void_stone","item_sheepstick","item_ogre_axe","item_black_king_bar","item_energy_booster","item_aether_lens",
+		"item_faerie_fire","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_enchanted_mango","item_tango","item_clarity","item_boots","item_arcane_boots","item_aghanims_shard","item_ghost","item_staff_of_wizardry","item_robe","item_ethereal_blade","item_headdress","item_hood_of_defiance","item_pipe","item_aether_lens","item_soul_booster",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,4,4,}, 0.1 },
+	{ {3,3,3,2,1,}, {4,4,4,2,5,}, 0.1 },
 	{
-		"Sticky Bomb","Reactive Tazer","Blast Off!","Minefield Sign","Proximity Mines","+20% Magic Resistance","-3s Proximity Mines Cooldown","+200 Blast Off! Damage","+3 Mana Regen","+125 Sticky Bomb Latch/Explosion Radius","-15s Blast Off! Cooldown","+252 Damage","-0.8s Proximity Mines Activation Delay",
+		"Sticky Bomb","Reactive Tazer","Blast Off!","Proximity Mines","+20% Magic Resistance","-3s Proximity Mines Cooldown","+200 Blast Off! Damage","+3 Mana Regen","+125 Sticky Bomb Latch/Explosion Radius","-15s Blast Off! Cooldown","+252 Damage","-0.8s Proximity Mines Activation Delay",
 	}
 }
 --@EndAutomatedHeroData
@@ -43,13 +43,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

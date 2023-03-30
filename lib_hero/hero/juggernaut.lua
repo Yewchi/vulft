@@ -1,12 +1,12 @@
 local hero_data = {
 	"juggernaut",
-	{1, 3, 1, 2, 1, 5, 1, 2, 2, 6, 2, 5, 3, 3, 9, 8, 11},
+	{1, 3, 1, 2, 1, 4, 1, 3, 2, 5, 2, 4, 2, 3, 8, 3, 10, 4, 11},
 	{
-		"item_tango","item_branches","item_quelling_blade","item_branches","item_magic_stick","item_branches","item_boots","item_wind_lace","item_magic_wand","item_gloves","item_boots_of_elves","item_power_treads","item_mithril_hammer","item_maelstrom","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_aghanims_shard","item_blink","item_ultimate_orb","item_skadi","item_mjollnir","item_ultimate_scepter",
+		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_slippers","item_boots","item_ring_of_health","item_chainmail","item_blades_of_attack","item_phase_boots","item_claymore","item_broadsword","item_bfury","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_ultimate_orb","item_skadi","item_magic_wand","item_ultimate_orb","item_ring_of_health","item_sphere","item_aghanims_shard","item_basher","item_abyssal_blade","item_blink","item_swift_blink","item_moon_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Blade Fury","Healing Ward","Blade Dance","Swiftslash","Omnislash","+5 All Stats","+75.0 Blade Fury Radius","-20.0s Healing Ward Cooldown","+1s Blade Fury Duration","+40% Blade Dance Lifesteal","+150 Blade Fury DPS","+1s Omnislash Duration","+2 Healing Ward Hits to Kill",
+		"Blade Fury","Healing Ward","Blade Dance","Omnislash","+5 All Stats","+100.0 Blade Fury Radius","-20.0s Healing Ward Cooldown","+1s Blade Fury Duration","+40% Blade Dance Lifesteal","+150 Blade Fury DPS","+1s Omnislash Duration","+2 Healing Ward Hits to Kill",
 	}
 }
 --@EndAutomatedHeroData
@@ -37,7 +37,8 @@ local BLADE_FURY_DURATION = 5
 local BLADE_FURY_RADIUS = 260
 local HEALING_WARD_DURATION = 25
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		FightClimate_RegAvoidHeroReponse(R.RESPONSE_TYPE_AVOID_CASTER,
 				nil,
@@ -55,6 +56,7 @@ local d = {
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

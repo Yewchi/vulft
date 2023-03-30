@@ -1,12 +1,12 @@
 local hero_data = {
 	"silencer",
-	{2, 1, 1, 3, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_enchanted_mango","item_branches","item_branches","item_sobi_mask","item_branches","item_ward_dispenser","item_ring_of_basilius","item_boots","item_magic_wand","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_aether_lens","item_aghanims_shard","item_pers","item_energy_booster","item_arcane_boots","item_lotus_orb","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_octarine_core",
+		"item_magic_stick","item_tango","item_faerie_fire","item_circlet","item_branches","item_ward_observer","item_null_talisman","item_magic_wand","item_boots","item_robe","item_gloves","item_power_treads","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_aghanims_shard","item_blade_of_alacrity","item_belt_of_strength","item_hurricane_pike","item_ultimate_orb","item_pers","item_sphere","item_invis_sword","item_lesser_crit","item_silver_edge",
 	},
-	{ {3,3,3,1,2,}, {4,4,4,5,2,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+12 Arcane Curse Damage","+20 Attack Speed","-25.0s Global Silence Cooldown","+0.8x Last Word Int Multiplier","+10% Glaives of Wisdom Damage","Arcane Curse Undispellable","+2 Glaives of Wisdom Bounces","Last Word Mutes",
+		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+10 Arcane Curse Damage","+20 Attack Speed","-20.0s Global Silence Cooldown","+0.8x Last Word Int Multiplier","+10% Glaives of Wisdom Damage","Arcane Curse Undispellable","+2 Glaives of Wisdom Bounces","Last Word Mutes",
 	}
 }
 --@EndAutomatedHeroData
@@ -50,13 +50,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

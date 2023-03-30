@@ -1,10 +1,10 @@
 local hero_data = {
 	"skeleton_king",
-	{1, 2, 4, 2, 2, 3, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9, 11},
+	{1, 2, 3, 2, 2, 3, 2, 3, 4, 6, 3, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_gauntlets","item_tango","item_quelling_blade","item_gauntlets","item_branches","item_branches","item_boots","item_blades_of_attack","item_phase_boots","item_gloves","item_blades_of_attack","item_armlet","item_mithril_hammer","item_blight_stone","item_mithril_hammer","item_desolator","item_blink","item_ogre_axe","item_belt_of_strength","item_heavens_halberd","item_mithril_hammer","item_basher","item_vanguard","item_abyssal_blade","item_aghanims_shard","item_reaver","item_overwhelming_blink","item_skadi","item_platemail","item_hyperstone","item_buckler","item_assault",
+		"item_branches","item_tango","item_slippers","item_magic_stick","item_quelling_blade","item_helm_of_iron_will","item_wraith_band","item_boots","item_blades_of_attack","item_phase_boots","item_gloves","item_armlet","item_relic","item_radiance","item_aghanims_shard","item_blink","item_hyperstone","item_buckler","item_assault","item_black_king_bar","item_monkey_king_bar","item_basher","item_vanguard","item_abyssal_blade","item_eagle","item_swift_blink",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{
 		"Wraithfire Blast","Vampiric Spirit","Mortal Strike","Reincarnation","+8% Vampiric Spirit Lifesteal","-25%% Summon Skeleton Duration/-25%% Cooldown","+0.7s Wraithfire Blast Stun Duration","+26 Skeletons Attack Damage","+25% Cleave","+6 Minimum Skeletons Spawned","-2.0s Mortal Strike Cooldown","Reincarnation Casts Wraithfire Blast",
 	}
@@ -26,6 +26,7 @@ local currentTask = Task_GetCurrentTaskHandle
 local GSI_AbilityCanBeCast = GSI_AbilityCanBeCast
 local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 local INCENTIVISE = Task_IncentiviseTask
+local POINT_DISTANCE_2D = Vector_PointDistance2D
 local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint
 local ACTIVITY_TYPE = ACTIVITY_TYPE
 local currentActivityType = Blueprint_GetCurrentTaskActivityType
@@ -40,7 +41,8 @@ local t_player_abilities = {}
 local ABILITY_USE_RANGE = 800
 local OUTER_RANGE = 1600
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
@@ -57,7 +59,7 @@ local d = {
 					end
 				end
 			end
-		return
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -77,8 +79,16 @@ local d = {
 		local currTask = currentTask(gsiPlayer)
 		local nearbyEnemies, outerEnemies
 				= Set_GetEnemyHeroesInLocRadOuter(gsiPlayer.lastSeen.location, ABILITY_USE_RANGE, OUTER_RANGE, 6)
-		local fightHarassTarget = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
-		local fhtPercHp = fightHarassTarget and fightHarassTarget.lastSeenHealth / fightHarassTarget.maxHealth or 1.0
+		local fht = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
+		local fhtReal = fht and fht.hUnit.IsNull and not fht.hUnit:IsNull()
+		local fhtHUnit = fhtReal and fht.hUnit
+		local fhtHpp = fht and fht.lastSeenHealth / fht.maxHealth
+		local fhtLoc = fht and fht.lastSeen.location
+
+		local playerLoc = gsiPlayer.lastSeen.location
+
+		local distToFht = fht and POINT_DISTANCE_2D(playerLoc, fhtLoc)
+
 		local reincarnationCost = reincarnation:GetManaCost()
 		local rezSeemsNeeded
 		if gsiPlayer.theorizedDanger then
@@ -91,10 +101,12 @@ local d = {
 			rezSeemsNeeded = playerHealthPercent < 0.45
 		end
 		if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+				and fhtReal
 				and AbilityLogic_AbilityCanBeCast(gsiPlayer, hellfireBlast)
+				and distToFht < hellfireBlast:GetCastRange()*1.05
 				and (not rezSeemsNeeded or gsiPlayer.lastSeenMana - hellfireBlast:GetManaCost() > reincarnationCost)
-				and HIGH_USE(gsiPlayer, hellfireBlast, highUse - hellfireBlast:GetManaCost(), fhtPercHp) then
-			USE_ABILITY(gsiPlayer, hellfireBlast, fightHarassTarget, 400, nil)
+				and HIGH_USE(gsiPlayer, hellfireBlast, highUse - hellfireBlast:GetManaCost(), fhtHpp) then
+			USE_ABILITY(gsiPlayer, hellfireBlast, fht, 400, nil)
 			return;
 		end
 		if currTask == push_handle and not nearbyEnemies[1] and not outerEnemies[1] then
@@ -105,12 +117,14 @@ local d = {
 				return;
 			end
 		elseif currActivityType > ACTIVITY_TYPE.CAREFUL
-				and nearbyEnemies[1] and AbilityLogic_AbilityCanBeCast(gsiPlayer, hellfireBlast)
+				and fhtReal
+				and AbilityLogic_AbilityCanBeCast(gsiPlayer, hellfireBlast)
+				and distToFht < hellfireBlast:GetCastRange()*1.45
 				and (not rezSeemsNeeded or gsiPlayer.lastSeenMana - hellfireBlast:GetManaCost() > reincarnationCost)
 				and HIGH_USE(
 								gsiPlayer, hellfireBlast, highUse - hellfireBlast:GetManaCost(), playerHealthPercent
 							) then
-			USE_ABILITY(gsiPlayer, hellfireBlast, fightHarassTarget, 400, nil)
+			USE_ABILITY(gsiPlayer, hellfireBlast, fht, 400, nil)
 			return;
 		end
 	end,

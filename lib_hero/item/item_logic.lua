@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Detects component items so we can know that a hero doesn't need to re-buy something after reloads, or any other reason for reset of data.
 -- TODO TODO TODO Make an item build choice relational map with the C-side and reformulate it each fortnight,
 -- - when heroes run out of items to build, use their current items bought to pick items that score most likely
@@ -99,7 +125,7 @@ local ITEM_PURCHASE_TIME_REQUIREMENT = {
 	["item_tome_of_knowledge"] = 10*60
 }
 
-local EFFECTIVE_VALUE_OF_BOOT_ITEM = 4500 -- Used to switch out aegis or w/e.
+local ADDITIONAL_VALUE_OF_BOOT_ITEM = 2000 -- Used to switch out aegis or w/e.
 
 local FAERIE_FIRE_MANGO_CARRIED_VALUE = GetItemCost("item_flask") + 1
 local FAERIE_FIRE_MANGO_VALUE = GetItemCost("item_faerie_fire") -- N.B. Bugged logic in best-swap check function if patch makes any consumable with no benefit to carry has same cost.
@@ -194,12 +220,13 @@ function Item_HandleItemShop(gsiPlayer)
 	if not nextPurchase then return end
 	-- cont have purchase
 	
+	
 	-- Check for uncombinable junk when held item limit
 	if checkSellJunkThrottle:allowed()
 			and (gsiPlayer.hUnit:DistanceFromFountain() == 0
-				or gsiPlayer.hUnit:DistanceFromSecretShop() == 0
-			) and Item_NumberItemsCarried(gsiPlayer) == ITEM_INVENTORY_AND_BACKPACK_STORAGE then
-		Item_SellOrDropJunk(gsiPlayer, nextItemBuildIndex)
+				or gsiPlayer.hUnit:DistanceFromSecretShop() == 0 )
+			and Item_NumberItemsCarried(gsiPlayer) >= ITEM_INVENTORY_AND_BACKPACK_STORAGE-1 then
+		--Item_SellOrDropJunk(gsiPlayer, nextItemBuildIndex)
 	end
 
 	--print("checking secret", gsiPlayer.shortName, IsItemPurchasedFromSecretShop(nextPurchase),
@@ -371,6 +398,29 @@ function Item_AnyItemsOnCourier(gsiPlayer)
 	return false
 end
 
+function Item_DistanceToAliveCourier(gsiPlayer)
+	local hCourier = gsiPlayer.hCourier
+	if hCourier then
+		local courierLoc = hCourier:GetLocation()
+		local playerLoc = gsiPlayer.lastSeen.location
+		return sqrt((courierLoc.x+playerLoc.x)^2 + (courierLoc.y+playerLoc.y^2))
+	end
+	return 20000
+end
+
+function Item_CountItemsOnCourier(gsiPlayer)
+	local hCourier = gsiPlayer.hCourier
+	local countItems = 0
+	if hCourier then
+		for inventoryIndex=0,ITEM_END_BACKPACK_INDEX do
+			if hCourier:GetItemInSlot(inventoryIndex) ~= ITEM_NOT_FOUND then
+				countItems = countItems + 1
+			end
+		end
+	end
+	return countItems
+end
+
 function Item_GetTreeCuttingItem(gsiPlayer)
 	return select(2, Item_ItemOwnedAnywhere(gsiPlayer, "item_quelling_blade"))
 			or select(2, Item_ItemOwnedAnywhere(gsiPlayer, "item_bfury"))
@@ -395,6 +445,18 @@ function Item_UseBottleIntelligently(gsiPlayer, forceHold)
 			end
 		end
 	end
+end
+
+-- Will be overridden by other actions on the same tick
+-------- Item_DropItemNow()
+function Item_DropItemNow(gsiPlayer, hItem)
+	local dropLoc = Vector_Addition(gsiPlayer.lastSeen.location,
+			Vector_ScalarMultiply(
+				Vector_UnitDirectionalFacingDegrees(gsiPlayer.hUnit:GetFacing()),
+				30
+			)
+		)
+	GetBot():Action_DropItem(hItem, dropLoc)
 end
 
 function Item_PlayerDropItemAtSlot(pUnit, slot)
@@ -591,7 +653,7 @@ end
 function Item_OnItemSwapCooldown(gsiPlayer, hItem, itemSlot)
 	local itemSlot = itemSlot or gsiPlayer.hUnit:FindItemSlot(hItem:GetName())
 	local swapTime = t_swap_index_time[gsiPlayer.nOnTeam][itemSlot]
-	if itemSlot > ITEM_END_INVENTORY_INDEX then
+	if itemSlot > ITEM_END_INVENTORY_INDEX and itemSlot < ITEM_END_BACKPACK_INDEX then
 		ALERT_print(
 				string.format(
 					"[item_logic]: %s Query on item not in the inventory.",
@@ -605,7 +667,7 @@ function Item_OnItemSwapCooldown(gsiPlayer, hItem, itemSlot)
 	return swapTime > GameTime()
 end
 
-function Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, forceSlot) -- N.B. Could be reversed without a following inventory lock
+function Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, forceSlot, dryRun) -- N.B. Could be reversed without a following inventory lock
 	local thisItemSlot = gsiPlayer.hUnit:FindItemSlot(hItem:GetName())
 	-- TODO Stash and at fountain, courier in vicinity (does swapping work then) checks?
 	if thisItemSlot == ITEM_NOT_FOUND then
@@ -617,8 +679,10 @@ function Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, forceSlot) -- N.B. 
 	end
 	local switchOutSlot = forceSlot or Item_GetBestSwitchOutInInventory(gsiPlayer)
 	if switchOutSlot then
-		--[[DEBUG]]if VERBOSE then VEBUG_print(string.format("%s switching item slots #%d, #%d for ensure carried operation.", gsiPlayer.shortName, thisItemSlot, switchOutSlot)) end
-		F_SWAP_ITEMS(gsiPlayer, thisItemSlot, switchOutSlot)
+		if not dryRun then
+			--[[DEBUG]]if VERBOSE then VEBUG_print(string.format("%s switching item slots #%d, #%d for ensure carried operation.", gsiPlayer.shortName, thisItemSlot, switchOutSlot)) end
+			F_SWAP_ITEMS(gsiPlayer, thisItemSlot, switchOutSlot)
+		end
 		return ITEM_ENSURE_RESULT_WAIT, switchOutSlot -- .'. check ~= false and we will have the item soon / ready now.
 	end
 end
@@ -755,6 +819,7 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 		local lowestValueConsumableSlot = nil
 		local highestValueConsumableBackpack = -1
 		local highestValueConsumableBackpackSlot = nil
+		local foundWardIndex = nil
 		local freeInventorySlot = nil
 		
 		local pUnit = gsiPlayer.hUnit
@@ -779,14 +844,20 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 				elseif Item_IsConsumable(thisItemName) then
 					if thisItemCost == FAERIE_FIRE_MANGO_VALUE then thisItemCost = FAERIE_FIRE_MANGO_CARRIED_VALUE end
 					--print(gsiPlayer.shortName, "checking", thisItemName)
-					if thisItemCost > highestValueConsumableBackpack then
+					if string.find(thisItemName, "ward") then
+						if foundWardIndex then
+							gsiPlayer.hUnit:ActionImmediate_SwapItems(thisBackpackSlot, foundWardIndex)
+						else
+							foundWardIndex = thisBackpackSlot
+						end
+					elseif thisItemCost > highestValueConsumableBackpack then
 						--print(gsiPlayer.shortName, "storing", thisItemName)
 						highestValueConsumableBackpack = thisItemCost
 						highestValueConsumableBackpackSlot = thisBackpackSlot
 					end
 				else
 					if string.find(thisItemName, "boot", ITEM_NAME_SEARCH_START) then
-						thisItemCost = EFFECTIVE_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
+						thisItemCost = thisItemCost + ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
 					end
 					if thisItemCost > highestValueBackpack then
 						highestValueBackpack = thisItemCost
@@ -829,7 +900,13 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 					end
 				elseif Item_IsConsumable(thisItemName) then 
 					if thisItemCost == FAERIE_FIRE_MANGO_VALUE then thisItemCost = FAERIE_FIRE_MANGO_CARRIED_VALUE end
-					if lowestValueConsumableSlot then
+					if string.find(thisItemName, "ward") then
+						if foundWardIndex then
+							gsiPlayer.hUnit:ActionImmediate_SwapItems(thisInventorySlot, foundWardIndex)
+						else
+							foundWardIndex = thisInventorySlot
+						end
+					elseif lowestValueConsumableSlot then
 						multipleConsumablesInInventory = true
 						if thisItemCost < lowestValueConsumable then
 							-- TODO Cheese still has high gold value? Not sure about Roshan refresher.
@@ -842,7 +919,7 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 					end
 				else
 					if string.find(thisItemName, "boot", ITEM_NAME_SEARCH_START) then
-						thisItemCost = EFFECTIVE_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
+						thisItemCost = ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
 					end
 					if thisItemCost < lowestValue then 
 						lowestValue = thisItemCost
@@ -894,7 +971,7 @@ function Item_DetectNextItemBuildIndex(gsiPlayer, itemBuild) -- Used for resolvi
 			end
 			for _,itemComponent in ipairs(break_item_until_basic(thisItem, playerPrimaryAttribute)) do
 				table.insert(ownedComponents, itemComponent)
-				--[VERBOSE]]if VERBOSE then VEBUG_print(string.format("%s's item slot#%d has: '%s'.", gsiPlayer.shortName, s, pUnit:GetItemInSlot(s):GetName())) end
+				
 			end
 		end
 	end
@@ -930,7 +1007,7 @@ function Item_DetectNextItemBuildIndex(gsiPlayer, itemBuild) -- Used for resolvi
 			for k,v in ipairs(ownedComponents) do
 				if itemComponentString == v then -- TODO Item_IsConsumable(itemName)
 					table.remove(ownedComponents, k)
-					--print(gsiPlayer.shortname, "removing from itemBuild", i, itemBuild[i])
+					
 					table.remove(itemBuild, i) -- HACK FIX
 					Util_ShiftElementsToLowerTblsOfTbl(becomesJunkTbl, i)
 					i = i - 1
@@ -950,7 +1027,7 @@ function Item_DetectNextItemBuildIndex(gsiPlayer, itemBuild) -- Used for resolvi
 					) then -- If it is out of stock after the time requirement, we already have it. Aghs Scepter is bugged for now. Reloads I can only imagine being debug anyways
 			end
 		else
-			INFO_print(string.format("removing from itemBuild %d, %s", i, itemBuild[i]))
+			
 			table.remove(itemBuild, i)
 			Util_ShiftElementsToLowerTblsOfTbl(becomesJunkTbl, i)
 			i = i - 1
@@ -959,7 +1036,7 @@ function Item_DetectNextItemBuildIndex(gsiPlayer, itemBuild) -- Used for resolvi
 		i = i + 1
 	end
 	--[[DEBUG]]if DEBUG then DEBUG_print(string.format("item_logic: %s reset their item list at index %d, next purchase: '%s'.", gsiPlayer.shortName, 1, itemBuild[1])) end
-	return 1 -- HACK FIX
+	return 1 -- HACK FIX TODO This is mainly for dev dota_bot_reload_scripts, also above. -- TODO item builds should be better at self-repairing anyways
 end
 
 -----	Item_ResolvePartiallyCombinedBuild() Functions --
@@ -1133,8 +1210,8 @@ end
 local function update_table_of_possible_junk(gsiPlayer, buildOrderIndex)
 	local pnot = gsiPlayer.nOnTeam
 	local updatedIndex = t_player_junk_updated_index[pnot]
-	for i=updatedIndex+1,buildOrderIndex do -- big gold gains mean that we might multiple items over two frames
-		local nowJunkTable = t_player_becomes_junk_index[pnot][updatedIndex]
+	for i=updatedIndex+1,buildOrderIndex do
+		local nowJunkTable = t_player_becomes_junk_index[pnot][i]
 		if nowJunkTable then
 			for iJunk=1,#nowJunkTable do
 				table.insert(t_player_can_only_be_junk[pnot], nowJunkTable[iJunk])
@@ -1144,28 +1221,37 @@ local function update_table_of_possible_junk(gsiPlayer, buildOrderIndex)
 	end
 	return t_player_can_only_be_junk[pnot]
 end
-local function sell_or_drop_update_junk_table(gsiPlayer, hItem, junkTable)
-	if gsiPlayer.hUnit:DistanceFromFountain()
-			or gsiPlayer.hUnit:DistanceFromSecretShop() then
-		INFO_print("SOLD", gsiPlayer.shortName, thisItem:GetName())
-		gsiPlayer.hUnit:ActionImmediate_SellItem(thisItem)
+local function sell_or_drop_junk_update_table(gsiPlayer, hItem, junkTable)
+	if gsiPlayer.hUnit:DistanceFromFountain() == 0
+			or gsiPlayer.hUnit:DistanceFromSecretShop() == 0 then
+		INFO_print(string.format("[item_logic] Junk - SOLD %s %s", gsiPlayer.shortName, hItem:GetName()))
+		gsiPlayer.hUnit:ActionImmediate_SellItem(hItem)
 	else
-		INFO_print("DROPPED", gsiPlayer.shortName, thisItem:GetName())
-		gsiPlayer.hUnit:Action_DropItem(thisItem, gsiPlayer.lastSeen.location)
+		--INFO_print(string.format("[item_logic] Junk - DROPPED %s %s", gsiPlayer.shortName, hItem:GetName()))
+		--gsiPlayer.hUnit:Action_DropItem(hItem, gsiPlayer.hUnit:GetLocation())
 	end
 end
 local MAX_JUNK_CHECKS = 4
 -- used on a throttle, and intended only while at a shop
 -- TODO TEST
+
 function Item_SellOrDropJunk(gsiPlayer, buildOrderIndex)
 	local junkTable = update_table_of_possible_junk(gsiPlayer, buildOrderIndex)
-	--Util_TablePrint(junkTable)
 	if not junkTable then
-		--INFO_print("No junk to sell", gsiPlayer.shortName)
+		
 		return;
 	end
+
+
+
+
+
+
+
+
 	local numPossibleJunk = junkTable and #junkTable
 	local sortedValueItems, itemsHeld = Item_SortHeldByValue(gsiPlayer, false)
+
 	local anyFreeSlots = false
 	for iInventory=0,ITEM_END_BACKPACK_INDEX do
 		local thisItem = sortedValueItems[iInventory]
@@ -1174,8 +1260,8 @@ function Item_SellOrDropJunk(gsiPlayer, buildOrderIndex)
 		end
 		for iJunk=1,numPossibleJunk do
 			if thisItem:GetName() == junkTable[iJunk] then
-				INFO_print(gsiPlayer.shortName, "SELLING_JUNK")
-				sell_or_drop_junk_update_junk_table(gsiPlayer, thisItem, junkTable)
+				INFO_print(string.format("[item_logic]::Item_SellOrDropJunk() %s selling junk: %s", gsiPlayer.shortName, junkTable[iJunk] or "nil"))
+				sell_or_drop_junk_update_table(gsiPlayer, thisItem, junkTable)
 				return;
 			end
 		end
@@ -1199,19 +1285,18 @@ function Item_SortHeldByValue(gsiPlayer, highToLow)
 	sorted_platter[itemsHeld+1] = nil
 	sorted_platter[itemsHeld+2] = nil -- #arr works
 	for i=0,itemsHeld-1 do
-		for j=itemsHeld-1,i+1,-1 do
+		for j=itemsHeld,i+1,-1 do
 			local itemPrev = sorted_platter[j-1]
 			local itemCurr = sorted_platter[j]
 			local upperIsHigher =
-					GetItemCost(itemPrev:GetName())
-						+ ( ITEMS_BOOTS[itemPrev:GetName()] and 2000 or 0)
+					GetItemCost(itemCurr:GetName())
+						+ ( ITEMS_BOOTS[itemCurr:GetName()] and ADDITIONAL_VALUE_OF_BOOT_ITEM or 0)
 					> GetItemCost(itemCurr:GetName()) 
-						+ ( ITEMS_BOOTS[itemPrev:GetName()] and 2000 or 0)
-			if upperIsHigher and highToLow
-					or not (upperIsHigher or highToLow) then
-				local temp = sorted_platter[j-1]
-				sorted_platter[j-1] = sorted_platter[j]
-				sorted_platter[j] = temp
+						+ ( ITEMS_BOOTS[itemPrev:GetName()] and ADDITIONAL_VALUE_OF_BOOT_ITEM or 0)
+			if (highToLow and upperIsHigher)
+					or not (highToLow or upperIsHigher) then
+				sorted_platter[j-1] = itemCurr
+				sorted_platter[j] = itemPrev
 			end
 		end
 	end

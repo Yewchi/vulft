@@ -1,10 +1,10 @@
 local hero_data = {
 	"jakiro",
-	{1, 3, 1, 3, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 8, 2, 4, 10},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 5, 2, 4, 3, 3, 8, 3, 4, 10, 11},
 	{
-		"item_null_talisman","item_ward_observer","item_faerie_fire","item_bottle","item_boots","item_arcane_boots","item_crown","item_staff_of_wizardry","item_crown","item_rod_of_atos","item_headdress","item_chainmail","item_hood_of_defiance","item_pipe","item_blitz_knuckles","item_robe","item_witch_blade","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance",
+		"item_tango","item_circlet","item_faerie_fire","item_ward_sentry","item_circlet","item_faerie_fire","item_wind_lace","item_boots","item_arcane_boots","item_wind_lace","item_aether_lens","item_ghost","item_arcane_boots","item_aghanims_shard","item_gem","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem",
 	},
-	{ {3,3,1,2,1,}, {5,5,3,2,4,}, 0.1 },
+	{ {1,1,1,5,2,}, {5,5,5,4,2,}, 0.1 },
 	{
 		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+275 Attack Range","-10%/-10 Dual Breath Movement/Attack Speed Slow","-50 Liquid Fire Attack Speed","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","+100%% Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
 	}
@@ -34,13 +34,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -57,5 +59,5 @@ local d = {
 local hero_access = function(key) return d[key] end
 
 do
-	HeroData_SetHeroData(hero_data, abilities, hero_access)
+	HeroData_SetHeroData(hero_data, abilities, hero_access, true)
 end
