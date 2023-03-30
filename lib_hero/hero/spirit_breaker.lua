@@ -1,12 +1,12 @@
 local hero_data = {
 	"spirit_breaker",
-	{3, 1, 3, 1, 3, 5, 3, 1, 1, 2, 2, 5, 2, 2, 8, 6, 5, 11, 9},
+	{3, 1, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 5, 4, 10, 11},
 	{
-		"item_boots","item_boots","item_ward_observer","item_magic_wand","item_boots","item_blades_of_attack","item_phase_boots","item_quarterstaff","item_oblivion_staff","item_echo_sabre","item_ogre_axe","item_blade_of_alacrity","item_staff_of_wizardry","item_ultimate_scepter","item_blitz_knuckles","item_broadsword","item_invis_sword","item_blades_of_attack","item_silver_edge","item_yasha_and_kaya","item_ultimate_orb","item_sphere","item_void_stone","item_wind_waker","item_ultimate_scepter_2","item_octarine_core",
+		"item_gauntlets","item_gauntlets","item_branches","item_tango","item_branches","item_faerie_fire","item_bracer","item_boots","item_bracer","item_chainmail","item_blades_of_attack","item_phase_boots","item_wind_lace","item_magic_wand","item_blitz_knuckles","item_broadsword","item_invis_sword","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_black_king_bar","item_aghanims_shard","item_yasha","item_kaya","item_yasha_and_kaya",
 	},
-	{ {3,3,3,2,2,}, {4,4,2,3,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,4,4,}, 0.1 },
 	{
-		"Charge of Darkness","Bulldoze","Greater Bash","Planar Pocket","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
+		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
 	}
 }
 --@EndAutomatedHeroData
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

@@ -1,8 +1,8 @@
 local hero_data = {
 	"invoker",
-	{3, 1, 3, 1, 3, 1, 3, 1, 2, 3, 3, 2, 3, 2, 7, 2, 2, 2, 2, 9, 1, 6, 1, 1, 12, 1},
+	{3, 1, 1, 2, 3, 1, 3, 1, 1, 3, 3, 2, 3, 2, 2, 2, 2, 2, 3, 9, 6, 1, 1, 7, 11, 1},
 	{
-		"item_ward_observer","item_branches","item_mantle","item_faerie_fire","item_circlet","item_circlet","item_gloves","item_hand_of_midas","item_null_talisman","item_boots","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_energy_booster","item_void_stone","item_aether_lens","item_octarine_core","item_aghanims_shard","item_sheepstick","item_blink","item_staff_of_wizardry","item_refresher","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_overwhelming_blink",
+		"item_circlet","item_mantle","item_circlet","item_tango","item_ward_observer","item_branches","item_null_talisman","item_urn_of_shadows","item_boots","item_vitality_booster","item_spirit_vessel","item_gloves","item_hand_of_midas","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_mystic_staff","item_void_stone","item_sheepstick","item_aghanims_shard","item_pers","item_pers","item_refresher",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
@@ -354,6 +354,7 @@ d = {
 		t_player_choice_tables[gsiPlayer.nOnTeam] = {{}, {}, {}}
 		REPRIORITIZE_CHOICES(gsiPlayer)
 		t_player_card_to_set[gsiPlayer.nOnTeam] = {}
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 require(GetScriptDirectory().."/lib_hero/ability/damage_tracker")
 
 local B_AND = bit.band
@@ -436,6 +462,9 @@ function AbilityLogic_HandleLevelAbility(gsiPlayer, skillBuild)
 		end
 		ALERT_print(string.format("[ability_logic] %s attempt to upgrade %s %s failed.", gsiPlayer.shortName, ability and ability:GetName() or "build#", t_skill_build_order_next[gsiPlayer.nOnTeam]))
 	end
+	if pUnit:GetAbilityPoints() == 0 then
+		return;
+	end
 	ALERT_print(
 			string.format("[ability_logic] Attempting skill build repair on %s...",
 				gsiPlayer.shortName
@@ -528,7 +557,7 @@ function AbilityLogic_AbilityCanBeCast(gsiPlayer, hAbility)
 end
 
 function AbilityLogic_IsLikelyAbilityPointInvestibleType(hAbility) -- I haven't noticed how to make this more robust, there's a lot of cave-ats to any aditional checks
-	return hAbility and not hAbility:IsHidden() and B_AND(hAbility:GetBehavior(), ABILITY_BEHAVIOR_NOT_LEARNABLE) == 0
+	return hAbility and B_AND(hAbility:GetBehavior(), ABILITY_BEHAVIOR_NOT_LEARNABLE) == 0
 			or false
 end
 
@@ -868,7 +897,7 @@ function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
 	local hUnit = target.hUnit
 	if target.typeIsNone or Unit_IsNullOrDead(target) or not hUnit.IsMagicImmune then
 		-- Sometimes IsMagicImmune is not defined, despite a valid hUnit
-		return 0.5 -- Temporary
+		return 0.67 -- Temporary
 	end
 	local targetFlags = hAbility:GetTargetFlags()
 	if hUnit:IsMagicImmune()
@@ -892,6 +921,7 @@ function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
 		return 1
 	end
 end
+local AbilityLogic_CastOnTargetWillSucceed = AbilityLogic_CastOnTargetWillSucceed
 
 -- TODO NOTE THAT THE USE OF INVERSE HEALTH PERCENT IN HIGHUSE IS VERY DEGENERATE.
 -- -- IT DOES NOT HELP ANYTHING EXCEPT FOR ENEMIES THAT TAKE PERCENT REMAINING HEALTH
@@ -1327,6 +1357,91 @@ function AbilityLogic_WillChainCastHit(gsiCasting, gsiTarget, castRange, chainin
 	end
 end
 
+-- Does not check cast range, returns preferred if over acceptable dmg factor if set or over 0
+-------- AbilityLogic_GetBestDmgFactorTarget()
+function AbilityLogic_GetBestDmgFactorTarget(gsiPlayer, hAbility, units,
+			preferredTarget, acceptableFactor
+		)
+	local bestDmgFactor = AbilityLogic_CastOnTargetWillSucceed(gsiPlayer, units[i], hAbility)
+	local acceptableFactor = acceptableFactor or 0.01
+	if bestDmgFactor > acceptablePreferredFactor then
+		return preferredTarget, bestDmgFactor, true
+	end
+	local bestDmgTarget
+	for i=1,#units do
+		if not pUnit_IsNullOrDead(units[i]) then
+			local dmgFactor = AbilityLogic_CastOnTargetWillSucceed(gsiPlayer, units[i], hAbility)
+			if dmgFactor > bestDmgFactor then
+				bestDmgTarget = units[i]
+			end
+		end
+	end
+	return bestDmgTarget, bestDmgFactor, bestDmgFactor > acceptableFactor
+end
+
+local al_gcsu_platter = {}
+-- Freely causes bugs with platter
+-------- AbilityLogic_GetCastSucceedsUnits()
+function AbilityLogic_GetCastSucceedsUnits(gsiPlayer, units, hAbility)
+	local unitsPlatter = al_gcsu_platter
+	local countSucceeds = 0
+	
+	for i=1,#units do
+		if AbilityLogic_CastOnTargetWillSucceed(gsiPlayer, units[i], hAbility) > 0 then
+			countSucceeds = countSucceeds + 1
+			unitsPlatter[countSucceeds] = units[i]
+		end
+	end
+	
+	unitsPlatter[countSucceeds+1] = nil
+	unitsPlatter[countSucceeds+2] = nil
+
+	return unitsPlatter
+end
+
+local al_gekv_platter = {}
+-- Good for searching for smites, however dots and allies may be in the fight
+-- -| best to be using a damage tracker to exclude units
+-- Freely causes bugs with platter
+-------- AbilityLogic_GetLowHealthVulnerableToAbility()
+function AbilityLogic_GetEfficientKillVulnerable(gsiPlayer, hAbility, units, damage, allHeroes, killsWin)
+	local unitsPlatter = units
+	local countSucceeds = 0
+
+	local dmgFactorWeight = killsWin and 0 or 1
+
+	local bestScore = 0
+	local bestFactor = 0
+	local bestCouldKill = false
+	local bestUnit
+	
+	for i=1,#units do
+		local thisUnit = units[i]
+		local dmgFactor = AbilityLogic_CastOnTargetWillSucceed(gsiPlayer, thisUnit, hAbility)
+		if dmgFactor > 0 then
+			countSucceeds = countSucceeds + 1
+			unitsPlatter[countSucceeds] = thisUnit
+			local remainingHealth = thisUnit.lastSeenHealth + 10 - dmgFactor*damage
+-- [[METRICS]] KDA of 33 above their allies will flip to pointless vengeance at near-death rather than kill shot at a low KDA
+			local couldKill = remainingHealth < 0
+			local score = dmgFactor + (allHeroes and GSI_GetKDA(thisUnit)*0.03) 
+					+ (couldKill and 2 or 1-(remainingHealth/thisUnit.maxHealth))
+			if score > bestScore or (killsWin and couldKill and not bestCouldKill) then
+				bestScore = score
+				bestFactor = dmgFactor
+				bestCouldKill = couldKill
+				bestUnit = thisUnit
+			end
+		end
+	end
+	
+	unitsPlatter[countSucceeds+1] = nil
+	unitsPlatter[countSucceeds+2] = nil
+
+	return bestUnit, bestFactor, bestCouldKill, unitsPlatter
+end
+
+-------- AbilityLogic_InformAbilityCast()
 function AbilityLogic_InformAbilityCast(gsiPlayer, hAbility)
 	--print("Got ability", gsiPlayer.shortName, hAbility:GetName())
 	--print(gsiPlayer.team, TEAM, hAbility:GetCooldown())
@@ -1334,6 +1449,7 @@ function AbilityLogic_InformAbilityCast(gsiPlayer, hAbility)
 	FightClimate_InformAbilityCast(gsiPlayer, hAbility)
 end
 
+-------- AbilityLogic_UpdateHighUseMana()
 function AbilityLogic_UpdateHighUseMana(gsiPlayer, abilities)
 	if not gsiPlayer.updateHighUseMana then
 		gsiPlayer.updateHighUseMana = AbilityLogic_UpdateHighUseMana
@@ -1347,5 +1463,8 @@ function AbilityLogic_UpdateHighUseMana(gsiPlayer, abilities)
 			abilityCount = abilityCount + 1
 		end
 	end
-	gsiPlayer.highUseManaSimple = totalMana*0.5
+	-- 30/03/23 - Due to the bug meaning high use mana has been 0 for
+	-- -| all bots, and for a while, it is decreased so that behavioural
+	-- -| changes are not drastic.. untested. TODO
+	gsiPlayer.highUseManaSimple = totalMana*0.5 * 0.66
 end

@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Stores per-player lane and role data and interfaces data for heroes to team, starts hero_behaviour init via hero_data (to ability and item modules)
 
 ---- lib_hero constants --
@@ -22,6 +48,10 @@ ROLE_SCORES_ORDERED_I__SCORE = 	1
 ROLE_SCORES_ORDERED_I__PID = 	2
 --
 
+LANE_ROLES = TEAM_IS_RADIANT and {{4,3},{2},{5,1}} or {{5,1},{2},{4,3}}
+
+local DEFAULT_COMMON_ROLE = 4
+
 require(GetScriptDirectory().."/lib_hero/hero_data")
 require(GetScriptDirectory().."/lib_hero/hero_behaviour")
 local hero_requires = {}
@@ -43,20 +73,22 @@ do
 	end
 end
 
-local function score_lanes(lanes) -- Primitive (gives an ordered scale, nils for unpreferred)
+local function score_lanes(lanes, additionalImportance) -- Primitive (gives an ordered scale, nils for unpreferred)
 	local scoredLanes = {}
+	additionalImportance = additionalImportance or 0
 	for i=1,MAX_LANE_TYPES,1 do
-		scoredLanes[lanes[i] or -0xFF] = scoring_table[i]
+		scoredLanes[lanes[i] or -0xFF] = scoring_table[i] + additionalImportance
 	end
 	scoredLanes[-0xFF] = nil
 	
 	return scoredLanes
 end
 
-local function score_roles(roles)  -- Primitive (gives an ordered scale, nils for unpreferred)
+local function score_roles(roles, additionalImportance)  -- Primitive (gives an ordered scale, nils for unpreferred)
 	local scoredRoles = {}
+	additionalImportance = additionalImportance or 0
 	for i=1,MAX_ROLE_TYPES,1 do
-		scoredRoles[roles[i] or -0xFF] = scoring_table[i]
+		scoredRoles[roles[i] or -0xFF] = scoring_table[i] + additionalImportance
 	end
 	scoredRoles[-0xFF] = nil
 	
@@ -123,6 +155,12 @@ function Hero_Initialize() -- require witch_slayer.lua's present in game.
 									thisRoleData[HERO_PREFERENCE_I__ROLE], 
 									thisRoleData[HERO_PREFERENCE_I__SOLO_POTENTIAL]
 			)
+		if thisPlayer.isBot and HeroData_IsHeroUntested(thisPlayer.shortName) then
+			Captain_ConfigIndicateNonStandardSetting(
+					CAPTAIN_CONFIG_NON_STANDARD.HERO_UNTESTED_ABILITY_USE,
+					thisPlayer.shortName
+				)
+		end
 	end
 	generate_ordered_preference_score_for_roles()
 end
@@ -156,13 +194,64 @@ function Hero_RegisterPreferences(thisPlayer, lanes, roles, soloPotentialMultipl
 			(onTeam and team_preferences[thisPlayerNumOnTeam] or enemy_preferences[thisPlayerNumOnTeam]) or {}
 	player_preferences[thisplayerID] = thisHeroPreferences
 
-	thisHeroPreferences[HERO_PREFERENCE_I__LANE] = score_lanes(lanes)
-	thisHeroPreferences[HERO_PREFERENCE_I__ROLE] = score_roles(roles)
+	thisHeroPreferences[HERO_PREFERENCE_I__LANE] = score_lanes(lanes, not thisPlayer.isBot and 0.1 or 0)
+	thisHeroPreferences[HERO_PREFERENCE_I__ROLE] = score_roles(roles, not thisPlayer.isBot and 0.1 or 0)
 	thisHeroPreferences[HERO_PREFERENCE_I__SOLO_POTENTIAL] = soloPotentialMultiplier
 	thisHeroPreferences.nonCoreRoleProclivity = roles[1] and roles[2] and roles[1] + roles[2]
 			or roles[3] and 0 + roles[3]
 			or roles[4] and 0 + roles[4]*2
 			or roles[5] and	0 + roles[5]*2 or 0 -- numbers below 8 incidate this hero will never prefer supporting. If a team has only cores, give pos 4 / 5 to those with highest nonCoreProcliv'.
+end
+
+function Hero_HardSetRole(gsiPlayer, role)
+	local roleTable = player_preferences[gsiPlayer.playerID][HERO_PREFERENCE_I__ROLE] or {}
+	for i=1,MAX_LANE_TYPES do
+		roleTable[i] = (i==role and 1 or -10)
+	end
+	player_preferences[gsiPlayer.playerID][HERO_PREFERENCE_I__ROLE] = roleTable
+	generate_ordered_preference_score_for_roles()
+end
+
+function Hero_HardSetLane(gsiPlayer, lane)
+	local laneTable = player_preferences[gsiPlayer.playerID][HERO_PREFERENCE_I__LANE] or {}
+	for i=1,MAX_LANE_TYPES do
+		laneTable[i] = (i==lane and 1 or -10)
+	end
+	player_preferences[gsiPlayer.playerID][HERO_PREFERENCE_I__LANE] = laneTable
+	generate_ordered_preference_score_for_roles()
+end
+
+function Hero_GetCommonHeroRoleInLane(gsiPlayer, lane)
+	-- Any loaded role tables should be sorted
+	local roleTable = player_preferences[gsiPlayer.playerID][HERO_PREFERENCE_I__ROLE]
+	Util_TablePrint(player_preferences)
+	local choices = LANE_ROLES[lane]
+	if not roleTable or not choices or not choices[1] then
+		return false, DEFAULT_COMMON_ROLE, false
+	end
+	local avgRole = 0
+	local rolesAvgDiv = 0
+	for i=1,MAX_ROLE_TYPES do
+		for k=1,#choices do
+			if roleTable[i] == choices[k] then
+				return choices[k], nil, true
+			end
+		end
+		if roleTable[i] then
+			rolesAvgDiv = rolesAvgDiv + 1
+			avgRole = avgRole + roleTable[i] / rolesAvgDiv
+		end
+	end
+	local closestChoice = choices[1]
+	local closestDiff = 0xFFFF
+	for k=1,#choices do
+		local diff = math.abs(choices[k] - avgRole)
+		if diff < closestDiff then
+			closestDiff = diff
+			closestChoice = choices[k]
+		end
+	end
+	return false, closestChoice, true
 end
 
 function Hero_GetAllHeroAssignmentScores()

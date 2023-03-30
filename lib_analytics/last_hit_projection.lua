@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 ---- last_hit_projection constants
 local FAR_PAST_DELETE_DAMAGE_NODE = 4.0
 
@@ -44,6 +70,7 @@ local t_attacker_to_future_damage_node = {} -- the current pre-attack-point atta
 local job_domain_analytics
 
 local next_projectile_hunit_ref = 0
+-------------- get_dummy_projectile_hunit_ref()
 local function get_dummy_projectile_hunit_ref()
 	next_projectile_hunit_ref = next_projectile_hunit_ref + 1 % DUMMY_ATTACKER_FOR_PROJECTILE_MAX
 	return next_projectile_hunit_ref
@@ -51,6 +78,7 @@ end
 
 
 
+-------------- indicate_far_past_is_for_recycling()
 local function indicate_far_past_is_for_recycling()
 	local deleteOlderThan = GameTime() - FAR_PAST_DELETE_DAMAGE_NODE
 	for atUnit,list in pairs(future_damage_lists) do
@@ -73,6 +101,7 @@ local function indicate_far_past_is_for_recycling()
 	end
 end
 
+-------------- recycle_or_create_node()
 local function recycle_or_create_node() -- Breaking this func taught me that Dota may miss the top-level stack dump (recycle_or_create_node was indicating a complaint of "arg#1 not a table", it was an incorrectly spelt table.remove(t_lists_with_ruhcyclubul_nodes).
 	-- if #t_next_recyclable_nodes > 0 then
 		-- return table.remove(t_next_recyclable_nodes)
@@ -86,6 +115,7 @@ local function recycle_or_create_node() -- Breaking this func taught me that Dot
 	return {}
 end
 
+-------------- insert_new_attack_time_node()
 local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit, attackPointPercent) -- Ensure nextNode, prevNode are set at least once (because recycling)
 	-- create a new potential attack node, to be confirmed by update_current_attacks__job
 	local new = recycle_or_create_node() 
@@ -143,6 +173,7 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 end
 
 -- --[[BENCH]]local benchThrottle = Time_CreateThrottle(10)
+-------------- update_current_attacks__job()
 local function update_current_attacks__job(workingSet) -- Shift to the current future, remove attacks that didn't complete their cycle.
 	if workingSet.throttle:allowed() then
 		-- if benchThrottle:allowed() then
@@ -214,6 +245,7 @@ local function update_current_attacks__job(workingSet) -- Shift to the current f
 	end
 end
 
+-------------- create_future_damage_lists__job()
 local function create_future_damage_lists__job(workingSet)
 	if workingSet.throttle:allowed() then
 		local sets = Set_NumericalIndexUnion( -- Temporary solution
@@ -311,12 +343,14 @@ local function create_future_damage_lists__job(workingSet)
 	end
 end
 
+-------- Analytics_RegisterAnalyticsJobDomainToLhp()
 function Analytics_RegisterAnalyticsJobDomainToLhp(analyticsJobDomain)
 	job_domain_analytics = analyticsJobDomain
 	DEAGRO_UPDATE_PRIORITY = Deagro_UpdatePriority
 	Analytics_RegisterAnalyticsJobDomainToLhp = nil
 end
 
+-------- LHP_UpdateHunit()
 function LHP_UpdateHunit(previousHunit, newHunit) -- New rule is no 
 --[[DEV]]DEBUG_KILLSWITCH = true
 -- This function is for accuracy of choices in the game, not for data safety
@@ -342,6 +376,7 @@ function LHP_UpdateHunit(previousHunit, newHunit) -- New rule is no
 --[[DEV]]DEBUG_KILLSWITCH = false
 end
 
+-------- Analytics_CreateUpdateLastHitProjectionCurrentAttacks()
 function Analytics_CreateUpdateLastHitProjectionCurrentAttacks()
 	job_domain_analytics:RegisterJob(
 			update_current_attacks__job,
@@ -351,6 +386,7 @@ function Analytics_CreateUpdateLastHitProjectionCurrentAttacks()
 	Analytics_CreateUpdateLastHitProjectionCurrentAttacks = nil
 end
 
+-------- Analytics_CreateUpdateLastHitProjectionFutureDamageLists()
 function Analytics_CreateUpdateLastHitProjectionFutureDamageLists()
 	job_domain_analytics:RegisterJob(
 			create_future_damage_lists__job,
@@ -364,23 +400,30 @@ local BFURY_CREEP_DMG_MELEE = 15
 local BFURY_CREEP_DMG_RANGED = 4
 local HATCHET_CREEP_DMG_MELEE = 12
 local HATCHET_CREEP_DMG_RANGED = 4
+-------- Lhp_GetActualFromUnitToUnitAttackOnce()
 function Lhp_GetActualFromUnitToUnitAttackOnce(hUnitAttacking, hUnitAttacked) -- Primative
 	if hUnitAttacking:IsHero() then
 		local attackDmg = hUnitAttacking:GetAttackDamage()
-		local itemSlot = hUnitAttacking:FindItemSlot("item_bfury")
-		if itemSlot >= 0 and itemSlot <= ITEM_END_INVENTORY_INDEX
-				and (hUnitAttacking:GetTeam() ~= TEAM or hUnitAttacking:GetItemInSlot(itemSlot):GetCooldownTimeRemaining() == 0) then
-			attackDmg = attackDmg + (hUnitAttacking:GetAttackRange() > 350
-					and BFURY_CREEP_DMG_RANGED or BFURY_CREEP_DMG_MELEE)
-			--print(hUnitAttacking:GetUnitName(), "has bfury dmg to", attackDmg)
-		else
-			itemSlot = hUnitAttacking:FindItemSlot("item_quelling_blade")
+		if hUnitAttacked:IsCreep() then
+			-- Add hatchet dmg
+			local itemSlot = hUnitAttacking:FindItemSlot("item_bfury")
 			if itemSlot >= 0 and itemSlot <= ITEM_END_INVENTORY_INDEX
-						and (hUnitAttacking:GetTeam() ~= TEAM or hUnitAttacking:GetItemInSlot(itemSlot):GetCooldownTimeRemaining() == 0) then
+					and (hUnitAttacking:GetTeam() ~= TEAM or hUnitAttacking:GetItemInSlot(itemSlot):GetCooldownTimeRemaining() == 0) then
 				attackDmg = attackDmg + (hUnitAttacking:GetAttackRange() > 350
-						and HATCHET_CREEP_DMG_RANGED or HATCHET_CREEP_DMG_MELEE)
-				--print(hUnitAttacking:GetUnitName(), "has hatchet dmg to", attackDmg)
+						and BFURY_CREEP_DMG_RANGED or BFURY_CREEP_DMG_MELEE)
+				--print(hUnitAttacking:GetUnitName(), "has bfury dmg to", attackDmg)
+			else
+				itemSlot = hUnitAttacking:FindItemSlot("item_quelling_blade")
+				if itemSlot >= 0 and itemSlot <= ITEM_END_INVENTORY_INDEX
+							and (hUnitAttacking:GetTeam() ~= TEAM or hUnitAttacking:GetItemInSlot(itemSlot):GetCooldownTimeRemaining() == 0) then
+					attackDmg = attackDmg + (hUnitAttacking:GetAttackRange() > 350
+							and HATCHET_CREEP_DMG_RANGED or HATCHET_CREEP_DMG_MELEE)
+					--print(hUnitAttacking:GetUnitName(), "has hatchet dmg to", attackDmg)
+				end
 			end
+		end
+		if hUnitAttacked:IsTower() then
+			--[[DEV]]if DEBUG then print("actual at tower", hUnitAttacking:GetUnitName(), hUnitAttacked:GetActualIncomingDamage(attackDmg * hUnitAttacking:GetAttackCombatProficiency(hUnitAttacked), DAMAGE_TYPE_PHYSICAL), hUnitAttacking:GetAttackCombatProficiency(hUnitAttacked)) end
 		end
 		return hUnitAttacked:GetActualIncomingDamage(
 				attackDmg
@@ -394,11 +437,13 @@ function Lhp_GetActualFromUnitToUnitAttackOnce(hUnitAttacking, hUnitAttacked) --
 		)
 end
 
+-------- Lhp_AttackNowForBestLastHit()
 function Lhp_AttackNowForBestLastHit(gsiPlayer, gsiUnit) -- Requires units are not dead nor null
 	local currTime = GameTime()
 	local currNode = future_damage_lists[gsiUnit.hUnit] and future_damage_lists[gsiUnit.hUnit].firstNodeFromNow
 	local timeProgressedHealth = gsiUnit.lastSeenHealth - Lhp_GetActualFromUnitToUnitAttackOnce(gsiPlayer.hUnit, gsiUnit.hUnit)*HERO_PHYSICAL_ATTACK_VARIANCE + DEATH_WISH_HP_REGEN_BUFFER
 	local attackNowProjectileLandTime = Projectile_TimeToLandProjectile(gsiPlayer, gsiUnit)
+	-- TODO TEST Time til facing is not bugged
 	local landingTimeOfAttackNow = currTime + attackNowProjectileLandTime
 	local anyTowersDecrement = 0 -- Tower damage needs an overzealous standing position when it's not time to attack. (We do not project forwards further than the current flying attacks and the currently animated/predicted based on last-attack-time attacks)
 	if timeProgressedHealth < 0 then
@@ -438,6 +483,7 @@ function Lhp_AttackNowForBestLastHit(gsiPlayer, gsiUnit) -- Requires units are n
 			) * gsiUnit.lastSeenHealth / gsiUnit.maxHealth
 end
 
+-------- Lhp_GetAnyLastHitsViableSimple()
 function Lhp_GetAnyLastHitsViableSimple(gsiPlayer)
 	local creepSet, dist
 			= Set_GetNearestEnemyCreepSetAtLaneLoc(
@@ -463,6 +509,7 @@ function Lhp_GetAnyLastHitsViableSimple(gsiPlayer)
 	return false
 end
 
+-------- Lhp_GetAnyDeniesViableSimple()
 function Lhp_GetAnyDeniesViableSimple(gsiPlayer)
 	local creepSet, dist = Set_GetNearestAlliedCreepSetInLane(gsiPlayer, Team_GetRoleBasedLane(gsiPlayer))
 	if creepSet then
@@ -484,15 +531,18 @@ function Lhp_GetAnyDeniesViableSimple(gsiPlayer)
 	return false
 end
 
+-------- Analytics_hUnitsLowGroundToTargetFactor()
 function Analytics_hUnitsLowGroundToTargetFactor(hUnit, hTarget)
 	return hUnit:GetLocation().z < hTarget:GetLocation().z and 0.75 or 1.0
 end
 
+-------- Analytics_GetNearFutureHealthPercent()
 function Analytics_GetNearFutureHealthPercent(gsiUnit, t)
 	local nearFutureHealth, attackCount = Analytics_GetNearFutureHealth(gsiUnit, t)
 	return nearFutureHealth / gsiUnit.maxHealth, attackCount
 end
 
+-------- Analytics_GetNearFutureHealth()
 function Analytics_GetNearFutureHealth(gsiUnit, t)
 	t = t and t + GameTime() or DEFAULT_NEAR_FUTURE_HEALTH_PERCENT_TIME + GameTime() -- default 1.0s future
 	local totalDamage = 0
@@ -506,6 +556,7 @@ function Analytics_GetNearFutureHealth(gsiUnit, t)
 	return gsiUnit.lastSeenHealth - totalDamage, attackCount
 end
 
+-------- Lhp_GetMyAttacksNeededForKill()
 function Lhp_GetMyAttacksNeededForKill(gsiPlayer, gsiUnit) -- TODO Confirm proc items and passives behaviour, Probably redo with physical base attack + then add other abilities and items with their dmg types seperately
 	return gsiUnit.lastSeenHealth / Lhp_GetActualFromUnitToUnitAttackOnce(gsiPlayer.hUnit, gsiUnit.hUnit)
 end
@@ -514,6 +565,7 @@ end
 	-- return future_damage_lists[hUnit] and future_damage_lists[hUnit].numAttacks or 0
 -- end
 
+-------- Analytics_GetTotalDamageInTimeline()
 function Analytics_GetTotalDamageInTimeline(hUnit)
 	return future_damage_lists[hUnit] and future_damage_lists[hUnit].totalDmgRecently or 0
 end
@@ -538,6 +590,7 @@ function Analytics_GetTotalDamageNumberAttackers(gsiPlayer) -- for team players
 	return 0, 0
 end
 
+-------- Analytics_RoshanOrHeroAttacksInTimeline()
 function Analytics_RoshanOrHeroAttacksInTimeline(gsiUnit)
 	local damageList = future_damage_lists[gsiUnit.hUnit]
 	if damageList then
@@ -556,6 +609,7 @@ end
 local hait_platter = {}
 -- pnot indexed, contains damage list node
 -- NB DATA MUST NOT PROPEGATE TO HUNIT USE OF HEROES FROM THE HAIT_PLATTER TABLE
+-------- Analytics_HeroAttacksInTimeline()
 function Analytics_HeroAttacksInTimeline(gsiUnit) 
 	local damageList = future_damage_lists[gsiUnit.hUnit]
 	if not damageList then return EMPTY_TABLE, false, false end
@@ -584,6 +638,7 @@ function Analytics_HeroAttacksInTimeline(gsiUnit)
 	return hait_platter, pastAttack, futureAttack
 end
 
+-------- Analytics_GetFutureDamageFromUnitType()
 function Analytics_GetFutureDamageFromUnitType(hUnit, unitType)
 	local damageList = future_damage_lists[hUnit]
 	local totalDamage = 0
@@ -600,6 +655,7 @@ function Analytics_GetFutureDamageFromUnitType(hUnit, unitType)
 	return totalDamage
 end
 
+-------- Analytics_GetMostDamagingUnitTypeToUnit()
 function Analytics_GetMostDamagingUnitTypeToUnit(gsiUnit)
 	local damageList = future_damage_lists[gsiUnit.hUnit]
 	if damageList then
@@ -624,6 +680,7 @@ function Analytics_GetMostDamagingUnitTypeToUnit(gsiUnit)
 	return nil, 0
 end
 
+-------- Lhp_CageFightKillTime()
 function Lhp_CageFightKillTime(gsiPlayer, gsiTarget) -- Time taken for this hero to kill a unit unassisted from it's current health.
 	-- This needs to be upgraded 
 	local hUnitPlayer = gsiPlayer.hUnit

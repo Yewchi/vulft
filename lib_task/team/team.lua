@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 TEAM_CAPTAIN_UNIT = TEAM_CAPTAIN_UNIT or GetBot()
 TEAM_CAPTAIN_UNIT.Chat = Captain_Chat
 
@@ -148,8 +174,11 @@ function DeduceBestRolesAndLanes()
 	for i=1, TEAM_NUMBER_OF_PLAYERS do
 		local thisPlayer = teamPlayers[i]
 		thisPlayer.role = role_assignments[i]
-		local thisPlayerLane = Team_GetRoleBasedLane(thisPlayer) -- TODO ignores trilane
-		thisPlayer.lane = thisPlayerLane
+		thisPlayer.lane = Team_GetRoleBasedLane(thisPlayer) -- TODO ignores trilane
+	end
+	for i=1,TEAM_NUMBER_OF_PLAYERS do
+		local thisPlayer = teamPlayers[i]
+		local thisPlayerLane = thisPlayer.lane
 		for k=1,TEAM_NUMBER_OF_PLAYERS do
 			if teamPlayers[k] ~= thisPlayer
 					and thisPlayerLane == teamPlayers[k].lane then
@@ -157,6 +186,7 @@ function DeduceBestRolesAndLanes()
 				teamPlayers[k].laningWith = thisPlayer
 			end
 		end
+		--print("DEDUCE", thisPlayer.shortName, thisPlayer.role, thisPlayer.lane, thisPlayer.laningWith)
 	end
 	
 	Vibe_CreateAndAllocatePlayerVibes(GSI_GetTeamPlayers(TEAM))
@@ -198,6 +228,9 @@ function Team_InformDeadTryBuyback(gsiPlayer)
 		t_present_or_committed[iLane][gsiPlayer.nOnTeam] = nil
 	end
 	local teamAncient = GSI_GetTeamAncient(TEAM)
+	if not teamAncient then
+		return;
+	end
 	local thisFortHealth = teamAncient.lastSeenHealth
 	local fortHasDroppedHp = prev_fort_health > thisFortHealth
 	prev_fort_health = thisFortHealth
@@ -205,7 +238,8 @@ function Team_InformDeadTryBuyback(gsiPlayer)
 	local team_players = team_players
 	local netDanger = 0
 	local aliveCount = 0
-	if gsiPlayer.hUnit:GetGold() > gsiPlayer.hUnit:GetBuybackCost()
+	if gsiPlayer.hUnit:HasBuyback()
+			and gsiPlayer.hUnit:GetGold() > gsiPlayer.hUnit:GetBuybackCost()
 			and gsiPlayer.hUnit:GetRespawnTime() > 5 then
 		if buyback_directive[gsiPlayer.nOnTeam] then
 			gsiPlayer.hUnit:ActionImmediate_Buyback()
@@ -301,32 +335,43 @@ end
 function Team_GetStrategicLane(gsiPlayer)
 	local strategicLane = gsiPlayer.time.data.strategicLane
 	if not strategicLane then
-		local prevLane = t_prev_strategic_lane[gsiPlayer.nOnTeam]
-		local roleHelpWeight = gsiPlayer.role/5
-		local highestScore = -0xFFFF
-		-- TODO Include game-lateness allocation, or is it a push task alone when trying to counter-push / take obj?
-		-- - Should heroes locked to Push not try to achieve last hit timings? Why rely on farm lane only because
-		-- - of convenience.
-		local aliveAdvantage = 1 + GSI_GetAliveAdvantageFactor()
-		local role = gsiPlayer.role
-		for iLane=1,3 do
-			local safety, helpNeededScore, pushingHasPressureScore, myFarmScore = Analytics_SafetyOfLaneFarm(gsiPlayer, iLane, t_present_or_committed[iLane])
-			pushingHasPressureScore = max(1.5, min(0.75, safety/(role*0.66)))
-					* pushingHasPressureScore * aliveAdvantage -- supports care more pushing when advtg
-					* max(1, (6-role)-(6-role)*abs(safety)) -- cores help push if pressure is high but edging dangerous
-			myFarmScore = myFarmScore / (0.452 + sqrt(0.3+aliveAdvantage)) -- cores care more solo farm when advtg
-			local thisScore = (prevLane == strategicLane and 1.2 or 1)
-					- min(1, abs(safety)) + pushingHasPressureScore + myFarmScore
-			if thisScore > highestScore then
-				highestScore = thisScore
-				strategicLane = iLane
-				-- nothing is scaled in minute detail, but the factors are correctly placed. TODO TEST STRATEGIC LANE
+		if not IsPlayerBot(gsiPlayer.playerID) then
+			if gsiPlayer.hUnit:IsAlive() then
+				strategicLane = Map_GetLaneValueOfMapPoint(gsiPlayer.lastSeen.location)
+			else
+				strategicLane = gsiPlayer.lane
 			end
---[[DEV]]	if VERBOSE then VEBUG_print(string.format("[team] GetStrategicLane(%s): Lane #%d has %.2f, %.2f, %.2f, %.2f -- score %.3f", gsiPlayer.shortName, iLane, safety, helpNeededScore, pushingHasPressureScore, myFarmScore, thisScore)) end
+		else
+			local prevLane = t_prev_strategic_lane[gsiPlayer.nOnTeam]
+			local roleHelpWeight = gsiPlayer.role/5
+			local highestScore = -0xFFFF
+			-- TODO Include game-lateness allocation, or is it a push task alone when trying to counter-push / take obj?
+			-- - Should heroes locked to Push not try to achieve last hit timings? Why rely on farm lane only because
+			-- - of convenience.
+			local aliveAdvantage = 1 + GSI_GetAliveAdvantageFactor()
+			local role = gsiPlayer.role
+			for iLane=1,3 do
+				local safety, helpNeededScore, pushingHasPressureScore, myFarmScore = Analytics_SafetyOfLaneFarm(gsiPlayer, iLane, t_present_or_committed[iLane])
+				pushingHasPressureScore = max(1.5, min(0.75, safety/(role*0.66)))
+						* pushingHasPressureScore * aliveAdvantage -- supports care more pushing when advtg
+						* max(1, (6-role)-(6-role)*abs(safety)) -- cores help push if pressure is high but edging dangerous
+				myFarmScore = myFarmScore / (0.452 + sqrt(0.3+aliveAdvantage)) -- cores care more solo farm when advtg
+				local thisScore = (prevLane == iLane and 1.1 or 1)
+						- min(1, abs(safety)) + pushingHasPressureScore + myFarmScore
+				if thisScore < -0xFFFF then
+					print("WOW", thisScore, min(1, abs(safety)), pushingHasPressureScore, myFarmScore)
+				end
+				if thisScore > highestScore then
+					highestScore = thisScore
+					strategicLane = iLane
+					-- nothing is scaled in minute detail, but the factors are correctly placed. TODO TEST STRATEGIC LANE
+				end
+	--[[DEV]]	if VERBOSE then VEBUG_print(string.format("[team] GetStrategicLane(%s): Lane #%d has %.2f, %.2f, %.2f, %.2f -- score %.3f", gsiPlayer.shortName, iLane, safety, helpNeededScore, pushingHasPressureScore, myFarmScore, thisScore)) end
+			end
 		end
 	--	DebugDrawText(370, 150+gsiPlayer.nOnTeam*8, string.format("%d-strat:%d-safe:%.1f", gsiPlayer.nOnTeam,
 	--			strategicLane, gsiPlayer.time.data.safetyOfLane[strategicLane]), 255, 255, 255)
-		gsiPlayer.time.data.strategicLane = strategicLane
+		gsiPlayer.time.data.strategicLane = strategicLane or prevLane or 2
 		local pnot = gsiPlayer.nOnTeam
 		t_present_or_committed[1][pnot] = nil
 		t_present_or_committed[2][pnot] = nil
@@ -349,6 +394,7 @@ function Team_FortUnderAttack(gsiUnit)
 	if GSI_CountTeamAlive(TEAM) == 0 then
 		doCheapAssBuybacks = true
 	else
+		doCheapAssBuybacks = false
 		local defenders = Set_GetAlliedHeroesInLocRadius(nil, ancient_on_ropes_fight_loc, 4000)
 		local attackers = Set_GetEnemyHeroesInLocRadOuter(ancient_on_ropes_fight_loc, 5000, 5000, 10)
 		local defensivePower = Analytics_GetTheoreticalEncounterPower(
@@ -369,11 +415,12 @@ function Team_FortUnderAttack(gsiUnit)
 		for i=1,#team_players do
 			local hUnitAllied = team_players[i].hUnit
 			if hUnitAllied:IsBot() and not hUnitAllied:IsAlive()
+					and hUnitAllied:HasBuyback()
 					and hUnitAllied:GetBuybackCost() < hUnitAllied:GetGold() then
 				if not buyback_directive[i] then
 					buyback_directive[i] = true
 				end
-				return;
+				break;
 			end
 		end
 	end
@@ -386,7 +433,7 @@ function Team_FortUnderAttack(gsiUnit)
 		local distScoreFactor = max(0.33, min(1, 1.99 - 0.00066*distToFort))
 		local score = distScoreFactor * fortDefBaseScore
 		local decrement = score / 8
-		--[[DEV]]print("fort defend player", i, score)
+		--[[DEV]]if DEBUG then print("fort defend player", i, score) end
 		Task_IncentiviseTask(team_players[i], fight_harass_handle, score, decrement)
 		Task_IncentiviseTask(team_players[i], UseItem_GetTaskHandle(), score, decrement)
 		Task_IncentiviseTask(team_players[i], UseAbility_GetTaskHandle(), score, decrement)

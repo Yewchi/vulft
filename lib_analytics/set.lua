@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Deduces clusters of units on the map for certain types. Useful for fast imaginary scoring, positioning,
 --- or also a quick search of a small subset of a unit type nearby.
 
@@ -180,8 +206,8 @@ local function update_lane_fronts()
 						TEAM == TEAM_RADIANT and 50 or 900, 650+15*iLane, 
 						string.format("%d backup %s, %s, (%d, %d, %d), (%d, %d, %d), (%d, %d, %d), (%d, %d, %d)", 
 						iLane,
-						string.sub(Util_Printable(alliedFronts[1]), 1, 20), 
-						string.sub(tostring(enemyFronts[1]), 1, 20), 
+						string.sub(Util_Printable(alliedFronts[i]), 1, 20), 
+						string.sub(tostring(enemyFronts[i]), 1, 20), 
 						theoreticalAlliedFrontLoc.x, theoreticalAlliedFrontLoc.y, theoreticalAlliedFrontLoc.z,
 						theoreticalEnemyFrontLoc.x, theoreticalEnemyFrontLoc.y, theoreticalEnemyFrontLoc.z,
 						thisLaneFrontLocations[LANE_FRONT_I__LAST_SEEN_WAVE_CRASH_LOC].x or -1,
@@ -289,13 +315,6 @@ local function update_creep_set_type(creepSetType)
 			end
 		end
 	end
-	-- if creepSetType == SET_CREEP_ALLIED then -- N.B. set logic-breaking hack
-		-- for i=#tCreepSets,1,-1 do
-			-- if tCreepSets[i].total == 1 then
-				-- table.remove(tCreepSets, i) -- Abandon the final creep of a wave, so we don't get swamped off a stun / slow
-			-- end
-		-- end
-	-- end
 end
 
 local function update_enemy_buildings()
@@ -339,8 +358,11 @@ local function DEBUG_update_all_sets__job(workingSet)
 	update_all_sets__job(workingSet)
 end
 
+-------- Set_Initialize()
 function Set_Initialize()
-	-- Create building sets (has module structural importance, not because towers need to be assorted)
+	-- Create building sets
+	
+	-- building.lua NB Enemy building data is utilizing allied tier::data for valid minute -1:30 data.
 	local tBuildingListAllied = bUnit_ConvertListToSafeUnits(GetUnitList(SET_BUILDING_ALLIED))
 	t_sets[SET_BUILDING_ALLIED] = {units={}, towers={}}
 	for i=1,#tBuildingListAllied,1 do
@@ -444,6 +466,11 @@ function Set_UpdateAlliedBuldingSets() -- TODO IMPLEMENT
 end
 
 function Set_NumericalIndexUnion(s1, s2) -- Destructive to s1 SetUnion
+--[[DEV]]	if TEST then
+--[[DEV]]		for k,v in pairs(EMPTY_TABLE) do
+--[[DEV]]			ERROR_print("[set] EMPTY TABLE HAS BEEN MODIFIED", type(k), type(v), tostring(k), Util_Printable(v))
+--[[DEV]]		end
+--[[DEV]]	end
 	local s1Size = #s1
 	if s1Size == 0 then
 		if #s2 > 0 then
@@ -869,7 +896,9 @@ function Set_GetEnemyHeroesInPlayerRadiusAndOuter(location, radius, outer, forAn
 		for n=1,#tEnemyHeroes,1 do
 			local gsiThisHero = tEnemyHeroes[n]
 			if ( not gsiThisHero.typeIsNone and not pUnit_IsNullOrDead(gsiThisHero) )
-					or (forAnalyticsTime and gsiThisHero.lastSeen.timeStamp + forAnalyticsTime > GameTime()) then
+					or (forAnalyticsTime and IsHeroAlive(gsiThisHero.playerID)
+						and gsiThisHero.lastSeen.timeStamp + forAnalyticsTime > GameTime()
+					) then
 				local dist = Math_PointToPointDistance2D(location, gsiThisHero.lastSeen.location)
 				if radius > dist then
 					table.insert(tInRadius, gsiThisHero)
@@ -1092,7 +1121,7 @@ function Set_GetNearestEnemyCreepSetToLocation(location)
 end
 
 function Set_LaneFrontCrashIsReal(lane)
-	return lane_front_most_recent[lane][LANE_FRONT_I__PREDICTED_WAVE_CRASH_LOC] == nil
+	return lane_front_most_recent[lane][ANE_FRONT_I__PREDICTED_WAVE_CRASH_LOC] == nil
 end
 
 function Set_GetPredictedLaneFrontLocation(lane)

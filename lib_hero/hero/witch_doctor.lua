@@ -1,12 +1,12 @@
 local hero_data = {
 	"witch_doctor",
-	{1, 3, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 12},
+	{1, 3, 3, 2, 3, 4, 1, 3, 2, 2, 5, 4, 2, 1, 8, 1, 4, 10},
 	{
-		"item_tango","item_faerie_fire","item_circlet","item_branches","item_enchanted_mango","item_quelling_blade","item_enchanted_mango","item_boots","item_arcane_boots","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_aghanims_shard","item_wraith_band","item_magic_wand","item_kaya","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves",
+		"item_tango","item_flask","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_faerie_fire","item_branches","item_branches","item_boots","item_magic_wand","item_arcane_boots","item_aghanims_shard","item_shadow_amulet","item_cloak","item_glimmer_cape","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_gem","item_gem","item_arcane_boots","item_black_king_bar","item_gem","item_gem","item_gem",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,3,3,}, 0.1 },
+	{ {5,1,3,1,4,}, {5,5,5,4,3,}, 0.1 },
 	{
-		"Paralyzing Cask","Voodoo Restoration","Maledict","Death Ward","-25% Voodoo Restoration Mana Per Second","+75 Maledict AoE","+2 Cask Bounces","+300 Health","+100 Death Ward Attack Range","+20% Maledict Burst Damage","+1.5% Max Health Voodoo Restoration Heal/Damage","+60 Death Ward Damage",
+		"Paralyzing Cask","Voodoo Restoration","Maledict","Death Ward","-25% Voodoo Restoration Mana Per Second","+75 Maledict AoE","+2 Cask Bounces","+300 Health","+100 Death Ward Attack Range","+25% Maledict Burst Damage","+1.5% Max Health Voodoo Restoration Heal/Damage","+60 Death Ward Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

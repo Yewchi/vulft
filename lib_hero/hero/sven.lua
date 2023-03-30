@@ -1,8 +1,8 @@
 local hero_data = {
 	"sven",
-	{1, 3, 2, 2, 2, 4, 2, 3, 1, 6, 1, 4, 3, 3, 7, 1, 4, 10, 11},
+	{1, 3, 1, 2, 2, 4, 2, 2, 1, 6, 1, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_quelling_blade","item_branches","item_tango","item_circlet","item_branches","item_slippers","item_wraith_band","item_boots","item_phase_boots","item_quarterstaff","item_lifesteal","item_mask_of_madness","item_oblivion_staff","item_magic_wand","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_mage_slayer","item_hyperstone","item_buckler","item_assault","item_void_stone","item_blitz_knuckles","item_claymore","item_bloodthorn","item_greater_crit","item_swift_blink",
+		"item_quelling_blade","item_branches","item_branches","item_tango","item_circlet","item_slippers","item_wraith_band","item_chainmail","item_phase_boots","item_lifesteal","item_mask_of_madness","item_oblivion_staff","item_echo_sabre","item_blink","item_blades_of_attack","item_lesser_crit","item_mithril_hammer","item_black_king_bar","item_invis_sword","item_silver_edge","item_blitz_knuckles","item_void_stone","item_orchid","item_cloak","item_bloodthorn","item_claymore","item_reaver","item_satanic","item_overwhelming_blink","item_point_booster","item_ultimate_scepter_2","item_moon_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

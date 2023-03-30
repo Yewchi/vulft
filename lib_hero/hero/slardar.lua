@@ -1,10 +1,10 @@
 local hero_data = {
 	"slardar",
-	{3, 2, 3, 1, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 7, 6, 4, 9, 12},
+	{3, 2, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 2, 7, 4, 10, 12},
 	{
-		"item_quelling_blade","item_circlet","item_slippers","item_tango","item_branches","item_branches","item_wraith_band","item_boots","item_gloves","item_power_treads","item_magic_wand","item_blink","item_lifesteal","item_quarterstaff","item_mask_of_madness","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_talisman_of_evasion","item_sange","item_heavens_halberd","item_platemail","item_buckler","item_assault",
+		"item_branches","item_circlet","item_quelling_blade","item_tango","item_gauntlets","item_branches","item_bracer","item_boots","item_gloves","item_power_treads","item_magic_wand","item_quarterstaff","item_robe","item_echo_sabre","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_point_booster","item_gem","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_platemail",
 	},
-	{ {3,3,3,3,1,}, {3,3,3,3,1,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,4,}, 0.1 },
 	{
 		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+0.2s Slithereen Crush Stun Duration","+325 Health","+50 Bash of the Deep Damage","+150.0 Slithereen Crush Damage","-4 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
 	}
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

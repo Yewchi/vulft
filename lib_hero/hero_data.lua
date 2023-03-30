@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Registers and creates data initialization functions (for hero.lua) for heroes per what is stored in (existing or non-existing, unimplemented) hero modules (ancient_apparition.lua ... zues.lua)
 
 HERO_ABILITY_THINK_THROTTLE = 0.223 -- .'. heroes will think of using any of their abilities, or initiating a combo just over 4 times a second.
@@ -12,9 +38,11 @@ HD_I__ITEM_BUILD = 3
 HD_I__LANE_AND_ROLE = 4
 HD_I__ABILITY_NAME_INDICES = 5
 
+local t_untested_and_loaded_heroes = {}
+
 local hero_search_funcs = {}
 
-local hero_data = { -- Known heroes -> loads to hero data if in-game
+local hero_data = { -- Known heroes -> loads to hero data if in-game -- doesn't mean tested/implemented
 	["default"] = true,
 	["abaddon"] = true,
 	["abyssal_underlord"] = true,
@@ -22,60 +50,122 @@ local hero_data = { -- Known heroes -> loads to hero data if in-game
 	["ancient_apparition"] = true,
 	["antimage"] = true,
 	["arc_warden"] = true,
+	["axe"] = true,
 	["bane"] = true,
+	["batrider"] = true,
+	["beastmaster"] = true,
 	["bloodseeker"] = true,
 	["bounty_hunter"] = true,
+	["brewmaster"] = true,
 	["bristleback"] = true,
+	["broodmother"] = true,
 	["centaur"] = true,
 	["chaos_knight"] = true,
+	["chen"] = true,
 	["clinkz"] = true,
 	["crystal_maiden"] = true,
+	["dark_seer"] = true,
+	["dark_willow"] = true,
 	["dawnbreaker"] = true,
 	["dazzle"] = true,
 	["death_prophet"] = true,
+	["disruptor"] = true,
 	["doom_bringer"] = true,
 	["dragon_knight"] = true,
 	["drow_ranger"] = true,
+	["earthshaker"] = true,
 	["earth_spirit"] = true,
+	["elder_titan"] = true,
 	["ember_spirit"] = true,
 	["enchantress"] = true,
+	["enigma"] = true,
+	["faceless_void"] = true,
+	["furion"] = true,
 	["grimstroke"] = true,
 	["gyrocopter"] = true,
+	["hoodwink"] = true,
+	["huskar"] = true,
 	["invoker"] = true,
 	["jakiro"] = true,
 	["juggernaut"] = true,
+	["keeper_of_the_light"] = true,
+	["kunkka"] = true,
+	["legion_commander"] = true,
+	["leshrac"] = true,
 	["lich"] = true,
 	["life_stealer"] = true,
 	["lina"] = true,
 	["lion"] = true,
+	["lone_druid"] = true,
 	["luna"] = true,
+	["lycan"] = true,
+	["magnataur"] = true,
+	["marci"] = true,
+	["mars"] = true,
+	["medusa"] = true,
+	["meepo"] = true,
+	["mirana"] = true,
+	["monkey_king"] = true,
+	["morphling"] = true,
 	["muerta"] = true,
+	["naga_siren"] = true,
 	["necrolyte"] = true,
+	["nevermore"] = true,
 	["night_stalker"] = true,
 	["nyx_assassin"] = true,
+	["obsidian_destroyer"] = true,
 	["ogre_magi"] = true,
-	["oracle"] = true,
 	["omniknight"] = true,
-	["queenofpain"] = true,
+	["oracle"] = true,
+	["pangolier"] = true,
 	["phantom_assassin"] = true,
+	["phantom_lancer"] = true,
+	["phoenix"] = true,
+	["primal_beast"] = true,
+	["puck"] = true,
+	["pudge"] = true,
+	["pugna"] = true,
+	["queenofpain"] = true,
 	["rattletrap"] = true,
 	["razor"] = true,
+	["riki"] = true,
+	["rubick"] = true,
 	["sand_king"] = true,
+	["shadow_demon"] = true,
+	["shadow_shaman"] = true,
+	["shredder"] = true,
 	["silencer"] = true,
 	["skeleton_king"] = true,
+	["skywrath_mage"] = true,
 	["slardar"] = true,
+	["slark"] = true,
 	["snapfire"] = true,
 	["sniper"] = true,
+	["spectre"] = true,
 	["spirit_breaker"] = true,
+	["storm_spirit"] = true,
 	["sven"] = true,
+	["techies"] = true,
+	["templar_assassin"] = true,
+	["terrorblade"] = true,
 	["tidehunter"] = true,
+	["tinker"] = true,
+	["tiny"] = true,
 	["treant"] = true,
+	["troll_warlord"] = true,
+	["tusk"] = true,
+	["undying"] = true,
+	["ursa"] = true,
+	["vengefulspirit"] = true,
 	["venomancer"] = true,
 	["viper"] = true,
+	["visage"] = true,
 	["void_spirit"] = true,
 	["warlock"] = true,
 	["weaver"] = true,
 	["windrunner"] = true,
+	["winter_wyvern"] = true,
+	["wisp"] = true,
 	["witch_doctor"] = true,
 	["zuus"] = true,
 }
@@ -87,11 +177,16 @@ function HeroData_SearchFuncForHero(shortName)
 	return foundOrNot or hero_search_funcs["default"]
 end
 
-function HeroData_SetHeroData(heroData, abilities, searchFunc)
+function HeroData_SetHeroData(heroData, abilities, searchFunc, untested)
 	local thisShortName = heroData[HD_I__SHORT_NAME]
 	hero_data[thisShortName] = heroData
 	hero_search_funcs[thisShortName] = searchFunc
 	Hero_RegisterBehaviour(thisShortName, heroData[HD_I__SKILL_BUILD], heroData[HD_I__ABILITY_NAME_INDICES], heroData[HD_I__ITEM_BUILD], abilities)
+	t_untested_and_loaded_heroes[thisShortName] = untested
+end
+
+function HeroData_IsHeroUntested(shortName)
+	return t_untested_and_loaded_heroes[shortName]
 end
 
 function HeroData_RequestHeroKeyValue(shortName, dataKey)

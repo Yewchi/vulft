@@ -1,12 +1,12 @@
 local hero_data = {
 	"chaos_knight",
-	{1, 3, 2, 3, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 7, 5, 4, 10, 11},
+	{1, 2, 3, 3, 3, 4, 3, 2, 2, 2, 1, 4, 5, 1, 8, 1, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_ward_observer","item_blight_stone","item_blight_stone","item_magic_wand","item_helm_of_iron_will","item_gloves","item_blades_of_attack","item_armlet","item_boots","item_gloves","item_belt_of_strength","item_wind_lace","item_power_treads","item_blitz_knuckles","item_broadsword","item_invis_sword","item_void_stone","item_aether_lens","item_aghanims_shard","item_vitality_booster","item_energy_booster","item_octarine_core","item_reaver","item_heart","item_silver_edge",
+		"item_magic_stick","item_quelling_blade","item_tango","item_branches","item_branches","item_enchanted_mango","item_magic_wand","item_boots","item_belt_of_strength","item_gloves","item_power_treads","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_ogre_axe","item_quarterstaff","item_echo_sabre","item_blink","item_boots_of_elves","item_yasha","item_manta","item_mithril_hammer","item_black_king_bar","item_cloak","item_mage_slayer","item_bloodthorn","item_overwhelming_blink",
 	},
-	{ {1,1,1,3,2,}, {1,1,1,3,2,}, 0.1 },
+	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{
-		"Chaos Bolt","Reality Rift","Chaos Strike","Phantasm","+22% Chaos Strike Lifesteal","+225 Reality Rift Pull Distance","-3s Chaos Bolt Cooldown","--75% Phantasm Illusion Incoming Damage","+0.75 Min/Max Chaos Bolt Duration","Reality Rift Pierces Spell Immune","+10% Chaos Strike Chance","+10.0s Phantasm Duration",
+		"Chaos Bolt","Reality Rift","Chaos Strike","Phantasm","+22% Chaos Strike Lifesteal","+225 Reality Rift Pull Distance","-3s Chaos Bolt Cooldown","--75% Phantasm Illusion Incoming Damage","+0.75 Min/Max Chaos Bolt Duration","Reality Rift Pierces Spell Immunity","+10% Chaos Strike Chance","+10.0s Phantasm Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -55,13 +55,15 @@ local ILLUSION_SEARCH_RADIUS = 1375
 local BOT_MODE_NONE = BOT_MODE_NONE
 local CHAOS_KNIGHT_INTERNAL_STR = "npc_dota_hero_chaos_knight"
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

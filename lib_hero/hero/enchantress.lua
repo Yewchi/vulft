@@ -1,12 +1,12 @@
 local hero_data = {
 	"enchantress",
-	{1, 6, 2, 1, 1, 5, 1, 3, 3, 3, 3, 5, 2, 2, 8, 2, 5, 10, 12},
+	{1, 2, 2, 1, 2, 5, 1, 1, 3, 3, 6, 5, 3, 3, 8, 2, 5, 10, 12},
 	{
-		"item_smoke_of_deceit","item_ward_observer","item_blight_stone","item_tango","item_branches","item_branches","item_branches","item_branches","item_boots","item_gloves","item_robe","item_power_treads","item_fluffy_hat","item_magic_wand","item_belt_of_strength","item_cloak","item_blade_of_alacrity","item_dragon_lance","item_quarterstaff","item_mage_slayer","item_wraith_band","item_force_staff","item_hurricane_pike","item_blitz_knuckles","item_bloodthorn","item_wraith_band","item_black_king_bar","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_basher","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar",
+		"item_ward_dispenser","item_tango","item_branches","item_branches","item_branches","item_magic_stick","item_boots","item_belt_of_strength","item_wind_lace","item_robe","item_ancient_janggo","item_magic_wand","item_tranquil_boots","item_blade_of_alacrity","item_dragon_lance","item_blade_of_alacrity","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_boots_of_bearing","item_claymore","item_blitz_knuckles","item_orchid","item_mithril_hammer","item_black_king_bar","item_staff_of_wizardry","item_force_staff","item_hurricane_pike",
 	},
-	{ {3,3,3,1,2,}, {3,3,4,2,5,}, 0.1 },
+	{ {1,1,4,3,3,}, {5,5,4,3,4,}, 0.1 },
 	{
-		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+10% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","-65 Untouchable Slow","Enchant Affects Ancients","+6.5% Impetus Damage","+20 Nature's Attendants Heal",
+		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+10% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","+-65 Untouchable Attack Slow","Enchant Affects Ancients","+6.5% Impetus Damage","+20 Nature's Attendants Heal",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,10 @@ local NEARBY_OUTER = Set_GetEnemyHeroesInPlayerRadiusAndOuter
 local HIGH_USE = AbilityLogic_HighUseAllowOffensive
 local SPELL_SUCCESS = AbilityLogic_CastOnTargetWillSucceed
 
+local ADDITIONAL_SPROINK_ACQUISITION_RANGE = 181
+
+local ULTRA_ENEMY_FOUNTAIN = Vector(ENEMY_FOUNTAIN.x*4, ENEMY_FOUNTAIN.y*4)
+
 local fight_harass_task_handle = FightHarass_GetTaskHandle()
 
 local min = math.min
@@ -52,8 +56,13 @@ local max = math.max
 local rad = math.rad
 local cos = math.cos
 local asin = math.asin
+local abs = math.abs
+local MATH_PI = math.pi
+local MATH_2PI
 
-local ACCEPTABLE_FACING = cos(MATH_PI/6)
+local ACCEPTABLE_FACING = MATH_PI/12
+
+local TEST = TEST and true
 
 local t_player_abilities = {}
 
@@ -61,18 +70,27 @@ local d
 d = {
 	["SproinkDominateFunc"] = function(gsiPlayer)
 		local sproink = t_player_abilities[gsiPlayer.nOnTeam][4]
-		if sproink:GetCooldownTimeRemaining() > 0 or gsiPlayer.sproinkTryExpiry < RealTime() then
+		local cancelDontCast = sproink:GetCooldownTimeRemaining() > 0
+				or gsiPlayer.hUnit:IsStunned()
+		if cancelDontCast or gsiPlayer.sproinkTryExpiry < GameTime() then
 			gsiPlayer.sproinkDesiredFacing = nil
 			gsiPlayer.sproinkMovementVector = nil
 			DOMINATE_SetDominateFunc(gsiPlayer, "LibHero_EnchantressCastSproink", d.SproinkDominateFunc, false)
 			-- keep the expiry to avoid repeated locking
+			if not cancelDontCast then
+				gsiPlayer.hUnit:Action_UseAbility(sproink)
+			end
 			return;
 		end
-		local unitFacingTarget = gsiPlayer.sproinkDesiredFacing - rad(gsiPlayer.hUnit:GetFacing())
-		if cos(unitFacingTarget) > ACCEPTABLE_FACING then
+		if Vector_UnitFacingRads(gsiPlayer, gsiPlayer.sproinkDesiredFacing) > ACCEPTABLE_FACING then
 			gsiPlayer.hUnit:Action_UseAbility(sproink)
 			return;
 		end
+		DebugDrawLine(gsiPlayer.lastSeen.location, 
+				Vector_Addition(
+						gsiPlayer.lastSeen.location,
+						gsiPlayer.sproinkMovementVector
+					), 100, 255, 50)
 		gsiPlayer.hUnit:Action_MoveToLocation(
 				Vector_Addition(
 						gsiPlayer.lastSeen.location,
@@ -82,9 +100,9 @@ d = {
 		end,
 	["StartCastSproink"] = function(gsiPlayer, awayFromLoc)
 		local unitDirectional = Vector_UnitDirectionalPointToPoint(gsiPlayer.lastSeen.location, awayFromLoc)
-		gsiPlayer.sproinkDesiredFacing = asin(unitDirectional.y)
-		gsiPlayer.sproinkMovementVector = Vector_ScalarMultiply(unitDirectional, 50)
-		gsiPlayer.sproinkTryExpiry = RealTime() + 0.75
+		gsiPlayer.sproinkMovementVector = Vector_ScalarMultiply2D(unitDirectional, 30)
+		gsiPlayer.sproinkDesiredFacing = Vector_GetRadsUnitToLoc(gsiPlayer, awayFromLoc)
+		gsiPlayer.sproinkTryExpiry = GameTime() + 0.75
 		DOMINATE_SetDominateFunc(gsiPlayer, "LibHero_EnchantressCastSproink", d.SproinkDominateFunc, true)
 	end,
 	["untouchable_at_lvl"] = {0,-1,-1.4,-1.8},
@@ -95,6 +113,7 @@ d = {
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["AbilityThink"] = function(gsiPlayer)
 		if not UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -140,12 +159,16 @@ d = {
 					Task_IncentiviseTask(gsiPlayer, fight_harass_task_handle, 15, 3)
 				end
 			end
-			if not sproink:IsHidden() and currentActivityType > ACTIVITY_TYPE.CAREFUL
+			if not sproink:IsHidden() and CAN_BE_CAST(gsiPlayer, sproink)
+					and currentActivityType > ACTIVITY_TYPE.CAREFUL
 					and fightHarassTarget and sproink:GetCooldownTimeRemaining() == 0
 					and AbilityLogic_HighUseAllowOffensive(gsiPlayer, sproink,
 							HIGH_USE_ENC_REMAINING_MANA, currHealthPercent
 						) then
-				d.StartCastSproink(gsiPlayer, ENEMY_FOUNTAIN)
+				local nearestEnemy, nearestEnemyDist = Set_GetNearestEnemyHeroToLocation(gsiPlayer.lastSeen.location, 0.5)
+				if nearestEnemyDist < gsiPlayer.attackRange+ADDITIONAL_SPROINK_ACQUISITION_RANGE then
+					d.StartCastSproink(gsiPlayer, ULTRA_ENEMY_FOUNTAIN)
+				end
 			end
 		end
 	end

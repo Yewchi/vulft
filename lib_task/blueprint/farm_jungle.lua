@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 JUNGLE_CAMP_EASY = 1
 JUNGLE_CAMP_MEDIUM = 2
 JUNGLE_CAMP_HARD = 3
@@ -34,6 +60,8 @@ local CLOSEST_NEUTRALS_I__SPAWNER = 1
 local CLOSEST_NEUTRALS_I__SPAWNER_INDEX = 2
 local CLOSEST_NEUTRALS_I__EXPIRES = 3
 
+local INCENTIVISE_JUNGLE_STAKES_DISTANCE = MAP_COORDINATE_BOUND_NUMERICAL*2
+
 SPAWNER_STATUS = {
 	["MISSING"] = 1,
 	["UNKNOWN"] = 2,
@@ -54,7 +82,7 @@ SPAWNER_TYPE = {
 local SPAWNER_TYPE = SPAWNER_TYPE
 
 local t_unit_closest_neutrals = {}
-local t_spawner = GetNeutralSpawners()
+local t_spawner
 local t_spawner_status = {}
 
 local confirmed_request_denials_until_next_cycle = {} -- Don't farm that pack, it's mine!!
@@ -62,6 +90,9 @@ local confirmed_request_denials_until_next_cycle = {} -- Don't farm that pack, i
 local dawdle_handle
 
 local sqrt = math.sqrt
+local abs = math.abs
+local max = math.max
+local min = math.min
 
 local function register_set_farm_request_jungle(gsiPlayer, creepSet, extrapolatedXeta)
 	-- If Lion requests: Anti-Mage can foresee farming that within the next cycle: Deny request until next cycle.
@@ -88,6 +119,20 @@ end
 
 function FarmJungle_Initialize()
 	dawdle_handle = Dawdle_GetTaskHandle()
+	local spawners = GetNeutralSpawners()
+	-- copy spawners out of userdata -- This is almost definitely not neccessary -- TODO
+	t_spawner = {}
+	for k,v in pairs(spawners) do
+		local thisSpawner = {}
+		for l,m in pairs(v) do
+			if (l == "location") then
+				thisSpawner[l] = Vector(m.x, m.y, m.z)
+			else
+				thisSpawner[l] = m
+			end
+		end
+		t_spawner[k] = thisSpawner
+	end
 	FarmJungle_Init = nil
 end
 
@@ -148,25 +193,39 @@ function FarmJungle_IncentiviseJungling(gsiPlayer, objective)
 	if gsiPlayer.level < 5 then return; end
 	if jungle_incentive_update[gsiPlayer.nOnTeam] < GameTime() then
 		jungle_incentive_update[gsiPlayer.nOnTeam] = GameTime() + 0.897
+		local objectiveLoc = objective.lastSeen and objective.lastSeen.location
+				or objective.center
 		if objective.type == UNIT_TYPE_BUILDING
 				or (objective.type ~= UNIT_TYPE_IMAGINARY
 					and Vector_PointDistance2D(
 						gsiPlayer.lastSeen.location,
-						objective.lastSeen and objective.lastSeen.location
-							or objective.center
+						objectiveLoc
 					) < 1100
 				) then
 			return;
 		end
+		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1800, 5)
+		if nearbyEnemies[1] then 
+			return;
+		end
+		local objectiveNearbyEnemies = Set_GetEnemyHeroesInLocRadOuter(objectiveLoc, 1750, 1750, 1)
+		if objectiveNearbyEnemies[1] then 
+			return;
+		end
+	--	local laneTower = GSI_GetLowestTierDefensible(ENEMY_TEAM,
+	--			objective.lane or Map_GetLaneValueOfMapPoint(objectiveLoc)
+	--		)
+		local distEndgameFactor = (INCENTIVISE_JUNGLE_STAKES_DISTANCE - abs(objectiveLoc.x + objectiveLoc.y))/
+				INCENTIVISE_JUNGLE_STAKES_DISTANCE
 		local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 2200, true)
 		if #nearbyAllies > 1 then
 			local hpp = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 			local effectiveHpp = hpp * gsiPlayer.hUnit:GetArmor() -- effective hit point >percent<
-			local allowed = (#nearbyAllies / 2) - 0.1
+			local allowed = (#nearbyAllies / (2.2 + 0.8*GSI_GetAliveAdvantageFactor())) + distEndgameFactor
 			for i=1,#nearbyAllies do
 				local allied = nearbyAllies[i]
 				if allied ~= gsiPlayer
-						and effectiveHpp * gsiPlayer.hUnit:GetArmor() -- fast, w/e
+						and effectiveHpp
 --[[PRIMITIVE]]					< allied.lastSeenHealth/allied.maxHealth -- flips on dmg taken BAD
 									* allied.hUnit:GetArmor() then
 					allowed = allowed - 1
@@ -176,9 +235,9 @@ function FarmJungle_IncentiviseJungling(gsiPlayer, objective)
 				end
 			end
 			Task_IncentiviseTask(gsiPlayer, dawdle_handle,
-					gsiPlayer.level >= 20 and 70
-						or 18 * sqrt(5-gsiPlayer.level)
-							* gsiPlayer.lastSeenHealth/gsiPlayer.maxHealth,
+					distEndgameFactor * (gsiPlayer.level >= 25 and 120
+							or 27 * sqrt(gsiPlayer.level-5)
+						) * gsiPlayer.lastSeenHealth/gsiPlayer.maxHealth,
 					14
 				)
 		end
@@ -256,6 +315,7 @@ function FarmJungle_GetNearestUncertainUncleared(gsiUnit, difficultyLimit)
 	local closestDist = 0xFFFF
 	local closestSpawner
 	local closestIndex 
+	
 	for i=1,#t_spawner do
 		local thisSpawner = t_spawner[i]
 		if t_spawner_status[i] ~= SPAWNER_STATUS_MISSING then
@@ -300,6 +360,7 @@ function FarmJungle_GetNearestUncertainUncleared(gsiUnit, difficultyLimit)
 	newCached[CLOSEST_NEUTRALS_I__SPAWNER_INDEX] = closestIndex
 	newCached[CLOSEST_NEUTRALS_I__EXPIRES] = GameTime() + CLOSEST_NEUTRALS_VALID_TIME
 	t_unit_closest_neutrals[gsiUnit] = newCached
+
 	return loc, false, nearbyNeutrals and (nearbyNeutrals[1] and nearbyNeutrals) or false
 end
 local get_nearest_uncertain_uncleared = FarmJungle_GetNearestUncertainUncleared

@@ -1,10 +1,10 @@
 local hero_data = {
 	"abyssal_underlord",
-	{1, 3, 1, 3, 1, 4, 1, 2, 2, 2, 2, 4, 3, 5, 8, 3, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 3, 6, 3, 4, 2, 2, 8, 3, 4, 9, 11},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_gauntlets","item_gauntlets","item_branches","item_magic_wand","item_ring_of_health","item_soul_ring","item_boots","item_arcane_boots","item_vanguard","item_cloak","item_hood_of_defiance","item_aghanims_shard","item_helm_of_iron_will","item_crimson_guard","item_headdress","item_pipe","item_platemail","item_ring_of_health","item_lotus_orb","item_ogre_axe","item_mask_of_madness","item_mithril_hammer","item_black_king_bar","item_moon_shard","item_moon_shard",
+		"item_tango","item_quelling_blade","item_magic_stick","item_enchanted_mango","item_boots","item_energy_booster","item_arcane_boots","item_crown","item_crown","item_magic_wand","item_staff_of_wizardry","item_rod_of_atos","item_ring_of_basilius","item_crown","item_cloak","item_veil_of_discord","item_ring_of_health","item_hood_of_defiance","item_headdress","item_pipe","item_void_stone","item_aether_lens","item_ghost","item_aghanims_shard","item_staff_of_wizardry","item_robe","item_ethereal_blade","item_arcane_boots","item_octarine_core",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Firestorm","Pit of Malice","Atrophy Aura","Fiend's Gate","+5 Armor","+100 Firestorm Radius","+75 Pit of Malice AoE","-4s Firestorm Cooldown","+1% Firestorm Burn Damage","+15% Atrophy Aura Attack Damage Reduction","+0.65s Pit of Malice Root","+50% Atrophy Allied Hero Bonus",
 	}
@@ -44,13 +44,15 @@ local abilities = {
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		local abilityLocked, _, queuedAbility = UseAbility_IsPlayerLocked(gsiPlayer)

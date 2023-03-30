@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- N.B. Naming choice aside, "confirmed denial" refers to a denial of the reservation of a last hit. I wasn't aware of Void Spirit saying it when I decided on the name. /shrug
 
 FARM_LANE_LAST_HIT_RECHECK_THROTTLE = 0.035 -- It is still checked, probably every frame. Low FPS computers are more likely to skip a frame, but it's not likely. Depends on how many re-prios the frame got.
@@ -10,13 +36,15 @@ EXP_VALUE_OF_LANING_STAGE_CREEP_SET = 180
 local BREAK_FARM_SEAL_POWER_LEVEL = Analytics_GetPerfectKDAPowerLevel(6)
 
 ---- farm_lane constants --
-local DISCOURAGE_FACTOR = 80
+local DISCOURAGE_FACTOR = 50
 local UNIT_TYPE_CREEP = UNIT_TYPE_CREEP
 local UNIT_TYPE_IMAGINARY = UNIT_TYPE_IMAGINARY
 local PLAYERS_ALL = PLAYERS_ALL
 local TASK_PRIORITY_TOP = TASK_PRIORITY_TOP
 local CREEP_ENEMY = CREEP_ENEMY
 local HIGH_CREEP_MAX_HEALTH = HIGH_CREEP_MAX_HEALTH
+local Vector_PointDistance = Vector_PointDistance
+local Vector_PointDistance2D = Vector_PointDistance2D
 local max = math.max
 local min = math.min
 local abs = math.abs
@@ -34,6 +62,8 @@ local t_utilizing_lane_safety_value = {} -- is the bot still locked to a lane du
 local t_power_seal_throttle = {} -- Should the bot check if it can start roaming the map freely
 
 local task_handle = Task_CreateNewTask()
+
+local fight_harass_handle
 
 local blueprint_farm_lane
 
@@ -72,14 +102,17 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 	return 0 -- TODO
 end
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "farm_lane")
 	if VERBOSE then VEBUG_print(string.format("farm_lane: Initialized with handle #%d.", task_handle)) end
+
+	fight_harass_handle = FightHarass_GetTaskHandle()
 	
 	for i=1,TEAM_NUMBER_OF_PLAYERS do
 		t_utilizing_lane_safety_value[i] = true
 		t_power_seal_throttle[i] = Time_CreateThrottle(8)
 		t_fighting_no_farming_expiry[i] = 0
 	end
-	
+
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint_farm_lane.run, blueprint_farm_lane.score, blueprint_farm_lane.init)
 	
 	taskJobDomain:RegisterJob( -- Task Score Priority Update
@@ -140,9 +173,10 @@ function Farm_GetMostSuitedLane(gsiPlayer, localCreepSet)
 	--print(gsiPlayer.shortName, "sees localCreepSet lane ", localCreepSet and localCreepSet.lane, Blueprint_GetCurrentTaskActivityType(gsiPlayer), ACTIVITY_TYPE.CONTROLLED_AGGRESSION, localCreepSet and Farm_AnyOtherCoresInLane(gsiPlayer, localCreepSet))
 	if t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] then
 		if gsiPlayer.level >= 4
-				and (GSI_AnyTierUnderHealthPercent(1, 0.15)
+				and (GSI_AnyTierUnderHealthPercent(1, 0.20)
 						or Analytics_GetPowerLevel(gsiPlayer) > BREAK_FARM_SEAL_POWER_LEVEL)
-				and Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) > 1 then
+				and Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) >
+					GSI_LowestTierHealthPercentWithDead(2) then
 			INFO_print(string.format("[farm_lane] %s broke the power seal of lane-locking. "..
 						"PLvl:%.2f. ReqLvl:%.2f", gsiPlayer.shortName,
 						Analytics_GetPowerLevel(gsiPlayer), BREAK_FARM_SEAL_POWER_LEVEL
@@ -150,9 +184,10 @@ function Farm_GetMostSuitedLane(gsiPlayer, localCreepSet)
 				)
 			t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] = false
 			t_power_seal_throttle[gsiPlayer.nOnTeam] = nil
-		elseif localCreepSet and localCreepSet.lane ~= roleBasedLane then
+		elseif localCreepSet and not localCreepSet.isImaginary and localCreepSet.lane ~= roleBasedLane then
 			if Blueprint_GetCurrentTaskActivityType(gsiPlayer) > ACTIVITY_TYPE.CONTROLLED_AGGRESSION
-					and Farm_AnyOtherCoresInLane(gsiPlayer, localCreepSet) then
+					and Farm_AnyOtherCoresInLane(gsiPlayer, localCreepSet)
+					or Vector_PointDistance2D(gsiPlayer.lastSeen.location, localCreepSet.center) > 2100 then
 				return roleBasedLane
 			end
 			return localCreepSet.lane
@@ -313,14 +348,12 @@ blueprint_farm_lane = {
 	end,
 		
 	score = function(gsiPlayer, prevObjective, prevScore)
-		if t_fighting_no_farming_expiry[gsiPlayer.nOnTeam] > GameTime() then
-			return prevObjective, XETA_SCORE_DO_NOT_RUN
-		end
 		-- Will attempt to babysit creep-wave obssessed morons that want to dive towers
 		-- -| before farm lane's lane-lock power seal is broken
 		-- PROGRAMMING METHODOLOGY -- Lua functional calls are AS SLOW AS A FRIDGE -- Despite
 		-- -| a local reference -- Avoid when possible in-loop.
-		local laneToFarm = Map_GetLaneValueOfMapPoint(gsiPlayer.lastSeen.location)
+		local currentLocationLane = Map_GetLaneValueOfMapPoint(gsiPlayer.lastSeen.location)
+		local laneToFarm = currentLocationLane
 		local thisPlayerRoleBasedLane = Team_GetRoleBasedLane(gsiPlayer)
 		local enemyCreepSet = Set_GetEnemyCreepSetLaneFront(laneToFarm)
 		if not t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] or laneToFarm ~= thisPlayerRoleBasedLane then
@@ -330,16 +363,44 @@ blueprint_farm_lane = {
 				enemyCreepSet = Set_GetEnemyCreepSetLaneFront(laneToFarm)
 			end
 		elseif t_power_seal_throttle[gsiPlayer.nOnTeam] and t_power_seal_throttle[gsiPlayer.nOnTeam]:allowed() then
-			Farm_GetMostSuitedLane(gsiPlayer, nil)
+			Farm_GetMostSuitedLane(gsiPlayer, nil) -- check power seal
 		end
-		--[[DEV]]if DEBUG and not TEAM_IS_RADIANT then DebugDrawText(2, 500+gsiPlayer.nOnTeam*8, string.format("%s-%d-%d-%d", string.sub(gsiPlayer.shortName,1,4), laneToFarm, Team_GetRoleBasedLane(gsiPlayer), Farm_GetMostSuitedLane(gsiPlayer, enemyCreepSet)), 255, 255, 255) end
+		local isOutOfBestLane = laneToFarm ~= currentLocationLane
+		if isOutOfBestLane then
+			Tilt_ReportSelfOutOfLane(gsiPlayer, currentLocationLane)
+		end
+		if t_fighting_no_farming_expiry[gsiPlayer.nOnTeam] > GameTime() then
+			-- Disallow farming if fighting
+
+			if not isOutOfBestLane then
+				return prevObjective, XETA_SCORE_DO_NOT_RUN
+			else
+				-- Early game get-to-lane fight-worth fences
+			
+				local fht = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
+				local fhtReal = fht and not fht.typeIsNone and not pUnit_IsNullOrDead(fht)
+				--local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+				local nearestEnemyTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
+				-- If the player is not in thier designated lane, greatly benefits from the XP
+				-- from lane, or their laning partner is alone and it is very early in the game, and the
+				-- fight is not immediately benefited by the player being present, false it, continue scoring
+--[[DEV]]		if DEBUG and nearestEnemyTower then DebugDrawText(150+(TEAM_IS_RADIANT and 0 or 200), 80+gsiPlayer.nOnTeam*8, string.format("%4s-%1s-%.2f>%.2f", gsiPlayer.shortName, tostring(fhtReal), fht and gsiPlayer.level/3 + 3*(1-(fht.lastSeenHealth / fht.maxHealth)) or -0, fht and 2.5 - (-gsiPlayer.attackRange*0.9 + Vector_PointDistance2D(fht.lastSeen.location, nearestEnemyTower.lastSeen.location))/900 or -0), 255, 255, 255) end
+				if fhtReal
+						and nearestEnemyTower and gsiPlayer.level/3 + 3*(1-(fht.lastSeenHealth / fht.maxHealth))
+							> 2.5 - (-gsiPlayer.attackRange*0.9 + Vector_PointDistance2D(fht.lastSeen.location,
+								nearestEnemyTower.lastSeen.location))/900 then
+					return prevObjective, XETA_SCORE_DO_NOT_RUN
+				end
+			end
+		end
+		--[[DEV]]if DEBUG then DebugDrawText(2, 400+gsiPlayer.nOnTeam*8+(TEAM_IS_RADIANT and 0 or 60), string.format("%s-%d-%d-%d", string.sub(gsiPlayer.shortName,1,4), laneToFarm, Team_GetRoleBasedLane(gsiPlayer), Farm_GetMostSuitedLane(gsiPlayer, enemyCreepSet)), 255, 255, 255) end
 		local alliedCreepSet = Set_GetAlliedCreepSetLaneFront(thisPlayerRoleBasedLane)
 		local recentDamageTakenCare = Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit)*VALUE_OF_ONE_HEALTH
 		local playerAttackDamage = gsiPlayer.hUnit:GetAttackDamage() -- nb. this is only to avoid a non-check on creeps not being damaged but very low health
 		--if recentDamageTakenCare > gsiPlayer.maxHealth*0.065 then LeechExp_UpdatePriority(gsiPlayer) end DEPRECIATE
 
 		local alliedCreepSetLoc = alliedCreepSet and alliedCreepSet.center
-		local danger = Analytics_GetTheoreticalDangerAmount(
+		local danger, knownE, theorizedE = Analytics_GetTheoreticalDangerAmount(
 				gsiPlayer,
 				nil,
 				alliedCreepSet and Vector_Addition(alliedCreepSetLoc,
@@ -353,7 +414,7 @@ blueprint_farm_lane = {
 					)
 			)
 		local dangerOfLaneScore = max(0, danger * DISCOURAGE_FACTOR
-					* (1 + 2.5*(1 - (gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth)) )
+					* (0.4 + (#knownE+0.7*#theorizedE)*(1 - (gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth)) )
 				)
 
 		local powerLevel = Analytics_GetPowerLevel(gsiPlayer)
@@ -407,7 +468,8 @@ blueprint_farm_lane = {
 					thisXeta = Xeta_EvaluateObjectiveCompletion(XETA_CREEP_KILL,
 							Math_ETA(gsiPlayer, thisCreep.lastSeen.location)
 									* awayFromLaneCareFactor,
-							1.0, gsiPlayer, thisCreep)
+							1.0, gsiPlayer, thisCreep
+						)
 					if thisXeta == 0 then
 						ERROR_print(string.format("0-value creep found. %s, %.2f, %.2f",
 									thisCreep.hUnit:GetUnitName(),
@@ -617,6 +679,10 @@ function Farm_AnyOtherCoresInLane(gsiPlayer, creepSet)
 	return false, nil
 end
 
+function Farm_ExpectedInLane(gsiPlayer, enemyCreepSet)
+
+end
+
 function Farm_TryCreepSetRequest(gsiPlayer, creepSet, extrapolatedXeta) -- Includes greedRating
 	local confirmedDenial = confirmed_lane_creep_set_request_denials[creepSet]
 	if confirmedDenial then
@@ -671,6 +737,92 @@ end
 
 function FarmLane_InformFightingNoFarming(gsiPlayer)
 	t_fighting_no_farming_expiry[gsiPlayer.nOnTeam] = GameTime() + FIGHTING_NO_FARMING_EXPIRY
+end
+
+function FarmLane_UpdateHumanLastHit(gsiPlayer)
+	local laneToFarm = Map_GetLaneValueOfMapPoint(gsiPlayer.lastSeen.location)
+	local thisPlayerRoleBasedLane = Team_GetRoleBasedLane(gsiPlayer)
+	local enemyCreepSet = Set_GetEnemyCreepSetLaneFront(laneToFarm)
+	if not t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] or laneToFarm ~= thisPlayerRoleBasedLane then
+		laneToFarm = Farm_GetMostSuitedLane(gsiPlayer, enemyCreepSet)
+		if not enemyCreepSet or laneToFarm ~= enemyCreepSet.lane then
+			--print("changing creep set to lane", laneToFarm, 'from', enemyCreepSet and enemyCreepSet.lane)
+			enemyCreepSet = Set_GetEnemyCreepSetLaneFront(laneToFarm)
+		end
+	elseif t_power_seal_throttle[gsiPlayer.nOnTeam] and t_power_seal_throttle[gsiPlayer.nOnTeam]:allowed() then
+		Farm_GetMostSuitedLane(gsiPlayer, nil)
+	end
+	if not enemyCreepSet or enemyCreepSet.isImaginary then
+		return;
+	end
+	local distToSet = Vector_PointDistance2D(enemyCreepSet.center, gsiPlayer.lastSeen.location)
+	if distToSet > 1600 then
+		return;
+	end
+	local playerAttackDamage = gsiPlayer.hUnit:GetAttackDamage()
+	local highestValueCreepXeta = XETA_SCORE_DO_NOT_RUN
+	local highestValueCreep
+	local playerAttackRangeCheck = gsiPlayer.attackRange + 500 -- nb- not having a huge buffer causes flip states as supports would try to get last hits momentarily
+	local playerLoc = gsiPlayer.lastSeen.location
+	local highestValueCreepTimelineDamage = 0
+	local previousPlayerForMyHighestValueCreep = nil
+	local laneFrontUnitsEnemy = enemyCreepSet.units
+	local recentDamageTakenCare = Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit)*VALUE_OF_ONE_HEALTH
+	local playerCurrentAttackDamage = max(1, gsiPlayer.hUnit:GetAttackDamage())
+	for i=1,#laneFrontUnitsEnemy,1 do
+		local thisCreep = laneFrontUnitsEnemy[i]
+		if Vector_PointDistance2D(playerLoc, thisCreep.lastSeen.location) < playerAttackRangeCheck then
+			local thisCreepNearFutureHealthPercent = Analytics_GetNearFutureHealthPercent(thisCreep)
+			local totalDamageInTimeline = Analytics_GetTotalDamageInTimeline(thisCreep.hUnit)
+			local thisXeta = XETA_SCORE_DO_NOT_RUN
+			if not thisCreep.hUnit:IsNull() and thisCreep.hUnit:IsAlive()
+					and ((thisCreep.creepType ~= CREEP_TYPE_RANGED and thisCreep.creepType ~= CREEP_TYPE_SIEGE)
+						or thisCreep.lastSeenHealth ~= thisCreep.maxHealth)
+					and (totalDamageInTimeline > 0 or thisCreep.lastSeenHealth < playerAttackDamage) then -- Don't score a full health range creep. (hack). Note dominated units are included if full health
+				thisXeta = Xeta_EvaluateObjectiveCompletion(XETA_CREEP_KILL,
+						Math_ETA(gsiPlayer, thisCreep.lastSeen.location),
+						1.0, gsiPlayer, thisCreep)
+				if thisXeta == 0 then
+					ERROR_print(string.format("0-value creep found. %s, %.2f, %.2f",
+								thisCreep.hUnit:GetUnitName(),
+								thisCreep.hUnit:GetBountyGoldMax(),
+								thisCreep.hUnit:GetBountyXP()
+							)
+						)
+				end
+				thisXeta = thisXeta/1.2
+				thisXeta = thisXeta * (playerCurrentAttackDamage + totalDamageInTimeline)/(playerCurrentAttackDamage+thisCreep.lastSeenHealth)
+				thisXeta = thisXeta - recentDamageTakenCare
+			end
+			if prevObjective == thisCreep then prevScore = thisXeta end
+			if thisXeta > highestValueCreepXeta then
+				local allowedTakeOver, thisPreviousPlayer = 
+						Farm_CheckTakeOverLastHitRequest(gsiPlayer, thisCreep, thisXeta*0.9)
+				if allowedTakeOver then
+					previousPlayerForMyHighestValueCreep = thisPreviousPlayer
+					highestValueCreepXeta = thisXeta
+					highestValueCreep = thisCreep
+					highestValueCreepTimelineDamage = totalDamageInTimeline
+				end
+			end
+		end
+	end
+	if not highestValueCreep then
+		return;
+	end
+	local confirmedDenial = confirmed_last_hit_request_denials[creep]
+	if confirmedDenial then
+		if confirmedDenial.player == gsiPlayer then
+			gsiPlayer.vibe.aggressivity = 0.35
+			return extrapolatedXeta
+		end
+		
+		--print(gsiPlayer.shortName, "sending objective disallow to", confirmedDenial.player.shortName, creep)
+		Task_InformObjectiveDisallow(confirmedDenial.player, {creep, DENIAL_TYPE_FARM_LANE_CREEP})
+	end
+	Farm_CancelAnyConfirmedDenials(gsiPlayer)
+	register_last_hit_request(gsiPlayer, highestValueCreep, highestValueCreepXeta)
+	--gsiPlayer.vibe.aggressivity = 0.35 --[[AGGRESIVITY OFF]] -- TODO
 end
 
 function FarmLane_AlternateTaskAllowance(gsiPlayer)

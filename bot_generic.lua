@@ -1,7 +1,33 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Dev note: DISCLAIMER -- Comments are terrible, sometimes vague, and damn rude.
 
 -- Very U(gly, Unrolled, Unabstracted, and Fast) Lua Full Takeover -- Dota 2 script -- Welcome to perfomance Lua, where empty tables are 64 bytes, and abstraction doesn't matter.
--- Written by zyewchi@gmail.com - Mike - github.com/Yewchi
+-- Written by zyewchi@gmail.com - Michael - github.com/Yewchi gitlab.com/yewchi
 
 local FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST = 150
 
@@ -14,13 +40,14 @@ if not GetBot():IsHero() then
 	return;
 end
 
-_G = nil
-_ENV = nil
+--_G = nil
+--_ENV = nil
 
 require(GetScriptDirectory().."/lib_util/util")
 require(GetScriptDirectory().."/lib_job/job_manager")
 require(GetScriptDirectory().."/lib_gsi/gsi_planar_gsi")
 require(GetScriptDirectory().."/partial_full_handover")
+
 
 local is_arc_warden_double = false
 
@@ -55,6 +82,7 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 		this_bot:disabledAndDominatedFunc()
 		return
 	end
+
 	--[[TESTTRUE]]if DEBUG then
 		if err_flag==1 then
 			err_count = err_count + 1
@@ -136,6 +164,8 @@ end
 local function bot_initialization_wait_gsi_ready__job(workingSet)
 	if GSI_READY then
 		this_bot = GSI_GetBot()
+
+		this_bot.CDOTA_Action_DropItem = CDOTA_Action_DropItem
 
 		if is_arc_warden_double then
 			GSI_HandleZetBotGenericCreated()

@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Vector mathematical operations and logic (trig is in math.lua)
 -- Fun and redundant!
 
@@ -19,140 +45,52 @@ local abs = math.abs
 local sqrt = math.sqrt
 local MATH_PI = math.pi
 local MATH_2PI = 2*MATH_PI
-
+local RADIAN90 = MATH_PI/2
+local RADIAN270 = MATH_PI*3/2
 
 function Vector_PointToPointLine(p1, p2)
 	return Vector((p2.x - p1.x), (p2.y - p1.y), (p2.z - p1.z))
 end
 local Vector_PointToPointLine = Vector_PointToPointLine
 
-function Vector_UnitFacingUnit(u1, u2)
---[[DEV]]if VERBOSE then
---[[DEV]]	if u1 and (
---[[DEV]]				(not u1.hUnit and u1.GetFacing and u1:IsNull())
---[[DEV]]				or (u1.hUnit and u1.hUnit.GetFacing and u1.hUnit:IsNull())
---[[DEV]]			) then
---[[DEV]]		ERROR_print("[vector] UnitFacingUnit() looking unit parameter is null")
---[[DEV]]		Util_TablePrint(u1)
---[[DEV]]		DEBUG_KILLSWITCH = true
---[[DEV]]	end
---[[DEV]]end
-	local u1Facing = u1.GetFacing and u1:GetFacing() or u1.hUnit:GetFacing()
-	local u1Loc = u1.GetLocation and u1:GetLocation() or u1.lastSeen.location
-	local u2Loc = u2.GetLocation and u2:GetLocation() or u2.lastSeen.location
-	local directionVector = Vector_PointToPointLine(u1Loc, u2Loc)
-	local directlyFacing = acos(directionVector.x / Vector_LengthOfVector(directionVector))
-	directlyFacing = directionVector.y < 0 and MATH_2PI-directlyFacing or directlyFacing
-	local unitFacing = rad(u1Facing)
-	local radToTurn = unitFacing - directlyFacing
-	return cos(radToTurn)
-end
-local Vector_UnitFacingUnit = Vector_UnitFacingUnit
-
-function Vector_UnitFacingLoc(unit, loc)
-	local unitFacing = unit.GetFacing and unit:GetFacing() or unit.hUnit:GetFacing()
-	local unitLoc = unit.GetLocation and unit:GetLocation() or unit.lastSeen.location
-	local directionVector = Vector_PointToPointLine(unitLoc, loc)
-	local directlyFacing = acos(directionVector.x / Vector_LengthOfVector(directionVector))
-	directlyFacing = directionVector.y < 0 and MATH_2PI-directlyFacing or directlyFacing
-	local unitFacing = rad(unitFacing)
-	local radToTurn = unitFacing - directlyFacing
-	return cos(radToTurn)
-end
-local Vector_UnitFacingLoc = Vector_UnitFacingLoc
-
-function Vector_PointToPointAngle(p1, p2)
-	local directionVector = Vector_PointToPointLine(p1, p2)
-	local angle = acos
-end
-local Vector_PointToPointAngle = Vector_PointToPointAngle
-
-function Vector_PointWithinTriangle(p, q1, q2, q3)
-	local X1 = Vector_CrossProduct2D(Vector_PointToPointLine(q1, q2), Vector_PointToPointLine(q2, p))
-	local X2 = Vector_CrossProduct2D(Vector_PointToPointLine(q2, q3), Vector_PointToPointLine(q3, p))
-	local X3 = Vector_CrossProduct2D(Vector_PointToPointLine(q3, q1), Vector_PointToPointLine(q1, p))
-	
-	if (X1 <= 0 and X2 <= 0 and X3 <= 0) or 
-			(X1 >= 0 and X2 >= 0 and X3 >= 0) then
-		return true
-	end
-	return false
-end
-local Vector_PointWithinTriangle = Vector_PointWithinTriangle
-
-function Vector_SideOfPlane(p, q1, q2) -- i.e. Always use counter-clock-wise encapsulation if comparing to 1
-	return Vector_CrossProduct2D(Vector_PointToPointLine(q1, q2), Vector_PointToPointLine(q2, p)) > 0 and 1 or -1
-end
-local Vector_SideOfPlane = Vector_SideOfPlane
-
-function Vector_PointWithinStrip(p, base, top, delta)
-	local directional = Vector_PointToPointLine(base, top)
-	local unitNormal = Vector_ToDirectionalUnitVector(Vector_CrossProduct(directional, ORTHOGONAL_Z))
-	local leftP1 = Vector(base.x+(-delta*unitNormal.x), base.y+(-delta*unitNormal.y), 0)
-	local leftP2 = Vector(leftP1.x+directional.x, leftP1.y+directional.y, 0)
-	local rightP1 = Vector(base.x+delta*unitNormal.x, base.y+delta*unitNormal.y, 0)
-	local rightP2 = Vector(rightP1.x+directional.x, rightP1.y+directional.y, 0)
---[[DEV]]if TEST then DebugDrawCircle(leftP1, 20, 100, 0, 100) end
---[[DEV]]if TEST then DebugDrawCircle(leftP2, 40, 150, 0, 100) end
---[[DEV]]if TEST then DebugDrawCircle(rightP1, 60, 200, 0, 100) end
---[[DEV]]if TEST then DebugDrawCircle(rightP2, 95, 255, 0, 100) end
---[[DEV]]if TEST then DebugDrawLine(leftP1, leftP2, 0, 0, 255) end
---[[DEV]]if TEST then DebugDrawLine(leftP2, rightP2, 0, 0, 180) end
---[[DEV]]if TEST then DebugDrawLine(rightP2, rightP1, 0, 0, 120) end
---[[DEV]]if TEST then DebugDrawLine(rightP1, leftP1, 0, 0, 60) end
-
-	-- Counter clock-wise (postive) encased
-	return Vector_SideOfPlane(p, leftP1, rightP1) > 0
-			and Vector_SideOfPlane(p, rightP1, rightP2) > 0
-			and Vector_SideOfPlane(p, rightP2, leftP2) > 0
-			and Vector_SideOfPlane(p, leftP2, leftP1) > 0
-end
-local Vector_PointWithinStrip = Vector_PointWithinStrip
-
-function Vector_Equal(v1, v2)
-	if type(v1.x) == "number" and type(v2.x) == "number" then
-		if v1.x == v2.x and v1.y == v2.y and v1.z == v2.z then
-			return true
-		else
-			return false
-		end
-	else
-		print("/VUL-FT/ <WARN> vector: Incorrect parameters given to Vector_Equal"..Util_ParamString(v1, v2))
-	end
-end
-local Vector_Equal = Vector_Equal
-
-function Vector_PointBetweenPoints(p1, p2)
-	return Vector((p1.x+p2.x)/2, (p1.y+p2.y)/2, (p1.z+p2.z)/2)
-end
-local Vector_PointBetweenPoints = Vector_PointBetweenPoints
-
 function Vector_CrossProduct2D(v1, v2)
 	return v1.x * v2.y - v1.y * v2.x
 end
 local Vector_CrossProduct2D = Vector_CrossProduct2D
-
--- I think this should be renamed "Vector_Orthogonal"
-function Vector_CartesianNormal(v)
-	return Vector_CrossProduct(v, ORTHOGONAL_Z)
-end
-local Vector_CartesianNormal = Vector_CartesianNormal
 
 function Vector_CrossProduct(v1, v2) 
 	return Vector(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x)
 end
 local Vector_CrossProduct = Vector_CrossProduct
 
+function Vector_PointBetweenPoints(p1, p2)
+	return Vector((p1.x+p2.x)/2, (p1.y+p2.y)/2, (p1.z+p2.z)/2)
+end
+local Vector_PointBetweenPoints = Vector_PointBetweenPoints
+
+-- I think this should be renamed "Vector_Orthogonal" -- 27/03/23 -- no refactored because it should allow modifying the orthoganal-z sign
+function Vector_CartesianNormal(v)
+	return Vector_CrossProduct(v, ORTHOGONAL_Z)
+end
+local Vector_CartesianNormal = Vector_CartesianNormal
+
+function Vector_DotProduct(v1, v2)
+	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+end
+local Vector_DotProduct = Vector_DotProduct
+
 function Vector_Addition(v1, v2)
 	return Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z)
 end
 local Vector_Addition = Vector_Addition
 
+-- and this would be the fix \/\/\/\/\/\/
 function Vector_ScalarMultiply2D(v, s)
 	return Vector(v.x*s, v.y*s, v.z)
 end
 local Vector_ScalarMultiply2D = Vector_ScalarMultiply2D
 
+-- Wondering if 3D scalar mutliply is the reason for off-map messages
 function Vector_ScalarMultiply(v, s)
 	return Vector(v.x*s, v.y*s, v.z*s)
 end
@@ -189,18 +127,192 @@ function Vector_UnitDirectionalPointToPoint(v1, v2)
 end
 local Vector_UnitDirectionalPointToPoint = Vector_UnitDirectionalPointToPoint
 
-function Vector_UnitDirectionalFacingDirection(degrees)
+function Vector_UnitDirectionalFacingDirection(degrees) -- TODO REFACTOR DEGREES NAME OR STANDARDIZE RADS IN
 	local radians = degrees * MATH_PI / 180
 	return Vector(cos(radians), sin(radians), 0)
 end
+Vector_UnitDirectionalFacingDegrees = Vector_UnitDirectionalFacingDirection
 local Vector_UnitDirectionalFacingDirection = Vector_UnitDirectionalFacingDirection
 
-function Vector_DirectionalUnitMovingForward(gsiUnit, moveSpeed)
+function Vector_UnitFacingUnit(u1, u2)
+--[[DEV]]if VERBOSE then
+--[[DEV]]	if u1 and (
+--[[DEV]]				(not u1.hUnit and u1.GetFacing and u1:IsNull())
+--[[DEV]]				or (u1.hUnit and u1.hUnit.GetFacing and u1.hUnit:IsNull())
+--[[DEV]]			) then
+--[[DEV]]		ERROR_print("[vector] UnitFacingUnit() looking unit parameter is null")
+--[[DEV]]		Util_TablePrint(u1)
+--[[DEV]]		DEBUG_KILLSWITCH = true
+--[[DEV]]	end
+--[[DEV]]end
+	local u1Facing = u1.GetFacing and u1:GetFacing() or u1.hUnit:GetFacing()
+	local u1Loc = u1.GetLocation and u1:GetLocation() or u1.lastSeen.location
+	local u2Loc = u2.GetLocation and u2:GetLocation() or u2.lastSeen.location
+	local directionVector = Vector_PointToPointLine(u1Loc, u2Loc)
+	local directlyFacing = acos(directionVector.x / Vector_LengthOfVector(directionVector))
+	directlyFacing = directionVector.y < 0 and MATH_2PI-directlyFacing or directlyFacing
+	local unitFacing = rad(u1Facing)
+	local radToTurn = unitFacing - directlyFacing
+	return cos(radToTurn)
+end
+local Vector_UnitFacingUnit = Vector_UnitFacingUnit
+
+function Vector_UnitFacingLoc(unit, loc)
+	local unitFacing = unit.GetFacing and unit:GetFacing() or unit.hUnit:GetFacing()
+	local unitLoc = unit.GetLocation and unit:GetLocation() or unit.lastSeen.location
+	local directionVector = Vector_PointToPointLine(unitLoc, loc)
+	local directlyFacing = acos(directionVector.x / Vector_LengthOfVector(directionVector))
+	directlyFacing = directionVector.y < 0 and MATH_2PI-directlyFacing or directlyFacing
+	local unitFacing = rad(unitFacing)
+	local radToTurn = unitFacing - directlyFacing
+	return cos(radToTurn)
+end
+local Vector_UnitFacingLoc = Vector_UnitFacingLoc
+
+function Vector_UnitFacingRads(unit, rads)
+	local unitFacingRads = (unit.GetFacing and unit:GetFacing() or unit.hUnit:GetFacing()) * MATH_PI / 180
+	local absDifference = abs(rads - unitFacingRads)
+	absDifference = absDifference > MATH_PI and MATH_2PI - absDifference or absDifference
+	return cos(absDifference)
+end
+
+function Vector_GetRadsUnitToLoc(unit, loc)
+	local unitLoc = unit.GetLocation and not unit:IsNull() and unit:GetLocation() or unit.lastSeen.location
+	local directionVector = Vector_PointToPointLine(unitLoc, loc)
+	local facingRads = acos(directionVector.x / Vector_LengthOfVector(directionVector))
+	facingRads = directionVector.y < 0 and MATH_2PI-facingRads or facingRads
+	return facingRads
+end
+
+function Vector_PointToPointRads(p1, p2)
+	local directionVector = Vector_PointToPointLine(p1, p2)
+	local radsAngle = acos(directionVector.x / sqrt(directionVector.x^2 + directionVector.y^2))
+	radsAngle = directionVector.y < 0 and MATH_2PI - radsAngle or radsAngle
+	return radsAngle
+end
+local Vector_PointToPointRads = Vector_PointToPointRads
+
+function Vector_PointWithinTriangle(p, q1, q2, q3)
+	local X1 = Vector_CrossProduct2D(Vector_PointToPointLine(q1, q2), Vector_PointToPointLine(q2, p))
+	local X2 = Vector_CrossProduct2D(Vector_PointToPointLine(q2, q3), Vector_PointToPointLine(q3, p))
+	local X3 = Vector_CrossProduct2D(Vector_PointToPointLine(q3, q1), Vector_PointToPointLine(q1, p))
+	
+	if (X1 <= 0 and X2 <= 0 and X3 <= 0) or 
+			(X1 >= 0 and X2 >= 0 and X3 >= 0) then
+		return true
+	end
+	return false
+end
+local Vector_PointWithinTriangle = Vector_PointWithinTriangle
+
+function Vector_SideOfPlane(p, q1, q2) -- i.e. Always use counter-clock-wise encapsulation if comparing to 1
+	return Vector_CrossProduct2D(Vector_PointToPointLine(q1, q2), Vector_PointToPointLine(q2, p)) > 0 and 1 or -1
+end
+local Vector_SideOfPlane = Vector_SideOfPlane
+
+function Vector_PointWithinStrip(p, base, top, delta)
+	local directional = Vector_PointToPointLine(base, top)
+	local unitNormal = Vector_ToDirectionalUnitVector(Vector_CrossProduct(directional, ORTHOGONAL_Z))
+	local leftP1 = Vector(base.x+(-delta*unitNormal.x), base.y+(-delta*unitNormal.y), 0)
+	local leftP2 = Vector(leftP1.x+directional.x, leftP1.y+directional.y, 0)
+	local rightP1 = Vector(base.x+delta*unitNormal.x, base.y+delta*unitNormal.y, 0)
+	local rightP2 = Vector(rightP1.x+directional.x, rightP1.y+directional.y, 0)
+--[[DEV]]if DEBUG then DebugDrawCircle(leftP1, 20, 100, 0, 100) end
+--[[DEV]]if DEBUG then DebugDrawCircle(leftP2, 40, 150, 0, 100) end
+--[[DEV]]if DEBUG then DebugDrawCircle(rightP1, 60, 200, 0, 100) end
+--[[DEV]]if DEBUG then DebugDrawCircle(rightP2, 95, 255, 0, 100) end
+--[[DEV]]if DEBUG then DebugDrawLine(leftP1, leftP2, 0, 0, 255) end
+--[[DEV]]if DEBUG then DebugDrawLine(leftP2, rightP2, 0, 0, 180) end
+--[[DEV]]if DEBUG then DebugDrawLine(rightP2, rightP1, 0, 0, 120) end
+--[[DEV]]if DEBUG then DebugDrawLine(rightP1, leftP1, 0, 0, 60) end
+
+	-- Counter clock-wise (postive) encased
+	return Vector_SideOfPlane(p, leftP1, rightP1) > 0
+			and Vector_SideOfPlane(p, rightP1, rightP2) > 0
+			and Vector_SideOfPlane(p, rightP2, leftP2) > 0
+			and Vector_SideOfPlane(p, leftP2, leftP1) > 0
+end
+local Vector_PointWithinStrip = Vector_PointWithinStrip
+
+-------- Vector_PointWithinStripDirectional()
+function Vector_PointWithinStripDirectional(p, base, directional, delta)
+	local unitNormal = Vector_ToDirectionalUnitVector(Vector_CrossProduct(directional, ORTHOGONAL_Z))
+	local leftP1 = Vector(base.x+(-delta*unitNormal.x), base.y+(-delta*unitNormal.y), 0)
+	local leftP2 = Vector(leftP1.x+directional.x, leftP1.y+directional.y, 0)
+	local rightP1 = Vector(base.x+delta*unitNormal.x, base.y+delta*unitNormal.y, 0)
+	local rightP2 = Vector(rightP1.x+directional.x, rightP1.y+directional.y, 0)
+
+	-- Counter clock-wise (postive) encased
+	return Vector_SideOfPlane(p, leftP1, rightP1) > 0
+			and Vector_SideOfPlane(p, rightP1, rightP2) > 0
+			and Vector_SideOfPlane(p, rightP2, leftP2) > 0
+			and Vector_SideOfPlane(p, leftP2, leftP1) > 0
+end
+local Vector_PointWithinStripDirectional = Vector_PointWithinStripDirectional
+
+-------- Vector_PointWithinCone()
+function Vector_PointWithinCone(p, base, height, projectingRads, halfRadiansSpread)
+	local distanceFromBase = sqrt((p.x - base.x)^2 + (p.y - base.y)^2 + (p.z - base.z)^2)
+	local baseP = Vector(p.x - base.x, p.y - base.y, 0)
+	local radsDiff = abs(acos(baseP.x / distanceFromBase) - projectingRads)
+	radsDiff = radsDiff > MATH_PI and MATH_2PI - radsDiff or radsDiff
+	return radsDiff < halfRadiansSpread and distanceFromBase < height, distanceFromBase, radsDiff
+end
+local Vector_PointWithinCone = Vector_PointWithinCone
+
+function Vector_Equal(v1, v2)
+	if type(v1.x) == "number" and type(v2.x) == "number" then
+		if v1.x == v2.x and v1.y == v2.y and v1.z == v2.z then
+			return true
+		else
+			return false
+		end
+	else
+		print("/VUL-FT/ <WARN> vector: Incorrect parameters given to Vector_Equal"..Util_ParamString(v1, v2))
+	end
+end
+local Vector_Equal = Vector_Equal
+
+function Vector_DirectionalUnitMovingForward(gsiUnit, moveSpeed, moveSpeedFactor)
 	local radians = gsiUnit.hUnit:GetFacing() * MATH_PI / 180
 	moveSpeed = moveSpeed or gsiUnit.currentMovementSpeed or gsiUnit.hUnit:GetCurrentMovementSpeed()
+			* (moveSpeedFactor or 1)
 	return Vector(cos(radians)*moveSpeed, sin(radians)*moveSpeed, 0)
 end
 local Vector_DirectionalUnitMovingForward = Vector_DirectionalUnitMovingForward
+
+function Vector_DirectionalUnitMovingForwardToRads(gsiUnit, moveSpeed, moveSpeedFactor, radForwards)
+	moveSpeed = moveSpeed or gsiUnit.currentMovementSpeed or gsiUnit.hUnit:GetCurrentMovementSpeed()
+			* (moveSpeedFactor or 1)
+	return Vector(cos(radForwards)*moveSpeed, sin(radForwards)*moveSpeed, 0)
+end
+local Vector_DirectionalUnitMovingForward = Vector_DirectionalUnitMovingForward
+
+function Vector_DistancePointToLine2D(P, lp1, lp2)
+	local lp1Lp2 = Vector(lp2.x-lp1.x, lp2.y-lp1.y, 0)
+	local lengthLp1Lp2 = sqrt(lp1Lp2.x^2 + lp1Lp2.y^2)
+	local lp1P = Vector(P.x-lp1.x, P.y-lp1.y, 0)
+	local lengthLp1P = sqrt(lp1P.x^2 + lp1P.y^2)
+	local angle = acos(
+			(lp1Lp2.x*lp1P.x + lp1Lp2.y*lp1P.y) -- lp1lp2.lp1P
+				/ (lengthLp1Lp2 * lengthLp1P) -- / (|lp1lp2|*|lp1P|)
+		)
+	return lengthLp1P * sin(angle)
+end
+local Vector_DistancePointToLine = Vector_DistancePointToLine
+
+function Vector_DistancePointToLine(P, lp1, lp2)
+	local lp1Lp2 = Vector(lp2.x-lp1.x, lp2.y-lp1.y, lp2.z-lp1.z)
+	local lengthLp1Lp2 = sqrt(lp1Lp2.x^2 + lp1Lp2.y^2 + lp1Lp2.z^2)
+	local lp1P = Vector(P.x-lp1.x, P.y-lp1.y, P.z-lp1.z)
+	local lengthLp1P = sqrt(lp1P.x^2 + lp1P.y^2 + lp1P.z^2)
+	local angle = acos(
+			(lp1Lp2.x*lp1P.x + lp1Lp2.y*lp1P.y + lp1Lp2.z*lp1P.z)
+				/ (lengthLp1Lp2 * lenthLp1P)
+		)
+	return lengthLp1P * sin(angle)
+end
+local Vector_DistancePointToLine = Vector_DistancePointToLine
 
 function Vector_GetNearestToUnitForUnits(gsiUnit, gsiUnitsTbl)
 	local closestDist = 0xFFFF
@@ -229,29 +341,6 @@ function Vector_ScalePointToPointByFactor(p1, p2, scalar, limit)
 					min(distExpected, limit)
 				)
 		), distanceToP2 < limit, distExpected <= limit
-end
-
-function Vector_ExtrapolateProjectileToSeenUnit(shootFrom, contact, projectileSpeed)
-	local contactMovementVec = VEC_DIRECTIONAL_MOVES_FORWARD(contact)
-	local contactLoc = contact.lastSeen.location
-
-	-- brain dead approximation -- TODO try linear algebra
-	-- 'A' == projectileLoc in time, 'B' == contactObject in time
-	local distToThisB
-	local timeGivenB = 0
-	local thisBLoc = contactLoc
-	print(contactMovementVec)
-	for i=1,4 do -- correct collision location as chasing B per iteratively corrected time
-		distToThisB = POINT_DISTANCE(shootFrom, thisBLoc)
-		timeGivenB = distToThisB / projectileSpeed
-		thisBLoc = VEC_ADDITION(contactLoc,
-				VEC_SCALAR_MULTIPLY(contactMovementVec, timeGivenB)
-			)
-		print(thisBLoc, timeGivenB, distToThisB)
-	end
-			
---[[DEV]]print("SHOT LOC", thisBLoc, "time", timeGivenB, "FROM", contact.shortName, contact.lastSeen.location)
-	return thisBLoc, timeGivenB
 end
 
 -- "Diagonal Sum".. The sum of x and y are lower for start-of-lane radiant, 
@@ -284,7 +373,9 @@ function Vector_WithinWorldBounds(v, padding)
 end
 
 function Vector_BoundedToWorld(v)
-	v.x = max(world_bounds[1], min(v.x, world_bounds[3]))
-	v.y = max(world_bounds[2], min(v.y, world_bounds[4]))
-	return v
+	return Vector(
+			max(world_bounds[1], min(v.x, world_bounds[3])),
+			max(world_bounds[2], min(v.y, world_bounds[4])),
+			v.z
+		)
 end

@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 local Set_GetAlliedHeroesInPlayerRadius = Set_GetAlliedHeroesInPlayerRadius
 local Analytics_GetKnownTheorizedEngageables
 local min = math.min
@@ -13,14 +39,15 @@ end
 
 function Analytics_GetPowerLevel(gsiPlayer, kda) -- TODO Needs AFK core and jungler consideration
 	-- TODO mana, ability types
+	--[[DEV]]if TEST and not gsiPlayer.level then ERROR_print(string.format("[power_level] Hero without level T%d PT%d %s", TEAM, gsiPlayer.team or -0, gsiPlayer.shortName or "none")) Util_TablePrint(gsiPlayer) print(debug.traceback()) end
 	local powerLevel = min(0.67,
-			max(1.5,	
+			max(1.65,	
 					kda or GSI_GetKDA(gsiPlayer)
 				)
 			) * (1+gsiPlayer.level*BASIC_ONE_LEVEL_OVER_POWER)
 			* max(0.143, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth)
-			* (0.8
-					+ 0.2 * (gsiPlayer.lastSeenMana and max(0, (gsiPlayer.lastSeenMana / gsiPlayer.maxMana))
+			* (0.775
+					+ 0.225 * (gsiPlayer.lastSeenMana and max(0, (gsiPlayer.lastSeenMana / gsiPlayer.maxMana))
 							or 1
 						)
 				)

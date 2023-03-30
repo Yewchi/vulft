@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- Other tasks trigger the scoring, and essentially the highest scoring task request incentivises this task for it's purposes.
 -- Abilities already in-cast are also incentivised. Probably needs some "this is taking way too long"
 
@@ -203,7 +229,7 @@ end
 
 function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, target, scoreToBreak, comboIdentifier, doNotCastPointSkip, skipQueue, elapseExpiry, forceAbilityFunc)
 	local nOnTeam = gsiPlayer.nOnTeam
-	scoreToBreak = scoreToBreak or HIGH_32_BIT
+	scoreToBreak = (scoreToBreak or HIGH_32_BIT) + 250 -- [[HOTFIX]] defense and push tasks are too high
 
 	local isAbility = type(abilityOrFunc) == "table" and true or false
 	local actionFunc = forceAbilityFunc
@@ -228,11 +254,11 @@ function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, t
 			while(stepNode and stepNode[QUEUED_ABILITY_I__NEXT_NODE]) do  i = i + 1 if i > 98 then Util_TablePrint({stepNode[1]:GetName(), stepNode}) if i>100 then DEBUG_KILLSWITCH = true ERROR_print("use_ability: UseAbility_RegisterAbilityUseAndLockToScore KILLSWITCH") return  end end
 				stepNode = stepNode[QUEUED_ABILITY_I__NEXT_NODE]
 			end
-			local newNode = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry or 1)
+			local newNode = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry)
 			stepNode[QUEUED_ABILITY_I__NEXT_NODE] = newNode
 			newNode[QUEUED_ABILITY_I__PREV_NODE] = stepNode
 		else
-			t_abilities_queued[nOnTeam] = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry or 1)
+			t_abilities_queued[nOnTeam] = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry)
 		end
 	end
 end
@@ -262,6 +288,7 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 end
 local next_player = 1
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "use_ability")
 	if VERBOSE then VEBUG_print(string.format("use_ability: Initialized with handle #%d.", task_handle)) end
 
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
@@ -306,7 +333,7 @@ blueprint = {
 
 		local currentlyCasting = gsiPlayer.hUnit:GetCurrentActiveAbility()
 		
-		--[[DEBUG]]if DEBUG  and not currentlyCasting then print("use_ability: [run]", not isAbility and "<func>" or abilityOrFunc:GetName(), target, isAbility and (ChargedCooldown_IsChargedCooldown(gsiPlayer, abilityOrFunc) and ChargedCooldown_GetCurrentCharges(gsiPlayer, abilityOrFunc) or "n/a")) end
+		--[[DEBUG]]if DEBUG  and not currentlyCasting then print("use_ability: [run]", not isAbility and "<func>" or abilityOrFunc:GetName(), Util_Printable(target), isAbility and (ChargedCooldown_IsChargedCooldown(gsiPlayer, abilityOrFunc) and ChargedCooldown_GetCurrentCharges(gsiPlayer, abilityOrFunc) or "n/a")) end
 		-- Check expiry
 		::CHECK_EXPIRED:: -- relies: registered func success -> clean up
 		if expired
@@ -321,13 +348,16 @@ blueprint = {
 				INFO_print(
 					string.format("%s killed use_ability '%s' because %s || ( !(%s and %s) && !%s ) || !%s",
 							gsiPlayer.shortName,
-							isAbility and abilityOrFunc:GetName() or "<func>",
+							not isAbility and "<func>" or abilityOrFunc:GetName(),
 							expired,
-							isAbility and abilityOrFunc:IsFullyCastable() or "##",
-							isAbility and abilityOrFunc:GetCooldownTimeRemaining() == 0 or "##",
-							currentlyCasting and currentlyCasting:GetName() == isAbility
-									and abilityOrFunc:GetName() or "",
-							isAbility and SPELL_SUCCESS(gsiPlayer, target, abilityOrFunc) or "##"
+							not isAbility and 'n/a'
+									or AbilityLogic_AbilityCanBeCast(gsiPlayer, abilityOrFunc),
+							not isAbility and 'n/a' or abilityOrFunc:GetCooldownTimeRemaining() == 0,
+							not isAbility and 'n/a'
+									or (currentlyCasting
+										and currentlyCasting:GetName() == abilityOrFunc:GetName()
+									),
+							not isAbility and 'n/a' or SPELL_SUCCESS(gsiPlayer, target, abilityOrFunc)
 						)
 					)
 			end
@@ -408,6 +438,7 @@ blueprint = {
 	end,
 	
 	init = function(gsiPlayer, objective, extrapolatedXeta)
+		Task_IndicateSuccessfulInitShortTask(gsiPlayer, task_handle)
 		return extrapolatedXeta
 	end
 }

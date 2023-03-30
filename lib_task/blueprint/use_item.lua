@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 require(GetScriptDirectory().."/lib_hero/item/urn_logic")
 
 local USABLE_ITEMS_FOR_INDEXING = USABLE_ITEMS_FOR_INDEXING
@@ -93,6 +119,10 @@ function generic_no_target_func(gsiPlayer, target, hItem)
 		)
 end
 function generic_on_location_func(gsiPlayer, target, hItem)
+	local currentActive = gsiPlayer.hUnit:GetCurrentActiveAbility()
+	if currentActive and currentActive:GetName() == (hItem and hItem:GetName()) then
+		Task_IncentiviseTask(gsiPlayer, task_handle, 100, 30)
+	end
 	gsiPlayer.hUnit:Action_UseAbilityOnLocation(
 			t_player_current_use[gsiPlayer.nOnTeam], target
 		)
@@ -167,12 +197,14 @@ function generic_self_avoid_magical_dmg_score(gsiPlayer, hItem, nearbyEnemies, n
 	return target and gsiPlayer or target, score
 end
 function use_ward_func(gsiPlayer, targetLoc, hItem)
-	local itemCarriedResult = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
+	local itemCarriedResult, wardInventorySlot = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
 	if itemCarriedResult == ITEM_NOT_FOUND
 			or itemCarriedResult == ITEM_ENSURE_RESULT_LOCKED then
 		--print("item bad")
 		return false
 	end
+
+	Item_LockInventoryIndex(gsiPlayer, wardInventorySlot, 1)
 
 	if Item_OnItemSwapCooldown(gsiPlayer, hItem) then
 		--print("item on cd, moving")
@@ -437,7 +469,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 					local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 					if activityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
 							and danger < (-2.0 + 1.5*(playerHpp)) then
-						return gsiPlayer, INSTANT_NO_TURNING_SCORE
+						return USE_WITHOUT_TARGET_TYPE, INSTANT_NO_TURNING_SCORE
 					else
 						local nearestEnemy, nearestEnemyDist
 								= Set_GetNearestEnemyHeroToLocation(gsiPlayer.lastSeen.location)
@@ -446,7 +478,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 							and gsiPlayer.lastSeenHealth > (pUnit_IsNullOrDead(nearestEnemy) and 120 or nearestEnemy.hUnit:GetAttackDamage()*#nearbyEnemies)
 							and playerHpp < abs(danger)^3 then -- If your health is less than extreme danger or extreme non-danger -- i.e. hero is probably dead either way, or very doubtful to be caught anyways
 							if nearestEnemyDist < nearestEnemy.attackRange*1.5 then
-								return gsiPlayer, INSTANT_NO_TURNING_SCORE
+								return USE_WITHOUT_TARGET_TYPE, INSTANT_NO_TURNING_SCORE
 							end
 						end
 					end
@@ -612,7 +644,8 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 				for i=1,numberNearbyEnemies do
 					local thisIntended = intentsTbl[i]
 					local thisAggressor = nearbyEnemies[i]
-					if thisIntended and (numberNearbyEnemies > 1 and not thisAggressor == fht
+					if thisIntended and not pUnit_IsNullOrDead(thisAggressor)
+								and (numberNearbyEnemies > 1 and not thisAggressor == fht
 								-- do not euls a solo enemy if nobody is in serious danger
 								or thisIntended.lastSeenHealth / thisIntended.maxHealth < 0.25
 							) and Vector_PointDistance2D(
@@ -768,7 +801,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 				end
 				if fht and activityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
 						and (1.25-fht.lastSeenHealth/fht.maxHealth) * danger < -0.5 then
-					if DEBUG then DebugDrawText(500, 510, gsiPlayer.shortName, 255, 255, 255) end
+					if DEBUG then DebugDrawText(500, 510, string.format("%.3s fs cons", gsiPlayer.shortName), 255, 255, 255) end
 					local distanceToFht = Vector_PointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
 					if distanceToFht < max(200, gsiPlayer.attackRange*0.8) or distanceToFht > 1400 then
 						if DEBUG then DebugDrawText(550, 510, gsiPlayer.shortName, 255, 255, 255) end
@@ -973,10 +1006,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 				--print("ward", wardIndex, gsiPlayer.time.data.wardScoreIndex, gsiPlayer.time.data.wardNowScore, wardLoc)
 				-- confirm wards on map state is still the same if using time data
 				if wardIndex == gsiPlayer.time.data.wardScoreIndex then
-					local ensureResult, index = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
-					if ensureResult ~= ITEM_ENSURE_RESULT_LOCKED then
-						Item_LockInventoryIndex(gsiPlayer, index)
-					end
+					local ensureResult, index = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, false, true)
 					t_player_current_ward_index[gsiPlayer.nOnTeam] = wardIndex
 					return wardLoc, wardNowScore
 				end
@@ -1007,6 +1037,7 @@ local external_task_control_lock_expire = 0
 local exteral_task_handle = false
 
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "use_item")
 	if VERBOSE then VEBUG_print(string.format("[use_item]: Initialized with handle #%d.", task_handle)) end
 
 	fight_harass_handle = FightHarass_GetTaskHandle()
@@ -1156,6 +1187,7 @@ blueprint = {
 		if TEST then
 			DEBUG_print(string.format("[use_item] %s inits use_item with '%s' - score: %.2f", gsiPlayer.shortName, t_player_current_use[gsiPlayer.nOnTeam], extrapolatedXeta))
 		end
+		Task_IndicateSuccessfulInitShortTask(gsiPlayer, task_handle)
 		return extrapolatedXeta
 	end
 }

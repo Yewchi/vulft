@@ -1,10 +1,10 @@
 local hero_data = {
 	"rattletrap",
-	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 8, 2, 4, 10, 12},
+	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 4, 5, 2, 2, 8, 2, 4, 9, 11},
 	{
-		"item_tango","item_magic_stick","item_enchanted_mango","item_branches","item_branches","item_ward_dispenser","item_wind_lace","item_boots","item_magic_wand","item_staff_of_wizardry","item_fluffy_hat","item_tranquil_boots","item_force_staff","item_buckler","item_ring_of_basilius","item_lifesteal","item_vladmir","item_wraith_pact","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter",
+		"item_tango","item_wind_lace","item_branches","item_branches","item_enchanted_mango","item_ward_dispenser","item_boots","item_tranquil_boots","item_void_stone","item_crown","item_meteor_hammer","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_magic_wand","item_fluffy_hat","item_void_stone","item_blitz_knuckles","item_orchid","item_aeon_disk","item_aghanims_shard","item_black_king_bar",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {3,3,3,1,1,}, {5,5,4,4,4,}, 0.1 },
 	{
 		"Battery Assault","Power Cogs","Rocket Flare","Hookshot","-2s Rocket Flare Cooldown","-2s Power Cogs Cooldown","+2 Power Cogs Hit To Kill","+24 Battery Assault Damage","Rocket Flare True Sight","Power Cogs Leash Units Inside","Spell Immunity Inside Power Cogs","-0.25s Battery Assault Interval",
 	}
@@ -45,13 +45,15 @@ local LSA_EXTRAPOLATE = LSA_CAST_TIME - (0.35 + 0.15) -- time to decypher animat
 local LSA_RADIUS = 250
 local DRAGON_SLAVE_EXTRAPOLATED = 0.45 + 0.5*1275 / 1075
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -64,7 +66,7 @@ local d = {
 		local battery = playerAbilities[1]
 		local flare = playerAbilities[2]
 		local cogs = playerAbilities[3]
-		local  = playerAbilities[4]
+		local hookshot = playerAbilities[4]
 		local highUse = gsiPlayer.highUseManaSimple
 		local playerHealthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 

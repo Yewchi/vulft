@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 -- #include at end of ability_logic
 ABILITY_USE_TYPES = {
 		["DEFENSIVE"] =			0x000001, -- target nearby enemies, target allies in danager
@@ -42,6 +68,7 @@ local LOWEST_HEALTH_PERCENT = Unit_LowestHealthPercentUnit
 local MATH_PTPD = Math_PointToPointDistance
 local MATH_PTPD2D = Math_PointToPointDistance2D
 local TEAM_FOUNTAIN = TEAM_FOUNTAIN
+local ENEMY_FOUNTAIN = ENEMY_FOUNTAIN
 local B_AND = bit.band
 local max = math.max
 local min = math.min
@@ -232,6 +259,55 @@ local make_target_building_far_safe = function(gsiPlayer, target)
 	return target
 end
 
+function AbilityLogic_GetBlinkLocation(gsiPlayer, hAbility, castRange, activityType,
+		activityHandle, fightHarassTarget, dangerLimit, nearbyAllies, nearbyEnemies)
+	-- Assumes a blink at FHT is desirable if aggressive AcTy. i.e. they are not dead / dotted up
+	-- They may be out of vision but it is assumed the last seen is reliable.
+	--[[
+	local attackRange = gsiPlayer.attackRange
+	local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies)
+	if GetHeightLevel(location) >= 5 then return false end -- TODO TEMP PREVENT STUCK
+	if activityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION and fightHarassTarget
+			and activityHandle == fight_harass_handle then
+		local fhtLoc = fightHarassTarget.lastSeen.location
+		local oneFourthAttackRange = max(100, attackRange / 4)
+		local uvecAlliedFountainFht = Vector_UnitDirectionalPointToPoint(
+				fhtLoc,
+				TEAM_FOUNTAIN
+			)
+		local uvecEnemyFountainFht = Vector_UnitDirectionalPointToPoint(
+				fhtLoc,
+				ENEMY_FOUNTAIN
+			)
+		local safetyZeroed = max(0, -danger)
+		local dangerZeroed = max(0, danger)
+		local softMagSafe = max(oneFourthAttackRange, min(danger*
+
+		local softDangerAdjust = Vector_Addition(
+				fhtLoc,
+				softDangerVec
+				
+		local dangerLocation
+				= Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies)
+		local toAlliedFountainFht = Vector_Addition(
+				fightHarassTarget,
+
+		local location = Vector_Addition(gsiPlayer.lastSeen.location,
+				Vector_ScalarMultiply(
+					Vector_UnitDirectionalPointToPoint(
+						gsiPlayer.lastSeen.location,
+						location),
+				
+			dangerLimit = dangerLimit or 0
+		local dangerLocation
+				= Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies, location)
+		
+		
+	elseif activityType > ACTIVITY_TYPE.CAREFUL then
+		
+	end--]]
+end
+
 -- for generics and placeholder hero functionality
 -- modules calling this function don't necessarily know how the ability functions, and that is assumed
 -- TODO -- If the abiilties usage is confirmed valid, if/when the end-of-nested-code was abstracted,
@@ -241,8 +317,10 @@ end
 --local I_INITIATE = 9 -- combo the ability into a group of enemies with a blink or movement speed
 local instruction_set = {}
 local BEST_FIT_CAST = AbilityLogic_GetBestFitCastFunc
+-------- AbilityLogic_DeduceBestFitCastAndUse()
 function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAutoCastOn)
 	local castFunc, targetType, targetTeam = BEST_FIT_CAST(gsiPlayer, hAbility, nil, true)
+	if hAbility:IsHidden() then print("CAN'T USE", hAbility:GetName()) return false end
 	if TEST then print("al_dbfcau:", gsiPlayer.shortName, hAbility:GetName(), target.x, target.hUnit, "best fit", castFunc, targetType, targetTeam) end
 		if castFunc == "Action_UseAbilityOnLocation" and (target.lastSeen or target.x or target.center) then
 		local castRange = hAbility:GetCastRange()
@@ -375,7 +453,7 @@ function AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, abilities)
 				end
 			end
 		end
-		if nearbyEnemies[1] and nearbyEnemies[1].currentMovementSpeed > gsiPlayer.currentMovementSpeed and #nearbyEnemies <= 2 then
+		if nearbyEnemies[1] and (nearbyEnemies[1].currentMovementSpeed > gsiPlayer.currentMovementSpeed or #nearbyEnemies >= 2) then
 			local stun = AbilityLogic_GetBestStun(gsiPlayer, false)
 			if stun and AbilityLogic_AbilityCanBeCast(gsiPlayer, stun) then
 				if AbilityLogic_HighUseAllowOffensive(
@@ -390,7 +468,9 @@ function AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, abilities)
 				end
 			end
 			local antiMobility = AbilityLogic_GetBestAntiMobility(gsiPlayer, false)
+			--[[DEV]]--print(gsiPlayer.shortName, "antimobility", antiMobility and antiMobility:GetName())
 			if antiMobility and AbilityLogic_AbilityCanBeCast(gsiPlayer, antiMobility) then
+				--[[DEV]]--print(gsiPlayer.shortName, "antimobility", antiMobility:GetName())
 				if AbilityLogic_HighUseAllowOffensive(
 							gsiPlayer,
 							antiMobility,
@@ -399,7 +479,11 @@ function AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, abilities)
 						) then
 					if DEDUCE_CAST(gsiPlayer, antiMobility, nearbyEnemies[1]) then
 						return
-					end
+					else
+--[[DEV]]print("no deduce")
+end
+				else
+					--[[DEV]]print("no")
 				end
 			end
 		end

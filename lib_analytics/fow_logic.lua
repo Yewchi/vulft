@@ -1,4 +1,30 @@
--- how threatened am I by fog of war?
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
+-- how threatened am i by fog of war?
 -- how threatened should I feel upon seeing an enemy exit fog of war into my radius?
 -- who is a regular in my lane?
 -- i.e. who is an unexpected guest?
@@ -21,6 +47,8 @@ local max = math.max
 local min = math.min
 local sqrt = math.sqrt
 
+local TEST = TEST and true
+
 local TIME_TO_PORT_FROM_START_CAST = 3
 local TIME_TO_PORT_CONSIDER_CANCELLED = TIME_TO_PORT_FROM_START_CAST + 4
 local MOVE_TO_FOG_TO_TP_BUFFER = 2
@@ -28,12 +56,15 @@ local UPDATE_INTERVAL = 1
 local CONSIDER_THEORETICAL_KNOWN = 1800
 
 local ENGAGEABLE_DIST = 2200
+local THEORIZED_ENGAGEABLE_DIST = 3450
 local IGNORE_CUSTOM_LOC_DIST = 600
 
 local DANGER_DEATH_INFORM_FLAG = -0xFFFF
 
 local ENEMY_TEAM_NUMBER_OF_PLAYERS = ENEMY_TEAM_NUMBER_OF_PLAYERS
 local Math_PointToPointDistance2D = Math_PointToPointDistance2D
+
+local HEAT_MAP_SNAPSHOT_THROTTLE = 3
 
 local ENEMY_FOUNTAIN_LOC = Map_GetLogicalLocation(
 		TEAM_IS_RADIANT and MAP_POINT_DIRE_FOUNTAIN_CENTER or MAP_POINT_RADIANT_FOUNTAIN_CENTER
@@ -58,11 +89,11 @@ local function update_fow_logic() -- Addition of unit time / 1 second values.
 	local enemies = GSI_GetTeamPlayers(ENEMY_TEAM)
 	for pnot=1,ENEMY_TEAM_NUMBER_OF_PLAYERS do
 		local thisEnemy = enemies[pnot]
-		local timeSinceSeen = max(0, thisEnemy.lastSeen.timeStamp + 1)
-		t_spread_port_percent[pnot] = (currTime - timeSinceSeen - MOVE_TO_FOG_TO_TP_BUFFER) / TIME_TO_PORT_FROM_START_CAST -- 2 sec buffer in fog, 3 sec cast.
-		t_spread_footrace[pnot] = currTime - timeSinceSeen < 1.5 and CONSIDER_THEORETICAL_KNOWN
+		local timeLastSeen = max(0, thisEnemy.lastSeen.timeStamp + 1)
+		t_spread_port_percent[pnot] = (currTime - timeLastSeen - MOVE_TO_FOG_TO_TP_BUFFER) / TIME_TO_PORT_FROM_START_CAST -- 2 sec buffer in fog, 3 sec cast.
+		t_spread_footrace[pnot] = currTime - timeLastSeen < 1.5 and CONSIDER_THEORETICAL_KNOWN
 				or ( t_spread_footrace[pnot] + thisEnemy.currentMovementSpeed
-						+ (IMPLEMENTitemandabilitymovementstuff or CONSIDER_THEORETICAL_KNOWN)
+						+ (IMPLEMENTitemandabilitymovementstuff or 0)
 					) * ( thisEnemy.lastSeen.location == ENEMY_FOUNTAIN_LOC and 0.15 or 1) -- slow spread pre-game
 		if t_current_port_location[thisEnemy.playerID] and t_current_port_location[thisEnemy.playerID][2] > TIME_TO_PORT_CONSIDER_CANCELLED then
 			t_current_port_location[thisEnemy.playerID] = nil
@@ -95,6 +126,25 @@ end
 -- 		allied locaitons. The more theoretical the dataset the more we must allow the known enemies to have
 -- 		dangerous gravity.
 local function incorporate_teamplay_gravity(gsiPlayer, enemiesTbl)
+end
+
+-- ---------------------- --
+-- /  \01/  \02/  \03/  \ --
+-- \11/  \12/  \13/  \14/ -- Unit facing == logical step sequence, decreasing heat increase over steps.
+-- /  \21/  \22/  \23/  \ -- top of even row diamond moving right and down slightly will go    
+-- \31/  \32/  \33/  \34/ -- up right, down, down right, up, down down, repeat.                
+-- /  \41/  \42/  \43/  \ -- 21 -> 12,  22 ,    33     , 23,    43    ,                        
+-- \51/  \52/  \53/  \54/ -- defines a line of avoidance for getting between locations safely. 
+-- /  \61/  \62/  \63/  \ -- find intersection of heat to desired movement via the same logic.-
+-- \71/  \72/  \73/  \74/ --
+-- ---------------------- --
+local heat_map = {}
+local heat_map_snapshot_throttle = Time_CreateThrottle(3)
+local heat_map_state = 0
+local function check_heat_map_take_snapshot(enemyPlayers)
+
+end
+function Analytics_IncrementalSafeWalkLocation(gsiPlayer, desiredLocation, timeLimit)
 end
 
 function FOW_ExplainConfidence(gsiEnemy, fearFunc)
@@ -134,7 +184,8 @@ function Analytics_GetKnownTheorizedEngageables(gsiPlayer, location)
 						iKnown = iKnown + 1
 					end
 				else
-					if distToEnemy - thisEnemyFootrace - ENGAGEABLE_DIST > 0 then
+					--[[DEV]]if TEST and DEBUG and DEBUG_IsBotTheIntern() then TEBUG_print(string.format("[fow_logic] %s %s theoretical dist to %s: %d. Footrace dist %d", TEAM_IS_RADIANT and "R" or "D", gsiPlayer.shortName, thisEnemy.shortName, distToEnemy - thisEnemyFootrace, thisEnemyFootrace)) end
+					if distToEnemy - thisEnemyFootrace - THEORIZED_ENGAGEABLE_DIST > 0 then
 						theorizedEng[iTheorized] = thisEnemy
 						iTheorized = iTheorized + 1
 					end
@@ -146,6 +197,12 @@ function Analytics_GetKnownTheorizedEngageables(gsiPlayer, location)
 								+ percentOfWayPossibleTravelled*3
 	-- for (possibleDistance, aggressorAmount) curves high into (0.67, 1), to (1, 1.16), (1.16, 1.18), (2.43, 0.33)
 							or 0.33
+					-- TODO [[HOTFIX]] 1800/dist known enemy reduces danger when close
+					-- Jenga moment -- using convenient metrics for scoring things analytically is dangerous.
+					-- -| point of xeta.lua was to provide truth to value. It's "just not possible" in a game
+					-- -| as complex as dota. 27/03/23
+					spreadFactor = knownEng[iKnown] ~= thisEnemy and spreadFactor
+							or 2.67 - 2.28/sqrt(min(1700, max(0, (3500 - thisEnemy.attackRange - distToEnemy)))/1700)
 					theorizedAggressorAmount = theorizedAggressorAmount 
 							+ spreadFactor*Analytics_GetPowerLevel(thisEnemy) / myPowerRating
 				end
@@ -154,17 +211,18 @@ function Analytics_GetKnownTheorizedEngageables(gsiPlayer, location)
 		gameSpeedToSelf = min(1.15, (gameSpeedToSelf / ENEMY_TEAM_NUMBER_OF_PLAYERS)
 				/ gsiPlayer.currentMovementSpeed)
 		theorizedAggressorAmount = theorizedAggressorAmount * gameSpeedToSelf * visionScore
+		--theorizedAggressorAmount = theorizedAggressorAmount - 0.5 -- welp
 		if allowCache then
 			gsiPlayer.time.data.knownEngageables = knownEng
 			gsiPlayer.time.data.theorizedEngageables = theorizedEng
 			gsiPlayer.time.data.theorizedAggressorAmount = theorizedAggressorAmount -- i.e. not a factor, score, nor ratio; it's the number of "mimics" in power level that could potentially engage the player
 		end
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1730 , 600, string.format("%d-%d", gameSpeedToSelf, visionScore), 255, 255, 255) end
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1730 , 750, string.format("%d-%d", gameSpeedToSelf, visionScore), 255, 255, 255) end
 		-- DebugDrawText(1650, 620, string.format("%s %.2f", type(theorizedAggressorAmount), theorizedAggressorAmount), 255, 255, 255)
 		return knownEng, theorizedEng, theorizedAggressorAmount
 	end
 --[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then 
---[[DEV]]	DebugDrawText(1600, 600, string.format("%d - %d - %.2f", #gsiPlayer.time.data.knownEngageables, #gsiPlayer.time.data.theorizedEngageables, gsiPlayer.time.data.theorizedAggressorAmount), 255, 255, 255)
+--[[DEV]]	DebugDrawText(1600, 750, string.format("%d - %d - %.2f", #gsiPlayer.time.data.knownEngageables, #gsiPlayer.time.data.theorizedEngageables, gsiPlayer.time.data.theorizedAggressorAmount), 255, 255, 255)
 --[[DEV]]end
 	
 	return gsiPlayer.time.data.knownEngageables, gsiPlayer.time.data.theorizedEngageables, gsiPlayer.time.data.theorizedAggressorAmount

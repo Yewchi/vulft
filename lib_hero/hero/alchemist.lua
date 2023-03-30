@@ -1,10 +1,10 @@
 local hero_data = {
 	"alchemist",
-	{2, 1, 1, 3, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 7, 5, 4, 9, 11},
+	{2, 1, 3, 1, 1, 4, 1, 3, 3, 3, 2, 4, 2, 6, 8, 2, 4, 9, 11},
 	{
-		"item_ward_observer","item_enchanted_mango","item_tango","item_gauntlets","item_quelling_blade","item_bottle","item_boots","item_chainmail","item_bracer","item_phase_boots","item_relic","item_radiance","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_reaver","item_overwhelming_blink","item_relic","item_nullifier","item_bfury","item_moon_shard","item_ultimate_scepter","item_ultimate_scepter","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
+		"item_quelling_blade","item_tango","item_branches","item_gauntlets","item_magic_stick","item_chainmail","item_boots","item_blades_of_attack","item_phase_boots","item_soul_ring","item_relic","item_radiance","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_hyperstone","item_buckler","item_assault","item_reaver","item_overwhelming_blink","item_mjollnir","item_abyssal_blade","item_aghanims_shard",
 	},
-	{ {1,1,1,3,2,}, {1,1,1,4,2,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Acid Spray","Unstable Concoction","Greevil's Greed","Chemical Rage","+1 Acid Spray Armor Reduction","+125 Unstable Concoction Radius","Acid Spray grants armor to allies","+1.5 Damage per Greevil's Greed stack","-0.1s Chemical Rage Base Attack Time","+400 Unstable Concoction Max Damage","+50 Chemical Rage Movement Speed","+50 Chemical Rage Regeneration",
 	}
@@ -34,13 +34,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

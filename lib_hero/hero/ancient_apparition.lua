@@ -1,12 +1,12 @@
 local hero_data = {
 	"ancient_apparition",
-	{3, 1, 3, 1, 2, 4, 2, 2, 2, 6, 1, 4, 1, 3, 7, 3, 4, 9, 11},
+	{3, 1, 3, 1, 2, 4, 2, 2, 2, 5, 3, 4, 3, 1, 7, 1, 4, 9, 12},
 	{
-		"item_tango","item_enchanted_mango","item_enchanted_mango","item_flask","item_faerie_fire","item_branches","item_branches","item_branches","item_ward_sentry","item_magic_wand","item_boots","item_tranquil_boots","item_shadow_amulet","item_aghanims_shard","item_fluffy_hat","item_shadow_amulet","item_cloak","item_glimmer_cape","item_staff_of_wizardry","item_force_staff","item_gem","item_sheepstick",
+		"item_ward_sentry","item_branches","item_tango","item_branches","item_faerie_fire","item_branches","item_enchanted_mango","item_magic_wand","item_boots","item_fluffy_hat","item_aghanims_shard","item_arcane_boots","item_force_staff","item_gem","item_pers","item_lotus_orb","item_gem","item_tranquil_boots","item_ancient_janggo","item_gem","item_boots_of_bearing","item_gem","item_gem",
 	},
-	{ {1,1,1,1,4,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
-		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+200 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+200 Cold Feet Breaking distance","-5% Ice Vortex Slow/Resistance","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
+		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+300 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+300 Cold Feet Breaking distance","-5% Ice Vortex Slow/Increased Magic Damage","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
 	}
 }
 --@EndAutomatedHeroData
@@ -152,6 +152,7 @@ d = {
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

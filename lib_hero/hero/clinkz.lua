@@ -1,8 +1,8 @@
 local hero_data = {
 	"clinkz",
-	{2, 3, 2, 1, 1, 4, 1, 1, 3, 3, 3, 4, 6, 2, 7, 2, 4, 10, 11},
+	{2, 1, 2, 3, 1, 4, 1, 1, 3, 3, 3, 4, 6, 2, 7, 2, 4, 10, 11},
 	{
-		"item_blades_of_attack","item_branches","item_branches","item_fluffy_hat","item_falcon_blade","item_javelin","item_boots","item_mithril_hammer","item_maelstrom","item_boots_of_elves","item_gloves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_lesser_crit","item_aghanims_shard","item_greater_crit","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar","item_sphere","item_blink","item_swift_blink","item_boots",
+		"item_blades_of_attack","item_branches","item_branches","item_sobi_mask","item_quelling_blade","item_branches","item_branches","item_tango","item_gloves","item_boots","item_boots_of_elves","item_javelin","item_power_treads","item_mithril_hammer","item_maelstrom","item_crown","item_crown","item_staff_of_wizardry","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_blades_of_attack","item_broadsword","item_lesser_crit","item_greater_crit","item_void_stone","item_ultimate_orb","item_pers","item_ultimate_orb","item_hurricane_pike","item_sphere","item_black_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

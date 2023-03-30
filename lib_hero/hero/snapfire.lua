@@ -1,12 +1,12 @@
 local hero_data = {
 	"snapfire",
-	{1, 2, 1, 2, 1, 5, 1, 2, 2, 6, 3, 5, 3, 3, 8, 3, 5, 10, 12, 13},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 7, 3, 4, 9},
 	{
-		"item_gauntlets","item_gauntlets","item_tango","item_branches","item_branches","item_enchanted_mango","item_bracer","item_magic_wand","item_boots","item_arcane_boots","item_headdress","item_soul_ring","item_headdress","item_mekansm","item_buckler","item_guardian_greaves","item_aghanims_shard","item_force_staff","item_hood_of_defiance","item_headdress","item_pipe","item_black_king_bar","item_ultimate_orb","item_mystic_staff","item_gem","item_sheepstick","item_buckler","item_platemail","item_assault",
+		"item_gauntlets","item_tango","item_branches","item_branches","item_gauntlets","item_faerie_fire","item_bracer","item_bracer","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_magic_wand","item_guardian_greaves","item_aghanims_shard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mystic_staff","item_sheepstick","item_broadsword","item_blades_of_attack","item_lesser_crit",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {5,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
 	{
-		"Scatterblast","Firesnap Cookie","Lil' Shredder","Spit Out","Mortimer Kisses","+70 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","Lil' Shredder Uses Your Attack Damage","+60 Mortimer Kisses Impact Damage","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
+		"Scatterblast","Firesnap Cookie","Lil' Shredder","Mortimer Kisses","+70 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","Lil' Shredder Uses Your Attack Damage","+60 Mortimer Kisses Impact Damage","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
 	}
 }
 --@EndAutomatedHeroData
@@ -34,13 +34,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

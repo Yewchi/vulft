@@ -1,10 +1,10 @@
 local hero_data = {
 	"bristleback",
-	{2, 3, 2, 3, 2, 4, 2, 3, 3, 6, 1, 4, 1, 1, 7, 1, 4, 9, 11},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_ring_of_protection","item_ring_of_health","item_vanguard","item_boots","item_arcane_boots","item_soul_ring","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_ogre_axe","item_belt_of_strength","item_sange","item_heavens_halberd","item_cloak","item_ring_of_health","item_hood_of_defiance","item_pipe","item_gem","item_point_booster","item_ultimate_scepter","item_gem","item_platemail","item_ultimate_scepter_2","item_gem","item_gem",
+		"item_tango","item_magic_stick","item_branches","item_branches","item_quelling_blade","item_enchanted_mango","item_bracer","item_magic_wand","item_ring_of_health","item_vanguard","item_boots","item_arcane_boots","item_voodoo_mask","item_bloodstone","item_hood_of_defiance","item_voodoo_mask","item_ring_of_health","item_platemail","item_pers","item_lotus_orb","item_relic","item_radiance","item_pers","item_eternal_shroud","item_sphere","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Viscous Nasal Goo","Quill Spray","Bristleback","Warpath","+15 Damage","+1.5 Mana Regen","+150 Goo Cast Range","+8%/+8% Bristleback Back/Side Damage Reduction","+20 Health Regen","+20 Quill Stack Damage","+12% Spell Lifesteal","+18 Warpath Damage Per Stack",
 	}
@@ -89,6 +89,7 @@ d = {
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

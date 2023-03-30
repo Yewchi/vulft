@@ -1,8 +1,8 @@
 local hero_data = {
 	"zuus",
-	{1, 3, 1, 3, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 7, 2, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 6, 7, 4, 9, 12},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_arcane_boots","item_wind_lace","item_magic_wand","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_staff_of_wizardry","item_kaya","item_aghanims_shard","item_kaya_and_sange","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_staff_of_wizardry","item_void_stone","item_cyclone","item_mystic_staff",
+		"item_tango","item_branches","item_branches","item_branches","item_branches","item_branches","item_faerie_fire","item_bottle","item_boots","item_energy_booster","item_staff_of_wizardry","item_robe","item_kaya","item_pers","item_sphere","item_aghanims_shard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_void_stone","item_ring_of_health","item_pers","item_refresher","item_octarine_core",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
@@ -68,6 +68,7 @@ d = {
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
 		t_enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

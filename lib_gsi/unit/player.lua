@@ -100,6 +100,18 @@ local function handle_player_spell_or_item_cast(castInfo, abc)
 	--[[DEV]]VEBUG_PlayerFrameProgressBar(thisPlayer.nOnTeam, floor(15*steps), 600, 150)
 end
 
+local t_falsify_attack_range = {}
+-------- pUnit_SetFalsifyAttackRange()
+function pUnit_SetFalsifyAttackRange(gsiPlayer, rangeOrFalse)
+	-- No internal management of falsify data
+	-- if spiritSiphonLinked then
+	-- 		Task_SetFalsifyAttackRange(gsiP, attackRange - 250)
+	-- elseif gsiP.attackRange ~= attackRange then
+	-- 		Task_SetFalsifyAttackRange(gsiP, false)
+	-- 	end
+	t_falsify_attack_range[gsiPlayer.nOnTeam] = rangeOrFalse
+end
+
 local function update_allied_hero_game_data(gsiPlayer)
 	local hUnit = gsiPlayer.hUnit
 	gsiPlayer.level = hUnit:GetLevel()
@@ -109,7 +121,7 @@ local function update_allied_hero_game_data(gsiPlayer)
 	gsiPlayer.maxHealth = hUnit:GetMaxHealth()
 	gsiPlayer.lastSeenMana = hUnit:GetMana()
 	gsiPlayer.maxMana = hUnit:GetMaxMana()
-	gsiPlayer.attackRange = hUnit:GetAttackRange()
+	gsiPlayer.attackRange = t_falsify_attack_range[gsiPlayer.nOnTeam] or hUnit:GetAttackRange()
 	gsiPlayer.attackPointPercent = hUnit:GetAttackPoint() / hUnit:GetAttackSpeed()
 	if gsiPlayer.shortName == "dragon_knight" then
 		if gsiPlayer.attackRange > 500 then
@@ -130,10 +142,11 @@ local function update_players_data()
 	local enemyPlayerHeroUnits = GetUnitList(UNIT_LIST_ENEMY_HEROES)
 	local prevSeen = prev_seen
 	local numEnemies = #enemyPlayerHeroUnits
+
 	for i=1,numEnemies do
 		local thisEnemyPlayerHeroUnit = enemyPlayerHeroUnits[i]
-		local thisplayerID = thisEnemyPlayerHeroUnit:GetPlayerID() -- "ID" may be inconsistent because it's not my cup of joe, i.e. "Id" "visionBlockedByFow" elsewhere.
-		local playerNumberOnTeam = GSI_GetPlayerNumberOnTeam(thisplayerID)
+		local thisPlayerID = thisEnemyPlayerHeroUnit:GetPlayerID() -- "ID" may be inconsistent because it's not my cup of joe, i.e. "Id" "visionBlockedByFow" elsewhere.
+		local playerNumberOnTeam = GSI_GetPlayerNumberOnTeam(thisPlayerID)
 		local thisPlayer = t_enemy_players[playerNumberOnTeam]
 
 		thisPlayer.illusionsUp = false
@@ -151,6 +164,12 @@ local function update_players_data()
 				thisPlayer.illusionsUp = true
 				-- Allow setting of data if it's a knownNonIllusionUnit
 				if VERBOSE then INFO_print(string.format("illusions up %s", thisPlayer.knownNonIllusionUnit)) end
+
+				if thisPlayer.optFuncs["illusion_detection"] then
+					thisPlayer.knownNonIllusionUnit
+							= gsiPlayer.optFuncs["illusion_detection"](gsiPlayer)
+							or thisPlayer.knownNonIllusionUnit
+				end
 				if thisPlayer.knownNonIllusionUnit then
 					if VERBOSE then INFO_print(string.format("known illusion loc %.2f, %.2f", thisPlayer.knownNonIllusionUnit:GetLocation().x, thisEnemyPlayerHeroUnit:GetLocation().x)) end
 					if thisPlayer.knownNonIllusionUnit:GetLocation().x ==
@@ -208,6 +227,7 @@ local function update_players_data()
 			t_named_players[thisPlayer.name] = thisPlayer
 
 			Hero_EnemyInitialize(thisPlayer)
+--[[DEV]]	if DEBUG then DEBUG_print(string.format("Got visible data for enemy '%s'. %s, %.2f.", thisPlayer.shortName, thisPlayer.name, thisPlayer.attackPointPercent)) end
 		end
 		::NEXT::
 	end
@@ -357,12 +377,12 @@ local function update_players_last_seen()
 	for i=1,#t_enemy_players,1 do
 		local thisEnemyPlayer = t_enemy_players[i]
 		if not thisEnemyPlayer.typeIsNone and thisEnemyPlayer.hUnit and thisEnemyPlayer.hUnit:IsAlive() then
-			thisEnemyPlayer.lastSeen:Update(thisEnemyPlayer.hUnit:GetLocation())
+			thisEnemyPlayer.lastSeen:Update(thisEnemyPlayer.hUnit:GetLocation(), thisEnemyPlayer.hUnit:GetFacing())
 		end
 	end
 	for i=1,#t_team_players,1 do
 		local thisTeamPlayer = t_team_players[i]
-		thisTeamPlayer.lastSeen:Update(thisTeamPlayer.hUnit:GetLocation())
+		thisTeamPlayer.lastSeen:Update(thisTeamPlayer.hUnit:GetLocation(), thisTeamPlayer.hUnit:GetFacing())
 	end
 end
 
@@ -460,6 +480,15 @@ function GSI_CreateUpdatePlayerDataJob()
 			{["throttle"] = Time_CreateThrottle(THROTTLE_PLAYERS_DATA_UPDATE)},
 			"JOB_UPDATE_PLAYER_DATA"
 		)
+end
+
+function GSI_GetTeamAverageLevel(team)
+	local levels = 0
+	local thisTeam = team == TEAM and t_team_players or t_enemy_players
+	for i=1,#thisTeam do
+		levels = levels + (thisTeam[i].level or 0)
+	end
+	return levels / #thisTeam
 end
 
 function GSI_GetTeamAverageKnownAttackDamage(team)
@@ -570,14 +599,14 @@ function pUnit_hCourierFindAndLoad()
 	end
 end
 
-function insert_player_data(thisPlayer, hUnit)
+local function insert_player_data(thisPlayer, hUnit)
 	thisPlayer.hUnit = hUnit
 	thisPlayer.team = TEAM
 	thisPlayer.dotaType = HERO_ALLIED
 	thisPlayer.type = UNIT_TYPE_HERO
 	thisPlayer.typeIsNone = false
 	thisPlayer.currentMovementSpeed = hUnit:GetCurrentMovementSpeed()
-	thisPlayer.lastSeen = Map_CreateLastSeenTable(hUnit:GetLocation(), true)
+	thisPlayer.lastSeen = Map_CreateLastSeenTable(hUnit:GetLocation(), true, 0)
 	thisPlayer.lastSeenHealth = hUnit:GetHealth()
 	thisPlayer.maxHealth = hUnit:GetMaxHealth()
 	thisPlayer.lastSeenMana = hUnit:GetMana()
@@ -675,6 +704,9 @@ function pUnit_LoadTeamPlayer(playerId, nOnTeam)
 	thisPlayer.playerID = playerId
 
 	insert_player_data(thisPlayer, hUnit)
+
+	thisPlayer.isBot = IsPlayerBot(playerId)
+	thisPlayer.isHero = true
 	
 	thisPlayer.zAxisMagnitudeSweeperRadians = RandomFloat(0, MATH_2PI) -- See lib_task/positioning.lua: Positioning_ProgressZNormalSweeper__Job()
 	thisPlayer.zAxisMagnitudeVector = Vector(0, 0, thisPlayer.zAxisMagnitudeSweeperRadians)
@@ -686,6 +718,8 @@ function pUnit_LoadTeamPlayer(playerId, nOnTeam)
 
 	t_team_players[nOnTeam] = thisPlayer
 	t_named_players[thisPlayer.name] = thisPlayer
+
+	thisPlayer.optFuncs = {}
 
 	InstallCastCallback(playerId, handle_player_spell_or_item_cast)
 
@@ -699,6 +733,8 @@ function pUnit_LoadEnemyPlayer(playerId, nOnTeam)
 	thisEnemyPlayer.team = ENEMY_TEAM
 	thisEnemyPlayer.playerID = playerId
 	thisEnemyPlayer.nOnTeam = nOnTeam
+	thisEnemyPlayer.isBot = IsPlayerBot(playerId)
+	thisEnemyPlayer.isHero = true
 	thisEnemyPlayer.dotatType = HERO_ENEMY
 	thisEnemyPlayer.lastSeenHealth = 600
 	thisEnemyPlayer.maxHealth = 600
@@ -715,8 +751,11 @@ function pUnit_LoadEnemyPlayer(playerId, nOnTeam)
 			ENEMY_TEAM == TEAM_RADIANT
 					and Map_GetLogicalLocation(MAP_POINT_RADIANT_FOUNTAIN_CENTER)
 					or Map_GetLogicalLocation(MAP_POINT_DIRE_FOUNTAIN_CENTER),
-			true
+			true,
+			0
 		)
+	
+	thisEnemyPlayer.optFuncs = {}
 
 	t_enemy_players[nOnTeam] = thisEnemyPlayer
 	

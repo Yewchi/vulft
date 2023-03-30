@@ -1,12 +1,12 @@
 local hero_data = {
 	"viper",
-	{1, 3, 1, 2, 1, 5, 2, 2, 3, 3, 3, 5, 1, 6, 9, 2, 5, 11, 7},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 5, 4, 2, 2, 8, 2, 4, 10, 11},
 	{
-		"item_circlet","item_slippers","item_tango","item_branches","item_branches","item_faerie_fire","item_magic_wand","item_wraith_band","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_blade_of_alacrity","item_belt_of_strength","item_hurricane_pike","item_aghanims_shard","item_ogre_axe","item_black_king_bar","item_ultimate_orb","item_skadi","item_eagle",
+		"item_tango","item_branches","item_slippers","item_tango","item_branches","item_branches","item_circlet","item_faerie_fire","item_ward_observer","item_wraith_band","item_wraith_band","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_staff_of_wizardry","item_crown","item_crown","item_rod_of_atos","item_javelin","item_maelstrom","item_gungir","item_sange",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,3,1,}, 0.1 },
 	{
-		"Poison Attack","Nethertoxin","Corrosive Skin","Nosedive","Viper Strike","+5% Poison Attack Magic Resistance Reduction","+18 Corrosive Skin Damage","+40 Nethertoxin Min/Max Damage","+15% Corrosive Skin Magic Resistance","+80 Viper Strike DPS","+25%% Poison Attack slow/damage","-11.0s Nethertoxin Cooldown","-50%% Viper Strike manacost/cooldown",
+		"Poison Attack","Nethertoxin","Corrosive Skin","Viper Strike","+5% Poison Attack Magic Resistance Reduction","+18 Corrosive Skin Damage Per Second","+40 Nethertoxin Min/Max Damage","+15% Corrosive Skin Magic Resistance","+80 Viper Strike DPS","+25%% Poison Attack slow/damage","-11.0s Nethertoxin Cooldown","-50%% Viper Strike manacost/cooldown",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,13 +45,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

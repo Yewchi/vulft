@@ -1,10 +1,10 @@
 local hero_data = {
 	"tidehunter",
-	{3, 1, 3, 2, 3, 5, 3, 2, 2, 6, 2, 5, 1, 1, 8, 1, 5, 10, 12},
+	{1, 3, 3, 2, 3, 5, 3, 2, 2, 6, 2, 5, 1, 1, 8, 1, 5, 11, 10, 13},
 	{
-		"item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_ward_sentry","item_ward_sentry","item_tango","item_flask","item_enchanted_mango","item_orb_of_venom","item_boots","item_wind_lace","item_tranquil_boots","item_soul_ring","item_wind_lace","item_magic_wand","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_gem","item_gem","item_blink","item_aghanims_shard","item_gem","item_point_booster","item_ultimate_scepter","item_gem","item_gem","item_pers","item_pers","item_refresher","item_desolator","item_lesser_crit",
+		"item_quelling_blade","item_ring_of_protection","item_branches","item_branches","item_enchanted_mango","item_tango","item_ring_of_health","item_meteor_hammer","item_boots","item_cloak","item_magic_wand","item_tranquil_boots","item_hood_of_defiance","item_headdress","item_pipe","item_belt_of_strength","item_wind_lace","item_robe","item_ancient_janggo","item_boots_of_bearing","item_blink","item_point_booster","item_ogre_axe","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_mystic_staff","item_shivas_guard","item_aghanims_shard","item_gem","item_void_stone","item_refresher","item_overwhelming_blink",
 	},
-	{ {3,3,3,1,1,}, {3,3,3,5,1,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Gush","Kraken Shell","Anchor Smash","Tendrils of the Deep","Ravage","+50 Anchor Smash Damage","+10.0% Gush Slow","+120 Gush Damage","-25% Anchor Smash Damage Reduction","Anchor Smash affects buildings","+40 Kraken Shell Damage Block","+1s Ravage Stun","50% chance of Anchor Smash on attack",
 	}
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

@@ -1,10 +1,10 @@
 local hero_data = {
 	"lich",
-	{1, 2, 1, 3, 1, 4, 1, 2, 3, 5, 3, 4, 3, 2, 7, 2, 4, 10},
+	{1, 2, 1, 3, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_tango","item_magic_stick","item_branches","item_branches","item_enchanted_mango","item_ward_sentry","item_tango","item_magic_wand","item_boots","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_shadow_amulet","item_glimmer_cape","item_aghanims_shard","item_ghost","item_staff_of_wizardry","item_point_booster",
+		"item_enchanted_mango","item_ward_sentry","item_tango","item_branches","item_faerie_fire","item_branches","item_magic_wand","item_boots","item_wind_lace","item_tranquil_boots","item_gem","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_glimmer_cape","item_gem","item_gem","item_aghanims_shard","item_meteor_hammer",
 	},
-	{ {1,1,1,3,4,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Frost Blast","Frost Shield","Sinister Gaze","Chain Frost","+10% Frost Shield Damage Reduction","+150 Frost Blast Radius and Damage","+0.5s Sinister Gaze Duration","-3s Frost Blast Cooldown","+100 Chain Frost Damage","+4s Frost Shield Duration","Frost Shield Provides +50 HP Regen","Chain Frost Unlimited Bounces",
 	}
@@ -42,13 +42,15 @@ local t_player_abilities = {}
 local ABILITY_USE_RANGE = 800
 local OUTER_RANGE = 1600
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

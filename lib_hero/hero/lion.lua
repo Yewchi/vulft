@@ -1,10 +1,10 @@
 local hero_data = {
 	"lion",
-	{1, 3, 1, 2, 1, 4, 1, 3, 2, 6, 2, 4, 2, 3, 8, 3, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 8, 5, 4, 9},
 	{
-		"item_tango","item_mantle","item_branches","item_faerie_fire","item_branches","item_circlet","item_null_talisman","item_boots","item_magic_wand","item_blink","item_gloves","item_robe","item_power_treads","item_ghost","item_staff_of_wizardry","item_robe","item_kaya","item_ethereal_blade","item_aghanims_shard","item_ultimate_scepter","item_energy_booster","item_void_stone","item_aether_lens","item_octarine_core",
+		"item_tango","item_faerie_fire","item_branches","item_ward_sentry","item_branches","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_tango","item_magic_wand","item_boots","item_tranquil_boots","item_blink","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_gem","item_aeon_disk",
 	},
-	{ {1,1,2,3,3,}, {5,5,2,4,4,}, 0.1 },
+	{ {1,1,4,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
 		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-3s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
 	}
@@ -27,8 +27,10 @@ local GSI_AbilityCanBeCast = GSI_AbilityCanBeCast
 local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
 local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 local INCENTIVISE = Task_IncentiviseTask
+local POINT_DISTANCE_2D = Vector_PointDistance2D
 local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint
 local ACTIVITY_TYPE = ACTIVITY_TYPE
+local CAST_SUCCESS = AbilityLogic_CastOnTargetWillSucceed
 local currentActivityType = Blueprint_GetCurrentTaskActivityType
 local currentTask = Task_GetCurrentTaskHandle
 local HIGH_USE = AbilityLogic_HighUseAllowOffensive
@@ -42,20 +44,46 @@ local ABILITY_USE_RANGE = 600
 local OUTER_RANGE = 1600
 
 local LION_FOD_COUNT_DMG = 40
+local DISALLOW_STUN_EARTH_SPIKE_DURATION = 2
+local DISALLOW_STUN_HEX_DURATION = 0.5
 
-local d = {
+local t_no_double_stun_expire = {}
+
+local function set_disallow_stun_target(gsiPlayer, gsiEnemy, duration)
+	local disallowTbl = t_no_double_stun_expire[gsiPlayer.nOnTeam]
+	disallowTbl[1] = gsiEnemy
+	disallowTbl[2] = GameTime() + duration
+end
+
+local function get_disallow_stun_target(gsiPlayer)
+	local disallowTbl = t_no_double_stun_expire[gsiPlayer.nOnTeam]
+	if disallowTbl[1] then
+		if disallowTbl[2] < GameTime() then
+			disallowTbl[1] = nil
+		else
+			return disallowTbl[1]
+		end
+	end
+	return false
+end
+
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
+		t_no_double_stun_expire[gsiPlayer.nOnTeam] = {}
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
+			-- TODO Break drain if you should kill the target instead, there are no allies killing them.
 			local currActiveAbility = gsiPlayer.hUnit:GetCurrentActiveAbility()
 			if currActiveAbility and currActiveAbility:GetName() == "lion_mana_drain" then
 				if Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit) > gsiPlayer.lastSeenHealth/10
@@ -71,6 +99,8 @@ local d = {
 		local hex = playerAbilities[2]
 		local drain = playerAbilities[3]
 		local foD = playerAbilities[4]
+
+		local playerLoc = gsiPlayer.lastSeen.location
 		local highUse = gsiPlayer.highUseManaSimple
 		local playerHealthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 
@@ -80,31 +110,50 @@ local d = {
 		local currTask = currentTask(gsiPlayer)
 		local nearbyEnemies, outerEnemies
 				= Set_GetEnemyHeroesInLocRadOuter(gsiPlayer.lastSeen.location, ABILITY_USE_RANGE, OUTER_RANGE, 6)
-		local fightHarassTarget = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
-		local fhtReal = fightHarassTarget
-				and fightHarassTarget.hUnit.IsNull and not fightHarassTarget.hUnit:IsNull()
-		local fhtPercHp = fightHarassTarget and fightHarassTarget.lastSeenHealth / fightHarassTarget.maxHealth or 1.0
-		if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION and fightHarassTarget then
+		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local fht = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
+		local fhtReal = fht
+				and fht.hUnit.IsNull and not fht.hUnit:IsNull()
+		local fhtHpp = fhtReal and fht.lastSeenHealth / fht.maxHealth
+		local distToFht = fhtReal and POINT_DISTANCE_2D(fht.lastSeen.location, playerLoc)
+		local disallowTarget = get_disallow_stun_target(gsiPlayer)
+--[[DEV]]		if DEBUG and disallowTarget and not pUnit_IsNullOrDead(disallowTarget) then INFO_print(string.format("LION DISALLOW %s stunned: %s",
+--[[DEV]]					disallowTarget.shortname, disallowTarget.hUnit:IsStunned())) end
+		local fhtPercHp = fht and fht.lastSeenHealth / fht.maxHealth or 1.0
+		if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION and fht then
 			-- TODO Range of unit target vs high additional range of point target
 			if AbilityLogic_AbilityCanBeCast(gsiPlayer, earthSpike)
-					and fhtReal and not fightHarassTarget.hUnit:IsHexed()
+					and fhtReal and not (fht.hUnit:IsHexed() or fht.hUnit:IsStunned())
+					and disallowTarget ~= fht
+					and CAST_SUCCESS(gsiPlayer, fht, earthSpike) > 0
 					and HIGH_USE(gsiPlayer, earthSpike, highUse - earthSpike:GetManaCost(), fhtPercHp) then
 				local crowdingCenter, crowdedRating
-						= CROWDED_RATING(fightHarassTarget.lastSeen.location, SET_HERO_ENEMY)
-				USE_ABILITY(gsiPlayer, earthSpike, fightHarassTarget, 400, nil)
+						= CROWDED_RATING(fht.lastSeen.location, SET_HERO_ENEMY)
+				set_disallow_stun_target(gsiPlayer, fht, DISALLOW_STUN_EARTH_SPIKE_DURATION)
+				USE_ABILITY(gsiPlayer, earthSpike, fht, 400, nil)
 				return;
 			end
 			if AbilityLogic_AbilityCanBeCast(gsiPlayer, hex)
-					and fhtReal and not fightHarassTarget.hUnit:IsStunned()
+					and fhtReal and not fht.hUnit:IsStunned()
+					and disallowTarget ~= fht
+					and CAST_SUCCESS(gsiPlayer, fht, hex) > 0
 					and HIGH_USE(gsiPlayer, hex, highUse - hex:GetManaCost(), fhtPercHp) then
-				USE_ABILITY(gsiPlayer, hex, fightHarassTarget, 400, nil)
+				set_disallow_stun_target(gsiPlayer, fht, DISALLOW_STUN_HEX_DURATION)
+				USE_ABILITY(gsiPlayer, hex, fht, 400, nil)
 				return;
 			end
 		end
-		if currActivityType > ACTIVITY_TYPE.CAREFUL
-				and nearbyEnemies[1] and AbilityLogic_AbilityCanBeCast(gsiPlayer, earthSpike)
+		local succeedsUnits = AbilityLogic_GetCastSucceedsUnits(gsiPlayer, earthSpike, nearbyEnemies)
+		local arbitrarySucceedsHero = succeedsUnits[1] and not pUnit_IsNullOrDead(succeedsUnits[1])
+				and succeedsUnits[1] or false
+		if currActivityType >= ACTIVITY_TYPE.CAREFUL
+				and arbitrarySucceedsHero and AbilityLogic_AbilityCanBeCast(gsiPlayer, earthSpike)
+				and disallowTarget ~= arbitrarySucceedsHero
+				and not (arbitrarySucceedsHero.hUnit:IsStunned() or arbitrarySucceedsHero.hUnit:IsHexed())
 				and HIGH_USE(gsiPlayer, earthSpike, highUse - earthSpike:GetManaCost(), playerHealthPercent) then
-			USE_ABILITY(gsiPlayer, earthSpike, nearbyEnemies[1], 400, nil)
+			-- TODO in strip
+			set_disallow_stun_target(gsiPlayer, arbitrarySucceedsHero, DISALLOW_STUN_EARTH_SPIKE_DURATION)
+			USE_ABILITY(gsiPlayer, earthSpike, arbitrarySucceedsHero, 400, nil)
 			return;
 		end
 		if currTask == push_handle and AbilityLogic_AbilityCanBeCast(gsiPlayer, earthSpike)
@@ -128,28 +177,39 @@ local d = {
 				and gsiPlayer.lastSeenMana > foD:GetManaCost()
 				and AbilityLogic_AllowOneHitKill(
 						gsiPlayer,
-						fightHarassTarget,
+						fht,
 						foD:GetCastRange(),
 						foD:GetSpecialValueInt("damage")
 							+ (foDKillCounterIndex and gsiPlayer.hUnit:GetModifierStackCount(foDKillCounterIndex)
 								or 0)*LION_FOD_COUNT_DMG,
 						foD:GetDamageType()
 					) then
-			USE_ABILITY(gsiPlayer, foD, fightHarassTarget, 400, nil)
+			USE_ABILITY(gsiPlayer, foD, fht, 400, nil)
 			return;
 		end
 		if currActivityType > ACTIVITY_TYPE.CAREFUL
-				and nearbyEnemies[1] and AbilityLogic_AbilityCanBeCast(gsiPlayer, hex)
+				and arbitrarySucceedsHero and AbilityLogic_AbilityCanBeCast(gsiPlayer, hex)
+				and disallowTarget ~= arbitrarySucceedsHero
 				and HIGH_USE(gsiPlayer, hex, highUse - hex:GetManaCost(), playerHealthPercent)
-				and not pUnit_IsNullOrDead(nearbyEnemies[1])
-				and not nearbyEnemies[1].hUnit:IsStunned() then
-			USE_ABILITY(gsiPlayer, hex, nearbyEnemies[1], 400, nil)
+				and not pUnit_IsNullOrDead(arbitrarySucceedsHero)
+				and not (arbitrarySucceedsHero.hUnit:IsStunned() or arbitrarySucceedsHero.hUnit:IsHexed()) then
+			set_disallow_stun_target(gsiPlayer, arbitrarySucceedsHero, DISALLOW_STUN_HEX_DURATION)
+			USE_ABILITY(gsiPlayer, hex, arbitrarySucceedsHero, 400, nil)
 			return;
 		end
 		if currActivityType <= ACTIVITY_TYPE.CAREFUL
-				and nearbyEnemies[1] and AbilityLogic_AbilityCanBeCast(gsiPlayer, drain)
-				and HIGH_USE(gsiPlayer, earthSpike, highUse - drain:GetManaCost(), playerHealthPercent) then
+				and arbitrarySucceedsHero and AbilityLogic_AbilityCanBeCast(gsiPlayer, drain)
+				and HIGH_USE(gsiPlayer, drain, highUse - drain:GetManaCost(), playerHealthPercent) then
 			USE_ABILITY(gsiPlayer, drain, nearbyEnemies[1], 400, nil)
+			return;
+		end
+		if fhtReal and gsiPlayer.lastSeenMana > gsiPlayer.maxMana*0.75
+				and HIGH_USE(gsiPlayer, earthSpike, highUse, fhtHpp)
+				and disallowTarget ~= fht
+				and not (fht.hUnit:IsStunned() or fht.hUnit:IsHexed())
+				and distToFht < earthSpike:GetCastRange() then
+			set_disallow_stun_target(gsiPlayer, fht, DISALLOW_STUN_EARTH_SPIKE_DURATION)
+			USE_ABILITY(gsiPlayer, earthSpike, fht, 400, nil)
 			return;
 		end
 	end,

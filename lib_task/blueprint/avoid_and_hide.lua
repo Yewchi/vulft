@@ -1,3 +1,29 @@
+-- - #################################################################################### -
+-- - - VUL-FT Full Takeover Bot Script for Dota 2 by yewchi // 'does stuff' on Steam
+-- - - 
+-- - - MIT License
+-- - - 
+-- - - Copyright (c) 2022 Michael, zyewchi@gmail.com, github.com/yewchi, gitlab.com/yewchi
+-- - - 
+-- - - Permission is hereby granted, free of charge, to any person obtaining a copy
+-- - - of this software and associated documentation files (the "Software"), to deal
+-- - - in the Software without restriction, including without limitation the rights
+-- - - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-- - - copies of the Software, and to permit persons to whom the Software is
+-- - - furnished to do so, subject to the following conditions:
+-- - - 
+-- - - The above copyright notice and this permission notice shall be included in all
+-- - - copies or substantial portions of the Software.
+-- - - 
+-- - - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- - - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- - - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- - - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- - - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- - - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- - - SOFTWARE.
+-- - #################################################################################### -
+
 local XETA_AVOID_AND_HIDE = XETA_AVOID_AND_HIDE
 local FightHarass_GetHealthDiffAndOutnumbered = FightHarass_GetHealthDiffAndOutnumbered
 local Set_GetNearestTeamTowerToPlayer = Set_GetNearestTeamTowerToPlayer
@@ -28,6 +54,7 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 	return 20 -- TODO consider
 end
 local function task_init_func(taskJobDomain)
+	Blueprint_RegisterTaskName(task_handle, "avoid_and_hide")
 	if VERBOSE then VEBUG_print(string.format("avoid_and_hide: Initialized with handle #%d.", task_handle)) end
 
 	for i=1,TEAM_NUMBER_OF_PLAYERS do
@@ -110,7 +137,7 @@ blueprint = {
 			 if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, behindTowerFromEnemy, 255, 255, 255) end
 		
 			if distanceToTower < 1400 then -- Get to tha chopper
-				gsiPlayer.hUnit:Action_MoveDirectly(Vector_BoundedToWorld(behindTowerFromEnemy))
+				Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 150, 1000, true)
 			elseif distanceToTower < 5000 then -- Try to 1-2 past your allies 
 				local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 5000)
 				if #nearbyAllies > 0 then
@@ -142,16 +169,16 @@ blueprint = {
 						)
 					--[[DEBUG]]if DEBUG then DebugDrawLine(escapeChannelHead, behindTowerFromEnemy, 255, 150, 150) end
 					moveLocation = Vector_PointBetweenPoints(escapeChannelHead, behindTowerFromEnemy)
-					Positioning_ZSMoveCasual(gsiPlayer, moveLocation, 3, 1000, true)
+					Positioning_ZSMoveCasual(gsiPlayer, moveLocation, 150, 1000, true)
 				else
-					Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 3, 1000, true)
+					Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 150, 1000, true)
 				end
 			else -- lead the enemy across the face of the plane that your nearby allies create, or towards fountain with a 45 degree shift from an ally
-				Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 3, 1000, true)
+				Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 150, 1000, true)
 			end
 		else
 			-- no towers remain
-			Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 3, 1000, true)
+			Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 150, 1000, true)
 		end
 		return xetaScore
 	end,
@@ -159,7 +186,7 @@ blueprint = {
 	score = function(gsiPlayer, prevObjective, prevScore)
 		-- TODO On a throttle, calculate the odds of a successful escape, drop score and greatly
 		-- -| incentivise fight harass if we seem to be dying
-		local theorizedDangerAmount, knownEngageables, theorizedEngageables = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local danger, knownEngageables, theorizedEngageables = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 		if #knownEngageables + #theorizedEngageables == 0 then
 			local thisFearedScore = t_stay_feared_score[gsiPlayer.nOnTeam]
 			if thisFearedScore < -50 then
@@ -168,7 +195,6 @@ blueprint = {
 				return false, XETA_SCORE_DO_NOT_RUN
 			else
 				local decreaseByBasic = gsiPlayer.time.frameElapsed*DECREASE_FEAR_PER_SECOND
-				local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 				t_stay_feared_score[gsiPlayer.nOnTeam] = thisFearedScore
 						- max(decreaseByBasic, decreaseByBasic*(1-danger))
 			end
@@ -196,8 +222,8 @@ blueprint = {
 				gsiPlayer,
 				gsiPlayer
 			)
+		local averageEnemyLevel = GSI_GetTeamAverageLevel(ENEMY_TEAM)
 		t_stay_feared_score[gsiPlayer.nOnTeam] = thisAvoidScore
-		--print(gsiPlayer.shortName, "avoid score is", thisAvoidScore)
 		return gsiPlayer, thisAvoidScore
 	end,
 	

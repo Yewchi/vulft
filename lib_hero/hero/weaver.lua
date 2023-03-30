@@ -1,10 +1,10 @@
 local hero_data = {
 	"weaver",
-	{2, 3, 1, 2, 2, 4, 2, 3, 3, 5, 3, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 3, 1, 2, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 8, 1, 4, 9, 12},
 	{
-		"item_circlet","item_slippers","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_wraith_band","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_javelin","item_mithril_hammer","item_maelstrom","item_ring_of_health","item_pers","item_sphere","item_magic_wand","item_blade_of_alacrity","item_dragon_lance","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_greater_crit","item_gem","item_helm_of_iron_will","item_relic","item_nullifier","item_hyperstone","item_mjollnir","item_aghanims_shard",
+		"item_tango","item_ward_observer","item_circlet","item_slippers","item_quelling_blade","item_branches","item_branches","item_wraith_band","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_magic_wand","item_javelin","item_maelstrom","item_crown","item_crown","item_staff_of_wizardry","item_gungir","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_greater_crit","item_ultimate_orb","item_sphere","item_monkey_king_bar","item_blink","item_overwhelming_blink",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{
 		"The Swarm","Shukuchi","Geminate Attack","Time Lapse","+50 Shukuchi Damage","+9 Strength","+20 Mana Break","+2 Swarm Attacks to Kill","+90 Geminate Attack Damage","+0.5 Swarm Armor Reduction","+2 Shukuchi Charges","+1 Geminate Attack",
 	}
@@ -47,13 +47,15 @@ local OUTER_RANGE = 1400
 
 local SWARM_TRAVEL_SPEED = 750
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -86,6 +88,14 @@ local d = {
 				and fht.lastSeenHealth / fht.maxHealth or 1.0
 		local arbitraryEnemy = nearbyEnemies[1] or outerEnemies[1]
 
+		local shukuchiOn = gsiPlayer.hUnit:HasModifier("modifier_weaver_shukuchi")
+
+		local attackRange = gsiPlayer.hUnit:GetAttackRange()
+
+		if not shukuchiOn and gsiPlayer.attackRange ~= attackRange then
+			pUnit_SetFalsifyAttackRange(gsiPlayer, false)
+		end
+
 		if arbitraryEnemy and CAN_BE_CAST(gsiPlayer, timeLapse) then
 			local currTaskScore = CURR_TASK_SCORE(gsiPlayer)
 			local recentDmgTaking = Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit)
@@ -107,9 +117,12 @@ local d = {
 		end
 
 		if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then
-			if gsiPlayer.hUnit:HasModifier("modifier_weaver_shukuchi") then
+			if shukuchiOn then
 				-- TODO work around while UseAbility combos unfinished
-				gsiPlayer.attackRange = 0
+				local attackRange = gsiPlayer.hUnit:GetAttackRange()
+				if attackRange == gsiPlayer.attackRange then
+					pUnit_SetFalsifyAttackRange(gsiPlayer, 125)
+				end
 				INCENTIVISE(gsiPlayer, fight_harass_handle, 60, 30)
 			end
 			if fhtReal and not isInvis and CAN_BE_CAST(gsiPlayer, swarm)
@@ -132,7 +145,7 @@ local d = {
 						and HIGH_USE(gsiPlayer, shukuchi, highUse - shukuchi:GetManaCost(), fhtPercHp) then
 					USE_ABILITY(gsiPlayer, shukuchi, nil, 400, nil)
 					-- TODO work around while UseAbility combos unfinished
-					gsiPlayer.attackRange = 50
+					pUnit_SetFalsifyAttackRange(gsiPlayer, 125)
 					INCENTIVISE(gsiPlayer, fight_harass_handle, 60, 30)
 					return;
 				end

@@ -1,12 +1,12 @@
 local hero_data = {
 	"muerta",
-	{1, 2, 1, 3, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 8, 2, 4, 9, 11},
+	{1, 2, 1, 2, 1, 4, 1, 2, 3, 5, 3, 4, 3, 3, 2, 8, 4, 11, 10},
 	{
-		"item_tango","item_magic_stick","item_branches","item_branches","item_tango","item_magic_wand","item_boots","item_power_treads","item_maelstrom","item_force_staff","item_black_king_bar","item_hurricane_pike","item_gungir","item_skadi","item_ethereal_blade",
+		"item_ward_observer","item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_branches","item_bottle","item_gloves","item_boots","item_robe","item_power_treads","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_staff_of_wizardry","item_hurricane_pike","item_ultimate_orb","item_pers","item_sphere","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_ultimate_orb","item_manta","item_demon_edge","item_monkey_king_bar",
 	},
-	{ {3,3,2,1,1}, {3,4,2,5,1}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,4,3,}, 0.1 },
 	{
-		"Dead Shot","The Calling","Gunslinger","Pierce The Veil","+100 Dead Shot damage","+8 Strength","+250 Dead Shot Cast Range","+25 Damage","2 Dead Shot Charges","The Calling summons 2 additional revenants","+20% Gunslinger chance","+25% Magic Resistance",
+		"Dead Shot","The Calling","Gunslinger","Pierce the Veil","+100 Dead Shot damage","+8 Strength","+250 Dead Shot Cast Range","+25 Damage","2 Dead Shot Charges","The Calling summons +2 additional revenants","+20% Gunslinger chance","+25% Magic Resistance",
 	}
 }
 --@EndAutomatedHeroData
@@ -32,8 +32,10 @@ local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 local INCENTIVISE = Task_IncentiviseTask
 local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint
 local POINT_DISTANCE = Vector_PointDistance
+local POINT_DISTANCE_2D = Vector_PointDistance2D
 local VEC_ADDITION = Vector_Addition
 local VEC_SCALAR_MULTIPLY = Vector_ScalarMultiply
+local VEC_SCALAR_MULTIPLY_2D = Vector_ScalarMultiply2D
 local VEC_SCALE_TO_FACTOR = Vector_ScalePointToPointByFactor
 local VEC_UNIT_DIRECTIONAL_FACING = Vector_UnitDirectionalFacingDirection
 local VEC_UNIT_FACING_LOC = Vector_UnitFacingLoc
@@ -113,7 +115,7 @@ local function shot_contact_loc_time(shootFrom, contact, contactLoc)
 	-- -| to the contactExtrapolated and contactLoc dist on the first check with some relation
 	-- -| to the time and use it to get a strong approximation on the 2nd step
 	for i=1,4 do -- correct collision location as chasing B per iteratively corrected time
-		distToThisB = POINT_DISTANCE(shootFrom, thisBLoc)
+		distToThisB = POINT_DISTANCE_2D(shootFrom, thisBLoc)
 		timeGivenB = DEAD_SHOT_CAST_POINT_ADJUST + distToThisB / DEAD_SHOT_TRAVEL_SPEED
 		thisBLoc = VEC_ADDITION(contactLoc,
 				VEC_SCALAR_MULTIPLY(contactMovementVec, timeGivenB)
@@ -133,7 +135,7 @@ end
 local function find_deadshot_unit(gsiPlayer, deadShot, nearbyEnemies, target, allowAlternate)
 	-- Find allowed skill of the shot -- does it kill? allow fancy shots
 	local countEnemies = #nearbyEnemies
-	if CAST_SUCCEEDS(gsiPlayer, target, deadShot) > 0 then
+	if CAST_SUCCEEDS(gsiPlayer, target, deadShot) == 0 then
 		if allowAlternate then
 			for i=1,countEnemies do
 				if not pUnit_IsNullOrDead(nearbyEnemies[i])
@@ -330,6 +332,7 @@ d = {
 				d.DeadShotChargeRestoreTime
 			)
 		Xeta_RegisterAbscondScore("muertaDeadShot", 0, 2, 5, 0.167)
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
@@ -499,10 +502,11 @@ d = {
 				end
 			end
 		end
-		if fhtReal and gsiPlayer.lastSeenHealth < 0.8
+		if nearbyEnemies[1] and gsiPlayer.lastSeenHealth < 0.8
 				and CAN_BE_CAST(gsiPlayer, pierce) then
 			damageInTimeline = damageInTimeline or DAMAGE_IN_TIMELINE(gsiPlayer.hUnit)
-			if damageInTimeline > gsiPlayer.maxHealth * 0.10
+			print("muerta check danger dmg timeline", damageInTimeline)
+			if damageInTimeline > gsiPlayer.lastSeenHealth * 0.10
 					and HIGH_USE(gsiPlayer, pierce, highUse - pierce:GetManaCost(),
 							max( 0.0001, (gsiPlayer.lastSeenHealth - damageInTimeline)/gsiPlayer.maxHealth )
 						) then

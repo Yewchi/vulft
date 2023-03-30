@@ -1,10 +1,10 @@
 local hero_data = {
 	"queenofpain",
-	{3, 1, 1, 3, 5, 4, 3, 3, 2, 2, 2, 4, 2, 1, 8, 1, 4, 9, 11},
+	{1, 5, 1, 2, 1, 4, 3, 3, 3, 3, 2, 4, 2, 2, 8, 1, 4, 9, 11},
 	{
-		"item_magic_stick","item_tango","item_mantle","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_bottle","item_magic_wand","item_null_talisman","item_gloves","item_robe","item_power_treads","item_staff_of_wizardry","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_claymore","item_orchid","item_ultimate_orb","item_sphere","item_energy_booster","item_void_stone","item_aether_lens","item_octarine_core","item_mystic_staff","item_ultimate_orb","item_sheepstick",
+		"item_branches","item_ward_observer","item_tango","item_branches","item_branches","item_bottle","item_boots","item_magic_wand","item_power_treads","item_chainmail","item_blitz_knuckles","item_witch_blade","item_oblivion_staff","item_cloak","item_mage_slayer","item_blitz_knuckles","item_void_stone","item_orchid","item_bloodthorn","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_aghanims_shard","item_buckler","item_assault",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
 		"Shadow Strike","Blink","Scream Of Pain","Sonic Wave","+20 Damage","+11 Strength","-0.7s Shadow Strike Damage Interval","+30 Attack Speed","+120 Scream of Pain Damage","-40s Sonic Wave Cooldown","-2.0s Blink Cooldown","+200 Sonic Wave Damage",
 	}
@@ -33,13 +33,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

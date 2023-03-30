@@ -1,22 +1,22 @@
 local hero_data = {
 	"ember_spirit",
-	{2, 3, 2, 3, 2, 4, 2, 3, 3, 1, 1, 1, 1, 6, 7, 4, 4, 10, 11},
+	{3, 2, 3, 1, 2, 4, 2, 1, 1, 5, 1, 4, 3, 3, 7, 2, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_faerie_fire","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_orb_of_corrosion","item_magic_wand","item_chainmail","item_phase_boots","item_javelin","item_mithril_hammer","item_maelstrom","item_platemail","item_ogre_axe","item_mithril_hammer","item_shivas_guard","item_ogre_axe","item_black_king_bar","item_aghanims_shard","item_sange","item_robe","item_kaya_and_sange","item_ultimate_scepter","item_gungir","item_pers","item_ring_of_health","item_refresher",
+		"item_faerie_fire","item_tango","item_branches","item_quelling_blade","item_branches","item_ward_observer","item_bottle","item_blight_stone","item_boots","item_magic_wand","item_orb_of_corrosion","item_chainmail","item_blades_of_attack","item_phase_boots","item_javelin","item_maelstrom","item_rod_of_atos","item_gungir","item_kaya","item_kaya_and_sange","item_aghanims_shard","item_ultimate_orb","item_ring_of_health","item_sphere","item_black_king_bar","item_pers","item_pers","item_refresher","item_lesser_crit","item_lesser_crit","item_lesser_crit","item_blades_of_attack","item_blades_of_attack","item_lesser_crit",
 	},
-	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Searing Chains","Sleight of Fist","Flame Guard","Fire Remnant","+15 Damage","+200 Flame Guard Absorption","+50 Flame Guard DPS","+1.0s Searing Chains Duration","+1 Searing Chains Target","+65 Sleight of Fist Hero Damage","2 Sleight of Fist Charges","-12s Remnant Charge Restore Time",
+		"Searing Chains","Sleight of Fist","Flame Guard","Fire Remnant","+12 Damage","+200 Flame Guard Absorption","+50 Flame Guard DPS","+1.0s Searing Chains Duration","+1 Searing Chains Target","+55 Sleight of Fist Hero Damage","2 Sleight of Fist Charges","-12s Remnant Charge Restore Time",
 	}
 }
 --@EndAutomatedHeroData
-THIS_INCLUDED_PICK_STAGE_DATA = hero_data
+if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
 
 local abilities = {
 	[0] = {"ember_spirit_chyaboyin_it_up", ABILITY_TYPE.HEAL + ABILITY_TYPE.NUKE},
 		{"ember_spirit_yes", ABILITY_TYPE.SHIELD},
 		{"ember_spirit_flame_guard", ABILITY_TYPE.PASSIVE},
-		[5] = {"ember_spirit_fire_remnant", ABILITY_TYPE.PASSIVE},
+		[5] = {"ember_spirit_today_im_gonna_be_showing_you_another_great_video_how_to_mow_your_lawn_using_only_one_spell", ABILITY_TYPE.PASSIVE},
 }
 
 local high_use
@@ -35,13 +35,15 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local d = {
+local d
+d = {
 	["ReponseNeeds"] = function()
 		return nil, REASPONSE_TYPE_DISPEL, nil, {RESPONSE_TYPE_KNOCKBACK, 4}
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
