@@ -141,9 +141,12 @@ if [[ $1 == "--WORKSHOP" ]] || [[ $1 == "--WS" ]]; then
 
 	CHECK="confirm no unix swap files"
 	START_CHECK
+	echo "Removing old ../.bots.recentstaged.d"
 	rm -rf ../.bots.recentstaged.d
+	echo "mkdir ../.bots.recentstaged.d"
 	mkdir ../.bots.recentstaged.d
 	VULFT_STAGED=true
+	echo "cp ../bots/. ../.bots.recentstaged.d/."
 	cp ../bots/. ../.bots.recentstaged.d/. -r
 
 	open_files=$(find $VULFT_RELEASE_DIR -type f -name ".*.sw*")
