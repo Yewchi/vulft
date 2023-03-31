@@ -42,7 +42,7 @@ dan salin konten folder itu ke folder bot di
 
 - Melalui Github: (diperbarui oleh pembuatnya)
 
-Jika Anda tahu cara menggunakan git, Anda dapat mengunduh bot secara manual dari [url=https://github.com/yewchi/vulft]official VUL-FT Github[/url] dan memasukkannya ke dalam
+Jika Anda tahu cara menggunakan git, Anda dapat mengunduh bot secara manual dari [official VUL-FT Github](https://github.com/yewchi/vulft) dan memasukkannya ke dalam
 
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
@@ -104,9 +104,9 @@ Tetapi juga, saya berjanji kode proyek ini 100% fungsional offline dan saya tida
 
 ## Laporan Kesalahan
 
-[url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (tautan diskusi uap)[/url] -- Gunakan ini jika Anda hanya ingin menyalin beberapa pesan kesalahan dari log konsol.
+[ Lua Error Dump (tautan diskusi uap)](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) -- Gunakan ini jika Anda hanya ingin menyalin beberapa pesan kesalahan dari log konsol.
 
-[url = https://github.com / yewchi / vulft ] Kode sumber VUL-FT[/url] -- GitHub publik
+[ Kode sumber VUL-FT]( https://github.com / yewchi / vulft ) -- GitHub publik
 
 
 

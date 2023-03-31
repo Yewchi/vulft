@@ -30,7 +30,7 @@ VUL-FTは現在、サブスクライブするだけでは機能しません。�
 
 - またはGithubを使用して:(作成者によって更新)
 
-git の使い方を知っている場合は、[url=https://github.com/yewchi/vulft]official VUL-FT Github[/url] からボットを手動でダウンロードして、
+git [official VUL-FT Github](の使い方を知っている場合は、https://github.com/yewchi/vulft) からボットを手動でダウンロードして、
 
 [ドライブ]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
@@ -94,9 +94,9 @@ OKを押します。
 
 ## エラーレポート
 
-[url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/]Lua エラーダンプ (Steam ディスカッションリンク)[/url] -- コンソールログからエラーメッセージを貼り付けたい場合に使用します。
+[Lua エラーダンプ (Steam ディスカッションリンク)](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) -- コンソールログからエラーメッセージを貼り付けたい場合に使用します。
 
-[url=https://github.com/yewchi/vulft]VUL-FT ソースコード [/url] -- パブリック github
+[VUL-FT ソースコード ](https://github.com/yewchi/vulft) -- パブリック github
 
 
 

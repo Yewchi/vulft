@@ -30,7 +30,7 @@ Ang lokal na folder ng dev bot ay matatagpuan sa
 
 -- O gamit ang Github: (na-update ng lumikha)
 
-Kung alam mo kung paano gamitin ang git maaari mong manu manong i download ang mga bot mula sa [url=https://github.com/yewchi/vulft]official VUL-FT Github[/url] at ilagay ang mga ito sa
+Kung alam mo kung paano gamitin ang git maaari mong manu manong i download ang mga bot mula sa [official VUL-FT Github](https://github.com/yewchi/vulft) at ilagay ang mga ito sa
 
 [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
@@ -94,9 +94,9 @@ Ngunit din, ipinapangako ko ang code ng proyektong ito ay 100% functional offlin
 
 ## Ulat ng Pagkakamali
 
-[url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (steam discussion link)[/url] -- Gamitin ito kung nais mong kopyahin nang mabilis ang ilang mensahe ng error mula sa console log.
+[ Lua Error Dump (steam discussion link)](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) -- Gamitin ito kung nais mong kopyahin nang mabilis ang ilang mensahe ng error mula sa console log.
 
-[url=https://github.com/Yewchi/vulft] VUL-FT source code[/url] -- Public github
+[ VUL-FT source code](https://github.com/Yewchi/vulft) -- Public github
 
 
 

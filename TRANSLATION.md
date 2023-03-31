@@ -1,7 +1,7 @@
 ### README Documentation // Steam workshop description translations:
 
 
-These are to help you install the bots, as it requires moving some workshop files around (Dota 2 bug)
+These are to help you install the bots, as it requires moving some workshop files around (Dota 2 workshop bug // workshop security feature)
 
 
 | Language | Link |

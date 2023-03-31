@@ -42,7 +42,7 @@ VUL-FT 目前不会在订阅后立即工作。它将恢复为默认机器人，�
 
 
 
-- 通过Github：（由创建者更新） 如果你知道如何使用 git，你可以从官方的 VUL-FT Github https://github.com/yewchi/vulft 手动下载机器人并将它们放入 [drive]：/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
+- 通过Github：（由创建者更新） 如果你知道如何使用 git，你可以从官方的 [VUL-FT Github](https://github.com/yewchi/vulft) 手动下载机器人并将它们放入 [drive]：/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
 
 
@@ -88,9 +88,9 @@ CPU 使用率低于其他流行的机器人。
 
 ## 错误报告
 
-[url=steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/]Lua Error Dump （Steam 讨论链接）[/url] -- 如果需要，可以使用错误主题论坛从控制台文本日志中通知我一些有关错误的文本
+[Lua Error Dump （Steam 讨论链接）](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) -- 如果需要，可以使用错误主题论坛从控制台文本日志中通知我一些有关错误的文本
 
-[url=github.com/yewchi/vulft]VUL-FT 源代码[/url] -- Public github
+[VUL-FT 源代码](https://github.com/yewchi/vulft) -- Public github
 
 
 

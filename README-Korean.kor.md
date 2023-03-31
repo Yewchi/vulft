@@ -42,7 +42,7 @@ VUL-FT는 현재 구독만으로는 작동하지 않습니다. 기본 봇으로 
 
 -- 또는 Github를 사용하여 : (제작자가 업데이트 함)
 
-git이라는 명령을 사용하는 방법을 알고 있다면 [url=https://github.com/yewchi/vulft]공식 VUL-FT Github[/url]에서 봇을 수동으로 다운로드하여 넣을 수 있습니다.
+git이라는 명령을 사용하는 방법을 알고 있다면 [공식 VUL-FT Github](https://github.com/yewchi/vulft)에서 봇을 수동으로 다운로드하여 넣을 수 있습니다.
 
 [드라이브]:/%프로그램 파일%/스팀/스팀앱/커먼/도타 2 베타/게임/도타/스크립트/vscripts/봇/
 
@@ -104,9 +104,9 @@ git이라는 명령을 사용하는 방법을 알고 있다면 [url=https://gith
 
 ## 오류 보고서
 
-[url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua 오류 덤프 (스팀 토론 링크)[/url] -- 콘솔 로그에서 일부 오류 메시지만 복사하려는 경우 사용합니다.
+[ Lua 오류 덤프 (스팀 토론 링크)](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) -- 콘솔 로그에서 일부 오류 메시지만 복사하려는 경우 사용합니다.
 
-[url=https://github.com/yewchi/vulft] VUL-FT 소스 코드[/url] -- 공용 깃허브
+[ VUL-FT 소스 코드](https://github.com/yewchi/vulft) -- 공용 깃허브
 
 
 

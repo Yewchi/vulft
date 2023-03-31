@@ -42,7 +42,7 @@ C:/٪ Program Files ٪ / Steam / steamapps / common / dota 2 beta / game / dota 
 
 - أو باستخدام Github: (تم تحديثه بواسطة المنشئ)
 
-إذا كنت تعرف كيفية استخدام git ، فيمكنك تنزيل برامج الروبوت يدويا من [url = https://github.com/yewchi/vulft] الرسمي VUL-FT Github [/ url] ووضعها في 
+إذا كنت تعرف كيفية استخدام git ، فيمكنك تنزيل برامج الروبوت يدويا من [ الرسمي VUL-FT Github ](https://github.com/yewchi/vulft) ووضعها في 
 
 C:/٪ Program Files ٪ / Steam / steamapps / common / dota 2 beta / game / dota / scripts / vscripts / bots /
 
@@ -104,9 +104,9 @@ CUSTOM LOBBIES -> CREATE -> EDIT:
 
 ##  تقرير الخطأ 
 
-[url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (رابط مناقشة البخار)[/url] - يمكنك الانتقال إلى مناقشة البخار هذه ولصق بعض رسائل الخطأ من سجل وحدة التحكم.
+[ Lua Error Dump (رابط مناقشة البخار)](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) - يمكنك الانتقال إلى مناقشة البخار هذه ولصق بعض رسائل الخطأ من سجل وحدة التحكم.
 
-[url=https://github.com/yewchi/vulft] شفرة مصدر VUL-FT [/ url] - جيثب العام
+[ شفرة مصدر VUL-FT ](https://github.com/yewchi/vulft) - جيثب العام
 
 
 

@@ -42,7 +42,7 @@ y copie el contenido de esa carpeta en la carpeta bots en
 
 -- Vía Github: (actualizado por el creador)
 
-Si sabes cómo usar git puedes descargar manualmente los bots desde el [url=https://github.com/yewchi/vulft]official VUL-FT Github[/url] y ponerlos en
+Si sabes cómo usar git puedes descargar manualmente los bots desde el [official VUL-FT Github](https://github.com/yewchi/vulft) y ponerlos en
 
 [unidad]:/%Archivos de programa%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
@@ -102,9 +102,9 @@ Pero también, prometo que el código de este proyecto es 100% funcional fuera d
 
 ##  Informe de errores 
 
-[url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (enlace de discusión de Steam)[/url] -- Utilícelo si desea copiar algunos mensajes de error del registro de la consola rápidamente.
+[ Lua Error Dump (enlace de discusión de Steam)](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) -- Utilícelo si desea copiar algunos mensajes de error del registro de la consola rápidamente.
 
-[url=https://github.com/Yewchi/vulft] Código fuente VUL-FT[/url] -- Github público
+[ Código fuente VUL-FT](https://github.com/Yewchi/vulft) -- Github público
 
 
 
