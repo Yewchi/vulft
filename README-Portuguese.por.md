@@ -1,9 +1,9 @@
-== Tradução ==
+##  Tradução 
 A tradução leva muito tempo para mim, cerca de 30 minutos. Preciso voltar à programação, então esse arquivo pode estar desatualizado. Se o processo de instalação manual for corrigido e não for mais necessário, atualizarei este documento. Consulte a página do workshop em inglês para a data de compilação atual do DotaBuff e a data de lançamento do software.
 
 VULFT - Total Override Bot Script. Comportamento de luta altamente dinâmico. As funções do DotaBuff e as sequências de construção de inventário são atualizadas em: 19/03/23. Requer instalação manual na pasta vscripts/bots (o mesmo que o Phalanx Bot e outros bots recentes, devido a um bug do workshop Dota). A VUL-FT não é afiliada à DotaBuff.
 
-== Instalação manual ==
+##  Instalação manual 
 Atualmente, o VUL-FT não funcionará apenas assinando. Ele será revertido para os bots padrão, outros bots lançados recentemente têm o mesmo problema. Por enquanto, é necessário instalar manualmente os bots.
 
 Opcional: Antes de definir o VUL-FT como o script de desenvolvimento local, também pode ser uma boa ideia fazer backup de sua antiga pasta 'vscript/bots' se você tiver outro bot armazenado lá:
@@ -34,7 +34,7 @@ Pressione START GAME.
 
 Alternativamente, você pode usar a opção "Play VS Bots", mas nem todos os heróis são implementados.
 
-==Características==
+## Características
 - Luta dinâmica na tomada de decisões.
 - Mais como jogadores reais.
 - Os bots começam a se mover imediatamente após os bots liberarem um ataque, caminhando em direção à retirada do inimigo.
@@ -50,19 +50,19 @@ Alternativamente, você pode usar a opção "Play VS Bots", mas nem todos os her
 
 Mas também, prometo que o código deste projeto é 100% funcional offline e nunca introduzirei a API de rede nesta base de código.
 
-== Relatório de Erros ==
+##  Relatório de Erros 
 [url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (link de discussão do steam)[/url] -- Use isso se quiser copiar apenas algumas mensagens de erro do log do console.
 [url=https://github.com/yewchi/vulft] Código-fonte VUL-FT[/url] -- Github público
 
-== Problemas conhecidos ==
+##  Problemas conhecidos 
 Esta seção é bastante difícil de traduzir, desculpe!
 
 Todas as novas entidades grabbable de recompensas de ouro e entidades de rios de água introduzidas em algum momento no 7.x atualmente não podem ser captadas por scripts de bot de substituição total. Isso inclui o recurso mais recente de entidades de recompensa empilhadas umas sobre as outras. Além disso, apenas a entidade de recompensa exibida mais recentemente pode ser coletada. Uma solução alternativa está em vigor antes do trombone de guerra às 0:00 para permitir que os bots os peguem, no entanto, a solução alternativa faz com que os bots percam o controle total de seu inventário, e por isso é removido após a buzina por volta das 0:30
 
-== Estado do projeto ==
+##  Estado do projeto 
 Versão alfa. Por favor, dê feedback.
 O projeto está atualmente estável: Estável, sem falhas de jogo ou script quebrando mais de 10 partidas a partir de 30/03/23 (30 de março)
 Última atualização da meta do DotaBuff: Por favor, verifique as datas da página do workshop, mas está em inglês.
 
-== Contato de desenvolvimento ==
+##  Contato de desenvolvimento 
 zyewchi@gmail.com

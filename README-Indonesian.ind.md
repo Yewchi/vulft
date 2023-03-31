@@ -1,9 +1,9 @@
-== Terjemahan ==
+##  Terjemahan 
 Terjemahan membutuhkan waktu lama bagi saya, sekitar 30 menit. Saya perlu kembali ke pemrograman, jadi file ini mungkin sudah ketinggalan zaman. Jika proses instalasi manual diperbaiki dan tidak lagi diperlukan, saya akan memperbarui dokumen ini. Lihat halaman lokakarya bahasa Inggris untuk tanggal pembuatan DotaBuff saat ini dan tanggal rilis perangkat lunak.
 
 VULFT - Total Override Bot Script. Peran DotaBuff dan urutan pembuatan inventaris diperbarui pada: 19/03/23. Memerlukan instalasi manual ke folder vscripts/bots (sama seperti Phalanx Bot, dan bot terbaru lainnya, karena bug bengkel Dota). VUL-FT tidak berafiliasi dengan DotaBuff.
 
-== Menginstal secara manual ==
+##  Menginstal secara manual 
 VUL-FT saat ini tidak akan bekerja hanya dengan berlangganan. Ini akan kembali ke bot default, bot lain yang baru dirilis memiliki masalah yang sama. Untuk saat ini, Anda perlu menginstal bot secara manual.
 
 Opsional: Sebelum mengatur VUL-FT sebagai skrip dev lokal, Mungkin juga ide yang baik untuk membuat cadangan folder 'vscript/bots' lama Anda jika Anda memiliki bot lain yang telah Anda simpan di sana:
@@ -34,7 +34,7 @@ Tekan START GAME.
 
 Atau, Anda dapat menggunakan opsi "Mainkan VS Bots" tetapi tidak semua pahlawan diterapkan.
 
-==Fitur==
+## Fitur
 - Pengambilan keputusan pertarungan dinamis.
 - Lebih seperti pemain sungguhan.
 - Bot mulai bergerak segera setelah bot melepaskan serangan, melangkah menuju mundurnya musuh.
@@ -50,19 +50,19 @@ Atau, Anda dapat menggunakan opsi "Mainkan VS Bots" tetapi tidak semua pahlawan 
 
 Tetapi juga, saya berjanji kode proyek ini 100% fungsional offline dan saya tidak akan pernah memperkenalkan API jaringan di basis kode ini.
 
-==Laporan Kesalahan==
+## Laporan Kesalahan
 [url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (tautan diskusi uap)[/url] -- Gunakan ini jika Anda hanya ingin menyalin beberapa pesan kesalahan dari log konsol.
 [url = https://github.com / yewchi / vulft ] Kode sumber VUL-FT[/url] -- GitHub publik
 
-==Masalah yang Diketahui==
+## Masalah yang Diketahui
 Bagian ini sangat sulit untuk diterjemahkan, maaf!
 
 Semua entitas yang dapat diambil hadiah emas baru dan entitas sungai air yang diperkenalkan sekitar pukul 7.x saat ini tidak dapat diambil oleh skrip bot override total. Ini termasuk fitur yang lebih baru dari entitas bounty yang menumpuk di atas satu sama lain. Juga, hanya entitas bounty yang paling baru muncul yang dapat dikumpulkan. Solusi ada sebelum trombon perang pada pukul 0:00 untuk memungkinkan bot mengambilnya, namun, solusinya menyebabkan bot kehilangan kendali penuh atas inventaris mereka, sehingga dihapus setelah klakson sekitar pukul 0:30
 
-==Status Proyek==
+## Status Proyek
 Versi alpha. Tolong beri umpan balik.
 Apakah proyek saat ini stabil: Stabil, tidak ada game crash atau skrip yang melanggar lebih dari 10 pertandingan pada 30/03/23 (30 Maret)
 Pembaruan meta DotaBuff terakhir: Silakan periksa tanggal halaman lokakarya bahasa Inggris.
 
-==Kontak dev==
+## Kontak dev
 zyewchi@gmail.com

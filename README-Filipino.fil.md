@@ -1,9 +1,9 @@
-== Pagsasalin ==
+##  Pagsasalin 
 Ang pagpapanatili ng pagsasalin na ito ay tumatagal ng mahabang panahon para sa akin, mga 30 minuto. Kailangan kong bumalik sa programming, kaya maaaring hindi na napapanahon ang file na ito. Kung ang proseso ng pag install ng bot ay kailanman naayos at hindi na kinakailangan, pagkatapos ay babalik ako upang i update ang dokumentong ito. Tingnan ang pahina ng workshop sa Ingles para sa kasalukuyang petsa ng pagtatayo ng DotaBuff at petsa ng paglabas ng software.
 
 VULFT - Kabuuang Takeover Bot Script na may dynamic na pag-uugali ng labanan. DotaBuff papel at imbentaryo build sequences ay na update sa: 19/03/23. Nangangailangan ng manu manong pag install sa vscripts / bots folder (may kasalukuyang problema sa Dota workshop sa mga bagong bot). Ang VUL-FT ay hindi kaakibat ng DotaBuff.
 
-== Manu manong pag install ==
+##  Manu manong pag install 
 Ang VUL-FT ay kasalukuyang hindi gagana sa pamamagitan lamang ng pag-subscribe. Ito ay magpapatakbo lamang ng mga default na bot sa halip, ang iba pang mga kamakailang inilabas na mga bot ay may parehong isyu. Sa ngayon, kailangan manu manong i install ang mga bot.
 
 Opsyonal: Bago itakda ang VUL-FT bilang lokal na dev script, Maaari ring magandang ideya na i-backup ang iyong lumang folder na 'vscript/bots' kung mayroon kang ibang bot na naimbak mo roon:
@@ -29,7 +29,7 @@ Pindutin ang START GAME.
 
 Bilang kahalili, maaari mong gamitin ang "Play VS Bots" na pagpipilian ngunit hindi lahat ng mga bayani ay ipinatupad.
 
-==Mga Tampok==
+## Mga Tampok
 - Dynamic labanan paggawa ng desisyon.
 - Higit pang mga tulad ng tunay na mga manlalaro.
 - Sila ay nagsisimula upang ilipat kaagad pagkatapos ng release ng isang atake.
@@ -45,19 +45,19 @@ Bilang kahalili, maaari mong gamitin ang "Play VS Bots" na pagpipilian ngunit hi
 
 Ngunit din, ipinapangako ko ang code ng proyektong ito ay 100% functional offline at mananatili sa ganoong paraan. Walang networking API ang gagamitin ng codebase na ito, kailanman.
 
-==Ulat ng Pagkakamali==
+## Ulat ng Pagkakamali
 [url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (steam discussion link)[/url] -- Gamitin ito kung nais mong kopyahin nang mabilis ang ilang mensahe ng error mula sa console log.
 [url=https://github.com/Yewchi/vulft] VUL-FT source code[/url] -- Public github
 
-==Mga Kilalang Isyu==
+## Mga Kilalang Isyu
 Ang bahaging ito ay napakahirap isalin, paumanhin!
 
 Ang lahat ng mga bagong gintong bounty grabbable entity at tubig ilog entity ipinakilala minsan sa 7.x ay hindi kasalukuyang magagawang upang ma pick up sa pamamagitan ng kabuuang override bot script. Kabilang dito ang mas bagong tampok ng mga entity ng bounty stacking ontop ng isa't isa. Gayundin, tanging ang pinakahuling lumitaw bounty entity ay maaaring kolektahin. Ang isang workaround ay nasa lugar bago ang trombone ng digmaan sa 0:00 upang payagan ang mga bot na kunin ang mga ito, gayunpaman, ang workaround ay nagiging sanhi ng mga bot na maluwag ang kabuuang kontrol ng kanilang imbentaryo, at kaya ito ay inalis pagkatapos ng sungay sa tungkol sa 0:30
 
-==Estado ng Proyekto==
+## Estado ng Proyekto
 Bersyon ng alpha. Magbigay po kayo ng feedback.
 Ang proyekto ba ay kasalukuyang matatag: Matatag, walang mga pag crash ng laro o script breaking sa paglipas ng 10 tugma bilang ng 30/03/23 (Marso 30)
 Huling DotaBuff meta update: Mangyaring suriin ang mga petsa ng pahina ng workshop sa Ingles.
 
-==Dev kontak==
+## Dev kontak
 zyewchi@gmail.com

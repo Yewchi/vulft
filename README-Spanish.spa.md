@@ -1,9 +1,9 @@
-== Traducción ==
+##  Traducción 
 La traducción me lleva mucho tiempo, unos 30 minutos. Necesito volver a la programación, por lo que este archivo puede estar desactualizado. Si el proceso de instalación manual está solucionado y ya no es necesario, actualizaré este documento. Consulte la página del taller en inglés para conocer la fecha de compilación actual de DotaBuff y la fecha de lanzamiento del software.
 
 VULFT - Script de bot de anulación total. Comportamiento de lucha altamente dinámico. Los roles de DotaBuff y las secuencias de compilación de inventario se actualizan el: 19/03/23. Requiere instalación manual en la carpeta vscripts/bots (igual que Phalanx Bot y otros bots recientes, debido a un error de taller de Dota). VUL-FT no está afiliado con DotaBuff.
 
-== Instalación manual ==
+##  Instalación manual 
 VUL-FT actualmente no funcionará solo suscribiéndose. Volverá a los bots predeterminados, otros bots lanzados recientemente tienen el mismo problema. Por ahora, es necesario instalar manualmente los bots.
 
 Opcional: Antes de configurar VUL-FT como script de desarrollo local, también puede ser una buena idea hacer una copia de seguridad de su antigua carpeta 'vscript/bots' si tiene otro bot que haya almacenado allí:
@@ -34,7 +34,7 @@ Presiona INICIAR JUEGO.
 
 Alternativamente, puede usar la opción "Jugar VS Bots", pero no todos los héroes están implementados.
 
-== Características ==
+##  Características 
 - Toma dinámica de decisiones de lucha.
 - Más como jugadores reales.
 - Comienzan a moverse inmediatamente después de lanzar un ataque.
@@ -49,19 +49,19 @@ Alternativamente, puede usar la opción "Jugar VS Bots", pero no todos los héro
 - ¡Errores de software! :)
 
 Pero también, prometo que el código de este proyecto es 100% funcional fuera de línea y se mantendrá así. Esta base de código no utilizará ninguna API de red, nunca.
-== Informe de errores ==
+##  Informe de errores 
 [url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (enlace de discusión de Steam)[/url] -- Utilícelo si desea copiar algunos mensajes de error del registro de la consola rápidamente.
 [url=https://github.com/Yewchi/vulft] Código fuente VUL-FT[/url] -- Github público
 
-== Problemas conocidos ==
+##  Problemas conocidos 
 Esta sección es muy difícil de traducir, ¡lo siento!
 
 Todas las nuevas entidades de recompensas de oro y las entidades de río de agua introducidas en algún momento en 7.x actualmente no pueden ser recogidas por scripts de bot de anulación total. Esto incluye la nueva característica de las entidades de recompensa que se apilan una encima de la otra. Además, solo se puede cobrar la entidad de recompensa aparecida más recientemente. Una solución está en su lugar antes del trombón de guerra a las 0:00 para permitir que los bots los recojan, sin embargo, la solución hace que los bots pierdan el control total de su inventario, por lo que se elimina después de la bocina alrededor de las 0:30
 
-== Estado del proyecto ==
+##  Estado del proyecto 
 Versión alfa. Por favor, envíe sus comentarios.
 ¿El proyecto es actualmente estable?: Estable, sin bloqueos de juego o ruptura de guión en 10 partidos a partir del 30/03/23 (30 de marzo)
 Última meta actualización de DotaBuff: Por favor, compruebe las fechas de la página del taller de inglés.
 
-== Contacto de desarrollo ==
+##  Contacto de desarrollo 
 zyewchi@gmail.com

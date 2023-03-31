@@ -1,9 +1,9 @@
-== Einzelnachweise ==
+##  Einzelnachweise 
 Das Übersetzen dauert bei mir sehr lange, etwa 30 Minuten. Ich muss zurück zur Programmierung, daher ist diese Datei möglicherweise veraltet. Wenn der manuelle Installationsprozess behoben ist und nicht mehr benötigt wird, werde ich dieses Dokument aktualisieren. Auf der englischen Workshop-Seite finden Sie das aktuelle DotaBuff-Erstellungsdatum und das Veröffentlichungsdatum der Software.
 
 VULFT - Total Override Bot Script. Hochdynamisches Kampfverhalten. DotaBuff-Rollen und Inventar-Build-Sequenzen werden aktualisiert am: 19/03/23. Erfordert eine manuelle Installation in den Ordner vscripts / bots (wie Phalanx Bot und andere aktuelle Bots aufgrund eines Dota-Workshop-Fehlers). VUL-FT ist nicht mit DotaBuff verbunden.
 
-== Manuelle Installation ==
+##  Manuelle Installation 
 VUL-FT funktioniert derzeit nicht, wenn Sie nur abonnieren. Es wird auf die Standard-Bots zurückgesetzt, andere kürzlich veröffentlichte Bots haben das gleiche Problem. Im Moment ist es notwendig, die Bots manuell zu installieren.
 
 Optional: Bevor Sie VUL-FT als lokales Dev-Skript festlegen, kann es auch eine gute Idee sein, Ihren alten Ordner "vscript / bots" zu sichern, wenn Sie einen anderen Bot haben, den Sie dort gespeichert haben:
@@ -34,7 +34,7 @@ Drücken Sie SPIEL STARTEN.
 
 Alternativ können Sie die Option "VS Bots spielen" verwenden, aber nicht alle Helden sind implementiert.
 
-== Funkitonnen ==
+##  Funkitonnen 
 - Dynamische Kampfentscheidung.
 - Eher wie echte Spieler.
 - Sie beginnen sich sofort nach dem Auslösen eines Angriffs zu bewegen.
@@ -50,19 +50,19 @@ Alternativ können Sie die Option "VS Bots spielen" verwenden, aber nicht alle H
 
 Aber ich verspreche auch, dass der Code dieses Projekts offline zu 100% funktionsfähig ist und so bleiben wird. Keine Netzwerk-API wird von dieser Codebasis verwendet, niemals.
 
-== Fehlerberichte ==
+##  Fehlerberichte 
 [url=https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/] Lua Error Dump (Steam-Diskussionslink)[/url] -- Verwenden Sie diese Option, wenn Sie einige Fehlermeldungen schnell aus dem Konsolenprotokoll kopieren möchten.
 [url=https://github.com/yewchi/vulft] VUL-FT-Quellcode [/url] -- Öffentlicher Github
 
-== Bekannte Probleme ==
+##  Bekannte Probleme 
 Dieser Abschnitt ist sehr schwer zu übersetzen, sorry!
 
 Alle neuen Gold-Bounty-Grabbable-Entitäten und Wasserfluss-Entitäten, die irgendwann in 7.x eingeführt wurden, können derzeit nicht von Bot-Skripten mit vollständiger Überschreibung abgeholt werden. Dazu gehört auch die neuere Funktion von Bounty-Entitäten, die übereinander gestapelt werden. Außerdem kann nur die zuletzt erschienene Bounty-Einheit gesammelt werden. Ein Workaround ist vor der Posaune des Krieges um 0:00 Uhr vorhanden, damit die Bots sie abholen können, aber der Workaround führt dazu, dass die Bots die vollständige Kontrolle über ihr Inventar verlieren, und so wird es nach dem Horn um etwa 0:30 Uhr entfernt
 
-== Projektstatus ==
+##  Projektstatus 
 Alpha-Version. Bitte geben Sie uns Feedback.
 Ist das Projekt derzeit stabil: Stabil, keine Spielabstürze oder Skriptbrüche über 10 Spiele am 30.03.23 (30. März)
 Letztes DotaBuff-Meta-Update: Bitte überprüfen Sie die Daten der englischen Workshop-Seite.
 
-== Einzelnachweise ==
+##  Einzelnachweise 
 zyewchi@gmail.com
