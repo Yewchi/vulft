@@ -1,32 +1,32 @@
 Developer README.md
 
-Development status: Fortnightly update (11/03/23)
+Development status: Fortnightly update (as of 01/04/23)
 
 VUL-FT - Very U(gly, Unrolled, Unabstracted, and Fast) Lua Full Takeover for Dota 2
 
-==Installing==
+### == Installing ==
 
 Please see the README.steam file for install instructions. If you have git, you can
 'git clone https://github.com/Yewchi/vulft.git' while in the directory:
 
-	<%STEAM_DIR%>steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots
+>	<%STEAM_DIR%>steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots
 
 Alternatively, press the probably green "Code" button above, and download the repo
 as a zip, and unzip it to the same folder stated above.
 
-==Project workflow==
+### == Project workflow ==
 
 Project workspaces can be viewed in the vim sessions (enter g then CTRL+T to tab through):
 
-	vim -S .taskwf
-	vim -S .anwf
-	vim -S .syswf
-	vim -S .herowf
+>	vim -S .taskwf
+>	vim -S .anwf
+>	vim -S .syswf
+>	vim -S .herowf
 	
 or alternatively in bash
 	. .wf
 
-==Full-takeover==
+### == Full-takeover ==
 
 I need to explain why I overrode the mode_x.lua files for a full-takeover bot:
 I'm unable to make the bots pick up river bounty runes. I've tried many silly things. So
@@ -45,7 +45,7 @@ concept of the full-takeover and also of the hookable behaviour at the same time
 However, if this is the solution followed, it might mean other problems in the future;
 item management being interrupted by default bots being the most likely.
 
-==Dotabuff data integration==
+### == Dotabuff data integration ==
 
 I wrote a dotabuff data ripper which means that I can automate item and talent builds
 based on recent behaviour at the top of ranked. So, if gyrocopter support is a meme build
@@ -67,30 +67,30 @@ but it was because of split pushing, a total accident that penetrated a weakness
 wombo combo style bots. Now, the bots 'play better', but lose out to RMM's strong desire
 for taking objectives -- Something VUL doesn't really understand yet. 13/10/22
 
-==Lua==
+### == Lua ==
 
 This codebase is very stubborn about disobeying coding practices that Lua expects of it's
 programmers, in order to improve performance. Modules/Files might be very messy where
 abstraction would make things neat. If it looks like garbage it's because I'm thinking
 about functional overhead.
 
-==Optimizing isn't finished==
+### == Optimizing isn't finished ==
 
 Let me know if this runs poorly on your computer, or worse than other bots.
 
 https://steamcommunity.com/sharedfiles/filedetails/?id=2872725543
 
-Vector mathematics do not use the Valve API wherever possible --
+Vector mathematics do not use the Valve API wherever possible -- <br/>
 I'm quite sure they are Valves compiled and optimized C++ -- I did this because
 I wanted to improve my vector mathematics.
 
-==Future progress==
+### == Future progress ==
 
 Bots aren't done, they can be much better and include grander strategy, but it's a
 lot of work and my main motivation currently is "it's something to do." If I could
 make a job out of this I'd be all over it.
 
-==Support==
+### == Support ==
 
 Please shoot me an email for any questions or to support the project:
 zyewchi@gmail.com
@@ -99,7 +99,7 @@ If you would like to support the project, my paypal is on the above email with t
 goofy robot icon. Support means I can justify more time to make them better. But
 also just a nice comment on the workshop page helps a lot.
 
-==Contact==
+### == Contact ==
 
 	zyewchi@gmail.com -- Mike
 	
