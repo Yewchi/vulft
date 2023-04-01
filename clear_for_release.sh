@@ -6,6 +6,8 @@ VULFT_TARGET=
 VULFT_STAGED=
 VULFT_SUCCESS=
 
+VULFT_GIT_README="README.md"
+
 PRINT_USAGE() {
 	printf "USAGE: ./clear_for_release.sh [--WORKSHOP||--GIT]\n "
 	printf "\tChecks for a valid release state for the specified target\n "
@@ -33,6 +35,14 @@ WORKSHOP_RETURN_TO_LOCAL_DEV() {
 			mv -v ../bots ../.bots.recentreleasable.d
 			sleep 1
 			mv -v ../.bots.recentstaged.d ../bots
+			sleep 1
+
+			read -p "Update the local dev script version to '$VERSION_SET' ?: " reply
+			if [[ $reply == [Yy] ]]; then
+				echo "Pushing the development version up.."
+				sed -i -e "s/VERSION = \"v[0-9]*\.[0-9]*.*/VERSION = \"$VERSION_SET\"/g" $VULFT_RELEASE_DIR/lib_util/util.lua
+				echo
+			fi
 		else
 			# FAILED
 			echo " -- Returning to pre-script copy -- "
@@ -129,6 +139,17 @@ REMOVE_DEV_LUA_LINES() {
 	fi
 }
 
+this_convert_file=
+PRINT_CONVERT_STEAM_TO_MD() {
+	cat $this_convert_file | sed 's/^\[url=\([^\]*\)\]\([^\[]*\)\[\/url\]/\[\2\](\1)/g'
+}
+
+this_convert_file=
+PRINT_CONVERT_MD_TO_STEAM() {
+	echo "$this_convert_file"
+	cat $this_convert_file | sed 's/\w*\[\([^\]*]\)(\([^)]*\))/\[url=\2\]\1\[\/url\]/g; s/\]\[/\[/g; s/!\[url=\([^'"]"']*\)\].*\[\/url\]/\[img\]\1\[\/img\]/g; s/^> //g; s/^[#]* //g; s/<br\/>//g'
+}
+
 if [[ $1 == "--WORKSHOP" ]] || [[ $1 == "--WS" ]]; then
 	echo "/VUL-FT/ Steam Workshop releasable state:"
 	VULFT_TARGET=WORKSHOP
@@ -167,18 +188,18 @@ if [[ $1 == "--WORKSHOP" ]] || [[ $1 == "--WS" ]]; then
 
 	CHECK_DEBUG_IS_OKAY
 
-	CHECK="provide steam README doc"
-	START_CHECK
-	if ! [[ -f README.steam ]]; then
-		read -p "There is no README.steam at $(pwd). Continue without a doc?: " reply
-		if ! [[ $reply =~ ^[Yy] ]]; then
-			NOT_OKAY_EXIT
-		fi
-		echo "... Continuing with supplying a README"
-	else
-		cp -v README.steam $VULFT_RELEASE_DIR/README
-	fi
-	OKAY
+#	CHECK="provide steam README doc"
+#	START_CHECK
+#	if ! [[ -f README.steam ]]; then
+#		read -p "There is no README.steam at $(pwd). Continue without a doc?: " reply
+#		if ! [[ $reply =~ ^[Yy] ]]; then
+#			NOT_OKAY_EXIT
+#		fi
+#		echo "... Continuing with supplying a README"
+#	else
+#		cp -v README.steam $VULFT_RELEASE_DIR/README
+#	fi
+#	OKAY
 
 	CHECK="remove DEV code"
 	START_CHECK
@@ -216,6 +237,28 @@ if [[ $1 == "--WORKSHOP" ]] || [[ $1 == "--WS" ]]; then
 	fi
 	OKAY
 
+	if [[ -f $VULFT_GIT_README ]]; then
+		tabchar=$'\n'
+		head -n 3 $VULFT_GIT_README | sed 's/\(.*\)/'"\\${tabchar}"'\1/g'
+		tail -n 7 $VULFT_GIT_README | sed 's/\(.*\)/'"\\${tabchar}"'\1/g'
+		echo
+		echo "The git $VUFLT_GIT_README file will be placed in the release folder. It is also the mardown README for git."
+
+		read -p "Edit $VULFT_GIT_README?: " reply
+		if [[ $reply == [Yy] ]]; then
+			vim README.md
+		fi
+		
+		cp $VULFT_GIT_README $VULFT_RELEASE_DIR/README
+		this_convert_file=$VULFT_GIT_README
+		echo "########### CONVERT TO STEAM FORMATTING ###############"
+		PRINT_CONVERT_MD_TO_STEAM
+		echo "########### ########################### ###############"
+	else
+		echo -n "\'README.steam\' not found in the local directory"; sleep 1; echo -n ". "; sleep 1; echo -n ". "; sleep 1; echo -n ". "
+		echo "... Ignoring."
+	fi
+
 	VULFT_SUCCESS=true
 
 	WORKSHOP_RETURN_TO_LOCAL_DEV
@@ -231,6 +274,12 @@ elif [[ $1 == "--GIT" ]]; then
 	REMOVE_DEV_LUA_LINES
 
 	VULFT_SUCCESS=true
+elif [[ $1 == "--steamtomd" ]]; then
+	this_convert_file=$2
+	PRINT_CONVERT_STEAM_TO_MD
+elif [[ $1 == "--mdtosteam" ]]; then
+	this_convert_file=$2
+	PRINT_CONVERT_MD_TO_STEAM
 else
 	PRINT_USAGE
 	exit;
