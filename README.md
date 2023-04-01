@@ -1,106 +1,97 @@
-Developer README.md
+VULFT - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 19/03/23. Requires manual install into vscripts/bots folder (all recently released bots have this issue). VUL-FT has no affiliation with DotaBuff.
 
-Development status: Fortnightly update (11/03/23)
+[Translations of This Page in Other Languages](https://github.com/Yewchi/vulft/blob/main/TRANSLATION.md)
 
-VUL-FT - Very U(gly, Unrolled, Unabstracted, and Fast) Lua Full Takeover for Dota 2
+== Manually installing ==
+VUL-FT currently will not work via subscription. It will revert to the default bots, it seems other recent bots have the same issue. I'm still investigating what is going wrong there. For now, it's necessary to manually install the bots.
 
-==Installing==
+Optional: Before setting VUL-FT as the local dev script, It may also be a good idea to backup your old 'vscript/bots' folder if you have another bot that you have stored there:
+The local dev bot folder is located at
+[drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots
+0) rename bots folder to bots.old.
+1) make a new folder named bots
+2) copy the VUL-FT files from either github or the workshop folder into the new bots folder.
 
-Please see the README.steam file for install instructions. If you have git, you can
-'git clone https://github.com/Yewchi/vulft.git' while in the directory:
+-- Via workshop local files: (the Valve-verified workshop files)
+After freshly subscribing, find the recent folder in
+[drive]:/%Program Files%/Steam/steamapps/workshop/content/570/2872725543
+and copy the contents of that folder to the bots folder at
+[drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
-	<%STEAM_DIR%>steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots
+-- Via Github: (updated by the creator)
+If you know how to use git you can manually download the bots from the [official VUL-FT Github](https://github.com/Yewchi/vulft) and put them in
+[drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/
 
-Alternatively, press the probably green "Code" button above, and download the repo
-as a zip, and unzip it to the same folder stated above.
+-- Running:
+After one of the above steps are complete, you can run the bots by navigating in-game to
+Custom Lobbies -> Create -> Edit:
+Under BOT SETTINGS change team bots to Local Dev Script (if you still want to fight the Valve bots, note that there is an option for "Default Bots" here as well)
+Change SERVER LOCATION to LOCAL HOST (your computer).
+Difficulty has no effect yet.
+Press OK.
+Join the top slot of either team.
+Press START GAME.
 
-==Project workflow==
+Alternatively, you may use "Play VS Bots" option but not all heroes are implemented. Sorry about all of this, but it is just the effect of having to run the bots as a dev, rather than via the workshop.
 
-Project workspaces can be viewed in the vim sessions (enter g then CTRL+T to tab through):
+==Features==
+![Animated gif of VUL-FT engaged in a teamfight](https://steamuserimages-a.akamaihd.net/ugc/2028349340710795317/22D68EA70AEF6E343BBE3EBD5F1A3EF1C52F5A04/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false)
+Dynamic fight decision making.
+More player-like.
+![Animated gif of Muerta bot running from orb walking enemies](https://steamuserimages-a.akamaihd.net/ugc/2009206964554280836/186F1E4C8B555F0D06352C96399941EBBD9A29E5/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false)
+Orb Walking.
+Advanced item management.
+Automatically generated and filtered for error ward locations, if the map ever changes.
+DotaBuff parser for averaged out of 5 game skill build, roles and an item build from Divine - Immortal players that week.
+Basic jungling in downtime.
+They may jungle self-deny in the early game if they get caught by the enemy.
+Dynamic retreat, to friendly towers (unless the tower gets overrun), or to friendly allies in the direction of the allied fountain.
+Bounty rune task allocation based on proximity, safety, fog, greed rating
+Tower defense allocation based on required threat. (No 5-man deathballs because you looked rudely at a tower).
+Lower CPU usage than other popular bots.
+Bugs!
 
-	vim -S .taskwf
-	vim -S .anwf
-	vim -S .syswf
-	vim -S .herowf
-	
-or alternatively in bash
-	. .wf
+In addition. I promise this project's code is 100% functional offline and will stay that way. No networking API functions, ever.
 
-==Full-takeover==
+==Error Report==
+[Lua Error Dump (steam discussion link)](https://steamcommunity.com/workshop/filedetails/discussion/2872725543/3648503910213521285/) -- Use this if you just want to quickly dump some console output.
+[VUL-FT source code](https://github.com/Yewchi/vulft) -- Public github
 
-I need to explain why I overrode the mode_x.lua files for a full-takeover bot:
-I'm unable to make the bots pick up river bounty runes. I've tried many silly things. So
-the full takeover is conducted by forcing mode_roam into a 100% desire state, running the
-bots within 'roam', and disabling the full-takeover by setting roam's desire to 0% for a
-bot near a river bounty rune when it is available, allowing the bots to engage default
-behaviour for less than a second, hopefully long enough to pick up the rune, but short
-enough to prevent any major behavioural shifts. After the 0:00 minute runes are seen to be
-missing or a hard-coded cut-off time in the early game (the 'other' water rune is broken),
-bot_generic is signaled to override Think(). So the bots spend less than a second on
-default mode, and the hook is removed to be a total override after the bounty runes.
+==Not yet implemented==
+The player can only choose their lane and role in the first 30 seconds of a match.
+Macro fight behaviour, initiator choice, grander strats like cutting losses, trading towers. They will assess the current aggressive plays being made and see if they think it's worth it for themselves, if an enemy is occupied attacking someone else. Enemy fight intent is tracked and loses magnitude based on facing direction, this allows allies to recognize trading without being attacked.
+Player-to-bot ping communication.
+Enemy vision assessments.
+Dewarding.
+Sentry and dust for enemy stealth.
+Outposts.
+Illusions are controlled by default behaviour. (But arc warden double is full-takeover).
+Enemy fountain threat.
+Avoid zones.
+Response types for ability casts. (Rupture: Avoid unnecessary movement)
+Structural enemy unit-health units. (tombstone, supernova)
+Attacking and avoiding hero creep units. (Lycan wolves, Broodmother spiders)
+Roshan.
+Denying towers.
 
-I might keep the bots in the flippable hook at some point in the future so that extra runes
-and water runes can always be picked up with this method. I would rather make proof of
-concept of the full-takeover and also of the hookable behaviour at the same time, for now.
-However, if this is the solution followed, it might mean other problems in the future;
-item management being interrupted by default bots being the most likely.
+==Known issues==
+Picking may over-select for core roles.
+Middle lane may have a difficult time outplaying the opposing mid -- much better in safe or offlane where they can trade.
+Some tasks are not well informed by threat analytics code, not all tasks use intelligent movement functions to adjust vectors around dangerous areas.
+Junk is not correctly sold (DotaBuff meta parser is not complete, and there may be additional junk buys incorrectly parsed into the build, item builds are calculated for their combines, however, the junk is incorrectly evaluated and the wrong item may be sold when 9-slotted).
 
-==Dotabuff data integration==
+Many other things.
 
-I wrote a dotabuff data ripper which means that I can automate item and talent builds
-based on recent behaviour at the top of ranked. So, if gyrocopter support is a meme build
-that is used half of games, then the scoring would be increased for gyro to be given a
-support role.
+Runes for full-takeover bots:
+-- bottom water runes cannot be picked up.
+-- river bounty runes cannot be picked up.
+-- any runes that are stacked up on by another bounty rune cannot be picked up.
+These three rune issues are all technically true, but there is a workaround in place. During the early stage of the game, the bots run as a partial takeover bot, all modes are set to do nothing, ability_item_usage state is set to 100% desire, and the bots use that as a hook to the full-takeover code. When they stand next to a rune, rune mode is engaged for a split second, in the hope that they will pick up the bounty rune. Once the runes are picked up, or after a short while, a handover is completed to cut the default bot code off completely and the bot_generic Think function is defined.
 
-However, the itemization is not completed and is a static rip of the most recent Dotabuff
-Guide (i.e. a recent match build). It was hoped to separate the item builds into logic
-around the role chosen, and also to detect commonly-taken-with items. There is also no
-taken-with logic in the skill build, and the resulting skill and talent build is
-whatever most resembles all 5 recent matches the most. This means a hero in a support
-role that showed most recently a core match on Dotabuff may build core items, or
-inversely a core may end up with a support match's build, at least for now.
+==Project State==
+Alpha version. Please give feedback.
+Is the project currently stable: Stable, no game crashes or script breaking over 10 matches 30/03/23 (March 30)
+Last DotaBuff meta update: 19/03/23
 
-yet to summon any demons from the pit of hell for parsing html in C.
-
-Update frequency will be based on subs, I guess. We still lose to RMM.. we used to win,
-but it was because of split pushing, a total accident that penetrated a weakness in
-wombo combo style bots. Now, the bots 'play better', but lose out to RMM's strong desire
-for taking objectives -- Something VUL doesn't really understand yet. 13/10/22
-
-==Lua==
-
-This codebase is very stubborn about disobeying coding practices that Lua expects of it's
-programmers, in order to improve performance. Modules/Files might be very messy where
-abstraction would make things neat. If it looks like garbage it's because I'm thinking
-about functional overhead.
-
-==Optimizing isn't finished==
-
-Let me know if this runs poorly on your computer, or worse than other bots.
-
-https://steamcommunity.com/sharedfiles/filedetails/?id=2872725543
-
-Vector mathematics do not use the Valve API wherever possible --
-I'm quite sure they are Valves compiled and optimized C++ -- I did this because
-I wanted to improve my vector mathematics.
-
-==Future progress==
-
-Bots aren't done, they can be much better and include grander strategy, but it's a
-lot of work and my main motivation currently is "it's something to do." If I could
-make a job out of this I'd be all over it.
-
-==Support==
-
-Please shoot me an email for any questions or to support the project:
+==Dev contact==
 zyewchi@gmail.com
-
-If you would like to support the project, my paypal is on the above email with the
-goofy robot icon. Support means I can justify more time to make them better. But
-also just a nice comment on the workshop page helps a lot.
-
-==Contact==
-
-	zyewchi@gmail.com -- Mike
-	
-Always happy to answer any technical questions about the project.
