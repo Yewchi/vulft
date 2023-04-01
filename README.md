@@ -2,7 +2,7 @@ VULFT - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles
 <br/>
 [Translations of This Page in Other Languages](https://github.com/Yewchi/vulft/blob/main/TRANSLATION.md)<br/>
 <br/>
-##== Manually installing ==<br/>
+## == Manually installing ==
 VUL-FT currently will not work via subscription. It will revert to the default bots, it seems other recent bots have the same issue. I'm still investigating what is going wrong there. For now, it's necessary to manually install the bots.<br/>
 <br/>
 Optional: Before setting VUL-FT as the local dev script, It may also be a good idea to backup your old 'vscript/bots' folder if you have another bot that you have stored there:<br/>
