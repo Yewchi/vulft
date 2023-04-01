@@ -18,15 +18,14 @@ The local dev bot folder is located at<br/>
 ### -- Via workshop local files: (the Valve-verified workshop files)
 After freshly subscribing, find the recent folder in<br/>
 > [drive]:/%Program Files%/Steam/steamapps/workshop/content/570/2872725543<br/>
+
 and copy the contents of that folder to the bots folder at<br/>
 > [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/<br/>
 <br/>
 
 ### -- Via Github: (updated by the creator)
 If you know how to use git you can manually download the bots from the [official VUL-FT Github](https://github.com/Yewchi/vulft) and put them in
-```
-[drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/<br/>
-```
+> [drive]:/%Program Files%/Steam/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/<br/>
 <br/>
 
 ### -- Running:
