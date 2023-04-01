@@ -7,7 +7,7 @@ These are to help you install the bots, as it requires moving some workshop file
 | Language | Link |
 | :--- | :---: |
 | Arabic | [العربية](README-Arabic.ara.md) |
-| Chinese (Simplified) | [简体中文](README-Chinese.zho.md) |
+| Chinese (Simplified) | [简体中文](https://steamcommunity.com/groups/VULFT/discussions/0/5940851423460775827/) |
 | Filipino | [Filipino](README-Filipino.fil.md) |
 | French | [Français](README-French.fra.md) |
 | German | [Deutche](README-German.deu.md) |
