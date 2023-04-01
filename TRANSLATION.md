@@ -9,7 +9,7 @@ These are to help you install the bots, as it requires moving some workshop file
 | Arabic | [العربية](README-Arabic.ara.md) |
 | Chinese (Simplified) | [简体中文](README-Chinese.zho.md) |
 | Filipino | [Filipino](README-Filipino.fil.md) |
-| French | [French](README-French.fra.md) |
+| French | [Français](README-French.fra.md) |
 | German | [Deutche](README-German.deu.md) |
 | Hindi | [हिंदी](README-Hindi.hin.md) |
 | Indonesian | [bahasa Indonesia](README-Indonesian.ind.md) |
