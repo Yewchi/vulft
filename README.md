@@ -18,10 +18,10 @@ as a zip, and unzip it to the same folder stated above.
 
 Project workspaces can be viewed in the vim sessions (enter g then CTRL+T to tab through):
 
->	vim -S .taskwf
->	vim -S .anwf
->	vim -S .syswf
->	vim -S .herowf
+>	vim -S .taskwf<br/>
+>	vim -S .anwf<br/>
+>	vim -S .syswf<br/>
+>	vim -S .herowf<br/>
 	
 or alternatively in bash
 	. .wf
