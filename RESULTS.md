@@ -123,6 +123,7 @@ In a fresh instance of Dota 2 that had not yet loaded a bot match.
 > [VScript] 3	tries grab	3</br>
 > [VScript] POWERUP1	0	POWERUP2	1	BOUNTY1	2	BOUNTY2	3	BOUNTY3	4	BOUNTY4	5</br>
 > [VScript] 4	tries grab	4</br>
-</br>
+
+
 ### 18:00+
 	Behaviour repeats
