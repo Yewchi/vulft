@@ -80,6 +80,8 @@ In a fresh instance of Dota 2 that had not yet loaded a bot match.
 
 
 ### 12:00
+	Same action as 0:00
+	
 	Same action as 8:00 from Dire.
 
 	(PID#6 and PID#7 die to lane creeps at top rune)
@@ -87,10 +89,15 @@ In a fresh instance of Dota 2 that had not yet loaded a bot match.
 ### 14:00
 	All players respawned in fountain ignore rune.
 
+### 15:00
+	Same action as 0:00
+
 ### 16:00
 	All players respawned in fountain ignore bot regen rune.
 
 ### 18:00
+	Same action as 0:00
+
 	All players respawned in fountain ignore top invis rune with:
 
 > [VScript] Rune status:	-1	0</br>
