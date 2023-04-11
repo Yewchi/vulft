@@ -38,7 +38,7 @@ In a fresh instance of Dota 2 that had not yet loaded a bot match.
 
 	Bottom river bounty is ignored.
 
-	The top bounty rune is not picked up.
+	The top river bounty rune is not picked up.
 
 ### 3:00
 	Same action as 0:00
@@ -55,7 +55,7 @@ In a fresh instance of Dota 2 that had not yet loaded a bot match.
 
 	PID#7 exits fountain to grab the arcane rune once PID#6 reveals it with hero vision.
 
-	The bottom bounty rune is not picked up.
+	The bottom river bounty rune is not picked up.
 
 ### 8:00
 	A haste rune spawns top.
