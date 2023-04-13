@@ -1,6 +1,6 @@
 ---
 name: "[error // game crash]"
-about: the bots are completely broken, none of the bots work, and they never return
+about: the bots are completely broken, an entire team of bots won't move, and they never return
   to normal
 title: "[error/crash] Enter short description here"
 labels: error
