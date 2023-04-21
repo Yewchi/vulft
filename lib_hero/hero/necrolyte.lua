@@ -1,16 +1,16 @@
 local hero_data = {
 	"necrolyte",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 3, 1, 3, 1, 4, 1, 2, 3, 3, 5, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_tango","item_faerie_fire","item_circlet","item_mantle","item_ward_observer","item_branches","item_branches","item_null_talisman","item_cloak","item_boots","item_relic","item_radiance","item_magic_wand","item_hood_of_defiance","item_eternal_shroud","item_aghanims_shard","item_platemail","item_arcane_boots","item_lotus_orb","item_soul_booster","item_energy_booster","item_void_stone","item_octarine_core","item_blink","item_overwhelming_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_heart",
+		"item_branches","item_tango","item_circlet","item_magic_stick","item_branches","item_branches","item_null_talisman","item_boots","item_arcane_boots","item_wind_lace","item_magic_wand","item_mekansm","item_cloak","item_buckler","item_hood_of_defiance","item_guardian_greaves","item_ogre_axe","item_belt_of_strength","item_sange","item_kaya","item_kaya_and_sange","item_reaver","item_vitality_booster","item_heart","item_sphere","item_black_king_bar",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
 		"Death Pulse","Ghost Shroud","Heartstopper Aura","Reaper's Scythe","+100 Reaper's Scythe Cast Range","+2s Heartstopper Aura Stack Duration","+24% Ghost Shroud Slow","+32 Death Pulse Heal","+15% Ghost Shroud Self Restoration Amp","+32% Heartstopper Regen Reduction","+0.5% Heartstopper Aura Damage","-2.5s Death Pulse Cooldown",
 	}
 }
 --@EndAutomatedHeroData
-THIS_INCLUDED_PICK_STAGE_DATA = hero_data
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 	[0] = {"necrolyte_death_pulse", ABILITY_TYPE.NUKE + ABILITY_TYPE.AOE + ABILITY_TYPE.HEAL},
@@ -51,6 +51,7 @@ d = {
 		-- TODO nb. the only time that heroes need HighUse mana admustments after update is when they have
 		-- strange utility spells, or spells which are intentionally not balanced to their cost for this or
 		--Util_TablePrint(gsiPlayer.highUseMana)
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

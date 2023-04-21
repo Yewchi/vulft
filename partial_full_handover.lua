@@ -30,12 +30,19 @@ local total_time_default_bot_control = 0
 local t_personal_bot_generic_triggers = {}
 local t_personal_job_domain_to_delete = {}
 -------- PFH_RegisterPersonalMicrothinkTriggerOfBotGeneric()
--- - - Engage the Think = func behaviour, deleting spurious default bot behaviour
+-- - - Engage the Think = func behavior, deleting spurious default bot behavior
 -- - -- such as item slot switching against the full-takeover's will. Used after
 -- - -- the otherwise unacquirable river runes are aqcuired.
 local abc = 0
 
 require(GetScriptDirectory().."/lib_util/time")
+
+function PFH_CancelMyHandoverForPosition5Bounties(gsiPlayer)
+	-- Usused, vantage needs to know wards are held, 5 can't be rune guy.
+	-- - So all heroes are rune guy until they hold 7 items.
+	t_personal_bot_generic_triggers[gsiPlayer.hUnit] = nil
+	t_personal_job_domain_to_delete[gsiPlayer.hUnit] = nil
+end
 
 function PFH_HaveNotExceededTimeInDefaultBots(gsiPlayer)
 	if total_time_default_bot_control < TOTAL_TIME_ALLOWED_IN_DEFAULT_BOTS then
@@ -61,12 +68,14 @@ function PFH_RegisterTempPersonalJobDomain(hUnit, jobDomain)
 	--print("checked in #:", xyz)
 end
 
-function PFH_TriggerHandoverToBotGeneric()
-	local botGenericReady=0
+-- Poorly refactored for individual handovers (happens at 7+ items held)
+local count_bots_handed_over = 0
+function PFH_TriggerHandoverToBotGeneric(gsiPlayer)
+	local botGenericReady = count_bots_handed_over
 	for _,_ in pairs(t_personal_bot_generic_triggers) do
 		botGenericReady = botGenericReady + 1
 	end
-	local abilityItemUsageGenericReady=0
+	local abilityItemUsageGenericReady = count_bots_handed_over
 	for _,_ in pairs(t_personal_job_domain_to_delete) do
 		abilityItemUsageGenericReady = abilityItemUsageGenericReady + 1
 	end
@@ -76,15 +85,20 @@ function PFH_TriggerHandoverToBotGeneric()
 		return
 	end
 	INFO_print( string.format(
-				"'%s' governing PFH's handover to bot_generic::Think().",
+				"'%s' doing it's own PFH handover to bot_generic::Think() for full-takeover.",
 				GetBot():GetUnitName()
 			)
 		)
 	for hUnit,botGenericTrigger in pairs(t_personal_bot_generic_triggers) do
-		botGenericTrigger()
-		t_personal_job_domain_to_delete[hUnit]:DeleteDomain()
+		if hUnit == gsiPlayer.hUnit then
+			botGenericTrigger()
+			t_personal_job_domain_to_delete[hUnit]:DeleteDomain()
+			gsiPlayer.awaitsDefaultBotsInterruptedFullTakeoverForHookHandoverToFull = false
+			t_personal_bot_generic_triggers[hUnit] = nil
+			t_personal_job_domain_to_delete[hUnit] = nil
+			count_bots_handed_over = count_bots_handed_over + 1
+			break;
+		end
 	end
-	t_personal_bot_generic_triggers = nil
-	t_personal_job_domain_to_delete = nil
 	-- ability_item_usage_generic will shut off it's entry to the full-takeover code
 end

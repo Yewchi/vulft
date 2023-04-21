@@ -1,16 +1,16 @@
 local hero_data = {
 	"ancient_apparition",
-	{3, 1, 3, 1, 2, 4, 2, 2, 2, 5, 3, 4, 3, 1, 7, 1, 4, 9, 12},
+	{3, 1, 3, 1, 1, 4, 1, 2, 2, 2, 2, 4, 5, 3, 7, 3, 4, 9},
 	{
-		"item_ward_sentry","item_branches","item_tango","item_branches","item_faerie_fire","item_branches","item_enchanted_mango","item_magic_wand","item_boots","item_fluffy_hat","item_aghanims_shard","item_arcane_boots","item_force_staff","item_gem","item_pers","item_lotus_orb","item_gem","item_tranquil_boots","item_ancient_janggo","item_gem","item_boots_of_bearing","item_gem","item_gem",
+		"item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_gloves","item_hand_of_midas","item_magic_wand","item_boots","item_belt_of_strength","item_gloves","item_power_treads","item_staff_of_wizardry","item_void_stone","item_cyclone","item_aghanims_shard","item_staff_of_wizardry","item_robe","item_kaya","item_kaya_and_sange","item_pers","item_ultimate_orb","item_sphere","item_mystic_staff",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,2,}, {5,5,5,5,2,}, 0.1 },
 	{
 		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+300 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+300 Cold Feet Breaking distance","-5% Ice Vortex Slow/Increased Magic Damage","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 	[0] = {"ancient_apparition_cold_feet", ABILITY_TYPE.DEGEN + ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN},
@@ -40,6 +40,7 @@ local currentTask = Task_GetCurrentTaskHandle
 local currentActivity = Blueprint_GetCurrentTaskActivityType
 local ACTIVITY_TYPE = ACTIVITY_TYPE
 local VERY_UNTHREATENING_UNIT = VERY_UNTHREATENING_UNIT
+local HIGH_USE = AbilityLogic_HighUseAllowOffensive
 local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 local HANDLE_AUTOCAST_GENERIC = AbilityLogic_HandleAutocastGeneric
 
@@ -51,11 +52,15 @@ local max = math.max
 local abs = math.abs
 
 local t_player_abilities = {}
+local t_ice_vortex_locations = {}
+for i=1,TEAM_NUMBER_OF_PLAYERS do
+	t_ice_vortex_locations[i] = {}
+end
 
 local ice_blast_parameters = {0, 0, ZEROED_VECTOR, ZEROED_VECTOR, 0} -- {timestampCast, distanceToStartTracking, originLoc, unitDirectional, closestEnemyDistSeenSinceLimit}
 
 local function ice_blast_time_landing_with_distance(dist)
-	return dist > I_B_USE_UPPER_TRAVEL_DIST and I_B_PROJECTILE_UPPER_TRAVEL_TIME or dist / I_B_PROJECTILE_LOWER_TRAVEL_SPEED
+	return dist > I_B_USE_UPPER_TRAVEL_DIST and I_B_PROJECTILE_UPPER_TRAVEL_TIME or max(0, (dist-200)) / I_B_PROJECTILE_LOWER_TRAVEL_SPEED
 end
 
 local function set_inner_to_outer(tracerLoc, sendTracerTime)
@@ -131,10 +136,12 @@ local function ice_blast_release_limit_loss_of_range(gsiPlayer, hAbility)
 	end
 end
 
-local function ice_blast_start_cast(gsiPlayer, target)
+local function ice_blast_start_cast(gsiPlayer, target, useLoc)
 	local ibp = ice_blast_parameters
-	local distanceToPlayerNow = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, target.lastSeen.location)
+	local distanceToPlayerNow = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, useLoc or target.lastSeen.location)
 	local extrapolatedLocation = target.hUnit:GetExtrapolatedLocation(distanceToPlayerNow/I_B_TRACER_SPEED + ice_blast_time_landing_with_distance(distanceToPlayerNow))
+	extrapolatedLocation = useLoc and Vector_PointBetweenPoints(extrapolatedLocation, useLoc)
+				or extrapolatedLocation
 	local unitDirectional = Vector_UnitDirectionalPointToPoint(gsiPlayer.lastSeen.location, extrapolatedLocation)
 	local extrapolatedDistance = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, extrapolatedLocation)
 	
@@ -147,6 +154,64 @@ local function ice_blast_start_cast(gsiPlayer, target)
 	UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam][4], extrapolatedLocation, 400)
 end
 
+local function remove_ice_vortex(gsiPlayer)
+	local ivTbl = t_ice_vortex_locations[gsiPlayer.nOnTeam]
+	local currTime = GameTime()
+	local i = 1
+	while(i<#ivTbl) do
+		if ivTbl[i][2] < currTime then
+			table.remove(ivTbl, i)
+		else
+			i = i + 1
+		end
+	end
+end
+
+local function correct_ice_vortex(gsiPlayer, iceVortex, location, radius)
+	local ivTbl = t_ice_vortex_locations[gsiPlayer.nOnTeam]
+	radius = radius or iceVortex:GetSpecialValueInt("radius") + 50
+	for i=1,#ivTbl do
+		local thisLoc = ivTbl[i][1]
+		if Vector_PointDistance2D(location, thisLoc) > radius then
+			return nil
+		end
+	end
+	table.insert(ivTbl, {location, GameTime() + iceVortex:GetSpecialValueFloat("vortex_duration")})
+	return location
+end
+
+-- TODO "Initialize()" needs to work for enemies, and the data is wanted anyways.
+-- rubick enters the ability run func, pretends he's the hero, and hooks CAN_BE_CAST
+-- so that if it asks for any spell besides his stolen spell it responds with false.
+-- Means that player abilities tables need to be removed, or made to two teams.
+-- they are practically useless anyways.
+		SpecialBehavior_RegisterBehavior("useItemArmletOverride",
+				function(gsiPlayer, hItem)
+					local hUnit = gsiPlayer.hUnit
+					if hUnit:HasModifier("modifier_ancient_apparition_ice_blast") then
+						local modIndex = hUnit:GetModifierByName("modifier_ancient_apparition_ice_blast")
+						local remainingTime = hUnit:GetModifierRemainingDuration(modIndex)
+						if hItem:GetToggleState() and gsiPlayer.lastSeenHealth then
+							local aa = GSI_GetPlayerByName("ancient_apparition")
+							local aaIceBlastLevel = not aa and 2
+									or math.max(1, math.min(3, math.floor(aa.level/6)))
+							local dps = ITEM_ARMLET_HEALTH_DRAIN_PER_SECOND + d.ice_blast_dps[aaIceBlastLevel]
+							if ( ( gsiPlayer.lastSeenHealth - dps * remainingTime)
+											/ gsiPlayer.maxHealth
+										) - d.ice_blast_kill_percent[aaIceBlastLevel]
+									< 0 then
+								return true
+							elseif gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth > 0.5 then
+								return false
+							end
+						else
+							return false
+						end
+					end
+					return nil
+				end
+			)
+
 local d
 d = {
 	["Initialize"] = function(gsiPlayer)
@@ -156,11 +221,14 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["cold_feet_cast_range"] = {[0] = 1000, 700, 800, 900, 1000},
 	["ColdFeetCastRange"] = function(gsiPlayer) return d.cold_feet_cast_range[t_player_abilities[gsiPlayer.nOnTeam][1]:GetLevel()] end,
 	["chilling_touch_bonus_range"] = {[0] = 0, 60, 120, 180, 240},
 	["ChillingTouchBonusRange"] = function(gsiPlayer) return d.chilling_touch_bonus_range[t_player_abilities[gsiPlayer.nOnTeam][3]:GetLevel()] end,
+	["ice_blast_dps"] = {[0] = 32, 12.5, 20, 32}, -- 7.32e
+	["ice_blast_kill_percent"] = {[0] = 14, 12, 13, 14}, -- 7.32e
 	["AttackRange"] = function(gsiPlayer) return gsiPlayer.hUnit:GetAttackRange() + t_player_abilities[gsiPlayer.nOnTeam][3]:GetAutoCastState() and d.ChillingTouchBonusRange(gsiPlayer) or 0 end,
 	["AbilityThink"] = function(gsiPlayer)
 		local thisPlayerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
@@ -170,6 +238,9 @@ d = {
 		local iceBlast = thisPlayerAbilities[4]
 		local iceBlastRelease = thisPlayerAbilities[5]
 		local chillingTouchOnCd = chillingTouch:GetCooldownTimeRemaining() > 0 -- gsiPlayer.attackRange is updated when on
+
+		remove_ice_vortex(gsiPlayer)
+
 		local abilityLocked, _, abilityQueued = UseAbility_IsPlayerLocked(gsiPlayer) 
 		local currTask = currentTask(gsiPlayer)
 		local currActivityType = Blueprint_GetCurrentTaskActivityType(gsiPlayer)
@@ -178,7 +249,13 @@ d = {
 			gsiPlayer.attackRange = gsiPlayer.hUnit:GetAttackRange()
 		end
 
+		print(chillingTouch:GetDuration())
+
+		local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 1350, false)
+
 		HANDLE_AUTOCAST_GENERIC(gsiPlayer, chillingTouch)
+
+		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, coldFeet:GetCastRange(), 5)
 
 		 -- Check if we need to release ice blast
 		if abilityQueued ~= iceBlastRelease and ice_blast_release_limit_loss_of_range(gsiPlayer, iceBlastRelease) then
@@ -194,21 +271,67 @@ d = {
 					local targetHealthPercent = Unit_GetHealthPercent(fightHarassTarget)
 					if AbilityLogic_AbilityCanBeCast(gsiPlayer, coldFeet) and targetStability < 0.2 and AbilityLogic_HighUseAllowOffensive(gsiPlayer, coldFeet, HIGH_USE_C_F_REMAINING_MANA, targetHealthPercent) then
 						--print(gsiPlayer.hUnit.Action_UseAbilityOnEntity)
+
 						USE_ABILITY(gsiPlayer, coldFeet, fightHarassTarget, 400, nil, nil, nil, nil,
 								gsiPlayer.hUnit.Action_UseAbilityOnEntity)
 						return
 					end
 				end
-				if fightHarassTarget and not fightHarassTarget.typeIsNone and fightHarassTarget.hUnit:HasModifier("modifier_cold_feet") and AbilityLogic_AbilityCanBeCast(gsiPlayer, iceVortex) then
-					USE_ABILITY(gsiPlayer, iceVortex, fightHarassTarget.lastSeen.location, 400, nil)
-					return
+				local totalHeat = FightClimate_GetEnemiesTotalHeat(nearbyEnemies, true)
+				if AbilityLogic_AbilityCanBeCast(gsiPlayer, iceVortex) then
+					if fightHarassTarget.hUnit:HasModifier("modifier_cold_feet")
+							or ( totalHeat < 0.35 or totalHeat > 0.99
+							and currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+							and AbilityLogic_HighUseAllowOffensive(gsiPlayer, iceVortex,
+									HIGH_USE_I_V_REMAINING_MANA,
+									fightHarassTarget.lastSeenHealth / fightHarassTarget.maxHealth
+								)
+							) then
+						local stability = fightHarassTarget.hUnit:GetMovementDirectionStability()
+						local vortexLoc = stability == 0 and fightHarassTarget.lastSeen.location
+								or Vector_Addition(fightHarassTarget.lastSeen.location,
+										Vector_ScalarMultiply(
+											Vector_UnitDirectionalFacingDirection(
+													fightHarassTarget.hUnit:GetFacing()
+												),
+											stability * 200
+										)
+									)
+						if correct_ice_vortex(gsiPlayer, iceVortex, vortexLoc, 350 + 200*stability) then
+							USE_ABILITY(gsiPlayer, iceVortex, vortexLoc, 400, nil)
+							return
+						end
+					elseif HIGH_USE(gsiPlayer, iceVortex, HIGH_USE_I_V_REMAINING_MANA, 0.75) then
+		 --[[NICE]]		local escapeBez
+								= SearchFog_GetNearbyBezier(gsiPlayer.lastSeen.location,
+										iceVortex:GetCastRange()
+									)
+						if escapeBez then
+							for i=1,#escapeBez do
+								local escapeLoc = escapeBez[i]
+								escapeLoc = escapeLoc and escapeLoc:computeForwards(0.05)
+								if escapeLoc and not IsLocationVisible(escapeLoc)
+										and IsLocationPassable(escapeLoc)
+										and correct_ice_vortex(gsiPlayer, iceVortex, escapeLoc, 600)
+										and Vector_PointDistance(escapeLoc, gsiPlayer.lastSeen.location)
+											< iceVortex:GetCastRange() then
+									USE_ABILITY(gsiPlayer, iceVortex, escapeBez, 400, nil)
+									return;
+								end
+							end
+						end
+					end
 				end
 			end
-			local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, coldFeet:GetCastRange())
 			if AbilityLogic_AbilityCanBeCast(gsiPlayer, coldFeet) then
 				for i=1,#nearbyEnemies do
 					local thisEnemy = nearbyEnemies[i]
-					if (thisEnemy.hUnit:IsRooted() or (thisEnemy.hUnit:IsStunned() and Unit_GetHealthPercent(thisEnemy) > 0.15)) and AbilityLogic_HighUseAllowOffensive(gsiPlayer, coldFeet, HIGH_USE_C_F_REMAINING_MANA, Unit_GetHealthPercent(thisEnemy)) then
+					if not pUnit_IsNullOrDead(thisEnemy)
+							and (thisEnemy.hUnit:IsRooted() or (thisEnemy.hUnit:IsStunned())
+							and Unit_GetHealthPercent(thisEnemy) > 0.15)
+							and AbilityLogic_HighUseAllowOffensive(gsiPlayer, coldFeet, 
+									HIGH_USE_C_F_REMAINING_MANA,
+									Unit_GetHealthPercent(thisEnemy)) then
 						USE_ABILITY(gsiPlayer, coldFeet, thisEnemy, 400, nil)
 						return
 					end
@@ -218,8 +341,11 @@ d = {
 					and AbilityLogic_HighUseAllowOffensive(gsiPlayer, iceVortex, HIGH_USE_I_V_REMAINING_MANA, Unit_GetHealthPercent(fightHarassTarget)) then
 				local nearestTower = Set_GetNearestTeamTowerToPlayer(TEAM, gsiPlayer)
 				local towerLoc = nearestTower and nearestTower.lastSeen.location
-				if nearestTower and Math_PointToPointDistance2D(fightHarassTarget.lastSeen.location, towerLoc) < 700 then
+				if nearestTower and Vector_PointDistance2D(fightHarassTarget.lastSeen.location, towerLoc)
+							< 700
+						and correct_ice_vortex(gsiPlayer, iceVortex, fightHarassTarget.lastSeen.location) then
 					USE_ABILITY(gsiPlayer, iceVortex, fightHarassTarget.lastSeen.location, 400, nil)
+					return;
 				end
 				if currActivityType > ACTIVITY_TYPE.CAREFUL then
 					if Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, iceVortex:GetCastRange())[1] then
@@ -245,9 +371,14 @@ d = {
 					if lowestFightingHere then
 						local fightingHerePercentHealth = lowestFightingHere.lastSeenHealth / lowestFightingHere.maxHealth
 						local fightingHereStability = lowestFightingHere.hUnit:GetMovementDirectionStability()
-						if (fightingHerePercentHealth < 0.311 and fightingHereStability > 0.6
+						local crowdedLoc, crowdedRating
+								= Set_GetCrowdedRatingToSetTypeAtLocation(lowestFightingHere.lastSeen.location,
+										SET_HERO_ENEMY, fightingHere, 250
+									)
+
+						if (fightingHerePercentHealth < 0.311+crowdedRating/3+0.15*(#nearbyAllies + Analytics_GetTheoreticalDangerAmount(gsiPlayer)) and fightingHereStability > 0.6
 								and AbilityLogic_HighUseAllowOffensive(gsiPlayer, iceBlast, HIGH_USE_I_B_REMAINING_MANA, fightingHerePercentHealth)) or playerHealthPercent < 0.2 then
-							ice_blast_start_cast(gsiPlayer, lowestFightingHere)
+							ice_blast_start_cast(gsiPlayer, lowestFightingHere, #fightingHere > 1 and crowdedLoc)
 						end
 					else
 						local lowestFightingElsewhere = Unit_LowestHealthPercentPlayer(fightingElsewhere)
@@ -291,6 +422,7 @@ d = {
 		end
 	end
 }
+
 local hero_access = function(key) return d[key] end
 
 do

@@ -1,21 +1,22 @@
 local hero_data = {
 	"lina",
-	{2, 3, 1, 1, 3, 4, 3, 2, 2, 5, 2, 4, 1, 1, 7, 3, 9, 4, 12},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 2, 2, 4, 2, 3, 8, 5, 4, 9, 12},
 	{
-		"item_ward_observer","item_tango","item_branches","item_branches","item_faerie_fire","item_branches","item_sobi_mask","item_magic_stick","item_bottle","item_boots","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_magic_wand","item_blink","item_maelstrom","item_rod_of_atos","item_gungir","item_ultimate_orb","item_sphere","item_lifesteal","item_satanic",
+		"item_branches","item_branches","item_tango","item_branches","item_faerie_fire","item_ward_observer","item_bottle","item_boots","item_wind_lace","item_null_talisman","item_energy_booster","item_arcane_boots","item_aether_lens","item_aghanims_shard","item_staff_of_wizardry","item_point_booster","item_ultimate_scepter","item_staff_of_wizardry","item_robe","item_kaya","item_point_booster","item_octarine_core","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_staff_of_wizardry","item_cyclone","item_mystic_staff","item_wind_waker","item_blink","item_arcane_blink","item_ultimate_scepter_2","item_pers","item_refresher","item_aeon_disk",
 	},
-	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,4,1,}, 0.1 },
 	{
-		"Dragon Slave","Light Strike Array","Fiery Soul","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+250 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure and pierces Spell Immunity",
+		"Dragon Slave","Light Strike Array","Fiery Soul","Flame Cloak","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+250 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure and pierces Spell Immunity",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"lina_dragon_slave", ABILITY_TYPE.NUKE + ABILITY_TYPE.AOE},
 		{"lina_light_strike_array", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN},
 		{"lina_fiery_soul", ABILITY_TYPE.PASSIVE},
+		{"lina_flame_cloak", ABILITY_TYPE.SHIELD + ABILITY_TYPE.BUFF},
 		[5] = {"lina_laguna_blade", ABILITY_TYPE.NUKE},
 }
 
@@ -23,7 +24,7 @@ local ZEROED_VECTOR = ZEROED_VECTOR
 local playerRadius = Set_GetEnemyHeroesInPlayerRadius
 local ENCASED_IN_RECT = Set_GetEnemiesInRectangle
 local currentTask = Task_GetCurrentTaskHandle
-local GSI_AbilityCanBeCast = GSI_AbilityCanBeCast
+local CAN_BE_CAST = AbilityLogic_AbilityCanBeCast
 local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
 local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 local INCENTIVISE = Task_IncentiviseTask
@@ -60,6 +61,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -68,7 +70,8 @@ d = {
 		local playerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
 		local dragonSlave = playerAbilities[1]
 		local lsa = playerAbilities[2]
-		local langua = playerAbilities[4]
+		local flameCloak = playerAbilities[4]
+		local langua = playerAbilities[5]
 		local highUse = gsiPlayer.highUseManaSimple
 		local playerHealthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 
@@ -86,7 +89,7 @@ d = {
 				and fht.lastSeenHealth / fht.maxHealth or 1.0
 		local fhtLoc = fhtReal and fht.lastSeen.location
 		if fhtReal and currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then
-			if AbilityLogic_AbilityCanBeCast(gsiPlayer, dragonSlave)
+			if CAN_BE_CAST(gsiPlayer, dragonSlave)
 					and Vector_PointDistance(playerLoc, fhtLoc) < 1100
 					and HIGH_USE(gsiPlayer, dragonSlave, highUse - dragonSlave:GetManaCost(), fhtPercHp) then
 				local extrapolatedFht = fht.hUnit:GetExtrapolatedLocation(DRAGON_SLAVE_EXTRAPOLATED)
@@ -95,8 +98,8 @@ d = {
 			end
 			if fhtReal then
 				local fhtStability = fht.hUnit:GetMovementDirectionStability()
-				if AbilityLogic_AbilityCanBeCast(gsiPlayer, lsa)
-						and fhtStability == 0 or fhtStability > 0.6
+				if CAN_BE_CAST(gsiPlayer, lsa)
+						and (fhtStability == 0 or fhtStability > 0.6)
 						and HIGH_USE(gsiPlayer, lsa, highUse - lsa:GetManaCost(), fhtPercHp) then
 					local extrapolatedFht = fht.hUnit:GetExtrapolatedLocation(LSA_EXTRAPOLATE)
 					local crowdingCenter, crowdedRating
@@ -115,7 +118,7 @@ d = {
 			end
 		end
 		if currActivityType > ACTIVITY_TYPE.CAREFUL
-				and nearbyEnemies[1] and AbilityLogic_AbilityCanBeCast(gsiPlayer, lsa)
+				and nearbyEnemies[1] and CAN_BE_CAST(gsiPlayer, lsa)
 				and HIGH_USE(gsiPlayer, lsa, highUse - lsa:GetManaCost(), playerHealthPercent) then
 			if nearbyEnemies[1].hUnit.IsNull and not nearbyEnemies[1].hUnit:IsNull() then
 				local projectedLoc = nearbyEnemies[1].hUnit:GetExtrapolatedLocation(LSA_EXTRAPOLATE)
@@ -123,7 +126,7 @@ d = {
 				return;
 			end
 		end
-		if currTask == push_handle and AbilityLogic_AbilityCanBeCast(gsiPlayer, dragonSlave)
+		if currTask == push_handle and CAN_BE_CAST(gsiPlayer, dragonSlave)
 				and HIGH_USE(gsiPlayer, dragonSlave, (highUse - dragonSlave:GetManaCost())*2.5, 1-playerHealthPercent) then 
 			local nearbyCreeps = Set_GetNearestEnemyCreepSetAtLaneLoc(
 					gsiPlayer.lastSeen.location, Map_GetBaseOrLaneLocation(gsiPlayer.lastSeen.location)
@@ -133,7 +136,17 @@ d = {
 				return;
 			end
 		end
-		if AbilityLogic_AbilityCanBeCast(gsiPlayer, langua) and fhtReal 
+		print(CAN_BE_CAST(gsiPlayer, langua),
+				fhtReal, langua:GetName(),
+					gsiPlayer.lastSeenMana > langua:GetManaCost(),
+					fhtReal and AbilityLogic_AllowOneHitKill(
+						gsiPlayer,
+						fht,
+						langua:GetCastRange(),
+						langua:GetSpecialValueInt("damage"),
+						langua:GetDamageType()
+					))
+		if CAN_BE_CAST(gsiPlayer, langua) and fhtReal 
 				and gsiPlayer.lastSeenMana > langua:GetManaCost()
 				and AbilityLogic_AllowOneHitKill(
 						gsiPlayer,
@@ -143,6 +156,16 @@ d = {
 						langua:GetDamageType()
 					) then
 			USE_ABILITY(gsiPlayer, langua, fht, 400, nil)
+			return;
+		end
+		if CAN_BE_CAST(gsiPlayer, flameCloak)
+				and (currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+					and FightClimate_GetEnemiesTotalHeat(nearbyEnemies) > 3
+					or (currActivityType > ACTIVITY_TYPE.FEAR
+						and Analytics_GetFutureDamageInTimeline(gsiPlayer.hUnit) > 0
+					)
+				) then
+			USE_ABILITY(gsiPlayer, flameCloak, nil, 400, nil)
 			return;
 		end
 	end,

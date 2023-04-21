@@ -66,11 +66,10 @@ function Time_InitializePlayerTimeData()
 		thisPlayer.time.prevFrame = GameTime()
 		thisPlayer.time.currFrame = GameTime()
 		thisPlayer.time.frameElapsed = 0.01667
+		thisPlayer.time.nextFrame = GameTime() + 0.01667
 		thisPlayer.time.data = {}
 		PNOT_TIMED_DATA[nOnTeam] = thisPlayer.time.data
 	end
-
-
 
 	Time_InitializePlayerTimeData = nil
 end
@@ -83,6 +82,7 @@ function Time_IndicateNewFrame(thisBot)
 	thisBot.time.prevFrame = thisBot.time.currFrame
 	thisBot.time.currFrame = GameTime()
 	thisBot.time.frameElapsed = thisBot.time.currFrame - thisBot.time.prevFrame
+	thisBot.time.nextFrame = thisBot.time.currFrame + thisBot.time.frameElapsed
 end
 
 function Time_Throttle(this)

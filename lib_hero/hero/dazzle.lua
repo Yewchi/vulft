@@ -1,10 +1,10 @@
 local hero_data = {
 	"dazzle",
-	{1, 3, 1, 2, 1, 5, 1, 3, 3, 3, 2, 5, 4, 2, 8, 2, 5, 10, 6, 12},
+	{1, 3, 1, 3, 1, 5, 1, 3, 3, 2, 2, 5, 2, 2, 8, 6, 5, 9, 11},
 	{
-		"item_blight_stone","item_branches","item_branches","item_tango","item_enchanted_mango","item_chainmail","item_medallion_of_courage","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_aghanims_shard","item_magic_wand","item_ancient_janggo","item_tranquil_boots","item_void_stone","item_aether_lens","item_boots_of_bearing","item_soul_booster","item_octarine_core","item_gem","item_pers",
+		"item_tango","item_flask","item_faerie_fire","item_circlet","item_mantle","item_ward_sentry","item_tango","item_boots","item_null_talisman","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_bracer","item_magic_wand","item_headdress","item_fluffy_hat","item_holy_locket",
 	},
-	{ {3,3,3,1,1,}, {4,4,5,3,1,}, 0.1 },
+	{ {1,1,1,3,2,}, {5,5,5,3,2,}, 0.1 },
 	{
 		"Poison Touch","Shallow Grave","Shadow Wave","Good Juju","Bad Juju","+60 Damage","+1.75 Mana Regen","+45 Shadow Wave Heal / Damage","+350 Poison Touch Attack Range","+200 Heal On Shallow Grave End","+45 Poison Touch DPS","-40% Poison Touch Slow","+0.5 Bad Juju Armor Reduction/Increase",
 	}
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -24,8 +24,23 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
-require(GetScriptDirectory().."/lib_job/modules/communication")
 local player_role_and_lane_file
+
+local STR__IN_PLAY_VS_BOTS_UNTESTED = "untested / unreleased vulft bots are running"
+local STR__IN_PLAY_VS_BOTS_USE_SERVER = "please run vulft from the local server to allow vulft to control hero selection"
+local STR__IN_PLAY_VS_BOTS_MESSAGE_DISAPPEARS = "this message will disappear at 1:40"
+RegisterLocalize(STR__IN_PLAY_VS_BOTS_UNTESTED,
+		"zh", "未经测试/未发布的 vulft 机器人正在运行",
+		"ru", "запускаются непроверенные/невыпущенные vulft-боты"
+	)
+RegisterLocalize(STR__IN_PLAY_VS_BOTS_USE_SERVER,
+		"zh", "请从本地服务器运行 vulft 以允许 vulft 控制英雄选择",
+		"ru", "пожалуйста, запустите vulft с локального сервера, чтобы vulft мог управлять выбором героя"
+	)
+RegisterLocalize(STR__IN_PLAY_VS_BOTS_MESSAGE_DISAPPEARS,
+		"zh", "此消息将在 1:40 消失",
+		"ru", "это сообщение исчезнет в 1:40"
+	)
 
 local THIS_BOT = {}
 local job_domain = {} -- Table is collected, but a useful allocated-table check skip
@@ -51,9 +66,9 @@ local should_draw_unimplemented_heroes_func
 local function draw_unimplemented_heroes()
 	if DotaTime() < 100 then
 		local red = math.min(255, math.max(0, (DotaTime() - 90)*25))
-		DebugDrawText(300, 300, "untested / unreleased vulft bots are running", red, 255-red, 255-red)
-		DebugDrawText(300, 310, "please run vulft from the local server to allow vulft to control hero selection", red, 255-red, 255-red)
-		DebugDrawText(300, 320, "this message will disappear at 1:40", red, 255-red, 255-red)
+		DebugDrawText(300, 300, GetLocalize(STR__IN_PLAY_VS_BOTS_UNTESTED), red, 255-red, 255-red)
+		DebugDrawText(300, 310, GetLocalize(STR__IN_PLAY_VS_BOTS_USE_SERVER), red, 255-red, 255-red)
+		DebugDrawText(300, 320, GetLocalize(STR__IN_PLAY_VS_BOTS_MESSAGE_DISAPPEARS), red, 255-red, 255-red)
 	end
 	DebugDrawText(160, 5, "VUL-FT untested:", 80, 0, 0)
 	if TEAM_IS_RADIANT and GameTime() % 16 < 8 or not TEAM_IS_RADIANT and GameTime() % 16 > 8 then
@@ -63,12 +78,10 @@ local function draw_unimplemented_heroes()
 	end
 end
 
-CHAT_CALLBACK_FUNCS = {}
-
 function Captain_ConfigIndicateNonStandardSetting(setting, ...)
 	if setting == CAPTAIN_CONFIG_NON_STANDARD.HERO_UNTESTED_ABILITY_USE then
 		local args = {...}
-		print("args1", args[1])
+		
 		table.insert(t_unimplemented_heroes, args[1])
 		Util_TableAlphabeticalSortValue(t_unimplemented_heroes)
 		should_draw_unimplemented_heroes_func = draw_unimplemented_heroes
@@ -79,11 +92,53 @@ function Captain_ConfigIndicateNonStandardSetting(setting, ...)
 	end
 end
 
-function Captain_Chat(msg, allChat)
+local STR__CAPTAIN = "captain"
+RegisterLocalize(STR__CAPTAIN,
+		"zh", "机器人队长",
+		"ru", "капитан роботов"
+	)
+local CAPTAIN_CHAT_QUEUE_DEFAULT_DELAY = 4.4
+local CAPTAIN_CHAT_DELAY_INTERRUPTED = 0.5
+local captain_chat_queue = {}
+function Captain_Chat(msg, allChat, isQueue)
 	if not THIS_BOT then
-		ERR_print("Captain not initialized for chatting.")
+		ERROR_print("Captain not initialized for chatting.")
 	end
-	THIS_BOT.hUnit:ActionImmediate_Chat("[Captain] "..(msg or "<missing message text>"), allChat)
+	if not msg then
+		ERROR_print("No message given to captain chat")
+	end
+	if not isQueue then
+		for i=1,#captain_chat_queue do
+			captain_chat_queue[i][3] = captain_chat_queue[i][3] + CAPTAIN_CHAT_DELAY_INTERRUPTED
+		end
+	end
+	THIS_BOT.hUnit:ActionImmediate_Chat(string.format("[%s] %s", 
+				GetLocalize("captain"), GetLocalize(msg)
+			),
+			allChat
+		)
+end
+
+-------- Captain_AddChatToQueue()
+function Captain_AddChatToQueue(msg, allChat, delayBefore)
+	local chatTime = captain_chat_queue[#captain_chat_queue]
+			and captain_chat_queue[#captain_chat_queue][3]
+				+ (delayBefore or  CAPTAIN_CHAT_QUEUE_DEFAULT_DELAY)
+			or GameTime()
+	table.insert(captain_chat_queue, {msg, allChat or false, chatTime})
+end
+
+local function check_captain_chat_queue()
+	local nextChatQueued = captain_chat_queue[1]
+	if nextChatQueued
+			and GameTime()
+				> nextChatQueued[3] then
+		if nextChatQueued[1] then
+			table.remove(captain_chat_queue, 1)
+			
+			Captain_Chat(nextChatQueued[1], nextChatQueued[2], true)
+		end
+	end
 end
 
 function Captain_RegisterCaptain(thisBot, microThinkFunc, deleteThisFunc)
@@ -236,6 +291,11 @@ function Captain_InitializeCaptain(thisBot) -- This is ran via job_domain:JOB_WA
 
 	THIS_BOT.Chat("/VUL-FT/ "..VULFT_VERSION, true)
 
+	DOMINATE_SetDominateFunc(THIS_BOT, "map_find_fountain_goal_posts", Map_FindFountainGoalPosts, true)
+
+	TEST_PARTY = false
+	
+
 	Captain_Initialize = nil
 end
 
@@ -250,6 +310,7 @@ local err_check = 0
 function Captain_CaptainThink()	
 	if 1 then
 		if err_check == 1 then err_count = err_count + 1 end err_check = 1 if err_count > 0 then DebugDrawText(140, 30, string.format("%d", err_count), 150, 0, 0) end
+		
 		
 	end
 
@@ -358,8 +419,8 @@ function Captain_CaptainThink()
 	if 1 then
 		err_check = 0
 	end
-	generic_microthink()
 	if VERBOSE then 
+		DebugDrawText(350, 5, string.format("%.2f,%.3f", GameTime(), RealTime()), 0, 255, 255)
 		local locs = VAN_GetWardLocations()
 		local correctedLocs = VAN_GetWardLocationsCorrected()
 		if locs then
@@ -370,8 +431,16 @@ function Captain_CaptainThink()
 			end
 		end
 	end
+
+	check_captain_chat_queue()
+
+	generic_microthink()
 end
 
 function Captain_GetCaptainJobDomain()
 	return job_domain
+end
+
+function Captain_GetCaptain()
+	return THIS_BOT
 end

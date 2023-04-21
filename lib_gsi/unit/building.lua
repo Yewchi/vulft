@@ -173,7 +173,7 @@ local function update_team_buildings_data(list)
 					and hUnit:GetMaxHealth() or safeUnit.maxHealth
 			safeUnit.lastSeenHealth = hUnit:GetHealth() ~= INVALID_TOWER_HEALTH
 					and hUnit:GetHealth() or safeUnit.lastSeenHealth
-			safeUnit.attackPointPercent = hUnit:GetAttackPoint() / hUnit:GetAttackSpeed()
+			safeUnit.attackPointPercent = hUnit:GetAttackPoint()
 		end
 	end
 end
@@ -227,8 +227,7 @@ function bUnit_UpdateHealthAndLocation(gsiBuilding)
 			and hUnitBuilding:GetHealth() or gsiBuilding.lastSeenHealth or gsiBuilding.maxHealth
 	gsiBuilding.maxHealth = hUnitBuilding:GetMaxHealth() ~= INVALID_TOWER_HEALTH
 			and hUnitBuilding:GetMaxHealth() or gsiBuilding.maxHealth
-
-	gsiBuilding.attackPointPercent = hUnitBuilding:GetAttackPoint() / hUnitCreep:GetAttackSpeed()
+	newSafeUnit.halfSecAttack = hUnitBuilding:GetSecondsPerAttack() / 2
 end
 
 function bUnit_GetBuildingTeamGoldValue(gsiBuilding)
@@ -241,6 +240,7 @@ function bUnit_IsNullOrDead(gsiBuilding)
 	if not gsiBuilding.hUnit or not gsiBuilding.hUnit.IsNull or
 			gsiBuilding.hUnit:IsNull() or not gsiBuilding.hUnit:IsAlive() then
 		gsiBuilding.typeIsNone = true
+
 		if gsiBuilding.lane
 				and t_buildings_index[gsiBuilding.team][gsiBuilding.lane][gsiBuilding.tier] then
 			if gsiBuilding.team == TEAM then
@@ -252,17 +252,33 @@ function bUnit_IsNullOrDead(gsiBuilding)
 				end
 			end
 			t_buildings_index[gsiBuilding.team][gsiBuilding.lane][gsiBuilding.tier] = nil
+			Analytics_InformBuildingFell(gsiBuilding)
+			t_buildings[gsiBuilding.team][gsiBuilding.hUnit] = nil
+		else
+
+
+
+
+
+
 		end
-		Analytics_InformBuildingFell(gsiBuilding)
-		t_buildings[gsiBuilding.team][gsiBuilding.hUnit] = nil
 		return true
 	end
 	return false
 end
 
 function bUnit_ConvertListToSafeUnits(list)
+	local nCount = 0
 	for i=1,#list,1 do
-		list[i] = t_buildings[list[i]:GetTeam()][list[i]] or bUnit_NewSafeUnit(list[i])
+		local gsiUnit = t_buildings[list[i]:GetTeam()][list[i]] or bUnit_NewSafeUnit(list[i])
+		if gsiUnit then
+			nCount = nCount + 1
+			list[nCount] = gsiUnit
+		
+		end
+	end
+	for i=nCount+1,#list do
+		list[i] = nil
 	end
 	return list
 end
@@ -356,10 +372,10 @@ local function assign_to_building_index(gsiBuilding) -- Initialization only
 end
 
 local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
-	if not hUnit or not hUnit:IsAlive() then return nil end
+	if not hUnit or hUnit:IsNull() or not hUnit:IsAlive() then return nil end
 	if t_buildings[hUnit:GetTeam()][hUnit] then return t_buildings[hUnit:GetTeam()][hUnit] end
 	local maxHealth = hUnit:GetMaxHealth()
-	
+
 	local newSafeUnit = {}
 	local unitLocation = hUnit:GetLocation()
 	
@@ -377,8 +393,12 @@ local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 	newSafeUnit.dotaType = TEAM == hUnit:GetTeam() and BUILDING_ALLIED or BUILDING_ENEMY
 	newSafeUnit.type = UNIT_TYPE_BUILDING
 	newSafeUnit.isTower = hUnit:IsTower()
+	newSafeUnit.isRanged = true
 	newSafeUnit.isFountain = newSafeUnit.name == "dota_fountain"
-	newSafeUnit.attackPointPercent = hUnit:GetAttackPoint() / hUnit:GetAttackSpeed()
+	newSafeUnit.releaseProjectileZ = newSafeUnit.isTower and 170 or 20 --[[PROJECTILE BAKE]]
+	newSafeUnit.getsHitZ = newSafeUnit.isTower and 144 or 20 --[[PROJECTILE BAKE]]
+	newSafeUnit.attackPointPercent = hUnit:GetAttackPoint() -- updated in projtl
+	newSafeUnit.halfSecAttack = hUnit:GetSecondsPerAttack() / 2
 	newSafeUnit.attackRange = newSafeUnit.isTower and BUILDING_TOWER_ATTACK_RANGE
 			or newSafeUnit.isFountain and FOUNTAIN_ATTACK_RANGE
 			or hUnit:GetAttackRange()
@@ -401,12 +421,16 @@ local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 	end
 	
 	if not dontIndex then
+		
 		t_buildings[newSafeUnit.team][hUnit] = newSafeUnit
 		
 		if newSafeUnit.isTower or newSafeUnit.isFountain or newSafeUnit.barracksType then
 			assign_to_building_index(newSafeUnit)
 		end
+
+	
 	end
+
 
 	-- updated on seen
 	newSafeUnit.attackDamage = not (newSafeUnit.isTower or newSafeUnit.isFountain) and 0
@@ -418,6 +442,7 @@ local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 end
 local function bunit_new_safe_unit_scan_data(hUnit, dontIndex)
 	local newSafeUnit = bunit_new_safe_unit_no_scan(hUnit, dontIndex)
+	if not newSafeUnit then return nil end
 
 	if newSafeUnit.team == TEAM and newSafeUnit.tier
 			and (newSafeUnit.isTower or newSafeUnit.isFountain) then

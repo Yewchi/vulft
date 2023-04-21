@@ -24,6 +24,9 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
+local ATT_FREE_SKILL_SHOT_RADIUS = 1
+
+
 
 local t_ability_think = {}
 

@@ -1,16 +1,16 @@
 local hero_data = {
 	"abaddon",
-	{2, 3, 2, 3, 2, 4, 2, 3, 3, 5, 1, 4, 1, 1, 7, 1, 4, 10, 11},
+	{3, 2, 3, 2, 3, 4, 2, 1, 2, 6, 1, 4, 3, 1, 7, 1, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_magic_wand","item_wind_lace","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_falcon_blade","item_relic","item_radiance","item_yasha","item_manta","item_blink","item_hyperstone","item_buckler","item_assault","item_basher","item_abyssal_blade","item_overwhelming_blink",
+		"item_magic_stick","item_tango","item_quelling_blade","item_branches","item_branches","item_branches","item_chainmail","item_boots","item_phase_boots","item_magic_wand","item_relic","item_radiance","item_blade_of_alacrity","item_ultimate_orb","item_blade_of_alacrity","item_yasha","item_manta","item_blink","item_mithril_hammer","item_belt_of_strength","item_basher","item_platemail","item_buckler","item_assault","item_abyssal_blade",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {1,1,1,3,3,}, {1,1,1,4,4,}, 0.1 },
 	{
 		"Mist Coil","Aphotic Shield","Curse of Avernus","Borrowed Time","+15% Curse of Avernus Movement Slow","+8 Strength","+65 Damage","+50 Mist Coil Heal/Damage","+100 Aphotic Shield Health","-8s Borrowed Time Cooldown","-1 Curse of Avernus Attacks Required","+400 AoE Mist Coil",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"abaddon_death_coil", ABILITY_TYPE.HEAL + ABILITY_TYPE.NUKE, 0},
@@ -69,6 +69,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then

@@ -2,9 +2,9 @@ local hero_data = {
 	"winter_wyvern",
 	{1, 2, 2, 1, 2, 4, 2, 1, 1, 6, 3, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_ward_observer","item_circlet","item_mantle","item_tango","item_branches","item_branches","item_mantle","item_faerie_fire","item_null_talisman","item_null_talisman","item_boots","item_blitz_knuckles","item_robe","item_chainmail","item_witch_blade","item_staff_of_wizardry","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_hurricane_pike","item_revenants_brooch","item_rapier",
+		"item_quelling_blade","item_faerie_fire","item_circlet","item_ward_observer","item_branches","item_bottle","item_null_talisman","item_boots","item_blitz_knuckles","item_robe","item_aghanims_shard","item_robe","item_chainmail","item_witch_blade","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_void_stone","item_pers","item_ultimate_orb","item_sphere","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_force_staff","item_hurricane_pike","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
 	},
-	{ {2,2,1,3,3,}, {2,2,5,3,3,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,2,4,2,}, 0.1 },
 	{
 		"Arctic Burn","Splinter Blast","Cold Embrace","Winter's Curse","+25.0HP/s Cold Embrace Heal","+35 Damage","+2.0s Arctic Burn Debuff Duration","+400 Splinter Blast Shatter Radius","+12% Arctic Burn Slow","+100 Splinter Blast Damage","+1.5s Winter's Curse Duration","Splinter Blast 1.5s Stun",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

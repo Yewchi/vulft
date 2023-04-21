@@ -122,3 +122,23 @@ function String_CompareTalentStringToBuiltInTier(talentString, bonusBuiltInOne, 
 		return 1, bonusBuiltInTwo
 	end
 end
+
+function String_GetArgumentTable(str)
+	if type(str) ~= "string" then
+		return nil
+	end
+	local tbl = {}
+	for arg in string.gmatch(str, "[^%s]+") do
+		table.insert(tbl, arg)
+	end
+	return tbl
+end
+
+function String_FindAbilityFromModifier(caster, str)
+	-- TODO cut end, sub str search of after name word in abilities
+	local strCheck = string.gsub(str, "modifier_", "")
+	local caster = caster.hUnit or caster.GetAbilityInSlot
+			and caster
+	local ability = caster:GetAbilityByName(str)
+	return ability or nil
+end

@@ -24,6 +24,8 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
+-- require(GetScriptDirectory().."/lib_hero/item/item_communication")
+
 ITEM_MAX_PLAYER_STORAGE = 16
 ITEM_INVENTORY_AND_BACKPACK_STORAGE = 9
 ITEM_MAX_COURIER_STORAGE = ITEM_INVENTORY_AND_BACKPACK_STORAGE
@@ -38,6 +40,8 @@ ITEM_END_STASH_INDEX = 14
 ITEM_NAME_SEARCH_START = 6 -- "item_[.+]"
 
 ITEM_HAVE_AGHS_SHARD_MYSTERIOUS = 114
+
+ITEM_ARMLET_HEALTH_DRAIN_PER_SECOND = 45
 
 ITEM_UPGRADES = {
 	"item_abyssal_blade",
@@ -138,6 +142,11 @@ ITEM_UPGRADES = {
 	"item_yasha_and_kaya",
 }
 
+ITEMS_GOODIES = { -- While totally safe, at a few steps distance, the score of picking up functional items bought by a player.
+	["item_rapier"] = 350,
+	["item_gem"] = 180
+}
+
 ITEM_COOLDOWN = {
 	["item_abyssal_blade"] = 35,
 	["item_ancient_janggo"] = 30,
@@ -198,6 +207,7 @@ USABLE_ITEMS_FOR_INDEXING = {
 	["item_blink"] = "blink",
 	["item_bloodstone"] = "bloodstone",
 	["item_bloodthorn"] = "bloodthorn",
+	["item_bottle"] = "bottle",
 	["item_branches"] = "branches",
 	["item_buckler"] = "buckler",
 	["item_cheese"] = "cheese",
@@ -280,7 +290,24 @@ ITEMS_BOOTS = {
 	["item_power_treads"] = true
 }
 
+ITEM_WAVE_CLEAR_NOT_ATTACK = {
+	["item_radiance"] = true,
+	["item_meteor_hammer"] = true,
+	["item_assault"] = true,
+}
+
+ITEM_WAVE_CLEAR_ATTACK = {
+	["item_gungir"] = true,
+	["item_maelstrom"] = true,
+	["item_mjollnir"] = true,
+}
+
 ITEMS_JUNGLE = {
+	["item_tier1_token"] = 1,
+	["item_tier2_token"] = 2,
+	["item_tier3_token"] = 3,
+	["item_tier4_token"] = 4,
+	["item_tier5_token"] = 5,
 	["item_keen_optic"] = 1,
 	["item_grove_bow"] = 2,
 	["item_quickening_charm"] = 3,
@@ -421,6 +448,11 @@ do
 	end
 end
 
+function Item_Initialize()
+	ItemComms_Initialize()
+	Item_Initialize = nil
+end
+
 function Item_UpdateKnownInventory(gsiEnemy)
 	local pnot = gsiEnemy.nOnTeam
 	local hUnit = gsiEnemy.hUnit
@@ -465,3 +497,5 @@ function Item_UpdateKnownCooldown(gsiEnemy, hItem)
 		end
 	end
 end
+
+require(GetScriptDirectory().."/lib_hero/item/item_communication")

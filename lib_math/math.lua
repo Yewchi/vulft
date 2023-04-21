@@ -90,6 +90,96 @@ function Math_ScreenCoordsToCartesianCentered(fScreenX, fScreenY, dampening)
 	return fScreenX*dampening + 960, fScreenY*dampening + 540
 end
 
+--[[
+local QUADRATIC_I__EXPONENTS = 1
+local QUADRATIC_I__COFACTORS = 2
+local QUADRATIC_I__MODIFY_FIRST = 3
+local function get_quadratic_value(self, x)
+	local value = 0
+	if self.modify and self[3] then
+		self:modify()
+	end
+	for i=1,#self[2] do
+		value = value + self[3][i] * x^self[2][i]
+	end
+	if self.modify and not self[3] then
+		self:modify()
+	end
+	self.val = value
+	self.timeStamp = GameTime()
+	return value
+end
+function Math_CreateQuadraticFunction(specialModificationFunction, modifyFirst, ...)
+	local args = {...}
+	local newQuadratic = {}
+	local i = 1
+	while(args[i]) do
+		local exponent = args[i]
+		local cofactor = args[i+1]
+		if not cofactor then
+			ERROR_print("[math] Attempt to create a quadratic without a cofactor at even index %s.", i)
+			print(debug.traceback())
+		end
+		newQuadratic[1][(i+1) / 2] = exponent
+		newQuadratic[2][(i+1) / 2] = cofactor
+		i = i + 2
+	end
+	newQuadratic.compute = get_quadratic_value
+	newQuadratic.modify = specialModificationFunction
+	newQuadratic[3] = modifyFirst
+	newQuadratic.shortName = "QuadraticFunction"
+	return newQuadratic
+end
+
+local function get_multivariable_value(self, t)
+	local vector = self.val or Vector(0, 0, 0)
+	local countValues = max(#self.x, #self.y, #self.z)
+	for i=1,countValues do
+		if self.x[i] then
+			vector.x = vector.x 
+			-- TODO ect
+		end
+	end
+	self.val = vector
+	self.timeStamp = GameTime()
+	return vector
+end
+
+-- Provide x y z cofactors and x y z rate of change over 't'.
+-- Very permissive with nil coordinates for additional single-coordinate computation
+-- 'Linear' for the rate of change, not necessarily the shape of the line it draws
+-------- Math_CreateLinearMultivariableFunctionXYZ()
+function Math_CreateLinearMultivariableFunctionXYZ(...)
+	local args = {...}
+	local newMultivariable = {}
+	local i = 1
+	while(args[i] or args[i+1] or args[i+2]) do
+		local productIndex = (i + 5) / 6
+		if args[i] then
+			newMultivariable.x = newMultivariable.x or {}
+			newMultivariable.dx = newMultivariable.dx or {}
+			newMultivariable.x[productIndex] = args[i]
+			newMultivariable.dx[productIndex] = args[i+3] or 0
+		end
+		if args[i+1] then
+			newMultivariable.y = newMultivariable.y or {}
+			newMultivariable.dy = newMultivariable.dy or {}
+			newMultivariable.y[productIndex] = args[i+1]
+			newMultivariable.dy[productIndex] = args[i+4] or 0
+		end
+		if args[i+2] then
+			newMultivariable.z = newMultivariable.z or {}
+			newMultivariable.dz = newMultivariable.dz or {}
+			newMultivariable.z[productIndex] = args[i+2]
+			newMultivariable.dz[productIndex] = args[i+5] or 0
+		end
+		local i = i + 6
+	end
+	newMultivariable.shortName = "LinearMultivariableFunction"
+	newMultivariable.compute = get_multivariable_value
+end
+--]]
+
 -- (using y because the value is probably a resultant value, and this is a logical limiter, not arithmetic, or not a truely mathematically limit) Simplistic half-range flip from 1.5*d/dy + 0.5*d/dy = avg d/dy over range until trueMaximumY
 -- Function is used to avoid any complicated maximums, minimums, or ammended mathematical functions with desired limits that would otherwise use heavy mathematical operations
 function Math_GetFastThrottledBounded(y, startThrottling, maximumThrottledBounded, trueMaximumY)

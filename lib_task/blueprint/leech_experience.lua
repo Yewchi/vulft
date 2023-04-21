@@ -42,6 +42,7 @@ local t_leech_exp_scores = {}
 local t_team_players = {}
 
 local max = math.max
+local min = math.min
 local Set_GetEnemyHeroesInPlayerRadiusAndOuterlocal = Set_GetEnemyHeroesInPlayerRadiusAndOuter
 local FightHarass_GetHealthDiffOutnumbered = FightHarass_GetHealthDiffOutnumbered
 local FightClimate_AnyIntentToHarm = FightClimate_AnyIntentToHarm
@@ -49,6 +50,8 @@ local UNIT_TYPE_IMAGINARY = UNIT_TYPE_IMAGINARY
 local increase_safety_handle
 local fight_harass_handle
 local farm_lane_handle
+
+local TEAM = GetTeam()
 
 local next_player = 1
 local function estimated_time_til_completed(gsiPlayer, objective)
@@ -71,11 +74,15 @@ local function task_init_func(taskJobDomain)
 	avoid_hide_handle = AvoidHide_GetTaskHandle()
 	fight_harass_handle = FightHarass_GetTaskHandle()
 	
+	local ACTIVITY_TYPE = ACTIVITY_TYPE
 	taskJobDomain:RegisterJob(
 			function(workingSet)
 				if workingSet.throttle:allowed() then
-					local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(t_team_players[next_player], 1400, 20)
-					if #nearbyEnemies > 0 then
+					local gsiPlayer = t_team_players[next_player]
+					local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1400, 20)
+					local currentActivityType = Blueprint_GetCurrentTaskActivityType(gsiPlayer)
+					if #nearbyEnemies > 0
+							or currentActivityType >= ACTIVITY_TYPE.FEAR then
 						Task_SetTaskPriority(task_handle, next_player, TASK_PRIORITY_TOP)
 					end
 					next_player = Task_RotatePlayerOnTeam(next_player)
@@ -91,38 +98,51 @@ local function task_init_func(taskJobDomain)
 end
 Blueprint_RegisterTask(task_init_func)
 
+local function get_lexp_standing_loc(gsiPlayer, farmLaneObj, timeTillStartAttack)
+	timeTillStartAttack = timeTillStartAttack or 2
+	local farmLaneObj = farmLaneObj or Task_GetTaskObjective(gsiPlayer, farm_lane_handle)
+	local activeLane = Farm_GetMostSuitedLane(gsiPlayer, farmLaneObj and farmLaneObj.ofUnitSet)
+	local tmp = gsiPlayer.attackRange
+	-- TODO BUG SAFE, LOGICALLY RELEVANT MOVEMENT
+	gsiPlayer.attackRange = LEECH_EXP_RANGE -- Spoof our attack range
+	local moveTo = farmLaneObj and (farmLaneObj.center or farmLaneObj.lastSeen.location)
+			or Set_GetPredictedLaneFrontLocation(Farm_GetMostSuitedLane(gsiPlayer))
+	local careFactor = 70 / math.max(0.1, Unit_GetHealthPercent(gsiPlayer)^2)
+	local moveTo = Positioning_ZSAttackRangeUnitHugAllied(
+			gsiPlayer, moveTo, SET_HERO_ENEMY, -- Needs check if heroes attacking
+			careFactor, min(2.5, math.max(0, timeTillStartAttack)),
+			timeTillStartAttack < 0.33, -- forceAttackRange
+			nil, true -- aheadness, dryRun
+		)
+	gsiPlayer.attackRange = tmp
+	return moveTo
+		-- TODO BUG SAFE, LOGICALLY RELEVANT MOVEMENT
+end
+LeechExp_GetStandingLoc = get_lexp_standing_loc
+
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
 		--print("leech_experience:", gsiPlayer.shortName, "running leech")
-		local _, knownEngage, theorizedEngage = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local danger, knownEngage, theorizedEngage = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 		if #knownEngage > 0 or #theorizedEngage > 0 then
 			Task_IncentiviseTask(gsiPlayer, avoid_hide_handle, 7.5*#knownEngage + 3.5*#theorizedEngage, 3)
 			Task_IncentiviseTask(gsiPlayer, increase_safety_handle, 7.5*#knownEngage + 3.5*#theorizedEngage, 0.5)
 		end
 		local farmLaneObj = Task_GetTaskObjective(gsiPlayer, farm_lane_handle)
-		local activeLane = Farm_GetMostSuitedLane(gsiPlayer, farmLaneObj and farmLaneObj.ofUnitSet)
 		if not farmLaneObj then
-			return false, XETA_SCORE_DO_NOT_RUN
+			return XETA_SCORE_DO_NOT_RUN
 		end
-		local tmp = gsiPlayer.attackRange
-		-- TODO BUG SAFE, LOGICALLY RELEVANT MOVEMENT
-		gsiPlayer.attackRange = LEECH_EXP_RANGE -- Spoof our attack range
-		local moveTo = farmLaneObj.center or farmLaneObj.lastSeen.location
-		local careFactor = 70 / math.max(0.1, Unit_GetHealthPercent(gsiPlayer)^2)
-		local nearToLowFactor = farmLaneObj.maxHealth and farmLaneObj.lastSeenHealth/farmLaneObj.maxHealth or 0.33
-		local timeTillStartAttack = 2.5*nearToLowFactor
-
-		Positioning_ZSAttackRangeUnitHugAllied(
-				gsiPlayer,
-				moveTo,
-				SET_HERO_ENEMY, -- Needs check if heroes attacking
-				careFactor,
-				timeTillStartAttack
-			)
-		--print("leech_experience:", gsiPlayer.shortName, "leech moving", xetaScore)
-		gsiPlayer.attackRange = tmp
---			local nearestTower = Set_GetNearestTeamTowerToPlayer(gsiPlayer.team, gsiPlayer)
---			Positioning_MoveToLocationSafe(gsiPlayer, nearestTower and nearestTower.lastSeen.location)
+		local creep, tta = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+		local moveTo = get_lexp_standing_loc(gsiPlayer, creep or farmLaneObj, tta)
+		if creep and danger < 1 and Vector_GsiDistance2D(gsiPlayer, creep) < CREEP_AGRO_RANGE
+				and Vector_BRads2D(gsiPlayer.lastSeen.location, creep.lastSeen.location, moveTo)
+					< math.pi/2
+				and LanePressure_AgroCreepsNow(gsiPlayer) then
+			INFO_print("[leech_experience] %s agros creeps into leech_exp down lane.", gsiPlayer.shortName)
+			return xetaScore
+		end
+		Positioning_MoveDirectlyCheckPort(gsiPlayer, moveTo)
+		
 		return xetaScore
 	end,
 	
@@ -131,8 +151,6 @@ blueprint = {
 		if not farmLaneObjective then return false, XETA_SCORE_DO_NOT_RUN end
 		local theorizedDangerScore, engageables, theorizedEngageables = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 		local anyIntendHarmFactor = FightClimate_AnyIntentToHarm(gsiPlayer, engageables) and 0.75 or 0
-		local nearestEnemyTower, distToEnemyTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
-		local nearestTeamTower, distToTeamTower = Set_GetNearestTeamTowerToPlayer(TEAM, gsiPlayer)
 		--local safetyRatio = 0.33 + math.max(1, distToTeamTower / distToEnemyTower)
 		local farmLaneScoreFactor = Task_GetTaskScore(gsiPlayer, farm_lane_handle)
 				* (farmLaneObjective.maxHealth
@@ -140,8 +158,25 @@ blueprint = {
 						or 0.33
 					)
 		--[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then print("leech exp returns", gsiPlayer.shortName, (0.3+anyIntendHarmFactor),(theorizedDangerScore*15), max(0, farmLaneScoreFactor)) end
-		return farmLaneObjective,
-				(0.3+anyIntendHarmFactor)*(theorizedDangerScore*15) + max(0, farmLaneScoreFactor)
+		local creep, tta, score = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+		local standingLoc = get_lexp_standing_loc(gsiPlayer, farmLaneObjective, tta)
+		if standingLoc then
+			print(standingLoc)
+			local underTower = Set_GetTowerOverLocation(standingLoc)
+			local score = (0.3+anyIntendHarmFactor)*(theorizedDangerScore*15) + max(0, farmLaneScoreFactor)
+					-(creep and tta and 50 - 50*min(1, max(0, tta - (Vector_PointDistance(
+									gsiPlayer.lastSeen.location,
+									creep.lastSeen.location
+								) / (gsiPlayer.currentMovementSpeed - 30)
+							))) or 0)
+			local towerScore = underTower and (1-gsiPlayer.hpp)
+						* ((underTower.team == TEAM
+							and 25 or -35) / 1+(0.15*gsiPlayer.level))
+					or 0
+						 -- TODO pretty loose
+			return farmLaneObjective, score + towerScore
+		end
+		return false, XETA_SCORE_DO_NOT_RUN
 	end,
 	
 	init = function(gsiPlayer, objective, extrapolatedXeta)

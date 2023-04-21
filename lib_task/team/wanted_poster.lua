@@ -578,8 +578,8 @@ function WP_AllocateToHighestScores(wpHandle, ignorePower)
 			set_next_try_alloc_allowed(wpHandle)
 			returnAllocated = true
 			break;
-			-- TODO How will waiting be implemented if at all? Won't it just be active states with a run state that include waiting behaviour, should there be a generic waiting run function that includes doing menial tasks like farming nearby jungle packs and checking for good closeby wards.
-			-- FAR state bots in a task could allow full task override, NEAR state bots could indicate everyone needs to make their way that was already NEAR, ACTIVE could mean the poster-and-task blueprint.run is active and we are currently doing the task, but that means that picking up runes is ACTIVE for one frame, which is odd and seems unneccesary. ACTIVE task for picking up runes could include things like drinking from bottle however, given, in almost every case the bot should've drank it already. .'. NEAR status type should engage the run function. Does the run function include moving towards the poster-and-task area, or should a WP override engage that include the bot's behaviour as they make their way. How do you know that immediate and switched behaviour doesn't imply that a bot is removing themself from the task. Oracle should still heal himself as he heads towards a task area, but he is not cancleing the wanted poster's engagement. Task types can indicate that a bot is out of a wanted poster, but is fight_low_health_contribution not a fear task, in which case the worst of our tasks is not disengatement. If AM happens upon a late-game triple ancient stack, should he not immediately engage the task and then continue with a high scoring wanted poster. Can this behaviour be assesed for time taken and rescored to inform the wait-around-time, reducing scores. And potentially leading to cancelations, rather than always leading to cancelation. FarmJungle_TTK already exists and can be used but this means that all tasks need to be objectified further for time-taken to complete tasks. Something that players do in their heads anyways, so why not extend the capability-- but greatly increasing complexity. Essentially icing on the cake but what is reasonable for abstraction or removal? -- Or rather these things do not need to be calculated at any time scoring but an additional time-taken function must be provied in tasks in order to get the data for other functions and wanted_poster, stored in player time data. It is the right answer but I needs a day of very boring work.
+			-- TODO How will waiting be implemented if at all? Won't it just be active states with a run state that include waiting behavior, should there be a generic waiting run function that includes doing menial tasks like farming nearby jungle packs and checking for good closeby wards.
+			-- FAR state bots in a task could allow full task override, NEAR state bots could indicate everyone needs to make their way that was already NEAR, ACTIVE could mean the poster-and-task blueprint.run is active and we are currently doing the task, but that means that picking up runes is ACTIVE for one frame, which is odd and seems unneccesary. ACTIVE task for picking up runes could include things like drinking from bottle however, given, in almost every case the bot should've drank it already. .'. NEAR status type should engage the run function. Does the run function include moving towards the poster-and-task area, or should a WP override engage that include the bot's behavior as they make their way. How do you know that immediate and switched behavior doesn't imply that a bot is removing themself from the task. Oracle should still heal himself as he heads towards a task area, but he is not cancleing the wanted poster's engagement. Task types can indicate that a bot is out of a wanted poster, but is fight_low_health_contribution not a fear task, in which case the worst of our tasks is not disengatement. If AM happens upon a late-game triple ancient stack, should he not immediately engage the task and then continue with a high scoring wanted poster. Can this behavior be assesed for time taken and rescored to inform the wait-around-time, reducing scores. And potentially leading to cancelations, rather than always leading to cancelation. FarmJungle_TTK already exists and can be used but this means that all tasks need to be objectified further for time-taken to complete tasks. Something that players do in their heads anyways, so why not extend the capability-- but greatly increasing complexity. Essentially icing on the cake but what is reasonable for abstraction or removal? -- Or rather these things do not need to be calculated at any time scoring but an additional time-taken function must be provied in tasks in order to get the data for other functions and wanted_poster, stored in player time data. It is the right answer but I needs a day of very boring work.
 		end
 		currHighIndex = currHighIndex+1
 		if currHighIndex > TEAM_NUMBER_OF_PLAYERS then
@@ -600,12 +600,15 @@ function WP_AllocateToHighestScores(wpHandle, ignorePower)
 	end
 end
 -- ^^ Score required cannot be checked here unless it is stored in a table. If a poster is old and inform interest is not ran, then we hit a time-data refresh switch to all-scores allowed, allowing bots to think a task is worth undertaking due to power level when other bots will see it as greatly losing score... AM gives power level to engage SOLO_PUSH_GUARDED, but walks off to farm his next jungle camp instead of commiting to the bait, other involved bots that saw it as high scoring sit in fog next to lane doing nothing with nobody pushing.
--- score improvement as an average of bots involved previous behaviour -- complexity and stubborness issues with being stuck on a WP when splitting to farm multiple jungle camps was the highest total score for all bots.
+-- score improvement as an average of bots involved previous behavior -- complexity and stubborness issues with being stuck on a WP when splitting to farm multiple jungle camps was the highest total score for all bots.
 
 
 function WP_AllowReinform(wpHandle)
 	if DEBUG then
-		DEBUG_print(string.format("[WP] %s allowing reform", GetBot():GetUnitName()))
+		DEBUG_print(string.format("[WP] %s allowing reform %s",
+				GetBot():GetUnitName(),
+				Util_Printable(wpHandle[POSTER_I__OBJECTIVE]))
+			)
 	end
 	for iPnot=1,TEAM_NUMBER_OF_PLAYERS do
 		wpHandle[POSTER_I__PRE_COMMIT_TYPES][iPnot] = nil
@@ -703,6 +706,7 @@ end
 
 if DEBUG then
 	function WP_DEBUG_Display()
+		if not TEAM_IS_RADIANT then return; end
 		local thisWp = wanted_poster_head
 		local n = 1
 		while (thisWp) do

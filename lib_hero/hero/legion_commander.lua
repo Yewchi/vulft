@@ -1,10 +1,10 @@
 local hero_data = {
 	"legion_commander",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 2, 1, 2, 3, 4, 3, 2, 2, 6, 3, 4, 3, 1, 7, 1, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_gauntlets","item_branches","item_circlet","item_enchanted_mango","item_bracer","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_broadsword","item_blade_mail","item_blink","item_ogre_axe","item_magic_wand","item_mithril_hammer","item_black_king_bar","item_platemail","item_buckler","item_assault","item_aghanims_shard","item_gem","item_lifesteal","item_claymore","item_satanic",
+		"item_quelling_blade","item_magic_stick","item_circlet","item_branches","item_tango","item_wraith_band","item_magic_wand","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_broadsword","item_chainmail","item_blade_mail","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_javelin","item_ogre_axe","item_belt_of_strength","item_sange","item_heavens_halberd","item_demon_edge","item_blitz_knuckles","item_monkey_king_bar","item_hyperstone","item_platemail","item_buckler","item_assault","item_moon_shard",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,3,5,}, 0.1 },
 	{
 		"Overwhelming Odds","Press The Attack","Moment of Courage","Duel","+100 Overwhelming Odds Radius","+8 Duel Bonus Damage","+40.0 Press The Attack HP Regen","+100 Overwhelming Odds Hero Damage","250 AoE Press The Attack","+12% Moment of Courage Proc Chance","+50% Moment of Courage Lifesteal","Press the Attack grants 1.5s Spell Immunity",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

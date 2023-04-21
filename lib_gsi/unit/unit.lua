@@ -7,6 +7,8 @@ require(GetScriptDirectory().."/lib_gsi/unit/ward")
 
 local PLAYER_NAME_START_SEARCH_INDEX = PLAYER_NAME_START_SEARCH_INDEX
 
+local CONSIDER_RANGED_ATTACK_MIN = 249
+
 local max = math.max
 local min = math.min
 
@@ -96,13 +98,13 @@ function Unit_GetTimeTilNextAttackStart(gsiUnit)
 	if not gsiUnit.hUnit:CanBeSeen() then
 		return 0
 	end
-	return max(gsiUnit.hUnit:GetSecondsPerAttack()*(1-gsiUnit.attackPointPercent)
+	return max(gsiUnit.hUnit:GetSecondsPerAttack()*(1-gsiUnit.hUnit:GetAttackPoint())
 			+ gsiUnit.hUnit:GetLastAttackTime() - GameTime(), 0)
 end
 local time_til_attack_start = Unit_GetTimeTilNextAttackStart
 
 function Unit_GetTimeTilNextAttackRelease(gsiUnit)
-	return time_til_attack_start(gsiUnit) + gsiUnit.attackPointPercent * gsiUnit.hUnit:GetSecondsPerAttack()
+	return time_til_attack_start(gsiUnit) + gsiUnit.hUnit:GetAttackPoint() * gsiUnit.hUnit:GetSecondsPerAttack()
 end
 local time_til_attack_release = Unit_GetTimeTilNextAttackRelease
 
@@ -128,14 +130,22 @@ end
 function Unit_GetSafeUnit(thisUnit)
 	if thisUnit.name then return thisUnit end
 	if thisUnit:IsCreep() or thisUnit:IsAncientCreep() then
-		return cUnit_GetSafeUnit(thisUnit)
+		return cUnit_NewSafeUnit(thisUnit)
 	elseif thisUnit:IsBuilding() then
-		return bUnit_GetSafeUnit(thisUnit)
+		return bUnit_NewSafeUnit(thisUnit)
 	elseif thisUnit:IsHero() then
 		return GSI_GetPlayerFromPlayerID(thisUnit:GetPlayerID())
 	elseif thisUnit:IsIllusion() then
 		return "TODO" + 1 + nil
 	end
+end
+
+function Unit_UnitIsRanged(thisUnit)
+	thisUnit = thisUnit and thisUnit.hUnit or thisUnit.GetUnitName and thisUnit
+	if thisUnit:IsNull() or not thisUnit:IsAlive() then return nil end
+	return thisUnit:GetAttackProjectileSpeed() > 0
+			and thisUnit:GetAttackRange() > CONSIDER_RANGED_ATTACK_MIN
+			or false
 end
 
 function Unit_ConvertListToSafeUnits(list)

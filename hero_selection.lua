@@ -24,15 +24,35 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
+-- CUSTOM_HERO_PICK! HEY! If you would like to override the heroes that bots will pick, then remove the '--[[' from the below line, and change the names. If you want a position on a team, use that player's slot 5 to 1 in the lobby.
+--[[
+CUSTOM_PICKS = {
+--RADIANT
+	[1] = "npc_dota_hero_lion",				-- radiant pos 5
+	[2] = "npc_dota_hero_windrunner",		-- radiant pos 4
+	[3] = "npc_dota_hero_abaddon",			-- radiant pos 3
+	[4] = "npc_dota_hero_death_prophet",	-- radiant pos 2
+	[5] = "npc_dota_hero_sven",				-- radiant pos 1
+--DIRE
+	[6] = "npc_dota_hero_bane",				-- dire pos 5
+	[7] = "npc_dota_hero_bounty_hunter",	-- dire pos 4
+	[8] = "npc_dota_hero_dawnbreaker",		-- dire pos 3
+	[9] = "npc_dota_hero_viper",			-- dire pos 2
+	[10] = "npc_dota_hero_gyrocopter"		-- dire pos 1
+}
+--]] -- FOR IMPLEMENTED HEROES CHECK THE 't_heroes_implemented' LIST BELOW
 
 local APIGameTime = GameTime
-local GameTime = GameTime
+local GameTime = GameTime -- May be changed to faster time for '/all !fast'
+local fake_time = 0 -- Incremented if GameTime is overridden to add pretend time, running the think func recursively to end picks immediately (turbo force picks now)
 
 local MAX_PLAYERS = 10
 
 local HERO_ALREADY_PICKED_FLAG = false
 local HERO_UNPICKED_UNLOADED_FLAG = nil
 local HERO_UNPICKED_STR = ""
+
+local TEAM_IS_RADIANT = GetTeam() == TEAM_RADIANT
 
 local t_heroes_implemented = {
 		[-1] = "default", -- used when a hero has been picked that VUL-FT doesn't have data for
@@ -49,7 +69,7 @@ local t_heroes_implemented = {
 		"npc_dota_hero_bristleback",
 		--"npc_dota_hero_centaur",
 		"npc_dota_hero_chaos_knight",
-		"npc_dota_hero_crystal_maiden",
+		--"npc_dota_hero_crystal_maiden",
 		"npc_dota_hero_dawnbreaker",
 		"npc_dota_hero_death_prophet",
 		"npc_dota_hero_doom_bringer",
@@ -60,13 +80,15 @@ local t_heroes_implemented = {
 		"npc_dota_hero_gyrocopter",
 		--"npc_dota_hero_invoker",
 		--"npc_dota_hero_jakiro",
-		--"npc_dota_hero_juggernaut",
+		"npc_dota_hero_juggernaut",
+		--"npc_dota_hero_kunkka",
 		"npc_dota_hero_lich",
 		--"npc_dota_hero_life_stealer",
 		"npc_dota_hero_lina",
 		"npc_dota_hero_lion",
 		--"npc_dota_hero_luna",
 		"npc_dota_hero_muerta",
+		--"npc_dota_hero_necrolyte",
 		"npc_dota_hero_night_stalker",
 		"npc_dota_hero_nyx_assassin",
 		"npc_dota_hero_ogre_magi",
@@ -100,38 +122,90 @@ local t_heroes_implemented = {
   --	"npc_dota_hero_void_spirit",
 }
 
+local t_heroes_with_custom_code = {
+		[0] = "npc_dota_hero_void_spirit",
+		"npc_dota_hero_abaddon",
+		"npc_dota_hero_abyssal_underlord",
+		--"npc_dota_hero_alchemist",
+		"npc_dota_hero_ancient_apparition",
+		--"npc_dota_hero_antimage",
+		"npc_dota_hero_arc_warden",
+		"npc_dota_hero_bane",
+		--"npc_dota_hero_bloodseeker",
+		--"npc_dota_hero_bounty_hunter",
+		"npc_dota_hero_bristleback",
+		--"npc_dota_hero_centaur",
+		"npc_dota_hero_chaos_knight",
+		--"npc_dota_hero_crystal_maiden",
+		"npc_dota_hero_dawnbreaker",
+		"npc_dota_hero_death_prophet",
+		"npc_dota_hero_doom_bringer",
+		--"npc_dota_hero_dragon_knight",
+		"npc_dota_hero_drow_ranger",
+		"npc_dota_hero_enchantress",
+		"npc_dota_hero_grimstroke",
+		--"npc_dota_hero_gyrocopter",
+		--"npc_dota_hero_invoker",
+		--"npc_dota_hero_jakiro",
+		--"npc_dota_hero_juggernaut",
+		--"npc_dota_hero_kunkka",
+		"npc_dota_hero_lich",
+		--"npc_dota_hero_life_stealer",
+		"npc_dota_hero_lina",
+		"npc_dota_hero_lion",
+		--"npc_dota_hero_luna",
+		"npc_dota_hero_muerta",
+		--"npc_dota_hero_necrolyte",
+		--"npc_dota_hero_night_stalker",
+		"npc_dota_hero_nyx_assassin",
+		--"npc_dota_hero_ogre_magi",
+		--"npc_dota_hero_phantom_assassin",
+		--"npc_dota_hero_queenofpain",
+		--"npc_dota_hero_rattletrap",
+		"npc_dota_hero_sand_king",
+		--"npc_dota_hero_silencer",
+		"npc_dota_hero_skeleton_king",
+		--"npc_dota_hero_slardar",
+		"npc_dota_hero_sniper",
+		--"npc_dota_hero_sven",
+		--"npc_dota_hero_tidehunter",
+		"npc_dota_hero_treant",
+		"npc_dota_hero_viper",
+		"npc_dota_hero_warlock",
+		"npc_dota_hero_weaver",
+		"npc_dota_hero_windrunner",
+		"npc_dota_hero_zuus",
+		--"npc_dota_hero_clinkz",
+		--"npc_dota_hero_dark_seer",
+		--"npc_dota_hero_earth_spirit",
+		--"npc_dota_hero_omniknight",
+		--"npc_dota_hero_snapfire",
+		--"npc_dota_hero_spirit_breaker",
+		--"npc_dota_hero_venomancer",
+}
+
+
+
+
 local pick_pool = {} -- heroes will be randomly loaded and considered for picking based on their role data from 5 recent DotaBuff matches
 -- TODO Include a synergy_and_counters.lua to inform picking, automating data. Increasingly random for bot difficulty levels dropped.
-
-function GetBotNames()
-	require(GetScriptDirectory().."/personality")
-	local playerNameOfBots = {}
-	for i=0,MAX_PLAYERS-1,1 do
-		local randomBotPersonalityN = RandomInt(1, #BOT_PERSONALITIES)
-		while(BOT_PERSONALITIES[randomBotPersonalityN][BOT_PERSONALITIES_I__TAKEN]) do
-			randomBotPersonalityN = RandomInt(1, #BOT_PERSONALITIES)
-		end
-		BOT_PERSONALITIES[randomBotPersonalityN][BOT_PERSONALITIES_I__TAKEN] = true
-		playerNameOfBots[i] = BOT_PERSONALITIES[randomBotPersonalityN][BOT_PERSONALITIES_I__NAME]
-	end
-	--print("Player", i, "picking", TEMPORARY_PICKS[i+1])
-	
-	return playerNameOfBots
-end
 
 local abs = math.abs
 local floor = math.floor
 
 --TEMPORARY
-local NEXT_PICK_WAIT = 7.5
-local NEXT_PICK_POOL_ADDITION_WAIT = 0.75
-local MAX_NEXT_PICK_WAIT_RANDOM_TIME = 7.0
+local NEXT_PICK_WAIT = 4.5
+local NEXT_PICK_POOL_ADDITION_WAIT = 0.45
+local MAX_NEXT_PICK_WAIT_RANDOM_TIME = 4.2
 local next_turn_to_pick_time
 local next_pick_pool_addition
 local turn_to_pick = 0
 local team_members
 local enemy_members
+local sorted_pnot_team_members
+local sorted_pnot_enemy_members
 local players_to_watch = {}
+local enemies_to_watch = {} -- This is for turbo mode
 local enemy_heroes_picked_count
 local still_making_picks = true
 local team_pick_offset = GetTeam() == TEAM_RADIANT and -1 or 4
@@ -164,6 +238,150 @@ local already_taken_roles = {} -- eliminate open roles.
 local roles_possible = {} -- roles a player can fill with their selected hero
 local role_distribution = {0, 0, 0, 0, 0} -- how many players could pick each role
 
+
+-------------- shift_tbl_element()
+local function shift_tbl_element(tbl, indexFrom, indexTo, zeroth)
+	local shiftedTmp = tbl[indexFrom]
+	for i=(zeroth or 1),indexTo-1 do
+		tbl[i] = tbl[i+1]
+	end
+	tbl[indexFrom] = shiftedTmp
+end
+--[[' don't know what happens when 1 radiant player in any slot and 1 dire player.
+-------------- make_sorted_player_lists_for_lobby_slot()
+local function make_sorted_player_lists_for_lobby_slot(teamPlayers, enemyPlayers)
+	-- This is not very thorough TODO it only detects the currently known behavior of filling the players into player ID from leftside of radiant to right side of dire, then filling with bots.
+	
+	-- returns sortedTeam, sortedEnemies;
+
+	local radiantPlayers = TEAM_IS_RADIANT and teamPlayers or enemyPlayers
+	local direPlayers = TEAM_IS_RADIANT and enemyPlayers or teamPlayers
+	local sortedRadiant = {}
+	local sortedDire = {}
+	local totalRadiantHumans = 0
+
+	local idsWereConsistent = true
+
+	for i=1,math.max(#radiantPlayers, #direPlayers) do
+		-- confirm data is expected and subsequent
+		if not radiantPlayers[i] or not direPlayers[i] then
+			print(string.format("/VULFT/ [WARN] [hero_selection] make_sorted_player_lists_for_lobby_slot - %s"..
+						"cannot sort players by lobby slot, tables are not in perfect sequence %d, %d.",
+					TEAM_IS_RADIANT and "Radiant" or "Dire",
+					#radiantPlayers, #direPlayers )
+				)
+			return false
+		end
+		-- FILL1 check radiant clients on this consistent index
+		if not IsPlayerBot(radiantPlayers[i]) then
+			sortedRadiant[radiantPlayers[i]+1] = radiantPlayers[i]
+			print("/VULFT/ [hero_selection] Found radiant client/human sorts to lobby slot "..i)
+			totalRadiantHumans = totalRadiantHumans + 1
+			allocateID = allocateID + 1
+		end
+		if radiantPlayers[i] ~= (direPlayers[i] - #radiantPlayers) then
+			idsWereConsistent = false
+		end
+	end
+
+	if idsWereConsistent then
+		print("/VULFT/ [hero_selection] Ending utility sort IDs as they are already sequential (expected during all-bot match)")
+		for i=1,math.max(#radiantPlayers, #direPlayers) do
+			sortedRadiant[i] = radiantPlayers[i]
+			sortedDire[i] = direPlayers[i]
+		end
+	else
+		for i=1,#direPlayers do -- implied that #tbls are all the same size after consistency check.
+			-- FILL2 check dire clients
+			if not IsPlayerBot(direPlayers[i]) then
+				sortedDire[i] = direPlayers[i]
+				direIndex = direIndex + 1
+				allocateID = allocateID + 1
+			end
+		end
+		-- FILL3 radiant bots
+		for i=radiantIndex,#radiantPlayers do
+			soretedRadiant[i] = allocateID
+			allocateID = allocateID + 1
+		end
+		-- FILL4 dire bots
+		for i=direIndex,#direPlayers do
+			sortedDire[i] = allocateID
+			allocateID = allocateID + 1
+		end
+	end
+	sorted_pnot_team_players = TEAM_IS_RADIANT and sortedRadiant or sortedDire
+	sorted_pnot_enemy_players = TEAM_IS_RADIANT and sortedDire or sortedRadiant
+	return true
+end
+--]]
+
+--local skip_team_indices = {}
+local skip_one_player = -1
+local wait_custom_picks
+-------------- doing_custom_picks()
+local function doing_custom_picks()
+	if CUSTOM_PICKS then
+		local teamPlayers = GetTeamPlayers(GetTeam())
+		if skip_one_player == -1 then
+			for i=1,#teamPlayers do
+				if not IsPlayerBot(teamPlayers[i]) then
+					skip_one_player = teamPlayers[i] + (TEAM_IS_RADIANT and 1
+							or #GetTeamPlayers(TEAM_RADIANT) + 1
+						)
+					print(string.format("/VULFT/ [hero_selection] Skipping custom picks for player at index %d on %s with playerID %d.\n\tThis only works for one player until I know how two players on opposing teams\n\tchanges the player IDs when the two human players are not in the\n\tfirst slot of both teams.", skip_one_player, TEAM_IS_RADIANT and "Radiant" or "Dire", teamPlayers[i]))
+					print("/VULFT/\tThat will be printed if custom picks is not uncommented and in a\n\tlobby with another player on the opposing team.\n\tI need someone to send me the result.")
+					break;		
+				end
+				skip_one_player = -2
+			end
+		end
+		wait_custom_picks = wait_custom_picks or GameTime() + 3
+		if wait_custom_picks > GameTime() then
+			if wait_custom_picks - 10 > GameTime() then
+				for i=-1,10 do
+					print(GetTeam(), "force", i)
+					SelectHero(i, t_heroes_implmented[RandomInt(1,#t_heroes_implemented)])
+				end
+			end
+			pickIndex = GetTeam() == TEAM_RADIANT and 1 or 6
+			local teamPlayers = GetTeamPlayers(GetTeam())
+			for i=1,#teamPlayers do
+				local thisPlayerId = teamPlayers[i]
+				print(string.format('/VULFT/ [hero_selection] team = %d, i=%d, thisPlayerId=%d, IsTeam=%s, skip_one_player=%d, pickIndex=%d', GetTeam(), i, thisPlayerId, IsTeamPlayer(thisPlayerId), skip_one_player, pickIndex))
+				if skip_one_player == pickIndex then
+					pickIndex = pickIndex + 1
+				end
+				if thisPlayerId and IsTeamPlayer(thisPlayerId) and IsPlayerBot(thisPlayerId) then
+					print(string.format('/VULFT/ [hero_selection] IsPlayerBot(%d)=%s, Selected already=%s', thisPlayerId, IsPlayerBot(thisPlayerId), GetSelectedHeroName(thisPlayerId)))
+					if IsPlayerBot(thisPlayerId) and GetSelectedHeroName(thisPlayerId) == HERO_UNPICKED_STR then
+						print("/VULFT/ [hero_selection] Selecting: ID:", thisPlayerId, CUSTOM_PICKS[pickIndex], i, 'team:', GetTeam())
+						--SelectHero(thisPlayerId, CUSTOM_PICKS[pickIndex])
+					end
+					pickIndex = pickIndex + 1
+				end
+			end
+		end
+		return true;
+	end
+end
+
+function GetBotNames()
+	require(GetScriptDirectory().."/personality")
+	local playerNameOfBots = {}
+	for i=0,MAX_PLAYERS,1 do
+		local randomBotPersonalityN = RandomInt(1, #BOT_PERSONALITIES)
+		while(BOT_PERSONALITIES[randomBotPersonalityN][BOT_PERSONALITIES_I__TAKEN]) do
+			randomBotPersonalityN = RandomInt(1, #BOT_PERSONALITIES)
+		end
+		BOT_PERSONALITIES[randomBotPersonalityN][BOT_PERSONALITIES_I__TAKEN] = true
+		playerNameOfBots[i] = BOT_PERSONALITIES[randomBotPersonalityN][BOT_PERSONALITIES_I__NAME]
+	end
+	--print("Player", i, "picking", TEMPORARY_PICKS[i+1])
+	
+	return playerNameOfBots
+end
+
 local function load_role_data_by_name(heroName, pick_index)
 	-- Search for the hero if the player had already picked without being loaded
 	print("/VUL-FT/ [#] [hero_selection]", GetTeam(), "loading hero", heroName)
@@ -193,6 +411,8 @@ local function load_role_data_by_name(heroName, pick_index)
 	return pick_pool[pick_index][HD_I__LANE_AND_ROLE][LR_I__ROLE]
 end
 local function add_random_hero_to_pick_pool()
+	if #pick_pool >= #t_heroes_implemented-1 then return; end -- TODO '-1' rushing
+
 	local tryAddHeroIndex = RandomInt(0, num_heroes_implemented-1)
 	-- find an unloaded hero
 	for i=0,num_heroes_implemented do
@@ -336,6 +556,7 @@ local function update_role_data_for_picks(roleData)
 	detect_taken_roles()
 end
 local function roles_able_based_scoring_as_role(mainRole, roleToCheck, inversePickStage, pickStageDampening)
+	
 	return (already_taken_roles[roleToCheck] and 10.0 or 0)
 			+ abs(mainRole - inversePickStage)/6.67
 				/ (1.5 - 0.5*GIVING_IT_AWAY_FACTOR[roleToCheck]*pickStageDampening) -- making the 1.5 more significant at later stages, thereby lowering adversity
@@ -460,11 +681,48 @@ local function pick_hero(pickPoolIndex, playerId)
 	update_role_data_for_picks(pick_pool[lowestIndex][HD_I__LANE_AND_ROLE][LR_I__ROLE])
 	return true
 end
+
+function finishing_picking_now()
+	for i=1,5 do
+		get_enemy_heroes_picked_count()
+		add_random_hero_to_pick_pool()
+		next_pick_pool_addition = GameTime() + NEXT_PICK_POOL_ADDITION_WAIT
+	end
+	-- Pick a hero from the pick pool which suits a required role, or keeps our options open
+	if still_making_picks and next_turn_to_pick_time < GameTime() then
+		if pick_hero(RandomInt(0, num_heroes_implemented-1), team_members[turn_to_pick]) then
+			next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0.0, MAX_NEXT_PICK_WAIT_RANDOM_TIME)
+		end
+		if turn_to_pick == 5 then
+			still_making_picks = false
+			-- Clean-up the required files - we were just stealing their prepended hero-data
+			-- TODO If a player picks very late, or the last to pick, will we not have a broken package.loaded?
+			for k,v in pairs(package.loaded) do
+				if type(v) == "table" and string.find(k, "bots/lib_hero/hero/") then
+					for j,w in pairs(v) do
+						v[j] = nil
+					end
+					package.loaded[k] = nil
+				end
+			end
+		else
+			turn_to_pick = turn_to_pick + 1
+			if false and turn_to_pick == 5 then
+				SelectHero(team_members[turn_to_pick], "npc_dota_hero_invoker")
+			end
+		end
+	end
+end
 function Think()
 	-- Check TeamPlayers data ready and init
 	if not next_turn_to_pick_time then
+		if doing_custom_picks() then return; end
+
 		team_members = GetTeamPlayers(GetTeam())
 		enemy_members = GetTeamPlayers(GetOpposingTeam())
+		for k,v in pairs(team_members) do
+			print("/VUL-FT/ IF YOU ARE PLAYING WITH 2 OR MORE HUMAN PLAYERS ON YOUR TEAM: COPY THIS LINE AND POST TO THE FEEDBACK DISCUSSION ON THE WORKSHOP. THANK YOU BIG HELP ", k, v)
+		end
 		if not team_members or not enemy_members then return end
 		for i=1,#team_members do
 			print("/VUL-FT/ [hero_selection] Found team member", team_members[i])
@@ -477,9 +735,16 @@ function Think()
 			print("/VUL-FT/ [!] Ensure script is ran from local server host \"CREATE LOBBY\" button from the main menu of dota. Set the server as the local host (your computer).")
 			print("/VUL-FT/ [!] Select the LOCAL DEV SCRIPT as the bot to play with, with the vulft files placed in %Steam Directory%/steamapps/common/dota 2 beta/game/dota/scripts/vscripts/bots/")
 		end
+		for i=1,#enemy_members do
+			if not IsPlayerBot(enemy_members[i]) then
+				table.insert(players_to_watch, enemy_members[i])
+			end
+		end
 		next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0, 6)
 		next_pick_pool_addition = GameTime() + NEXT_PICK_POOL_ADDITION_WAIT
 		turn_to_pick = 1
+
+
 
 
 
@@ -517,7 +782,7 @@ function Think()
 		end
 	end
 	-- Check player picks
-	if players_to_watch[1] then
+	if players_to_watch[1] or enemies_to_watch[1] then
 		local i = 1
 		while(i <= #players_to_watch) do
 			if GetSelectedHeroName(players_to_watch[i]) ~= HERO_UNPICKED_STR then
@@ -532,6 +797,22 @@ function Think()
 			end
 			i=i+1
 		end
+
+		--[[' Below is the intended fix for auto-picking in turbo mode. Doesn't work because the client's pick is processed last on the server, after the server realized all clients have picked.
+		-- Proposed solution is to implement all the default heroes.
+		if #players_to_watch + #enemies_to_watch == 0 then
+			-- There were players, but they picked, rush it.
+			fake_time = GameTime()
+			GameTime = function()
+				fake_time = fake_time + 0.25
+				return fake_time
+			end
+			while(still_making_picks) do
+				-- fun! :D
+				print(GameTime())
+				Think()
+			end
+		end--]]
 	end
 
 	-- Add heroes to the pick pool for consideration intermittently

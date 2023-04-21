@@ -1,3 +1,92 @@
+v0.7-230414 (10th April meta)
+> ADDED HERO Juggernaut
+
+> ADDED HERO Kunkka
+
+> Set your role at any time with '!pos [1 to 5]'
+
+> More aggressive pushing when the enemy are dead
+	-| increasing probability of using the hard push behaviour during the early mid and to the late mid game when enemies are dead.
+	-| Still high but slightly reduced aggresivity unless enemies are dead in the very late game.
+	-| See "Metrics" on the git wiki for more info, if you know where that is and you are able to access that.
+
+> Slightly increased denying creeps in lane.
+
+> Higher aggression when a deny is difficult, or unknown to succeed (atk dmg variation)
+
+> Slightly reduced aggression when below HighUseMana value (the mana required to cast almost every spell known)
+
+> Greatly improved last-hitting
+	-| Still unfinished
+	-| Incorporated hit-box to start attack time.
+	-| Fixed a data bug that causes last hit time landing to incorporate the walking distance to attack in the projectile distance.
+	-| Check for where a projectile leaves the hero and averages to new last hits before projectile release.
+	-| True attack point check.
+	-| FindTurnRate: Bots find their turn rate in [radians/sec] at the start of the match.
+
+> Late-game ability use improved for some heroes
+	-| Fixed a bug where talents taken changing an ability's behavoiur would be unusable.
+	-| Fixes things AoE Cold Feet, or AoE snot after buying aghs then leveling up.
+	-| Some abilities may still break but the main source of the issue is removed.
+
+> Override/Dominate functionality improved
+	-| Things like solving why a hero is stuck is improved
+	-| A queue is allowed to allow better initialization and require less programming
+	-| used for FindTurnRate
+
+> Added a time-till-attack threshold before engaging avoid_hide behaviour when laning near to creeps.
+	-| May help increase last-hitting performance.
+
+> Melee core laning perfomance
+	-| Melee cores switching to avoid_hide without a last hit may now agro the creep wave before they start to run away.
+	-| May help improve positioning for getting thier last hits
+
+> search_fog (for recently fogged, vulnerable enemies) curves
+	-| search_fog now creates a bezier curve for a hero that has just gone missing.
+	-| the missing hero travels along it's facing direction and curves up into the enemy fountain at their movement speed.
+	-| these curves can be used for casting spells like spark wraith, ice vortex, lightning bolt in fog when an enemy was known to be worth searching for.
+
+> Reduced use tango on tree causing missed last hits
+
+> Minor memory bug removed.
+	-| Fixed a bug causing last hit projection to keep a table of almost every attack registered in an entire match.
+	-| Amounted to, from a guess, 30-100KB / minute. 5MB for a long match.
+
+> Buyback improved
+	-| Greatly reduced odds of buying back when the fight is at an outer tower and the bot's respawn timer is low.
+
+> Deagro tower fix
+	-| Fixed bots being unable to think deagroing is worth it when they were actively attacking a tower.
+
+> Some help text if anyone wants to force hero picks by changing the lines near the top of the hero_selection.lua file.
+
+> Danger location analytics improved for some logic.
+	-| Found a major bug in danger analytics while trying to fix a static danger for deciding best lane to push / be around.
+	-| Heroes with blinks improved
+	-| ZoneDefend improved to find the danger of the zone defend location rather than the hero's current location.
+	-| Reverting a dangerous teleport to a higher tier tower needlessly, and teleporting into danger reduced.
+	-| Lane choice greatly improved, heroes are more likely leave dangerous lanes; not likely enough yet as they see far off lanes as a loss of score in time.
+
+> Improved warding
+	-| Fixed a bug where bots wouldn't know they owned wards after combining sentries and observers
+
+> Other improvement and tweaks.
+
+> Localization and language changing with '!lang [en|zh|ru]'
+	-| Language choices are from total country esports earning in the game and pro players. Source: https://www.esportsearnings.com/games/231-dota-2/countries
+	-| Localization takes a long time, and I overloaded myself.
+	-| It's not a political statement, and it never will be, because nobody should get in trouble for relaxing or being entertained, within reason; but I do hope that list will be traversed deeper, and I do feel bad.
+
+> Translation of page description to a handful of languages at https://steamcommunity.com/groups/VULFT/announcements/detail/6966546241858334331
+	-| This is in fairness to the global professional and amatuer communities, however I understand that pros do their best to keep their state-of-mind in the human game of Dota. I still think a lot can be learned in 0-pressure matches with bots.
+	-| This is based on Bot vs Bot performance of VULFT, and my own bots forcing me to lose matches due to the similarity of them to a higher calibre player, as a previous Ancient 3 try-hard.
+	-| This is arrogance, but only because I have not [i]scientifically[/i] verified that my bots win more matches, and act more player-like (I'd say they do, and they do). But I don't have time. Fun for everyone!
+
+DEVELOPER:
+> Added language splitting to the release script to speed up releases to other languages / reduce risk of any party getting into trouble due to banned urls to development pages.
+
+~~~~
+
 v0.6-230330 (19th March meta)
 stability greatly improved, danger analytics fixed, returning to lane fix, better defense, windranger added
 

@@ -1,10 +1,10 @@
 local hero_data = {
 	"phoenix",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 8, 1, 4, 9},
+	{2, 1, 2, 1, 2, 4, 2, 3, 3, 3, 3, 4, 6, 1, 7, 1, 4, 9, 11},
 	{
-		"item_tango","item_crown","item_ring_of_health","item_pers","item_meteor_hammer","item_boots","item_magic_wand","item_aghanims_shard","item_magic_wand","item_tranquil_boots","item_platemail","item_shivas_guard","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_wind_lace","item_staff_of_wizardry","item_cyclone",
+		"item_gauntlets","item_tango","item_branches","item_branches","item_gauntlets","item_faerie_fire","item_gauntlets","item_bracer","item_bracer","item_wind_lace","item_tranquil_boots","item_veil_of_discord","item_aghanims_shard","item_magic_wand","item_mystic_staff","item_shivas_guard","item_ultimate_orb","item_pers","item_pers","item_refresher","item_mystic_staff","item_sheepstick",
 	},
-	{ {3,3,3,3,4,}, {4,4,4,3,5,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Icarus Dive","Fire Spirits","Sun Ray","Supernova","+25% Icarus Dive Slow","+6% Spell Amplification","+20 Fire Spirits Damage Per Second","+500 Health","+1.5% Max Health Sun Ray Damage","+0.5s Supernova Stun Duration","+3 Supernova Hit Count","+1000 Icarus Dive Cast Range",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

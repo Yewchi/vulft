@@ -29,6 +29,8 @@ local VEBOSE = VERBOSE
 local DEBUG = DEBUG
 local TEST = TEST
 
+local min = math.min
+
 local task_handle = Task_CreateNewTask()
 
 local approx_building_attack_time = 0.8
@@ -58,7 +60,7 @@ blueprint = {
 		if GSI_UnitCanStartAttack(gsiPlayer) and (objective.type ~= UNIT_TYPE_BUILDING or objective.hUnit:CanBeSeen() and objective.hUnit:GetAttackTarget() == gsiPlayer.hUnit) then
 			local nearbyCreeps = gsiPlayer.hUnit:GetNearbyCreeps(800, false)
 			--print(gsiPlayer.shortName, "trying deagro")
-			if nearbyCreeps and nearbyCreeps[1] then
+			if GameTime() % 1.2 < 0.66 and nearbyCreeps and nearbyCreeps[1] then
 				for i=1,#nearbyCreeps,1 do
 					--if nearbyCreeps[i]:GetHealth()/nearbyCreeps[i]:GetMaxHealth() < 0.5 then
 						--[DEBUG]]print(gsiPlayer.shortName, "deagro should succeed")
@@ -69,8 +71,21 @@ end
 						return xetaScore
 					--end
 				end
+			else
+				local moveTo = Vector_UnitDirectionalPointToPoint(gsiPlayer.lastSeen.location,
+						TEAM_FOUNTAIN
+					)
+				moveTo.x = moveTo.x*0.65; moveTo.y = moveTo.y*0.65
+				moveTo = Vector_Addition(
+						Vector_UnitDirectionalPointToPoint(objective.lastSeen.location,
+								gsiPlayer.lastSeen.location
+							),
+						moveTo
+					)
+				moveTo = Vector_ScalarMultiply2D(moveTo, 800 + min(1000, (1500 - (gsiPlayer.locationVariation or 1500))))
+				gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
+				return xetaScore
 			end
-			--[DEBUG]]print(gsiPlayer.shortName, nearbyCreeps and "creeps were too high health" or "no creeps")
 		end
 		return XETA_SCORE_DO_NOT_RUN
 	end,
@@ -97,7 +112,7 @@ if DEBUG then
 end
 			if i > numUnderTower then return false, XETA_SCORE_DO_NOT_RUN end
 			--print("creeps", gsiPlayer.hUnit:GetNearbyCreeps(1200, true), "target", underTower.hUnit:GetAttackTarget(), "can attack", GSI_UnitCanStartAttack(gsiPlayer))
-			if underTower.hUnit:GetAttackTarget() == gsiPlayer.hUnit and GSI_UnitCanStartAttack(gsiPlayer) and gsiPlayer.hUnit:GetNearbyCreeps(1200, true) then
+			if underTower.hUnit:GetAttackTarget() == gsiPlayer.hUnit and gsiPlayer.hUnit:GetNearbyCreeps(1200, true) then
 			--print("returning deagro score", 3.0, -Analytics_GetNearFutureHealthPercent(gsiPlayer), -math.min(2.0, gsiPlayer.hUnit:TimeSinceDamagedByTower()),
 						--Xeta_EvaluateObjectiveCompletion(XETA_HEALTH_LOSS, 0, 2*Lhp_GetActualFromUnitToUnitAttackOnce(underTower.hUnit, gsiPlayer.hUnit), gsiPlayer, gsiPlayer))
 			--print("deagro", (3.0 - Analytics_GetNearFutureHealthPercent(gsiPlayer) - math.min(2.0, gsiPlayer.hUnit:TimeSinceDamagedByTower()))

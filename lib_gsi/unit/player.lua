@@ -30,6 +30,10 @@ local TEST = TEST and true
 local DEBUG = DEBUG
 local VERBOSE = VERBOSE
 
+local TEAM = TEAM
+local ENEMY_TEAM = ENEMY_TEAM
+local BOTH_TEAMS = BOTH_TEAMS
+
 local cos = math.cos
 local sin = math.sin
 
@@ -49,6 +53,7 @@ local function handle_player_spell_or_item_cast(castInfo, abc)
 -- NB. CANNOT enter code with GetBot() calls -- Callback triggers presumably make their Lua hook directly without stepping into per-bot code.
 	
 	
+	
 	local thisPlayer = GSI_GetPlayerFromPlayerID(castInfo.player_id)
 	
 	local ability = castInfo.ability
@@ -60,7 +65,7 @@ local function handle_player_spell_or_item_cast(castInfo, abc)
 	local abilityName = ability:GetName()
 	
 	if thisPlayer.illusionsUp then
-		if thisPlayer.shortName ~= "phantom_lancer" then
+		if not SpecialBehavior_GetBooleanOr("foundIllusionCancel", thisPlayer, ability) then
 		
 			thisPlayer.knownNonIllusionUnit = castInfo.unit -- knownNon will drop check Rand(1,6)%6 == 0, for fairness
 		
@@ -71,30 +76,37 @@ local function handle_player_spell_or_item_cast(castInfo, abc)
 		if TEST then INFO_print(string.format("CAUGHT %s TELEPORT", thisPlayer.shortName)) end
 		Analytics_RegisterPortActivity(thisPlayer, castInfo)
 		
-		--Util_TablePrint(castInfo)
-	elseif ability:GetName():match("^item") then
-		
-		if thisPlayer.team == TEAM then
-			
-			Consumable_CheckConsumableUse(thisPlayer, ability)
-			
-		else
-			
-			Item_UpdateKnownCooldown(thisPlayer, ability)
-			
-		end
 	else
-		
-		--Util_TablePrint(castInfo)
-		if VERBOSE then print(castInfo.unit and castInfo.unit:GetUnitName(), castInfo.location and castInfo.location.x or castInfo.location.GetUnitName) end
-		
-		AbilityLogic_InformAbilityCast(thisPlayer, ability)
-		
-		if castInfo.location then
-			local enemy, enemyDist = Set_GetNearestEnemyHeroToLocation(castInfo.location)
-			if enemyDist < 50 then -- TODO check target types, ability behaviour, aoe is aggression to all
-				FightClimate_RegisterRecentHeroAggression(thisPlayer, enemy, true)
+		local raiseToFightClimate = true
+		if ability:GetName():match("^item") then
+			raiseToFightClimate = true or false
+			
+			if thisPlayer.team == TEAM then
+				
+				Consumable_CheckConsumableUse(thisPlayer, ability, castInfo)
+				
+				UseItem_RegisterCaughtAbility(thisPlayer, ability, castInfo)
+			else
+				
+				Item_UpdateKnownCooldown(thisPlayer, ability, castInfo)
+				
 			end
+		end
+		if raiseToFightClimate then 
+			
+			--Util_TablePrint(castInfo)
+			if VERBOSE then print(castInfo.unit and castInfo.unit:GetUnitName(), castInfo.location and castInfo.location.x or castInfo.location.GetUnitName) end
+			
+			AbilityLogic_InformAbilityCast(thisPlayer, ability)
+			
+			--if castInfo.location then
+			FightClimate_InformAbilityCast(thisPlayer, ability, castInfo)
+				--[[
+				local enemy, enemyDist = Set_GetNearestEnemyHeroToLocation(castInfo.location)
+				if enemyDist < 50 then -- TODO check target types, ability behavior, aoe is aggression to all
+					FightClimate_RegisterRecentHeroAggression(thisPlayer, enemy, true)
+				end
+			end--]]
 		end
 	end
 	
@@ -103,7 +115,7 @@ end
 local t_falsify_attack_range = {}
 -------- pUnit_SetFalsifyAttackRange()
 function pUnit_SetFalsifyAttackRange(gsiPlayer, rangeOrFalse)
-	-- No internal management of falsify data
+	-- No internal management of falsify data:
 	-- if spiritSiphonLinked then
 	-- 		Task_SetFalsifyAttackRange(gsiP, attackRange - 250)
 	-- elseif gsiP.attackRange ~= attackRange then
@@ -119,17 +131,13 @@ local function update_allied_hero_game_data(gsiPlayer)
 	
 	gsiPlayer.lastSeenHealth = hUnit:GetHealth()
 	gsiPlayer.maxHealth = hUnit:GetMaxHealth()
+	gsiPlayer.hpp = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 	gsiPlayer.lastSeenMana = hUnit:GetMana()
 	gsiPlayer.maxMana = hUnit:GetMaxMana()
+	gsiPlayer.manapp = gsiPlayer.lastSeenMana / gsiPlayer.maxMana
 	gsiPlayer.attackRange = t_falsify_attack_range[gsiPlayer.nOnTeam] or hUnit:GetAttackRange()
-	gsiPlayer.attackPointPercent = hUnit:GetAttackPoint() / hUnit:GetAttackSpeed()
-	if gsiPlayer.shortName == "dragon_knight" then
-		if gsiPlayer.attackRange > 500 then
-			gsiPlayer.isMelee = false
-		else
-			gsiPlayer.isMelee = true
-		end
-	end
+	gsiPlayer.halfSecAttack = hUnit:GetSecondsPerAttack() / 2
+	gsiPlayer.isRanged = Unit_UnitIsRanged(gsiPlayer)
 end
 
 local prev_seen = {}
@@ -212,17 +220,21 @@ local function update_players_data()
 		thisPlayer.lastSeenMana = thisEnemyPlayerHeroUnit:GetMana()
 		thisPlayer.maxMana = thisEnemyPlayerHeroUnit:GetMaxMana()
 		thisPlayer.attackRange = thisEnemyPlayerHeroUnit:GetAttackRange()
-		thisPlayer.attackPointPercent = thisEnemyPlayerHeroUnit:GetAttackPoint()
-				/ thisEnemyPlayerHeroUnit:GetAttackSpeed()
+		thisPlayer.halfSecAttack = thisEnemyPlayerHeroUnit:GetSecondsPerAttack() / 2
+		thisPlayer.isRanged = Unit_UnitIsRanged(thisPlayer)
 
 		if RandomInt(0, 16) == 0 then Item_UpdateKnownInventory(thisPlayer) end -- Update Inventory knowledge randomly
 			
 		if thisPlayer.needsVisibleData then
-			thisPlayer.attackPointPercent = thisEnemyPlayerHeroUnit:GetAttackPoint() / thisEnemyPlayerHeroUnit:GetAttackSpeed()
+			thisPlayer.attackPointPercent = thisEnemyPlayerHeroUnit:GetAttackPoint() -- updated in projtl
 			thisPlayer.name = GSI_GetUnitName(thisPlayer)
 			thisPlayer.shortName = GSI_GetHeroShortName(thisPlayer)
 			thisPlayer.needsVisibleData = false
 			thisPlayer.typeIsNone = false
+			thisPlayer.isRanged = Unit_UnitIsRanged(thisPlayer)
+			thisPlayer.armor = thisEnemyPlayerHeroUnit:GetArmor()
+			thisPlayer.magicTaken = 1 - thisEnemyPlayerHeroUnit:GetMagicResist()
+			thisPlayer.evasion = thisEnemyPlayerHeroUnit:GetEvasion()
 
 			t_named_players[thisPlayer.name] = thisPlayer
 
@@ -256,9 +268,12 @@ local function port_while_stuck(gsiPlayer)
 	if not gsiPlayer.hUnit:IsAlive() or gsiPlayer.locationVariation > DETERMINE_STUCK_LESS_THAN_DIST then
 		DOMINATE_SetDominateFunc(gsiPlayer, "port_while_stuck", port_while_stuck, false)
 		gsiPlayer.stuckDiagnoseBeforeTpExpiry = nil
+		gsiPlayer.stuckAttempts = nil
 		return
 	end
 	local hUnit = gsiPlayer.hUnit
+
+	local playerLoc = gsiPlayer.lastSeen.location
 	
 	local forceStaff = gsiPlayer.usableItemCache.forceStaff
 	local blink = gsiPlayer.usableItemCache.blink
@@ -270,7 +285,7 @@ local function port_while_stuck(gsiPlayer)
 		Item_EnsureCarriedItemInInventory(gsiPlayer, blink, 3)
 	end
 	if hatchet and hUnit:FindItemSlot(hatchet:GetName()) ~= 4 then
-		Item_EnsureCarriedItemInInventory(gsiPlayer, hatchet, 4)
+		print(Item_EnsureCarriedItemInInventory(gsiPlayer, hatchet, 4))
 	end
 
 	local activeAbility = hUnit:GetCurrentActiveAbility()
@@ -284,9 +299,10 @@ local function port_while_stuck(gsiPlayer)
 	Port_BuyPortScrollsIfNeeded(gsiPlayer)
 	if hUnit:GetItemInSlot(TPSCROLL_SLOT) then -- courier will auto send
 		--print("have port")
+		-- delayed start
 		if gsiPlayer.stuckDiagnoseBeforeTpExpiry < GameTime()
 				and AbilityLogic_AbilityCanBeCast(gsiPlayer, hUnit:GetItemInSlot(TPSCROLL_SLOT)) then
-			DOMINATE_print(gsiPlayer, "Attempting port.")
+			DOMINATE_print(gsiPlayer, false, "[player] attempting port.")
 			hUnit:ActionImmediate_Ping(gsiPlayer.lastSeen.location.x, gsiPlayer.lastSeen.location.y, true)
 			hUnit:Action_UseAbilityOnLocation(hUnit:GetItemInSlot(TPSCROLL_SLOT), Map_GetTeamFountainLocation())
 			return
@@ -302,32 +318,37 @@ local function port_while_stuck(gsiPlayer)
 	end
 	local anyHope = hatchet or mobilityItem or mobilityAbility or false
 	--print("no active")
-	if hatchet and AbilityLogic_AbilityCanBeCast(gsiPlayer, hatchet) then
-		DOMINATE_print(gsiPlayer, "Lumberjack solution.")
+	if hatchet and AbilityLogic_AbilityCanBeCast(gsiPlayer, hatchet) and gsiPlayer.stuckAttempts.hatchet < 30 then
+		gsiPlayer.stuckAttempts.hatchet = gsiPlayer.stuckAttempts.hatchet + 1
+		DOMINATE_print(gsiPlayer, false, "[player] lumberjack solution.")
 		local nearbyTrees = hUnit:GetNearbyTrees(500)
 		if nearbyTrees and nearbyTrees[1] then
 			hUnit:Action_UseAbilityOnTree(hatchet, nearbyTrees[1])
 			return;
 		end
 	end
-	local mobilityAbility = AbilityLogic_GetBestMobility(gsiPlayer)
-	if mobilityAbility and mobilityAbility:GetCooldownTimeRemaining() == 0 then
-		anyHope = true
-		if AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, mobilityAbility, ZEROED_VECTOR) then
-			DOMINATE_print(gsiPlayer, "Using random mobility ability.")
+	local mobilityItem = blink and AbilityLogic_AbilityCanBeCast(gsiPlayer, blink) and blink
+			or forceStaff and AbilityLogic_AbilityCanBeCast(gsiPlayer, forceStaff) and forceStaff
+	if mobilityItem and mobilityItem:GetCooldownTimeRemaining() == 0 and gsiPlayer.stuckAttempts.mobilityItem < 30 then
+		gsiPlayer.stuckAttempts.mobilityItem = gsiPlayer.stuckAttempts.mobilityItem + 1
+		if AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, mobilityItem,
+					Vector_PointToPointLimited(playerLoc, ZEROED_VECTOR, 600)
+				) then
+			DOMINATE_print(gsiPlayer, false, "[player] mobility item solution.")
 			return;
 		end
 	end
-	local mobilityItem = blink and AbilityLogic_AbilityCanBeCast(gsiPlayer, blink) and blink
-			or forceStaff and AbilityLogic_AbilityCanBeCast(gsiPlayer, forceStaff) and forceStaff
-	if mobilityItem and mobilityItem:GetCooldownTimeRemaining() == 0 then
-		if AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, mobilityItem, ZEROED_VECTOR) then
-			DOMINATE_print(gsiPlayer, "Mobility item solution.")
+	local mobilityAbility = AbilityLogic_GetBestMobility(gsiPlayer)
+	if mobilityAbility and mobilityAbility:GetCooldownTimeRemaining() == 0 and gsiPlayer.stuckAttempts.ability < 30 then
+		gsiPlayer.stuckAttempts.ability = gsiPlayer.stuckAttempts.ability + 1
+		anyHope = true
+		if AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, mobilityAbility, ZEROED_VECTOR) then
+			DOMINATE_print(gsiPlayer, false, "[player] using random mobility ability.")
 			return;
 		end
 	end
 	if not activeAbility then
-		local vec = Vector(sin(DotaTime()/5.0)*400.0 - 400.0, cos(DotaTime()/5.0)*400.0 - 400.0, 0)
+		local vec = Vector(sin(DotaTime()*1.5/5.0)*500.0 - 500.0, cos(DotaTime()*1.5/5.0)*500.0 - 500.0, 0)
 		hUnit:Action_MoveDirectly(vec)
 	end
 end
@@ -345,10 +366,17 @@ local function abscond_location_variation()
 	for i=1,TEAM_NUMBER_OF_BOTS do
 		local thisPlayer = t_team_bots[i]
 		--if not thisPlayer then Util_TablePrint(t_team_bots) print(i) end
-		local diff = Math_PointToPointDistance2D(last_throttled_seen_loc[i] or thisPlayer.lastSeen.location, thisPlayer.lastSeen.location)
+		local diff = Vector_PointDistance2D(last_throttled_seen_loc[i] or thisPlayer.lastSeen.location, thisPlayer.lastSeen.location)
 		-- absond movement
 		--print("abscond", thisPlayer.shortName, thisPlayer.locationVariation)
-		if not Unit_IsImmobilized(thisPlayer) then
+		local closeIsOkay = thisPlayer.recentMoveTo
+				and ( Vector_PointDistance2D(thisPlayer.lastSeen.location, thisPlayer.recentMoveTo)
+					/ thisPlayer.currentMovementSpeed*2 )^0.25 or 1
+		if not Unit_IsImmobilized(thisPlayer)
+					and ( not thisPlayer.recentMoveTo
+					or Vector_PointDistance2D(thisPlayer.recentMoveTo, thisPlayer.lastSeen.location)
+						> thisPlayer.currentMovementSpeed / 3
+				) then
 			local abscondedShiftFactor
 			local currLocVariation = thisPlayer.locationVariation
 			local isIncreasing = 5*diff > currLocVariation
@@ -359,6 +387,7 @@ local function abscond_location_variation()
 			else
 				abscondedShiftFactor = isIncreasing and (1.2 - 0.0006*currLocVariation)^2 or 0.2
 			end
+			abscondedShiftFactor = abscondedShiftFactor
 			local abscondedAdd = thisPlayer.currentMovementSpeed*abscondedShiftFactor 
 			abscondedAdd = isIncreasing and abscondedAdd or -abscondedAdd
 			thisPlayer.locationVariation = max(0, min(2000, thisPlayer.locationVariation + abscondedAdd))
@@ -369,6 +398,7 @@ local function abscond_location_variation()
 		if thisPlayer.locationVariation < DETERMINE_STUCK_LESS_THAN_DIST and thisPlayer.disabledAndDominatedFunc == nil then
 			DOMINATE_SetDominateFunc(thisPlayer, "port_while_stuck", port_while_stuck, true)
 			thisPlayer.stuckDiagnoseBeforeTpExpiry = GameTime() + 5
+			thisPlayer.stuckAttempts = {hatchet = 0, ability = 0, mobilityItem = 0}
 		end
 	end
 end
@@ -488,7 +518,9 @@ function GSI_GetTeamAverageLevel(team)
 	for i=1,#thisTeam do
 		levels = levels + (thisTeam[i].level or 0)
 	end
-	return levels / #thisTeam
+	local avgLevel = levels / #thisTeam
+	
+	return avgLevel
 end
 
 function GSI_GetTeamAverageKnownAttackDamage(team)
@@ -611,13 +643,19 @@ local function insert_player_data(thisPlayer, hUnit)
 	thisPlayer.maxHealth = hUnit:GetMaxHealth()
 	thisPlayer.lastSeenMana = hUnit:GetMana()
 	thisPlayer.maxMana = hUnit:GetMaxMana()
-	thisPlayer.attackPointPercent = hUnit:GetAttackPoint() / hUnit:GetAttackSpeed()
+	thisPlayer.armor = hUnit:GetArmor()
+	thisPlayer.magicTaken = 1 - hUnit:GetMagicResist()
+	thisPlayer.evasion = hUnit:GetEvasion()
+	thisPlayer.attackPointPercent = hUnit:GetAttackPoint() -- updated in projtl
+	thisPlayer.halfSecAttack = hUnit:GetSecondsPerAttack() / 2
 	thisPlayer.BAT = hUnit:GetSecondsPerAttack() * hUnit:GetAttackSpeed() -- always 1.7 -- nb. GetAttackSpeed() is a percentage float
+	thisPlayer.turnRate = TURN_RATE_BASIC
 	thisPlayer.name = GSI_GetUnitName(thisPlayer)
 	thisPlayer.shortName = GSI_GetHeroShortName(thisPlayer)
 	thisPlayer.isCaptain = Team_AmITheCaptain(thisPlayer)
+	thisPlayer.difficulty = hUnit:GetDifficulty()
 	thisPlayer.attackRange = hUnit:GetAttackRange()
---[[PRIMATIVE]]thisPlayer.isRanged = thisPlayer.attackRange > MINIMUM_RANGE_UNIT_RANGE -- Needs check table	
+--[[PRIMATIVE]]thisPlayer.isRanged = Unit_UnitIsRanged(thisPlayer)
 end
 
 local recyclable_dominated_units = {}
@@ -740,11 +778,15 @@ function pUnit_LoadEnemyPlayer(playerId, nOnTeam)
 	thisEnemyPlayer.maxHealth = 600
 	thisEnemyPlayer.lastSeenMana = 300
 	thisEnemyPlayer.maxMana = 300
+	thisEnemyPlayer.armor = 2
+	thisEnemyPlayer.magicTaken = 0.75
+	thisEnemyPlayer.evasion = 0
 	thisEnemyPlayer.attackRange = 200
 	thisEnemyPlayer.type = UNIT_TYPE_HERO
 	thisEnemyPlayer.needsVisibleData = true
 	thisEnemyPlayer.typeIsNone = true
 	thisEnemyPlayer.attackPointPercent = PLACEHOLDER_ATTACK_POINT
+	thisEnemyPlayer.turnRate = TURN_RATE_BASIC
 	thisEnemyPlayer.currentMovementSpeed = PLACEHOLDER_MOVEMENT_SPEED
 	thisEnemyPlayer.level = GetHeroLevel(playerId)
 	thisEnemyPlayer.lastSeen = Map_CreateLastSeenTable(
@@ -791,7 +833,7 @@ function GSI_GetBot()
 end
 
 function GSI_GetPlayerFromUnit(hUnit)
-	GSI_GetPlayerFromPlayerID(hUnit.playerID)
+	GSI_GetPlayerFromPlayerID(hUnit:GetPlayerID())
 end
 
 function GSI_GetPlayerFromPlayerID(playerId)
@@ -803,19 +845,24 @@ function GSI_GetPlayerFromPlayerID(playerId)
 end
 
 function GSI_GetPlayerByName(name)
-	for i=1,TEAM_NUMBER_OF_PLAYERS do
-		if t_team_players[i].shortName == name then
-			return t_team_players[i]
+	local players = t_team_players
+	for i=1,#players do
+		if players[i].shortName == name then
+			return players[i]
 		end
 	end
-	for i=1,ENEMY_TEAM_NUMBER_OF_PLAYERS do
-		if t_enemy_players[i].shortName == name then
-			return t_enemy_players[i]
+	players = t_enemy_players
+	for i=1,#players do
+		if players[i].shortName == name then
+			return players[i]
 		end
 	end
 end
 
 function GSI_GetTeamPlayers(team)
+	if team == BOTH_TEAMS then
+		return t_team_players, t_enemy_players
+	end
 	return team == TEAM and t_team_players or team == ENEMY_TEAM and t_enemy_players
 end
 
@@ -877,6 +924,7 @@ function GSI_HandleZetBotGenericCreated()
 	end
 	if GSI_READY then
 		arc_tempest_double_player = pUnit_CreateDominatedUnit(thisPlayerId, GetBot())
+		AbilityLogic_UpdateHighUseMana(arc_tempest_double_player, {})
 		arc_tempest_double_player.isTempest = true
 		INFO_print(string.format("Registered tempest double: %s",
 				tostring(arc_tempest_double_player) )

@@ -1,10 +1,10 @@
 local hero_data = {
 	"nyx_assassin",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 2, 2, 7, 5, 4, 9, 11},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_enchanted_mango","item_faerie_fire","item_branches","item_magic_wand","item_ring_of_health","item_pers","item_meteor_hammer","item_boots","item_arcane_boots","item_staff_of_wizardry","item_crown","item_dagon_5","item_aghanims_shard","item_dagon_2L","item_dagon_3L","item_dagon_4L","item_dagon_5L","item_ghost",
+		"item_slippers","item_circlet","item_branches","item_branches","item_enchanted_mango","item_tango","item_quelling_blade","item_wraith_band","item_ring_of_health","item_crown","item_meteor_hammer","item_boots","item_wind_lace","item_chainmail","item_phase_boots","item_aghanims_shard","item_null_talisman","item_magic_wand","item_crown","item_staff_of_wizardry","item_dagon_5","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_aether_lens","item_vitality_booster","item_energy_booster","item_octarine_core",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,4,4,}, 0.1 },
+	{ {3,3,3,3,5,}, {4,4,4,4,3,}, 0.1 },
 	{
 		"Impale","Mana Burn","Spiked Carapace","Vendetta","+8% Spell Amplification","+0.25s Impale Stun Duration","+0.5s Spiked Carapace Reflect Duration","+0.5x Mana Burn Intelligence Multiplier","+0.6s Spiked Carapace Stun Duration","+130 Impale Damage","+300 Mana Burn Radius","Vendetta Unobstructed Pathing",
 	}
@@ -14,7 +14,7 @@ if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"nyx_assassin_impale", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN},
-		{"nyx_assassin_mana_burn", ABILITY_TYPE.NUKE + ABILITY_TYPE.DEGEN},
+		{"nyx_assassin_jolt", ABILITY_TYPE.NUKE + ABILITY_TYPE.DEGEN},
 		{"nyx_assassin_spiked_carapace", ABILITY_TYPE.NUKE + ABILITY_TYPE.SHIELD},
 		{"nyx_assassin_burrow", ABILITY_TYPE.SHIELD + ABILITY_TYPE.UTILITY},
 		{"nyx_assassin_unburrow", ABILITY_TYPE.MOBILITY + ABILITY_TYPE.UTILITY},
@@ -67,6 +67,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["impale_range"] = {[true] = 1225, [false] = 700},
 	["ImpaleRange"] = function(isBurrowed) return d.impale_range[isBurrowed] end,
@@ -76,7 +77,7 @@ d = {
 		end
 		local thisPlayerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
 		local impale = thisPlayerAbilities[1]
-		local manaBurn = thisPlayerAbilities[2]
+		local jolt = thisPlayerAbilities[2]
 		local spikedCarapace = thisPlayerAbilities[3]
 		local vendetta = thisPlayerAbilities[6]
 
@@ -120,7 +121,8 @@ end
 		if CAN_BE_CAST(gsiPlayer, spikedCarapace)
 					and HIGH_USE(gsiPlayer, spikedCarapace, highUse - spikedCarapace:GetManaCost(), playerHpp) then
 			local damageRecorded, numHeroesAttacking = Analytics_GetTotalDamageNumberAttackers(gsiPlayer)
-			if (numHeroesAttacking > 0
+			local anyIntent = FightClimate_AnyIntentToHarm(gsiPlayer, nearbyEnemies)
+			if (numHeroesAttacking > 0 or (anyIntent and gsiPlayer.lastSeenHealth < 0.4)
 						and (currentActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
 							or currentActivityType > ACTIVITY_TYPE.CAREFUL))
 					or numHeroesAttacking > 1 then
@@ -146,17 +148,17 @@ end
 					return;
 				end
 			end
-			if not breakingStealthDisallowed and CAN_BE_CAST(gsiPlayer, manaBurn) then
+			if not breakingStealthDisallowed and CAN_BE_CAST(gsiPlayer, jolt) then
 				local bestTarget
 				local bestTargetHpp = 1.0
 				local highestTargetScore = 0
-				local burnMultiplier = manaBurn:GetSpecialValueFloat("float_multiplier")
+				local burnMultiplier = jolt:GetSpecialValueFloat("float_multiplier")
 				for i=1,#nearbyEnemies do
 					local thisEnemy = nearbyEnemies[i]
 					if not pUnit_IsNullOrDead(thisEnemy) then
 						local thisDamage = thisEnemy.hUnit:GetAttributeValue(ATTRIBUTE_INTELLECT)*burnMultiplier
 						local trueDamage = min(thisDamage, thisEnemy.lastSeenMana)
-								* SPELL_SUCCESS(gsiPlayer, thisEnemy, manaBurn)
+								* SPELL_SUCCESS(gsiPlayer, thisEnemy, jolt)
 						local healthRemainingFactor = (trueDamage / thisDamage)
 								* (1 - abs((thisEnemy.lastSeenHealth - trueDamage) / thisEnemy.maxHealth))
 						local thisScore = trueDamage * healthRemainingFactor
@@ -167,8 +169,8 @@ end
 						end
 					end
 				end
-				if HIGH_USE(gsiPlayer, manaBurn, highUse - manaBurn:GetManaCost(), bestTargetHpp) then
-					USE_ABILITY(gsiPlayer, manaBurn, bestTarget, 400, nil)
+				if HIGH_USE(gsiPlayer, jolt, highUse - jolt:GetManaCost(), bestTargetHpp) then
+					USE_ABILITY(gsiPlayer, jolt, bestTarget, 400, nil)
 					return;
 				end
 			end
@@ -185,7 +187,7 @@ end
 				local crowdedEnemy = Set_GetNearestEnemyHeroToLocation(
 						Vector_PointBetweenPoints(playerLoc, crowdingCenter)
 					)
-				print("crowded center:", crowdedEnemy)
+				
 				if crowdedEnemy then
 					local distToCrowded = Vector_PointDistance(playerLoc, crowdedEnemy.lastSeen.location)
 					local extrapolatedTime = IMPALE_CAST_POINT + distToCrowded / IMPALE_TRAVEL_SPEED
@@ -202,6 +204,24 @@ end
 					and HIGH_USE(gsiPlayer, vendetta, highUse - vendetta:GetManaCost(), playerHpp) then
 				USE_ABILITY(gsiPlayer, vendetta, nil, 400, nil)
 				return;
+			end
+		end
+		if currentTask == push_handle
+				and gsiPlayer.time.data.theorizedDanger
+				and gsiPlayer.time.data.theorizedDanger < 0
+				and gsiPlayer.time.data.theorizedEngageables == 0
+				and #nearbyEnemies + #outerEnemies == 0
+				and CAN_BE_CAST(gsiPlayer, impale) then
+			local nearbyCreeps = Set_GetNearestEnemyCreepSetAtLaneLoc(
+					gsiPlayer.lastSeen.location, Map_GetBaseOrLaneLocation(gsiPlayer.lastSeen.location)
+				)
+			if nearbyCreeps and Vector_PointDistance2D(playerLoc, nearbyCreeps.center) < impaleRange then
+				local crowdingCenter, crowdedRating
+						= CROWDED_RATING(nearbyCreeps.center, SET_CREEP_ENEMY, nearbyCreeps.units, 250)
+				if crowdedRating > 2 then
+					USE_ABILITY(gsiPlayer, impale, crowdingCenter, 400, nil)
+					return;
+				end
 			end
 		end
 	end,

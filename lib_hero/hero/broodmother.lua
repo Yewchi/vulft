@@ -2,7 +2,7 @@ local hero_data = {
 	"broodmother",
 	{2, 3, 1, 2, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9, 12},
 	{
-		"item_quelling_blade","item_tango","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_blight_stone","item_boots","item_arcane_boots","item_soul_ring","item_headdress","item_mekansm","item_buckler","item_guardian_greaves","item_hood_of_defiance","item_headdress","item_pipe","item_point_booster","item_ultimate_scepter","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_void_stone","item_sheepstick",
+		"item_tango","item_branches","item_circlet","item_quelling_blade","item_branches","item_slippers","item_wraith_band","item_boots","item_magic_wand","item_arcane_boots","item_crown","item_meteor_hammer","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_blitz_knuckles","item_orchid","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_black_king_bar",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

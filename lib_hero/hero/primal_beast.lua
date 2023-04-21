@@ -1,10 +1,10 @@
 local hero_data = {
 	"primal_beast",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 8, 3, 4, 9, 11},
+	{1, 2, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_magic_stick","item_faerie_fire","item_quelling_blade","item_ward_observer","item_branches","item_branches","item_bottle","item_wind_lace","item_boots","item_chainmail","item_magic_wand","item_phase_boots","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_sange","item_staff_of_wizardry","item_kaya_and_sange","item_blink","item_ultimate_orb","item_sheepstick","item_overwhelming_blink","item_pers","item_pers","item_refresher","item_ultimate_scepter_2",
+		"item_branches","item_gauntlets","item_gauntlets","item_tango","item_branches","item_boots","item_phase_boots","item_wind_lace","item_soul_ring","item_magic_wand","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_blink","item_gem",
 	},
-	{ {3,3,2,2,1,}, {3,3,2,2,5,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
 		"Onslaught","Trample","Uproar","Pulverize","+90 Onslaught Damage","+20% Magic Resistance During Trample","-5s Trample Cooldown","Beast dispels himself when activating Uproar","+25% Trample Attack Multiplier","+4 Uproar Armor Per Stack","Pulverize Pierces Magic Immunity","+100%% Pulverize Duration",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

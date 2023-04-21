@@ -1,8 +1,8 @@
 local hero_data = {
 	"warlock",
-	{2, 3, 2, 3, 3, 4, 3, 1, 1, 6, 1, 4, 1, 2, 7, 2, 4, 9},
+	{2, 1, 2, 3, 3, 4, 3, 3, 2, 2, 1, 4, 1, 1, 7, 5, 4, 9, 12},
 	{
-		"item_branches","item_tango","item_magic_stick","item_branches","item_enchanted_mango","item_ward_observer","item_faerie_fire","item_boots","item_magic_wand","item_ring_of_basilius","item_crown","item_veil_of_discord","item_wind_lace","item_belt_of_strength","item_robe","item_ancient_janggo","item_tranquil_boots","item_boots_of_bearing","item_gem","item_fluffy_hat","item_gem","item_staff_of_wizardry","item_force_staff",
+		"item_tango","item_magic_stick","item_enchanted_mango","item_faerie_fire","item_ward_dispenser","item_ring_of_basilius","item_magic_wand","item_boots","item_aghanims_shard","item_headdress","item_arcane_boots","item_fluffy_hat","item_holy_locket","item_headdress","item_chainmail","item_buckler","item_mekansm","item_guardian_greaves","item_buckler","item_vladmir","item_wraith_pact",
 	},
 	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
@@ -10,7 +10,7 @@ local hero_data = {
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 	[0] = {"warlock_fatal_bonds", ABILITY_TYPE.DEGEN + ABILITY_TYPE.AOE + ABILITY_TYPE.NUKE},
@@ -57,6 +57,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if ABILITY_LOCKED(gsiPlayer) then

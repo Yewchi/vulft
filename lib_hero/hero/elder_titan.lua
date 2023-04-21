@@ -1,10 +1,10 @@
 local hero_data = {
 	"elder_titan",
-	{2, 1, 2, 1, 2, 1, 2, 1, 4, 3, 3, 4, 3, 3, 8, 5, 4, 9, 11},
+	{2, 3, 2, 3, 2, 3, 2, 3, 1, 6, 4, 1, 1, 4, 8, 1, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_gauntlets","item_faerie_fire","item_boots","item_blight_stone","item_orb_of_venom","item_gloves","item_hand_of_midas","item_phase_boots","item_blade_of_alacrity","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_lesser_crit","item_invis_sword","item_silver_edge","item_blitz_knuckles","item_javelin","item_monkey_king_bar","item_basher","item_abyssal_blade","item_desolator",
+		"item_enchanted_mango","item_branches","item_circlet","item_slippers","item_quelling_blade","item_tango","item_wraith_band","item_boots","item_chainmail","item_wind_lace","item_chainmail","item_phase_boots","item_blade_of_alacrity","item_quarterstaff","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_lifesteal","item_mask_of_madness","item_aghanims_shard","item_lesser_crit","item_greater_crit","item_blink","item_desolator","item_basher",
 	},
-	{ {1,1,1,3,3,}, {5,5,3,4,1,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,4,5,}, 0.1 },
 	{
 		"Echo Stomp","Astral Spirit","Natural Order","Earth Splitter","+2% Astral Spirit Move Speed Per Hero","+25 Attack Speed","+75 Echo Stomp Damage","+25 Astral Spirit Hero Attack","+100% Cleave","+100 Natural Order Radius","-60s Earth Splitter Cooldown","+450 Echo Stomp Wake Damage",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -68,7 +68,7 @@ local function alloc_or_recycle_queue_node(hAbility, target, score, comboIdentif
 	new[4] = comboIdentifier or false			 -- ..4 -- recycled node is clean
 	if not comboIdentifier and not actionFunc then print("ACTION FUNC NIL", debug.traceback()) end
 	new[5] = actionFunc
-	new[6] = GameTime() + (elapseExpiry or (hAbility:GetCastPoint() + hAbility:GetChannelTime() + 1)) -- NB. 1 sec limit on combo behaviour -- UseAbility_RefreshQueueTop(gsiPlayer) for long sequences
+	new[6] = GameTime() + (elapseExpiry or (hAbility:GetCastPoint() + hAbility:GetChannelTime() + 1)) -- NB. 1 sec limit on combo behavior -- UseAbility_RefreshQueueTop(gsiPlayer) for long sequences
 	
 	return new
 end
@@ -140,7 +140,6 @@ function UseAbility_IndicateCastCompleted(castInfo) -- Installed @ AbilityThink_
 		end
 	end
 end
-
 
 -------- UseAbility_SetComboScore(...)
 -- - For reprioritizing combos that have been put to sleep by
@@ -227,22 +226,50 @@ function UseAbility_ClearQueuedAbilities(gsiPlayer, scoreBreaking)
 	if VERBOSE then VEBUG_print(string.format("use_ability: Cleared %s ability queue. Abilities remaining: %s", gsiPlayer.shortName, tostring(t_abilities_queued[pnot]))) end
 end
 
+local squelch_not_off_cd = 5
 function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, target, scoreToBreak, comboIdentifier, doNotCastPointSkip, skipQueue, elapseExpiry, forceAbilityFunc)
+	if gsiPlayer.level-gsiPlayer.vibe.greedRating*10 < 5 then
+		local attackTarget = gsiPlayer.hUnit:GetAttackTarget()
+		if attackTarget and attackTarget:IsCreep() and attackTarget:GetTeam() ~= gsiPlayer.team
+				and gsiPlayer.hUnit:GetAnimCycle() < gsiPlayer.attackPointPercent
+				and attackTarget:GetHealth() < gsiPlayer.hUnit:GetAttackDamage() then
+			if DEBUG then
+				DEBUG_print(string.format("[use_ability] Rejecting register ability of low level and greedy %s attacking %s that would die", gsiPlayer.shortName, not attackTarget:IsNull() and attackTarget:GetUnitName()))
+			end
+			return false
+		end
+	end
 	local nOnTeam = gsiPlayer.nOnTeam
 	scoreToBreak = (scoreToBreak or HIGH_32_BIT) + 250 -- [[HOTFIX]] defense and push tasks are too high
 
-	local isAbility = type(abilityOrFunc) == "table" and true or false
+	local isAbility = type(abilityOrFunc) == "table" and abilityOrFunc.GetCooldownTimeRemaining and true or false
 	local actionFunc = forceAbilityFunc
 
 	
 	
 	if isAbility and not forceAbilityFunc then
 		actionFunc = AbilityLogic_GetBestFitCastFunc(gsiPlayer, abilityOrFunc, target)
+		if actionFunc == gsiPlayer.hUnit.Action_UseAbilityOnLocation
+				and target and not target.x
+				and (target.lastSeen or target.GetLocation) then
+			target = target.hUnit and target.lastSeen.location or target:GetLocation()
+		end
+	end
+	if actionFunc and isAbility and abilityOrFunc:GetCooldownTimeRemaining() ~= 0 then
+		if squelch_not_off_cd > 0 then
+			squelch_not_off_cd = squelch_not_off_cd - 1
+			WARN_print("[use_ability] Attempt to register an ability which is on cooldown. %s(%s): t=%.2f.%s",
+					gsiPlayer.shortName, abilityOrFunc:GetName(),
+					abilityOrFunc:GetCooldownTimeRemaining(),
+					squelch_not_off_cd > 0 and "" or " - SQUELCHED"
+				)
+			print(debug.traceback())
+		end
 	end
 
 	if TEST then print("use_ability: [RegisterAbilityUseAndLockToScore]", gsiPlayer.shortName, isAbility and abilityOrFunc:GetName() or 'func', target, Util_Printable(target), isAbility, actionFunc, forceAbilityFunc) end
 
-	if skipQueue or (isAbility and not doNotCastPointSkip and abilityOrFunc:GetCastPoint() == 0) then -- e.g. spells with 0.0 cast point can be cast immediately even if other spells are to be cast -- TODO Does it need a facing direction? Probably should have target-in-range check and ability-needs-correct-facing-direction -- doNotCastPointSkip is because we may queue stun -> safety TP type behaviour.
+	if skipQueue or (isAbility and not doNotCastPointSkip and abilityOrFunc:GetCastPoint() == 0) then -- e.g. spells with 0.0 cast point can be cast immediately even if other spells are to be cast -- TODO Does it need a facing direction? Probably should have target-in-range check and ability-needs-correct-facing-direction -- doNotCastPointSkip is because we may queue stun -> safety TP type behavior.
 		local nextNode = t_abilities_queued[nOnTeam]
 		t_abilities_queued[nOnTeam] = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry)
 		t_abilities_queued[nOnTeam][QUEUED_ABILITY_I__NEXT_NODE] = nextNode
@@ -403,7 +430,7 @@ blueprint = {
 				end
 			else
 				if target and not target.x then
-					WARN_print(string.format("[use_ability] Undefined behaviour type 1. '%s' casts: '%s' -> '%s'",
+					WARN_print(string.format("[use_ability] Undefined behavior type 1. '%s' casts: '%s' -> '%s'",
 								gsiPlayer.shortName,
 								type(abilityOrFunc) == "table" and abilityOrFunc.GetName and abilityOrFunc:GetName()
 										or Util_Printable(abilityOrFunc),
@@ -415,7 +442,7 @@ blueprint = {
 			end
 		else
 			if type(target) ~= "number" then
-				WARN_print(string.format("[use_ability] Undefined behaviour type 2. '%s' casts: '%s' -> '%s'",
+				WARN_print(string.format("[use_ability] Undefined behavior type 2. '%s' casts: '%s' -> '%s'",
 							gsiPlayer.shortName,
 							type(abilityOrFunc) == "table" and abilityOrFunc.GetName and abilityOrFunc:GetName()
 									or Util_Printable(abilityOrFunc),

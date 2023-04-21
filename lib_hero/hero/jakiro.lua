@@ -1,10 +1,10 @@
 local hero_data = {
 	"jakiro",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 5, 2, 4, 3, 3, 8, 3, 4, 10, 11},
+	{1, 3, 1, 2, 3, 4, 2, 2, 2, 1, 1, 4, 3, 3, 8, 5, 4, 9},
 	{
-		"item_tango","item_circlet","item_faerie_fire","item_ward_sentry","item_circlet","item_faerie_fire","item_wind_lace","item_boots","item_arcane_boots","item_wind_lace","item_aether_lens","item_ghost","item_arcane_boots","item_aghanims_shard","item_gem","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem",
+		"item_tango","item_enchanted_mango","item_flask","item_ward_sentry","item_branches","item_branches","item_boots","item_arcane_boots","item_wind_lace","item_magic_wand","item_cloak","item_shadow_amulet","item_glimmer_cape","item_aether_lens","item_wind_lace","item_tranquil_boots","item_boots_of_bearing","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_gem","item_ultimate_scepter",
 	},
-	{ {1,1,1,5,2,}, {5,5,5,4,2,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,3,}, 0.1 },
 	{
 		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+275 Attack Range","-10%/-10 Dual Breath Movement/Attack Speed Slow","-50 Liquid Fire Attack Speed","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","+100%% Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
 	}
@@ -46,6 +46,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

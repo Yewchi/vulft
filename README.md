@@ -1,6 +1,6 @@
 VULFT - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 19/03/23. Requires manual install into vscripts/bots folder (all recently released bots have this issue). VUL-FT has no affiliation with DotaBuff.<br/>
 <br/>
-[Translations of This Page in Other Languages](https://github.com/Yewchi/vulft/blob/main/TRANSLATION.md)<br/>
+[Translations of This Page in Other Languages](https://steamcommunity.com/groups/VULFT/announcements/detail/6966546241858334331)<br/>
 <br/>
 
 ## == Manually installing ==
@@ -109,5 +109,11 @@ Is the project currently stable: Stable, no game crashes or script breaking over
 Last DotaBuff meta update: 19/03/23<br/>
 <br/>
 
-## == Dev contact ==
+## == Support ==
+Please shoot me an email for any questions or to support the project: <br/>
 zyewchi@gmail.com<br/>
+
+If you would like to support the project, my paypal is on the above email with the goofy robot icon. Support means I can justify more time to make them better. But also just a nice comment on the workshop page helps a lot.
+
+## == Dev contact ==
+Michael - zyewchi@gmail.com<br/>

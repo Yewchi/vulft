@@ -92,7 +92,7 @@ local t_ward_correction = {} -- Corrected for use -- Assume to either be an appr
 --		Vector(1364.00, -5116.00, 384.00),
 --		Vector(2144.00, -716.00, 384.00),
 --		Vector(2914.00, -3036.00, 384.00),
---		Vector(4854.00, 844.00, 384.00)
+--		Vector(4854.00, 844.00, 384.00) -- this is commented out because the aim is to get the auto-generation satisfactory, they are current 7.32e
 --	}
 
 local t_ward_loc_reserved = {}
@@ -338,12 +338,17 @@ end
 								end
 							end
 						end
-						if highestBuyBot and (obsStock > 1 or RandomInt(0, 16) == 0) then
+						local _, _, hItemWards = highestBuyBot and Item_IsHoldingAnyDispenser(highestBuyBot)
+						if highestBuyBot and obsStock > 1
+								and (not hItemWards or hItemWards:GetCurrentCharges() < 4) then
 							Item_InsertItemToItemBuild(highestBuyBot, "item_ward_observer")
 							if DEBUG then INFO_print(
-									string.format("[vantage] %s buys observer wards with score %.2f",
+									string.format("[vantage] %s buys observer wards with score %.2f, holds %d, %d, %d",
 										highestBuyBot.shortName,
-										highestBuyScore
+										highestBuyScore,
+										hItemWards and hItemWards:GetCurrentCharges() or 0,
+										hItemWards and hItemWards:GetSecondaryCharges() or 0,
+										hItemWards and hItemWards:GetInitialCharges() or 0
 									)
 								)
 							end
@@ -381,6 +386,12 @@ function VAN_InformDefensibleFell(gsiBuilding)
 		end
 	end
 	local i = 1
+
+
+
+
+
+
 	while (i <= count_reserve_ward_spots) do
 		local thisLoc = t_ward_loc_reserved[i]
 		if VERBOSE then
@@ -413,6 +424,14 @@ function VAN_InformDefensibleFell(gsiBuilding)
 			i = i + 1
 		end
 	end
+	
+	Util_TablePrint(t_ward_loc[1])
+
+
+
+
+
+
 end
 
 function VAN_GetWardLocations()
@@ -469,6 +488,11 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 					Util_Printable(isCorrected ~= nil)
 				)
 			)
+		
+		
+		
+		
+		
 		return false; -- MODULE MUST CORRECT ITSELF
 	end
 
@@ -482,8 +506,10 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 		end
 		DebugDrawLine(t_ward_loc[wardIndex], correctedVec, 0, 255, 255)
 		if Vector_PointDistance2D(gsiPlayer.lastSeen.location, correctedVec) > 1600 then
-			Positioning_ZSMoveCasual(gsiPlayer, correctedVec, 150, 900, false, false)
+			
+			Positioning_ZSMoveCasual(gsiPlayer, correctedVec, 150, 900, 1, false)
 		else
+			
 			gsiPlayer.hUnit:Action_UseAbilityOnLocation(hItem, correctedVec)
 		end
 		
@@ -552,7 +578,7 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 		gsiPlayer.hUnit:Action_ClearActions(true)
 		t_player_check_index[pnot] = wardIndex
 		t_player_check_frame[pnot] = 0
-		t_player_check_limit[pnot] = GameTime() + 0.5
+		t_player_check_limit[pnot] = GameTime() + 5
 		gsiPlayer.hUnit:Action_UseAbilityOnLocation(hItem, correctedVec)
 		INFO_print(
 				string.format("[vantage] starting ward location correction on %s...",
@@ -567,15 +593,18 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 				or Vector_PointDistance(gsiPlayer.lastSeen.location, correctedVec) < hItem:GetCastRange()*1.1 then
 			t_player_check_limit[pnot] = 0
 			return false; -- Cannot confirm it works, because the location is visible || we are close enough to go idle from placing.
-		elseif gsiPlayer.hUnit:GetCurrentActionType() == BOT_ACTION_TYPE_USE_ABILITY then
+		elseif gsiPlayer.hUnit:GetCurrentActionType() == BOT_ACTION_TYPE_USE_ABILITY
+				and hUnit:GetCurrentActiveAbility()
+				and string.find(hUnit:GetCurrentActiveAbility():GetName(), "ward") then
 			gsiPlayer.hUnit:Action_UseAbilityOnEntity(hItem, gsiPlayer.hUnit)
 			-- We lasted two frames after ordering a use ward at location, must be fine. (may still be on low ground, terribly placed)
 			t_ward_correction[wardIndex] = correctedVec
 			t_ward_is_corrected[wardIndex] = true
 			INFO_print(
 					string.format(
-						"[vantage] Automatically corrected a presumed warding pillar location on final action %s. %s",
+						"[vantage] Automatically corrected a presumed warding pillar location on final action %s. %s. %s",
 						hUnit:GetCurrentActionType(),
+						hUnit:GetCurrentActiveAbility() and hUnit:GetCurrentActiveAbility():GetName(),
 						tostring(correctedVec)
 					)
 				)
@@ -593,7 +622,11 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 		t_ward_loc[wardIndex] = t_ward_loc[count_ward_spots]
 		t_ward_loc[count_ward_spots] = false
 		t_is_warded[wardIndex] = t_is_warded[count_ward_spots]
-		t_is_warded[wardIndex] = nil
+		t_is_warded[count_ward_spots] = nil
+		t_ward_is_corrected[wardIndex] = t_ward_is_corrected[count_ward_spots]
+		t_ward_is_corrected[count_ward_spots] = false
+		t_ward_score_cache[wardIndex] = t_ward_score_cache[count_ward_spots]
+		t_ward_score_cache[count_ward_spots] = nil
 		count_ward_spots = count_ward_spots-1
 		for k=1,3 do
 			if t_preferred_ward_index_cache[k] == wardIndex then
@@ -605,12 +638,20 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 				break;
 			end
 		end
+
+
+
+
+
+
+
+
+
 		return false;
 	end
 	return true; -- keep waiting
 end
 local F_GUIDE_WARD = VAN_GuideWardAtIndex
-
 
 function VAN_GuideWardAtIndexKillDevalued(gsiPlayer, wardIndex, hItem)
 	for i=1,3 do

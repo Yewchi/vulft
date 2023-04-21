@@ -1,10 +1,10 @@
 local hero_data = {
 	"chen",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 3, 3, 4, 3, 3, 7, 5, 4, 9, 12},
+	{2, 1, 2, 1, 2, 4, 2, 1, 3, 5, 1, 4, 3, 3, 3, 7, 4},
 	{
-		"item_ward_dispenser","item_ring_of_basilius","item_boots","item_chainmail","item_mekansm","item_aghanims_shard","item_lifesteal","item_buckler","item_vladmir","item_ring_of_health","item_cloak","item_belt_of_strength","item_hood_of_defiance","item_tranquil_boots","item_ancient_janggo","item_headdress","item_boots_of_bearing","item_pipe","item_point_booster","item_wraith_pact",
+		"item_tango","item_headdress","item_ward_dispenser","item_ring_of_basilius","item_chainmail","item_mekansm","item_boots","item_arcane_boots","item_buckler","item_guardian_greaves","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_platemail","item_hyperstone","item_buckler","item_assault",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {1,1,3,4,4,}, {5,5,5,3,4,}, 0.1 },
 	{
 		"Penitence","Holy Persuasion","Divine Favor","Hand of God","Penitence Deals 225 Damage","-2s Holy Persuasion Teleport Delay","+12 Holy Persuasion Damage","+12% Penitence Slow","-30s Hand of God Cooldown","+1200 Holy Persuasion Minimum Health","Hand of God applies a Strong Dispel","+10/+10 Hand of God Heal/Heal Over Time",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -1,8 +1,8 @@
 local hero_data = {
 	"faceless_void",
-	{1, 2, 3, 1, 3, 4, 1, 3, 3, 1, 2, 4, 2, 2, 7, 6, 9, 4, 11},
+	{1, 2, 3, 1, 3, 4, 3, 1, 1, 3, 2, 4, 2, 2, 7, 6, 9, 4, 11},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_branches","item_magic_stick","item_tango","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_magic_wand","item_mithril_hammer","item_black_king_bar","item_sange","item_blade_of_alacrity","item_boots_of_elves","item_sange_and_yasha","item_hyperstone","item_mjollnir","item_ultimate_orb","item_skadi","item_refresher","item_silver_edge",
+		"item_tango","item_branches","item_branches","item_quelling_blade","item_slippers","item_circlet","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_lifesteal","item_mask_of_madness","item_blade_of_alacrity","item_magic_wand","item_yasha","item_manta","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_aghanims_shard","item_butterfly","item_moon_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

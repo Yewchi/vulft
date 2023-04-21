@@ -1,10 +1,10 @@
 local hero_data = {
 	"templar_assassin",
-	{3, 1, 1, 3, 1, 4, 1, 3, 2, 2, 2, 4, 2, 3, 8, 5, 4, 9, 12},
+	{2, 3, 1, 1, 1, 4, 1, 3, 2, 2, 2, 4, 3, 3, 8, 5, 4, 9, 12},
 	{
-		"item_ward_observer","item_tango","item_branches","item_branches","item_faerie_fire","item_branches","item_slippers","item_circlet","item_bottle","item_gloves","item_boots","item_blight_stone","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_blink","item_mithril_hammer","item_desolator","item_aghanims_shard","item_black_king_bar","item_sheepstick","item_swift_blink","item_nullifier","item_blitz_knuckles","item_claymore","item_mage_slayer","item_bloodthorn","item_moon_shard",
+		"item_magic_wand","item_circlet","item_branches","item_quelling_blade","item_circlet","item_magic_stick","item_wraith_band","item_boots","item_boots_of_elves","item_gloves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_blight_stone","item_dragon_lance","item_mithril_hammer","item_desolator","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_lesser_crit","item_invis_sword","item_silver_edge","item_swift_blink","item_sheepstick","item_quarterstaff","item_butterfly",
 	},
-	{ {2,2,2,1,1,}, {2,2,2,1,1,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Refraction","Meld","Psi Blades","Psionic Trap","+25 Refraction Damage","+110 Psionic Trap Damage","Refraction Can Be Cast While Disabled","+120 Psi Blades Attack and Spill Range","Meld Dispels","-3 Meld Armor Reduction","1.0s Meld Hit Bash","+7 Refraction Instances",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

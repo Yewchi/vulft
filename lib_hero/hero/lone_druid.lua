@@ -1,8 +1,8 @@
 local hero_data = {
 	"lone_druid",
-	{1, 2, 2, 1, 2, 4, 2, 1, 1, 3, 3, 4, 3, 3, 7, 5, 4, 9, 12},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 3, 5, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_boots","item_magic_stick","item_quelling_blade","item_branches","item_branches","item_branches","item_tango","item_blades_of_attack","item_phase_boots","item_quarterstaff","item_lifesteal","item_mask_of_madness","item_orb_of_corrosion","item_blight_stone","item_mithril_hammer","item_mithril_hammer","item_desolator","item_aghanims_shard","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_buckler","item_wraith_band","item_wraith_band","item_magic_wand","item_lifesteal","item_blades_of_attack","item_ring_of_basilius","item_vladmir","item_boots_of_bearing","item_medallion_of_courage","item_crown","item_wind_lace","item_solar_crest",
+		"item_branches","item_tango","item_branches","item_quelling_blade","item_branches","item_branches","item_blades_of_attack","item_boots","item_phase_boots","item_gloves","item_quarterstaff","item_lifesteal","item_blight_stone","item_mask_of_madness","item_mithril_hammer","item_desolator","item_aghanims_shard","item_mithril_hammer","item_belt_of_strength","item_basher","item_buckler","item_hyperstone","item_platemail","item_assault","item_ogre_axe","item_mithril_hammer","item_black_king_bar",
 	},
 	{ {2,2,2,1,1,}, {2,2,2,1,1,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

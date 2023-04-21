@@ -1,16 +1,16 @@
 local hero_data = {
 	"rattletrap",
-	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 4, 5, 2, 2, 8, 2, 4, 9, 11},
+	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 8, 2, 4, 10, 12},
 	{
-		"item_tango","item_wind_lace","item_branches","item_branches","item_enchanted_mango","item_ward_dispenser","item_boots","item_tranquil_boots","item_void_stone","item_crown","item_meteor_hammer","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_magic_wand","item_fluffy_hat","item_void_stone","item_blitz_knuckles","item_orchid","item_aeon_disk","item_aghanims_shard","item_black_king_bar",
+		"item_tango","item_gauntlets","item_quelling_blade","item_gauntlets","item_enchanted_mango","item_branches","item_ring_of_health","item_vanguard","item_boots","item_wind_lace","item_arcane_boots","item_magic_wand","item_headdress","item_chainmail","item_mekansm","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_buckler","item_guardian_greaves","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_platemail",
 	},
-	{ {3,3,3,1,1,}, {5,5,4,4,4,}, 0.1 },
+	{ {3,3,3,5,1,}, {5,3,3,4,4,}, 0.1 },
 	{
 		"Battery Assault","Power Cogs","Rocket Flare","Hookshot","-2s Rocket Flare Cooldown","-2s Power Cogs Cooldown","+2 Power Cogs Hit To Kill","+24 Battery Assault Damage","Rocket Flare True Sight","Power Cogs Leash Units Inside","Spell Immunity Inside Power Cogs","-0.25s Battery Assault Interval",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"rattletrap_battery_assault", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN},
@@ -57,6 +57,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then

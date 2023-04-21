@@ -1,8 +1,8 @@
 local hero_data = {
 	"void_spirit",
-	{3, 1, 3, 2, 2, 4, 2, 2, 3, 3, 1, 4, 1, 1, 8, 6, 4, 9, 12},
+	{3, 1, 3, 1, 3, 4, 3, 2, 2, 2, 2, 4, 1, 1, 8, 6, 4, 9, 12},
 	{
-		"item_ward_observer","item_branches","item_branches","item_tango","item_faerie_fire","item_quelling_blade","item_bottle","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_null_talisman","item_null_talisman","item_kaya","item_ethereal_blade","item_ultimate_orb","item_sphere","item_aether_lens","item_octarine_core","item_ultimate_scepter","item_shivas_guard","item_aghanims_shard","item_sheepstick",
+		"item_ward_observer","item_quelling_blade","item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_staff_of_wizardry","item_robe","item_kaya","item_sange","item_kaya_and_sange","item_staff_of_wizardry","item_wind_lace","item_cyclone","item_aghanims_shard","item_wind_waker","item_energy_booster","item_aether_lens",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
@@ -10,7 +10,7 @@ local hero_data = {
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"void_spirit_aether_remnant", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN + ABILITY_TYPE.POINT_TARGET},
@@ -114,6 +114,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)
 		local locked, _, ability = UseAbility_IsPlayerLocked(gsiPlayer)

@@ -1,10 +1,10 @@
 local hero_data = {
 	"monkey_king",
-	{3, 1, 3, 2, 2, 2, 2, 4, 1, 1, 1, 6, 3, 3, 7, 4, 4, 10, 12},
+	{1, 3, 3, 2, 3, 2, 2, 1, 1, 1, 4, 4, 3, 2, 7, 6, 4, 10, 12},
 	{
-		"item_quelling_blade","item_circlet","item_slippers","item_branches","item_enchanted_mango","item_enchanted_mango","item_tango","item_branches","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_relic","item_talisman_of_evasion","item_radiance","item_magic_wand","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_skadi","item_point_booster","item_ultimate_scepter","item_maelstrom","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_refresher",
+		"item_quelling_blade","item_tango","item_circlet","item_branches","item_branches","item_orb_of_venom","item_blight_stone","item_orb_of_corrosion","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_quarterstaff","item_robe","item_echo_sabre","item_mithril_hammer","item_echo_sabre","item_black_king_bar","item_echo_sabre","item_mithril_hammer","item_blight_stone","item_desolator","item_blade_of_alacrity","item_yasha","item_manta","item_blink","item_arcane_blink","item_refresher","item_silver_edge",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
 	{
 		"Boundless Strike","Tree Dance","Jingu Mastery","Wukong's Command","+0.2s Mischief Invulnerability Duration","+0.3s Boundless Strike Stun Duration","+450 Tree Dance Cast Range","+130 Jingu Mastery Damage","+2 Jingu Mastery Charges","-7.0s Boundless Strike Cooldown","0 Cooldown Primal Spring","Additional Wukong's Command Ring",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

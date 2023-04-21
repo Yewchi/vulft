@@ -1,8 +1,8 @@
 local hero_data = {
 	"skeleton_king",
-	{1, 2, 3, 2, 2, 3, 2, 3, 4, 6, 3, 4, 1, 1, 7, 1, 4, 9, 11},
+	{1, 2, 2, 3, 2, 4, 2, 5, 3, 3, 3, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_branches","item_tango","item_slippers","item_magic_stick","item_quelling_blade","item_helm_of_iron_will","item_wraith_band","item_boots","item_blades_of_attack","item_phase_boots","item_gloves","item_armlet","item_relic","item_radiance","item_aghanims_shard","item_blink","item_hyperstone","item_buckler","item_assault","item_black_king_bar","item_monkey_king_bar","item_basher","item_vanguard","item_abyssal_blade","item_eagle","item_swift_blink",
+		"item_quelling_blade","item_tango","item_branches","item_branches","item_magic_stick","item_enchanted_mango","item_helm_of_iron_will","item_blades_of_attack","item_magic_wand","item_gloves","item_armlet","item_boots","item_chainmail","item_blight_stone","item_phase_boots","item_mithril_hammer","item_desolator","item_blitz_knuckles","item_shadow_amulet","item_invis_sword","item_broadsword","item_silver_edge","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_hyperstone","item_buckler","item_platemail","item_assault","item_aghanims_shard","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
 	},
 	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{
@@ -10,7 +10,7 @@ local hero_data = {
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"skeleton_king_hellfire_blast", ABILITY_TYPE.STUN, ABILITY_TYPE.NUKE},
@@ -63,6 +63,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then

@@ -1,8 +1,8 @@
 local hero_data = {
 	"wisp",
-	{1, 3, 1, 3},
+	{1, 3, 3, 1, 3, 4, 3, 1, 12, 6, 2, 4, 2, 2, 7, 2, 4, 9},
 	{
-		"item_magic_stick","item_ring_of_regen","item_tango","item_headdress","item_chainmail","item_mekansm","item_cloak","item_shadow_amulet","item_glimmer_cape","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_aeon_disk",
+		"item_tango","item_faerie_fire","item_magic_stick","item_ring_of_regen","item_ward_dispenser","item_headdress","item_magic_wand","item_fluffy_hat","item_holy_locket","item_headdress","item_chainmail","item_ring_of_basilius","item_mekansm","item_gem","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_ogre_axe","item_mithril_hammer","item_black_king_bar",
 	},
 	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

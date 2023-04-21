@@ -1,8 +1,8 @@
 local hero_data = {
 	"antimage",
-	{1, 2, 1, 3, 2, 4, 1, 2, 2, 6, 1, 4, 3, 3, 7, 3, 4, 10, 12},
+	{1, 2, 1, 3, 1, 4, 2, 2, 2, 1, 6, 4, 3, 3, 7, 3, 4, 10, 12},
 	{
-		"item_slippers","item_circlet","item_tango","item_tango","item_quelling_blade","item_wraith_band","item_boots","item_ring_of_health","item_gloves","item_boots_of_elves","item_power_treads","item_claymore","item_broadsword","item_bfury","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_point_booster","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_ultimate_orb","item_skadi","item_butterfly","item_ultimate_scepter_2","item_basher","item_abyssal_blade","item_moon_shard","item_moon_shard","item_moon_shard","item_reaver","item_vitality_booster","item_heart",
+		"item_branches","item_branches","item_quelling_blade","item_tango","item_orb_of_venom","item_blight_stone","item_orb_of_corrosion","item_gloves","item_ring_of_health","item_vanguard","item_boots","item_boots_of_elves","item_power_treads","item_broadsword","item_claymore","item_void_stone","item_bfury","item_yasha","item_magic_wand","item_manta","item_vanguard","item_sphere","item_ultimate_orb","item_skadi","item_basher","item_abyssal_blade","item_black_king_bar","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter_2",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -10,7 +10,7 @@ local hero_data = {
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 	[0] = {"antimage_mana_break", ABILITY_TYPE.PASSIVE},
@@ -35,6 +35,14 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
+-- register cast callback
+-- f(event) {
+-- 		if ability == stun && ability.dmgType == mgk && thisAntiMage.hpp > 0.8 && not thisAntiMage.isStunned
+-- 				&& not AbilityLogic_CouldBeBlocked(thisAntiMage, ability) && UnitFacingUnit(thisAntiMage, caster) > 0.75 && randint(1, 10 - KDA(thisAntiMage)) == 1, {
+-- 			chat("Magic is an abo- *", ability.name, " hits*")
+-- 		}
+-- 	}
+
 local d
 d = {
 	["ReponseNeeds"] = function()
@@ -50,6 +58,7 @@ d = {
 		-- TODO nb. the only time that heroes need HighUse mana admustments after update is when they have
 		-- strange utility spells, or spells which are intentionally not balanced to their cost for this or
 		--Util_TablePrint(gsiPlayer.highUseMana)
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -1,10 +1,10 @@
 local hero_data = {
 	"zuus",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 6, 7, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 3, 8, 4, 9, 11},
 	{
-		"item_tango","item_branches","item_branches","item_branches","item_branches","item_branches","item_faerie_fire","item_bottle","item_boots","item_energy_booster","item_staff_of_wizardry","item_robe","item_kaya","item_pers","item_sphere","item_aghanims_shard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_void_stone","item_ring_of_health","item_pers","item_refresher","item_octarine_core",
+		"item_branches","item_branches","item_branches","item_faerie_fire","item_tango","item_bottle","item_boots","item_energy_booster","item_arcane_boots","item_void_stone","item_aether_lens","item_robe","item_kaya","item_aghanims_shard","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_ultimate_orb","item_ring_of_health","item_sphere","item_vitality_booster","item_energy_booster","item_soul_booster","item_kaya_and_sange","item_octarine_core","item_refresher","item_ultimate_scepter_2","item_arcane_blink","item_force_staff","item_silver_edge","item_falcon_blade",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,5,}, 0.1 },
 	{
 		"Arc Lightning","Lightning Bolt","Heavenly Jump","Thundergod's Wrath","-4s Heavenly Jump Cooldown","+250 Health","+30 Movement Speed after Heavenly Jump","+1 Heavenly Jump Target","+100 Thundergod's Wrath Damage","+0.4s Lightning Bolt Ministun","325 AOE Lightning Bolt","+100 Arc Lightning Damage",
 	}
@@ -44,6 +44,7 @@ local SPELL_SUCCESS = AbilityLogic_CastOnTargetWillSucceed
 
 local fight_harass_handle = FightHarass_GetTaskHandle()
 local push_handle = Push_GetTaskHandle()
+local search_fog_handle = SearchFog_GetTaskHandle()
 
 local t_player_abilities = {}
 
@@ -72,6 +73,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -248,6 +250,22 @@ d = {
 					local extrapolated = hUnit:GetExtrapolatedLocation(1)
 					USE_ABILITY(gsiPlayer, cloud, extrapolated, 400, nil)
 					return;
+				end
+			end
+		end
+		if CAN_BE_CAST(gsiPlayer, bolt) and not currTask == fight_harass_handle 
+				and HIGH_USE(gsiPlayer, bolt, highUse, 0) then
+			local bez = SearchFog_GetNearbyBezier(gsiPlayer.lastSeen.location, bolt:GetCastRange())
+			
+			if bez then
+				for i=1,#bez do
+					
+					local bezi = bez[i]
+					if bezi and bezi.val and POINT_DISTANCE(playerLoc, bezi.val)
+								< bolt:GetCastRange() then
+						USE_ABILITY(gsiPlayer, bolt, bezi.val, 400, nil)
+						return;
+					end
 				end
 			end
 		end

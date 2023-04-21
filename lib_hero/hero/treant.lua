@@ -1,10 +1,10 @@
 local hero_data = {
 	"treant",
-	{2, 3, 2, 3, 1, 4, 1, 1, 3, 5, 3, 4, 1, 2, 8, 2, 4, 9, 11},
+	{2, 1, 2, 3, 3, 4, 1, 3, 2, 1, 2, 4, 5, 3, 8, 1, 4, 9, 11},
 	{
-		"item_tango","item_wraith_band","item_enchanted_mango","item_ring_of_health","item_pers","item_meteor_hammer","item_boots","item_staff_of_wizardry","item_wind_lace","item_force_staff","item_aghanims_shard","item_blink","item_void_stone","item_sheepstick","item_refresher",
+		"item_tango","item_magic_stick","item_ward_sentry","item_wind_lace","item_boots","item_arcane_boots","item_fluffy_hat","item_headdress","item_magic_wand","item_holy_locket","item_staff_of_wizardry","item_tranquil_boots","item_force_staff","item_aghanims_shard","item_mekansm","item_ring_of_health","item_cloak","item_headdress","item_hood_of_defiance","item_gem","item_pipe","item_blink","item_pers","item_refresher","item_wraith_pact","item_gem","item_overwhelming_blink",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,3,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
 	{
 		"Nature's Grasp","Leech Seed","Living Armor","Overgrowth","+2 Living Armor Heal Per Second","-5.0s Nature's Grasp Cooldown","+15% Leech Seed Movement Slow","+30 Nature's Grasp Damage","+8 Living Armor Bonus Armor","+40 Leech Seed Damage/Heal","Overgrowth Undispellable","450 AoE Living Armor",
 	}
@@ -81,6 +81,8 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		t_player_abilities[gsiPlayer.nOnTeam][3] = gsiPlayer.hUnit:GetAbilityInSlot(2)
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -204,13 +206,13 @@ d = {
 					and HIGH_USE(gsiPlayer, livingArmor, highUse, 
 							saveUnit.lastSeenHealth / saveUnit.maxHealth
 						) then
-				USE_ABILITY(gsiPlayer, livingArmor, saveUnit, 500, nil)
+				USE_ABILITY(gsiPlayer, livingArmor, saveUnit, 500, nil, nil, nil, nil, gsiPlayer.hUnit.Action_UseAbilityOnEntity)
 				return;
 			end
 			local lowestPlayer, lowestHpp = Unit_LowestHealthPercentPlayer(t_team_players)
 			--print("lowestHpp", lowestHpp, highUse*2)
 			if lowestHpp < 0.75 and HIGH_USE(gsiPlayer, livingArmor, highUse*2, lowestHpp) then
-				USE_ABILITY(gsiPlayer, livingArmor, lowestPlayer, 500, nil)
+				USE_ABILITY(gsiPlayer, livingArmor, lowestPlayer, 500, nil, nil, nil, nil, gsiPlayer.hUnit.Action_UseAbilityOnEntity)
 				return;
 			end
 			-- TODO activity types need to be more stable and persitant when switching to in-and-out
@@ -230,7 +232,7 @@ d = {
 						if HIGH_USE(gsiPlayer, livingArmor, highUse*4,
 										towerObjective.lastSeenHealth / towerObjective.maxHealth
 									) then
-							USE_ABILITY(gsiPlayer, livingArmor, towerObjective, 500, nil)
+							USE_ABILITY(gsiPlayer, livingArmor, towerObjective, 500, nil, nil, nil, nil, gsiPlayer.hUnit.Action_UseAbilityOnEntity)
 							return;
 						end
 					end

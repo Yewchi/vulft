@@ -44,7 +44,7 @@ if DEBUG
 
 	ARC_DISABLE_FRAMES = 0
 
-	DEBUG_SHORTNAME = "windrunner"
+	DEBUG_SHORTNAME = "juggernaut"
 	
 	MAP_COORDS_TO_SCREEN_SCALE = 0.08
 	MAP_COORDS_TO_MINIMAP_SCALE = 0.015
@@ -62,26 +62,43 @@ if DEBUG
 		DEBUG_Init = nil
 	end
 
-	function DEBUG_print(str)
-		print("/VUL-FT/ <DEBUG> "..str)
+	local sin = math.sin
+	local cos = math.cos
+	local rad = math.rad
+	local deg = math.deg
+	local min = math.min
+	local max = math.max
+	local ceil = math.ceil
+	local floor = math.floor
+	local acos = math.acos
+	local pi = math.pi
+	local pi2 = pi*2
+
+	local grey = {128, 128, 128}
+	function GetDBGColor(gsiPlayer, rbg)
+		return gsiPlayer.DBGColor and gsiPlayer.DBGColor[rbg] or grey[rbg]
 	end
 
-	function VEBUG_print(str)
-		print("/VUL-FT/ <VERBOSE> "..str)
+	function DEBUG_print(str, ...)
+		print(string.format("/VUL-FT/ <DEBUG> "..str, ...))
+	end
+
+	function VEBUG_print(str, ...)
+		print(string.format("/VUL-FT/ <VERBOSE> "..str, ...))
 	end
 	
-	function TEBUG_print(str)
-		print("/VUL-FT/ <TEST> "..str)
+	function TEBUG_print(str, ...)
+		print(string.format("/VUL-FT/ <TEST> "..str, ...))
 	end
 	
 	function DEBUG_IsBotTheIntern()
-		return true
-		--return GSI_GetBot().shortName == DEBUG_SHORTNAME
+		return GSI_GetBot().shortName == DEBUG_SHORTNAME
 	end
 	
 	function DEBUG_PrintUntilErroredNone(gsiUnit)
 		DEBUG_KILLSWITCH = true
 		print("PrintUntilError: --", GameTime())
+		Util_TablePrint(gsiUnit)
 		print(gsiUnit)
 		print(gsiUnit.hUnit)
 		print(gsiUnit.name, gsiUnit.type, gsiUnit.lastSeenHealth, gsiUnit.typeIsNone, gsiUnit.needsVisibleData)
@@ -103,7 +120,7 @@ if DEBUG
 	end
 	function VEBUG_PlayerFrameProgressBarStart(pnot, offsetx, offsety, force)
 		if not DEBUG and not force then return end
-		offsety = (offsety or 230) + (pnot-1)*10
+		offsety = (offsety or 130) + (pnot-1)*10
 		if TEAM_IS_RADIANT then
 			DebugDrawText((offsetx or 300), offsety, "[", 100, 255, 100)
 		else
@@ -112,9 +129,9 @@ if DEBUG
 	end
 	function VEBUG_PlayerFrameProgressBar(pnot, progress, offsetx, offsety)
 		if not DEBUG and not force then return end
-		offsety = (offsety or 230) + (pnot-1)*10
+		offsety = (offsety or 130) + (pnot-1)*10
 		if TEAM_IS_RADIANT then
-			offsetx = (offsetx or 300) + 8 + progress
+			offsetx = (offsetx or 200) + 8 + progress
 			DebugDrawText(offsetx, offsety, progress < 100 and "|" or "|]", 100, 255, 100)
 		else
 			offsetx = (offsetx or 430) + 8 + progress
@@ -327,55 +344,72 @@ if DEBUG
 	
 	local gary
 	local garyhUnit
-	local garyThrottle = Time_CreateThrottle(0.0)
+	local garyThrottle = Time_CreateThrottle(-10.0)
 	local garyLastAttackSeen = 0
 	local animCycleAtRelease = 0
 	local currentProjectile
 	local catchNextProjectileLands = false
-	local locOfProjectileAtRelease = Vector(0, 0, 0)
+	local locOfProjectileAtRelease = Vector(-0, -0, -0)
 	local landingTime = 0
+	local getsHitClosest = Vector(-0, -0, -0)
+	local closestGetsHitDist = 0xFFFF
 	local velocity = 0
 	local radius = 0
+	function DEBUG_IsGary(gsiUnit) return gary == gsiUnit end
 	function DEBUG_CreepAdventure()
 		if garyThrottle:allowed() then
 			if not gary then
-				gary = GSI_GetTeamLaneTierTower(TEAM, 2, 1)
-			--	gary = Set_GetAlliedCreepSetsInLane(2)
-			--	if gary[1] then
-			--		for i=1,#(gary[1].units),1 do
-			--			if gary[1].units[i].creepType == CREEP_TYPE_RANGED then
-			--				gary = gary[1].units[i]
-			--				break
-			--			end
-			--		end
-			--	end
+				gary = Set_GetAlliedCreepSetsInLane(2)
+				if gary[1] then
+					for i=1,#(gary[1].units),1 do
+						print("GAZ", gary[1], gary[1].units[i])
+						if gary[1].units[i].creepType == CREEP_TYPE_SIEGE then
+							gary = gary[1].units[i]
+							break
+						end
+					end
+				end
+				gary = GSI_GetLowestTierTeamLaneTower(ENEMY_TEAM, 2)
+				gary = GSI_GetPlayerByName(DEBUG_SHORTNAME)
 				if not gary or gary.hUnit == nil then gary = nil return end
 				garyhUnit = gary.hUnit
 				TEAM_CAPTAIN_UNIT:ActionImmediate_Chat("Starting debug creep tracking", true)
 			end
-			if cUnit_IsNullOrDead(gary) then 
+			if Unit_IsNullOrDead(gary) then 
 				DebugDrawText(0, 600, string.format(" :( "), 255, 255, 255)
 				return
 			end
 			local lastAttackRelease = garyhUnit:GetLastAttackTime()
 			local unitAttacked = garyhUnit:GetAttackTarget()
+			local projSpeed = garyhUnit:GetAttackProjectileSpeed()
 			if garyLastAttackSeen ~= lastAttackRelease then
 				animCycleAtRelease = garyhUnit:GetAnimCycle()
 				garyLastAttackSeen = lastAttackRelease
 				catchNextProjectileLands = true
 			end
+			local incomingProjectiles = garyhUnit:GetIncomingTrackingProjectiles()
+			for i=0,#incomingProjectiles do
+				if incomingProjectiles[i] then
+					local dist2D = Vector_PointDistance2D(incomingProjectiles[i].location, garyhUnit:GetLocation())
+					if dist2D < closestGetsHitDist then
+						getsHitClosest = incomingProjectiles[i].location
+						closestGetsHitDist = dist2D
+					end
+				end
+			end
+
 			if unitAttacked then
 				currentProjectile = unitAttacked:GetIncomingTrackingProjectiles()
-				for i=1,#currentProjectile do
+				for i=0,#currentProjectile do
 					if currentProjectile[i] then
 						if currentProjectile[i].caster == garyhUnit then
-							currentProjectile = currentProjectile[i]
+							currentProjectile = currentProjectile[i] -- #attProj
 							break;
 						end
 					end
 					if i == #currentProjectile then currentProjectile = nil end
 				end
-				if currentProjectile then
+				if currentProjectile then -- #attProj
 					landingTime = catchNextProjectileLands and GameTime() or landingTime
 					locOfProjectileAtRelease = catchNextProjectileLands and currentProjectile.location or locOfProjectileAtRelease
 					catchNextProjectileLands = false
@@ -383,8 +417,10 @@ if DEBUG
 			end
 			DebugDrawText(0, 600, 
 					string.format("long name:%s\n"..
+							"time:%s\n"..
 							"address:%s\n"..
 							"location:(%d, %d, %d)\n"..
+							"closestGetsHitProjectile:(%d, %d, %d)\n"..
 							"locProjectileRelease:(%d, %d, %d)\n"..
 							"reductionDistToTarget:%.1f\n"..
 							"attacking:%s\n"..
@@ -393,6 +429,8 @@ if DEBUG
 							"attackPointPercent:%.4f\n"..
 							"attackRange:%d\n"..
 							"projectileSpeed:%d\n"..
+							"TTLProj:%.2f\n"..
+							"GNACProj:%.2f\n"..
 							"lastAttackTime:%.4f\n"..
 							"animActivity:%d\n"..
 							"animCycleAtRelease:%.4f\n"..
@@ -402,24 +440,30 @@ if DEBUG
 							"expected3D:%.4f\n"..
 							"rangeToTarget:%.4f",
 						gary.name, 
+						GameTime(),
 						tostring(garyhUnit),
 						garyhUnit:GetLocation().x, garyhUnit:GetLocation().y, garyhUnit:GetLocation().z,
+						getsHitClosest.x, getsHitClosest.y, getsHitClosest.z,
 						locOfProjectileAtRelease.x, locOfProjectileAtRelease.y, locOfProjectileAtRelease.z,
 						unitAttacked and Vector_PointDistance(garyhUnit:GetLocation(), unitAttacked:GetLocation())
 								- Vector_PointDistance(locOfProjectileAtRelease, unitAttacked:GetLocation()) or -0,
-						unitAttacked and "yes" or "no", 
+						tostring(garyhUnit:GetAttackTarget()), 
 						garyhUnit:GetAnimCycle(),
-						garyhUnit:GetAttackPoint(),
-						garyhUnit:GetAttackPoint() / garyhUnit:GetAttackSpeed(),
+						gary.attackPointPercent * garyhUnit:GetSecondsPerAttack(),
+						gary.attackPointPercent,
 						garyhUnit:GetAttackRange(),
-						garyhUnit:GetAttackProjectileSpeed(),
+						projSpeed,
+						unitAttacked and Unit_GetSafeUnit(unitAttacked) and select(1,unitAttacked and Projectile_TimeToLandProjectile(gary,
+								Unit_GetSafeUnit(unitAttacked)
+							)) or -0,
+						select(2, Projectile_GetNextAttackComplete(gary)) or -0,
 						garyhUnit:GetLastAttackTime(),
 						garyhUnit:GetAnimActivity(),
 						animCycleAtRelease,
 						landingTime,
 						landingTime - garyhUnit:GetLastAttackTime(),
-						unitAttacked and Vector_PointDistance2D(garyhUnit:GetLocation(), unitAttacked:GetLocation()) / 900 or 0,
-						unitAttacked and Vector_PointDistance(garyhUnit:GetLocation(), unitAttacked:GetLocation()) / 900 or 0,
+						unitAttacked and Vector_PointDistance2D(garyhUnit:GetLocation(), unitAttacked:GetLocation()) / projSpeed or 0,
+						unitAttacked and Vector_PointDistance(garyhUnit:GetLocation(), unitAttacked:GetLocation()) / projSpeed or 0,
 						unitAttacked and Vector_PointDistance(
 								garyhUnit:GetAttackTarget():GetLocation(), garyhUnit:GetLocation()) or 0.0000
 					),
@@ -435,6 +479,185 @@ if DEBUG
 				--print(gary, garyhUnit, gary.lastSeen.location, gary.lastSeenHealth, gary.isNull(garyhUnit), gary.hUnit:IsNull())
 				--print(garyhUnit:IsNull())
 			end
+		end
+	end
+
+	local xNice = 0
+	local DBGColor = {0, 0, 0}
+	local DBGNiceT = 0
+	function DEBUG_NicePrint(str, ...)
+		local TC = Captain_GetCaptain()
+		if not TC then return end;
+		if DBGNiceT < TC.time.currFrame then
+			DBGNiceT = TC.time.currFrame + (TC.time.nextFrame - TC.time.currFrame)/2
+			DebugDrawText(950, 85, string.format("redraw %.3f; nF %.3f; cF %.3f; gt %.3f",
+						DBGNiceT, TC.time.nextFrame, TC.time.currFrame, GameTime()
+					),
+					DBGColor[1], DBGColor[2], DBGColor[3]
+				)
+			xNice = 9
+		end
+		
+		DebugDrawText(950, 85+xNice, string.format(str, ...), DBGColor[1], DBGColor[2], DBGColor[3])
+		
+		xNice = xNice + 9
+	end
+
+	function DEBUG_StartTestParty()
+		local p = GSI_GetTeamPlayers(TEAM)
+		for i=1,#p do
+			if i~=4 then
+				DOMINATE_SetDominateFunc(p[i], "DEBUG_TestParty", DEBUG_TestParty, true)
+			end
+		end
+	end
+
+	local stage = 0
+	local dbgTpTbl = {}
+	function DEBUG_TestParty(gsiPlayer)
+		TEST_PARTY = true
+		TEST_PARTY_PRINT = false
+		Time_IndicateNewFrame(gsiPlayer)
+		local vadd = Vector_Addition
+		local vsca = Vector_ScalarMultiply
+		local vfdeg = Vector_UnitDirectionalFacingDegrees
+		local vdist = Vector_PointDistance
+		local vud = Vector_UnitDirectionalPointToPoint
+		local vufu = Vector_UnitFacingUnit
+		local vec = Vector
+		local dnp = DEBUG_NicePrint
+
+		local t = dbgTpTbl
+		local h = gsiPlayer.hUnit
+		local m = h.Action_MoveDirectly
+		local a = h.Action_AttackUnit
+
+		local pl = h:GetLocation()
+
+		local curr = GameTime()
+
+		local tpN = 4
+
+		local nE = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 2000)
+		local targ = GSI_GetTeamPlayers(ENEMY_TEAM)[tpN]
+		local th = targ.hUnit
+		local targReal = th and not targ.needsVisibleData and not th:IsNull() and th:IsAlive()
+		local targLoc = targReal and th:GetLocation()
+
+		local isatt = TEAM_IS_RADIANT  -- will be attacking
+
+		print("n", #nE)
+		
+		local bountyLoc = TEAM_FOUNTAIN or GetRuneSpawnLocation(RUNE_BOUNTY_2)
+		local thatSide = GetTeam() == gsiPlayer.nOnTeam % 2 + 2
+		if gsiPlayer.nOnTeam ~= tpN then
+			local meMoveTo = vadd(bountyLoc, vsca(
+					vec(sin(thatSide and -1 or 1)*gsiPlayer.nOnTeam/1.59,
+						cos(thatSide and -1 or 1)*gsiPlayer.nOnTeam/1.59
+					),
+					600)
+				)
+			m(h, meMoveTo)
+			local distDesig = vdist(pl, meMoveTo)
+			if distDesig > 1450 then
+				gsiPlayer.DBGGetBackTime = curr + 8
+			elseif not gsiPlayer.DBGresetTreeCut or gsiPlayer.DBGresetTreeCut < curr then
+				if gsiPlayer.nOnTeam == 3 then
+					print("333333", gsiPlayer.shortName, distDesig)
+					local creeps = h:GetNearbyCreeps(1600, true)
+					if creeps[1] then
+						a(h, creeps[1], false)
+					end
+				elseif gsiPlayer.nOnTeam >= 4 then
+					local trees = h:GetNearbyTrees(1500)
+					local hatchet = h:FindItemSlot("item_quelling_blade")
+					print("44545454545", #trees, trees[1], hatchet)
+					hatchet = hatchet > -1 and hatchet < 9 and h:GetItemInSlot(hatchet)
+					print("44545454545", hatchet)
+					if trees[1] and hatchet then
+						if curr % 10 < 2 then
+							m(h, meMoveTo)
+						elseif curr % 3 < 1 then
+							h:Action_UseAbilityOnTree(hatchet, trees[1])
+						else
+							h:Action_MoveDirectly(GetTreeLocation(trees[1]))
+						end
+					end
+				end
+			end
+			if gsiPlayer.nOnTeam == 5 then
+				h:Action_PurchaseItem("item_ward_observer")
+				local ob = h:GetItemInSlot(h:FindItemSlot("item_ward_observer"))
+				if ob then
+					local offset = RandomInt(-500, 500)
+					h:Action_UseAbilityOnLocation(ob, Vector(bountyLoc.x + offset, bountyLoc.y + offset))
+				end
+			end
+			return;
+		end
+		t.ttlStartsNow = targReal and Projectile_TimeToLandProjectile(gsiPlayer, targ)
+		gnacTarg, t.ttlLive, needs = Projectile_GetNextAttackComplete(gsiPlayer, t.startHitsT1 ~= nil)
+		if isatt then
+			-- [[ PRINTS ]]
+			dnp("stage: %d", stage)
+			DEBUG_NicePrint("@%s, dist %s, facingToUnit-1to1 %s, animActivity %s",
+					targReal and string.sub(targ.shortName, 1, 5), targReal and vdist(pl, targ.hUnit:GetLocation()),
+					vufu(gsiPlayer, targ), h:GetAnimActivity())
+			dnp("targVec (%.3f, %.3f, %.3f), acquiredTarget %s", targReal and targLoc.x, targReal and targLoc.y, targReal and targLoc.z, Util_Printable(h:GetAttackTarget()))
+			dnp("secPAttk %s, atkPnt %s, atkReleaseSec %s, animCycle %s",  h:GetSecondsPerAttack(), h:GetAttackPoint(),
+					h:GetSecondsPerAttack()*h:GetAttackPoint(), h:GetAnimCycle())
+			dnp("projectileSpeed %s, vulftAttackPoint %s, vulftReleaseSec %s", h:GetAttackProjectileSpeed(),
+					gsiPlayer.attackPointPercent, h:GetSecondsPerAttack()*gsiPlayer.attackPointPercent)
+			dnp("lastAttack %s", h:GetLastAttackTime())
+			dnp("trueRange %s", h:GetAttackRange())
+			dnp("RangeStartAttack %s", t.startDist0)
+			dnp("ttlStartsNow %s; ttlStartsNowEnd %s; ttlLive %s; ttlLiveEnd %s", t.ttlStartsNow,
+					t.ttlStartsNow and curr+t.ttlStartsNow, t.ttlLive, t.ttlLive and curr+t.ttlLive)
+			dnp("startDeg %s; startTtl %s; landsT %s", t.startDeg0, t.startTtl0, t.startLands0)
+			dnp("projectileStart %s; projectileLandsEst %s", t.startProj1, t.startHitsT1)
+			dnp("projInformed: %s", t.startHitsFlyingT1)
+			dnp("gnacT %s; gnacHits %s; gnacNeeds %s", Util_Printable(gnacTarg), t.ttlLive, needs)
+		end
+
+
+		local moveTo = t.moveTo or vadd(bountyLoc, vsca(vec(sin((TEAM_IS_RADIANT and pi*1.5 or pi*0.5)), 0), 600))
+		if not isatt then
+			m(h, moveTo)
+			--Lhp_AttackNowForBestLastHit(gsiPlayer, gsiPlayer)
+		elseif stage == 0 and isatt then
+			-- [[ STAGE 0 ]]
+			local delay = t.delay
+			m(h, moveTo)
+			local distNow = vdist(pl, moveTo)
+			if targReal and distNow < 50 then
+				t.delay = t.delay or curr + 0.5
+				if t.delay < curr and not t.startDist0 then
+					t.startDist0 = vdist(pl, th:GetLocation())
+					t.startDeg0 = vufu(gsiPlayer, targ)
+					t.startTtl0 = Projectile_TimeToLandProjectile(gsiPlayer, targ)
+					t.startLands0 = curr + t.startTtl0
+					stage = 1
+					a(h, th, false)
+				end
+			end
+		elseif stage == 1 then
+			-- [[ STAGE 1 ]]
+			if not gnacTarg then return; end
+			local projectiles = th:GetIncomingTrackingProjectiles()
+			local thisProj = projectiles and projectiles[1]
+			if not t.startHitsT1 then
+				if gnacTarg and needs then
+					t.startHitsT1 = curr + t.ttlLive
+				end
+			elseif not needs and thisProj and thisProj.caster == h then
+				local locP = thisProj.location
+				t.startProj1 = locP
+				t.startHitsFlyingT1 = curr + t.ttlLive
+				
+				--h:Action_ClearActions(true)
+				--stage = 2
+			end
+			a(h, th, false)
 		end
 	end
 	
@@ -555,6 +778,10 @@ if DEBUG
 			prevPoint = currPoint
 		end
 	end
+
+	function DEBUG_DrawLhpTarget(gsiPlayer)
+		DEBUG_LHP_DrawLhpTarget(gsiPlayer)
+	end
 	
 	local trees = GetBot():GetNearbyTrees(1600)
 	local treesIndex = 1
@@ -565,7 +792,7 @@ if DEBUG
 		treesIndex = treesIndex + 1
 	end
 	
-	function DEBUG_DevBehaviourOverride()
+	function DEBUG_DevBehaviorOverride()
 	end
 
 	NastyCheck = {}

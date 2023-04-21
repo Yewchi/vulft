@@ -29,7 +29,7 @@
 -- 		rosh also based on enemy spread over the map, and team effectiveness for
 -- 		the encounter.
 -- When losing, the lower the team state, the more strategic
--- 		the pushing behaviour should be. As the team state gets lower, bots should
+-- 		the pushing behavior should be. As the team state gets lower, bots should
 -- 		begin to use more extreme strategies to get ahead: Don't farm lanes or
 -- 		jungle, stick together, try to catch someone out, put our heroes with high
 -- 		suvivability and high escape somewhere to bait and try to get kills elsewhere

@@ -1,8 +1,8 @@
 local hero_data = {
 	"queenofpain",
-	{1, 5, 1, 2, 1, 4, 3, 3, 3, 3, 2, 4, 2, 2, 8, 1, 4, 9, 11},
+	{3, 1, 1, 2, 3, 4, 3, 3, 2, 6, 2, 4, 2, 1, 8, 1, 4, 9, 11},
 	{
-		"item_branches","item_ward_observer","item_tango","item_branches","item_branches","item_bottle","item_boots","item_magic_wand","item_power_treads","item_chainmail","item_blitz_knuckles","item_witch_blade","item_oblivion_staff","item_cloak","item_mage_slayer","item_blitz_knuckles","item_void_stone","item_orchid","item_bloodthorn","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_aghanims_shard","item_buckler","item_assault",
+		"item_tango","item_ward_observer","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_null_talisman","item_gloves","item_boots","item_robe","item_power_treads","item_magic_wand","item_staff_of_wizardry","item_robe","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_sphere","item_mystic_staff","item_sheepstick","item_pers","item_refresher","item_shivas_guard",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

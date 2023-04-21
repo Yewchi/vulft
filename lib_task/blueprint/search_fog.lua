@@ -32,13 +32,16 @@ local task_handle = Task_CreateNewTask()
 
 local next_player = 1
 
+local TIME_SINCE_SEEN_LIMIT_SEARCH = 8
+
 local t_enemy_players
 
 local ENEMY_FOUNTAIN = ENEMY_FOUNTAIN
 
 local t_player_check_location = {}
+local t_player_bezier_escape = {}
 
-local TEST = false
+local TEST = true
 
 local max = math.max
 
@@ -71,9 +74,54 @@ local function task_init_func(taskJobDomain)
 end
 Blueprint_RegisterTask(task_init_func)
 
+local bezier_platter = {}
+function SearchFog_GetNearbyBezier(location, radius)
+	local beziers = t_player_bezier_escape
+	local countBeziers = 0
+	for i=1,TEAM_NUMBER_OF_PLAYERS do
+		local bez = beziers[i]
+		if bez then
+			if bez.expires < GameTime() then
+				beziers[i] = nil
+			elseif Vector_PointDistance(location, bez.val or bez.p0) < radius then
+				countBeziers = countBeziers + 1
+				bezier_platter[countBeziers] = bez
+			end
+		end
+	end
+	bezier_platter[countBeziers+1] = nil
+	bezier_platter[countBeziers+2] = nil
+	bezier_platter[countBeziers+3] = nil
+	return bezier_platter
+end
+
+function SearchFog_GetRevealLocNearby(location, radius)
+	local beziers = t_player_bezier_escape
+	local exitIndex = RandomInt(1,TEAM_NUMBER_OF_PLAYERS)
+	local i = (exitIndex % TEAM_NUMBER_OF_PLAYERS) + 1
+	while(i ~= exitIndex) do
+		local bez = beziers[i]
+		if bez and bez.val then
+			if bez.expires < GameTime() then
+				beziers[i] = nil
+			elseif Vector_PointDistance(location, bez.val or bez.p0) < radius then
+				return bez.val
+			end
+		end
+		i = (i % TEAM_NUMBER_OF_PLAYERS) + 1
+	end
+end
+
+function SearchFog_GetEscapeGuess(gsiPlayer)
+	return t_player_bezier_escape[gsiPlayer.nOnTeam]
+end
+SearchFog_GetPlayerBezier = SearchFog_GetEscapeGuess
+
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
+		local currTime = GameTime()
 		local checkLocation = t_player_check_location[gsiPlayer.nOnTeam]
+		local timeSinceSeen = currTime-objective.lastSeen.timeStamp
 
 
 
@@ -85,7 +133,44 @@ blueprint = {
 		if not checkLocation then
 			return XETA_SCORE_DO_NOT_RUN
 		end
-		Positioning_ZSMoveCasual(gsiPlayer, checkLocation, 650, 1100)
+
+		local lastSeenLoc = objective.lastSeen.location
+
+		local checkBezier = t_player_bezier_escape[gsiPlayer.nOnTeam]
+		if not checkBezier or checkBezier and (checkBezier.hero ~= objective or checkBezier.expires < currTime) then
+			local forwardsFacing = Vector_Addition(
+					lastSeenLoc,
+					Vector_ScalarMultiply2D(Vector_UnitDirectionalFacingDegrees(
+							objective.lastSeen.facingDegrees
+						),
+						objective.currentMovementSpeed*TIME_SINCE_SEEN_LIMIT_SEARCH/2
+					)
+				)
+			local forwardsToFountainUnit = Vector_UnitDirectionalPointToPoint(forwardsFacing, ENEMY_FOUNTAIN)
+			forwardsFacing = Vector_Addition(forwardsFacing, Vector_ScalarMultiply2D(
+						Vector_Inverse(forwardsToFountainUnit),
+						objective.currentMovementSpeed * TIME_SINCE_SEEN_LIMIT_SEARCH/4
+					)
+				)
+			checkBezier = Vector_CreateBezierFunction(objective.lastSeen.location,
+					forwardsFacing,
+					Vector_Addition(
+						Vector_PointBetweenPoints(lastSeenLoc, forwardsFacing),
+						Vector_ScalarMultiply2D(Vector_UnitDirectionalPointToPoint(
+								lastSeenLoc, ENEMY_FOUNTAIN -- using lastSeenLoc here ends up closer to the ^|channel|^ towards fountain of the forwardsFacing location, it is in interception.
+							),
+							objective.currentMovementSpeed*TIME_SINCE_SEEN_LIMIT_SEARCH*1.33
+						)
+					)
+				)
+			checkBezier.expires = currTime + TIME_SINCE_SEEN_LIMIT_SEARCH
+			t_player_bezier_escape[gsiPlayer.nOnTeam] = checkBezier
+		end
+
+		Positioning_ZSMoveCasual(gsiPlayer, checkBezier:compute(timeSinceSeen / TIME_SINCE_SEEN_LIMIT_SEARCH), 650, 1100, 0.05)
+		gsiPlayer.recentMoveTo = objective.location
+
+		
 		return xetaScore
 	end,
 	
@@ -103,6 +188,7 @@ blueprint = {
 		local nearestTower
 		local nearestTowerDist
 		local nearestTowerLoc
+		local playerEhp = (1 + Unit_GetArmorPhysicalFactor(gsiPlayer)) * gsiPlayer.lastSeenHealth
 		t_player_check_location[gsiPlayer.nOnTeam] = nil
 		for i=1,#t_enemy_players do
 			local thisEnemy = t_enemy_players[i]
@@ -116,7 +202,7 @@ blueprint = {
 
 
 			if IsHeroAlive(thisEnemy.playerID)
-					and lastSeenTime < timeStampConsiderUnknown and GameTime() - lastSeenTime < 8
+					and lastSeenTime < timeStampConsiderUnknown and GameTime() - lastSeenTime < TIME_SINCE_SEEN_LIMIT_SEARCH
 					and Vector_PointDistance2D(gsiPlayer.lastSeen.location, thisEnemy.lastSeen.location)
 						< 1700 then
 				local thisHpp = thisEnemy.lastSeenHealth / thisEnemy.maxHealth
@@ -133,7 +219,9 @@ blueprint = {
 									(GameTime() - thisEnemy.lastSeen.timeStamp)*thisEnemy.currentMovementSpeed*1.25
 								)
 						)
-					if not nearestTower
+					local playerCanWithstandOrNoTower = not nearestTower
+							or playerEhp / nearestTower.attackDamage > 4 * (thisHpp + #t_enemy_players)
+					if playerCanWithstandOrNoTower
 							or ( Vector_PointDistance(checkLocation, nearestTower.lastSeen.location)
 											> nearestTower.attackRange + 200
 									and not Positioning_WillAttackCmdExposeToLocRad(
@@ -155,6 +243,7 @@ blueprint = {
 					)
 				)
 			local earlyGameReduction = DotaTime() < 720 and 1+(720 - DotaTime())/720 or 1
+			
 			t_player_check_location[gsiPlayer.nOnTeam] = lowestHealthCheckLocation
 			return lowestHealthEnemy, (30 - earlyGameReduction*2*(GameTime() - lowestHealthEnemy.lastSeen.timeStamp))
 					* (-danger)*((1-lowestHealthPercent)+0.33) - towerFear

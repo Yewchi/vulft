@@ -279,7 +279,7 @@ function Team_InformDeadTryBuyback(gsiPlayer)
 			local distOfEnemy = select(2, Set_GetNearestEnemyHeroToLocation(defensible.lastSeen.location, 8))
 			if distOfEnemy < 2400 then
 					-- just as I write this, the fact that the bot will probably tp to any low
-					-- -| danger farmable lane is an indication that that behaviour needs to be
+					-- -| danger farmable lane is an indication that that behavior needs to be
 					-- -| fixed, not this working around it. TODO
 				if defensible.isAncient
 						and gsiPlayer.hUnit:GetRespawnTime() > 4 + distOfEnemy / 400 then
@@ -292,7 +292,7 @@ function Team_InformDeadTryBuyback(gsiPlayer)
 				end
 				if defensible.lastSeenHealth > 200
 						and (defensible.tier >= 3 or Item_TownPortalScrollCooldown(gsiPlayer) == 0) then
-					if RandomInt(1, max(16, (6 - defensible.tier)*100 / (gsiPlayer.hUnit:GetGold() - gsiPlayer.hUnit:GetBuybackCost()))) == 1 then
+					if gsiPlayer.hUnit:GetRespawnTime() > (5 - defensible.tier)*10 and RandomInt(1, max(16, (6 - defensible.tier)*100 / (gsiPlayer.hUnit:GetGold() - gsiPlayer.hUnit:GetBuybackCost()))) == 1 then
 						Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 80, 4)
 						gsiPlayer.hUnit:ActionImmediate_Buyback()
 					end
@@ -320,6 +320,17 @@ function Team_GetClearForLaunchHero(gsiPlayer)
 	-- if me check GameTime() > expire clear for launch
 	-- return hero, isMe, launch
 end
+
+function Team_GetLaneOfRoleNumberForTeam(roleNum, team)
+	if roleNum == 1 or roleNum == 5 then 
+		return team == TEAM_RADIANT and MAP_LOGICAL_BOTTOM_LANE or MAP_LOGICAL_TOP_LANE
+	elseif roleNum == 3 or roleNum == 4 then
+		return team == TEAM_RADIANT and MAP_LOGICAL_TOP_LANE or MAP_LOGICAL_BOTTOM_LANE
+	else
+		return MAP_LOGICAL_MIDDLE_LANE
+	end
+end
+
 
 function Team_GetRoleBasedLane(thisPlayer) -- TODO Is there any way to determine the enemy bot names for lane predictions before they show on map? -a Yes, names are queryable.
 	local thisPlayerRole = role_assignments[thisPlayer.nOnTeam]
@@ -391,6 +402,7 @@ end
 
 function Team_FortUnderAttack(gsiUnit)
 	local doCheapAssBuybacks = false
+	
 	if GSI_CountTeamAlive(TEAM) == 0 then
 		doCheapAssBuybacks = true
 	else

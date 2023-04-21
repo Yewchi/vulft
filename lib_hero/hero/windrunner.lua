@@ -1,13 +1,12 @@
 local hero_data = {
 	"windrunner",
-	--{2, 3, 2, 1, 2, 4, 2, 1, 3, 3, 1, 4, 1, 3, 7, 6, 4, 10, 12},
-	{2},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 11},
 	{
-		"item_faerie_fire","item_branches","item_tango","item_branches","item_circlet","item_circlet","item_bracer","item_magic_wand","item_wraith_band","item_javelin","item_mithril_hammer","item_maelstrom","item_boots","item_robe","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_ghost","item_blink","item_ghost","item_kaya","item_ethereal_blade",
+		"item_branches","item_branches","item_tango","item_branches","item_faerie_fire","item_branches","item_ward_observer","item_bottle","item_gloves","item_power_treads","item_magic_wand","item_javelin","item_mithril_hammer","item_maelstrom","item_gloves","item_mithril_hammer","item_black_king_bar","item_blink","item_lesser_crit","item_headdress","item_greater_crit","item_gungir","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,3,4,}, 0.1 },
 	{
-		"Shackleshot","Powershot","Windrun","Gale Force","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.8s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
+		"Shackleshot","Powershot","Windrun","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.8s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
 	}
 }
 --@EndAutomatedHeroData
@@ -15,7 +14,7 @@ if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"windrunner_shackleshot", ABILITY_TYPE.STUN},
-		{"windrunner_powershot", ABILITY_TYPE.NUKE},
+		{"windrunner_powershot", ABILITY_TYPE.NUKE + ABILITY_TYPE.AOE},
 		{"windrunner_windrun", ABILITY_TYPE.MOBILITY + ABILITY_TYPE.BUFF + ABILITY_TYPE.SHIELD},
 		{"windrunner_gale_force", ABILITY_TYPE.SLOW + ABILITY_TYPE.AOE},
 		[5] = {"windrunner_focusfire", ABILITY_TYPE.NUKE},
@@ -72,7 +71,7 @@ local avoid_and_hide_handle = AvoidHide_GetTaskHandle()
 local SHACKLE_CAST_RANGE = 800
 local SHACKLE_CONE_RANGE = 575
 local SHACKLE_LIMIT_RANGE_LINKED = SHACKLE_CAST_RANGE + SHACKLE_CONE_RANGE
-local SHACKLE_CONE_ANGLE = math.rad(25.5) -- I think it's 25.5 dgrees based on fandom. unsure.
+local SHACKLE_CONE_ANGLE = math.rad(12.25) -- I think it's 25.5 dgrees based on fandom. unsure.
 local SHACKLE_TRAVEL_SPEED = 1650
 local SHACKLE_USE_EXPIRY = 0.15
 
@@ -107,6 +106,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		local playerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
@@ -201,7 +201,8 @@ d = {
 						true, POWERSHOT_TRAVEL_SPEED
 					)
 				
-				if POINT_DISTANCE_2D(hitGuess, playerLoc) < powerShotRange then
+				if not IsLocationVisible(hitGuess)
+						and POINT_DISTANCE_2D(hitGuess, playerLoc) < powerShotRange then
 					
 					t_powershot_expire_before_cast[gsiPlayer.nOnTeam] = GameTime() + POWERSHOT_USE_EXPIRY
 					USE_ABILITY(gsiPlayer, powerShot, hitGuess, 400, nil)

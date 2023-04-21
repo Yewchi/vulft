@@ -1,8 +1,8 @@
 local hero_data = {
 	"spectre",
-	{1, 3, 1, 3, 1, 4, 1, 3, 2, 3, 6, 4, 2, 2, 8, 2, 4, 9, 11},
+	{1, 3, 1, 3, 3, 4, 1, 1, 3, 6, 2, 4, 2, 2, 8, 2, 4, 10, 11},
 	{
-		"item_branches","item_tango","item_quelling_blade","item_circlet","item_slippers","item_branches","item_wraith_band","item_boots_of_elves","item_gloves","item_boots","item_power_treads","item_relic","item_staff_of_wizardry","item_radiance","item_blade_of_alacrity","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_manta","item_ultimate_orb","item_skadi","item_nullifier","item_ultimate_scepter_2","item_sheepstick","item_moon_shard","item_butterfly",
+		"item_branches","item_slippers","item_tango","item_quelling_blade","item_branches","item_circlet","item_wraith_band","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_oblivion_staff","item_echo_sabre","item_blade_of_alacrity","item_staff_of_wizardry","item_ultimate_scepter","item_cloak","item_mage_slayer","item_yasha","item_ultimate_orb","item_manta","item_mithril_hammer","item_basher","item_butterfly","item_abyssal_blade","item_blitz_knuckles","item_claymore","item_bloodthorn","item_ultimate_scepter_2","item_moon_shard","item_refresher",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

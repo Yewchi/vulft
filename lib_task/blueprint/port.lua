@@ -45,7 +45,7 @@ local desired_locations = {}
 local port_state = {}
 
 function Port_BuyPortScrollsIfNeeded(gsiPlayer)
-	-- 12/10/22 buying behaviour should mostly trigger from port.score()
+	-- 12/10/22 buying behavior should mostly trigger from port.score()
 	
 	if Item_TownPortalScrollsOwned(gsiPlayer) < 2 and gsiPlayer.hUnit:GetGold() > GetItemCost("item_tpscroll") then
 		
@@ -56,7 +56,7 @@ function Port_BuyPortScrollsIfNeeded(gsiPlayer)
 	end
 end
 
-function Port_CheckPortNeeded(gsiPlayer, location) -- Checks for good ports are above
+function Port_CheckPortNeeded(gsiPlayer, location, dryRun) -- Checks for good ports are above
 	local tpScroll = gsiPlayer.hUnit:GetItemInSlot(TPSCROLL_SLOT)
 	local taskStartTime = Task_GetCurrentTaskStartTime(gsiPlayer)
 	if not tpScroll or tpScroll:GetCooldownTimeRemaining() > 0 
@@ -81,6 +81,9 @@ function Port_CheckPortNeeded(gsiPlayer, location) -- Checks for good ports are 
 			and port_state[nOnTeam] == NO_CHECK_PORT_NEEDED
 			and distancePlayerToDestination-distancePortToDestination
 				> MINIMUM_ALLOWED_USE_TP_INSTEAD then -- Can we just walk there; Is the port a shortcut?
+		if dryRun then
+			return location
+		end
 		
 		desired_locations[nOnTeam] = location
 		port_state[nOnTeam] = CHECK_PORT_NEEDED
@@ -137,6 +140,10 @@ end
 			end
 		else
 			return XETA_SCORE_DO_NOT_RUN
+		end
+		if Vector_PointDistance(desired_locations[nOnTeam], TEAM_FOUNTAIN) > 6000
+				and Map_LocIsInTeamFountain(gsiPlayer.lastSeen.location) then
+			ItemComms_ICanFillBottleAtLoc(gsiPlayer, desired_locations[nOnTeam])
 		end
 		return xetaScore
 	end,

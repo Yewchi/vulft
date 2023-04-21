@@ -79,7 +79,7 @@ function Tilt_ReportSelfOutOfLane(gsiPlayer, inLane, objective)
 	--local enemyCreepLaneFront = Set_GetEnemyCreepSetLaneFrontStored(inLane)
 	local anyCores, laneCore = Farm_AnyOtherCoresInLane(gsiPlayer, enemyCreeps)
 
-	if not anyCores or laneCore.level >= 12 then -- NB. 12, 12/6, 1.414
+	if not anyCores or laneCore.level >= 12 then -- NB. 12, 12/6, 1.414 -- see below
 		
 		return false;
 	end
@@ -102,8 +102,8 @@ function Tilt_ReportSelfOutOfLane(gsiPlayer, inLane, objective)
 				+ (Vector_DistancePointToLine2D(
 						enemyCreeps.center,
 						playerLoc, objectiveLocationForComparison
-					) < LEECH_EXP_RANGE and 30 or 0.15)
-					* (1.414 - sqrt(laneCore.level/6)) / 1.414 -- NB. 12, 12/6, 1.414
+					) < LEECH_EXP_RANGE and 35 or 0.15)
+					* (1.414 - sqrt(laneCore.level/6)) / 1.414 -- NB. 12, 12/6, 1.414 -- see above
 		outOfLaneTilt[1] = min(135, outOfLaneTilt[1])
 		if outOfLaneTilt[1] > 0 then
 			local decrement = outOfLaneTilt[1] / (gsiPlayer.currentMovementSpeed / 15)

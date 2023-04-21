@@ -1,10 +1,13 @@
-##  Pagsasalin 
-
-Ang pagpapanatili ng pagsasalin na ito ay tumatagal ng mahabang panahon para sa akin, mga 30 minuto. Kailangan kong bumalik sa programming, kaya maaaring hindi na napapanahon ang file na ito. Kung ang proseso ng pag install ng bot ay kailanman naayos at hindi na kinakailangan, pagkatapos ay babalik ako upang i update ang dokumentong ito. Tingnan ang pahina ng workshop sa Ingles para sa kasalukuyang petsa ng pagtatayo ng DotaBuff at petsa ng paglabas ng software.
-
+## VULFT
 
 
 VULFT - Kabuuang Takeover Bot Script na may dynamic na pag-uugali ng labanan. DotaBuff papel at imbentaryo build sequences ay na update sa: 19/03/23. Nangangailangan ng manu manong pag install sa vscripts / bots folder (may kasalukuyang problema sa Dota workshop sa mga bagong bot). Ang VUL-FT ay hindi kaakibat ng DotaBuff.
+
+
+
+##  Pagsasalin 
+
+Ang pagpapanatili ng pagsasalin na ito ay tumatagal ng mahabang panahon para sa akin, mga 30 minuto. Kailangan kong bumalik sa programming, kaya maaaring hindi na napapanahon ang file na ito. Kung ang proseso ng pag install ng bot ay kailanman naayos at hindi na kinakailangan, pagkatapos ay babalik ako upang i update ang dokumentong ito. Tingnan ang pahina ng workshop sa Ingles para sa kasalukuyang petsa ng pagtatayo ng DotaBuff at petsa ng paglabas ng software.
 
 
 

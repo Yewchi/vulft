@@ -1,8 +1,8 @@
 local hero_data = {
 	"doom_bringer",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 6, 3, 3, 3, 3, 7, 4, 4, 10, 12},
+	{2, 1, 2, 3, 2, 4, 2, 1, 1, 6, 1, 3, 3, 3, 7, 4, 4, 10, 11},
 	{
-		"item_quelling_blade","item_slippers","item_circlet","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_wraith_band","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_gloves","item_hand_of_midas","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_aghanims_shard","item_energy_booster","item_aether_lens","item_octarine_core","item_overwhelming_blink","item_staff_of_wizardry","item_ogre_axe",
+		"item_tango","item_magic_stick","item_quelling_blade","item_branches","item_branches","item_flask","item_boots","item_chainmail","item_magic_wand","item_blades_of_attack","item_phase_boots","item_ring_of_health","item_crown","item_void_stone","item_meteor_hammer","item_gloves","item_hand_of_midas","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_aether_lens","item_aghanims_shard","item_energy_booster","item_vitality_booster","item_octarine_core","item_gem","item_pers","item_pers","item_gem","item_refresher","item_ultimate_scepter_2",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
@@ -101,6 +101,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		local isLocked, isCombo = UseAbility_IsPlayerLocked(gsiPlayer)
@@ -240,6 +241,9 @@ d = {
 				local thisScore = sqrt(thisEnemy.lastSeenHealth/thisEnemy.maxHealth)
 							* thisEnemy.lastSeenMana
 							* Analytics_GetPowerLevel(thisEnemy)
+							* (not thisEnemy.hUnit:IsNull() and thisEnemy.hUnit:IsStunned()
+									and 0.35 or 1
+								)
 						- distanceDanger
 				if thisScore > bestScore then
 					bestScore = thisScore

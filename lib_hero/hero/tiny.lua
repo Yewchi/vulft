@@ -1,10 +1,10 @@
 local hero_data = {
 	"tiny",
-	{3, 1, 1, 2, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 8, 3, 4, 9, 11},
+	{3, 1, 1, 2, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 8, 3, 4, 9, 12},
 	{
-		"item_faerie_fire","item_quelling_blade","item_branches","item_branches","item_tango","item_ward_observer","item_bottle","item_belt_of_strength","item_boots","item_gloves","item_power_treads","item_blink","item_magic_wand","item_quarterstaff","item_oblivion_staff","item_echo_sabre","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_echo_sabre","item_lesser_crit","item_mithril_hammer","item_black_king_bar","item_shadow_amulet","item_blitz_knuckles","item_silver_edge","item_lesser_crit","item_greater_crit","item_aghanims_shard","item_sange_and_yasha",
+		"item_gauntlets","item_gauntlets","item_tango","item_quelling_blade","item_enchanted_mango","item_branches","item_boots","item_gloves","item_soul_ring","item_power_treads","item_quarterstaff","item_robe","item_echo_sabre","item_magic_wand","item_blink","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_blitz_knuckles","item_shadow_amulet","item_invis_sword","item_lesser_crit","item_silver_edge","item_hyperstone","item_platemail","item_assault","item_eagle","item_swift_blink","item_reaver","item_satanic","item_moon_shard",
 	},
-	{ {2,2,3,4,4,}, {2,2,4,5,5,}, 0.1 },
+	{ {2,2,2,1,1,}, {2,2,2,1,5,}, 0.1 },
 	{
 		"Avalanche","Toss","Tree Grab","Grow","+20 Movement Speed","+10 Strength","+10% Status Resistance","+80 Avalanche Damage","+40% Grow Bonus Damage With Tree","Toss Requires No Target","-8s Avalanche Cooldown","2 Toss Charges",
 	}
@@ -13,11 +13,11 @@ local hero_data = {
 if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
-		[0] = {"template_hurt1", ABILITY_TYPE.NUKE},
-		{"template_ouch", ABILITY_TYPE.NUKE},
-		{"template_slow", ABILITY_TYPE.NUKE},
-		[5] = {"template_big_slow", ABILITY_TYPE.NUKE},
-
+		[0] = {"tiny_avalanche", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN + ABILITY_TYPE.AOE},
+		{"tiny_toss", ABILITY_TYPE.NUKE},
+		{"tiny_tree_grab", ABILITY_TYPE.ATTACK_MODIFIER},
+		--don't teach generic grab {"tiny_tree_throw", ABILITY_TYPE.NUKE + ABILITY_TYPE.SLOW + ABILITY_TYPE.AOE},
+		[5] = {"tiny_grow", ABILITY_TYPE.PASSIVE},
 }
 
 local ZEROED_VECTOR = ZEROED_VECTOR
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		-- Any spell immune unit cannot be tossed

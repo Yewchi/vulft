@@ -2,9 +2,9 @@ local hero_data = {
 	"nevermore",
 	{1, 2, 1, 2, 1, 2, 1, 2, 4, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_magic_stick","item_tango","item_enchanted_mango","item_enchanted_mango","item_branches","item_branches","item_branches","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_quarterstaff","item_magic_wand","item_mask_of_madness","item_belt_of_strength","item_blade_of_alacrity","item_dragon_lance","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_invis_sword","item_lesser_crit","item_silver_edge","item_hurricane_pike","item_blink","item_arcane_blink","item_gem","item_refresher","item_moon_shard","item_aghanims_shard",
+		"item_enchanted_mango","item_branches","item_tango","item_branches","item_faerie_fire","item_ward_observer","item_bottle","item_boots","item_boots_of_elves","item_power_treads","item_wind_lace","item_magic_wand","item_belt_of_strength","item_blade_of_alacrity","item_dragon_lance","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_force_staff","item_hurricane_pike","item_blink","item_arcane_blink","item_invis_sword","item_lesser_crit","item_silver_edge","item_refresher","item_aghanims_shard","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,1,1,}, {2,2,2,1,1,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{
 		"Shadowraze","Necromastery","Presence of the Dark Lord","Requiem of Souls","+25 Shadowraze Stack Damage","+25 Attack Speed","Presence Aura Affects Building","+100 Shadowraze Damage","+3.0 Damage Per Soul","+0.3s Requiem Fear per line","-5s Shadowraze Cooldown","Shadowraze Applies Attack Damage",
 	}
@@ -52,6 +52,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

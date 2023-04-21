@@ -1,10 +1,10 @@
 local hero_data = {
 	"brewmaster",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 2, 1, 2, 1, 4, 2, 2, 1, 6, 7, 4, 3, 3, 3, 3, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_gauntlets","item_branches","item_bracer","item_boots","item_arcane_boots","item_ogre_axe","item_magic_wand","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_chainmail","item_hood_of_defiance","item_headdress","item_pipe","item_chainmail","item_mekansm","item_guardian_greaves","item_platemail","item_buckler","item_assault","item_sphere",
+		"item_tango","item_quelling_blade","item_branches","item_branches","item_ring_of_protection","item_enchanted_mango","item_urn_of_shadows","item_boots","item_arcane_boots","item_vitality_booster","item_spirit_vessel","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_platemail","item_pers","item_lotus_orb","item_cloak","item_ring_of_health","item_headdress","item_pipe","item_buckler","item_ring_of_basilius","item_lifesteal","item_blades_of_attack","item_vladmir","item_point_booster","item_wraith_pact",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
 		"Thunder Clap","Cinder Brew","Drunken Brawler","Primal Split","+15 Damage","+200 Thunder Clap AoE","+30% Cinder Brew Damage/Duration","+1x Brewed Up multiplier for Drunken Brawler","+1200 Brewlings Health","+80 Attack Speed","Brewlings Gain Drunken Brawler Passive","Cinder Brew applies Fear when ignited",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

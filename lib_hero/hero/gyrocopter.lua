@@ -1,16 +1,16 @@
 local hero_data = {
 	"gyrocopter",
-	{2, 1, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 10, 12},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 10, 4},
 	{
-		"item_magic_stick","item_faerie_fire","item_enchanted_mango","item_slippers","item_branches","item_wraith_band","item_boots","item_boots_of_elves","item_magic_wand","item_power_treads","item_broadsword","item_lesser_crit","item_point_booster","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blitz_knuckles","item_broadsword","item_invis_sword","item_silver_edge","item_lifesteal","item_claymore","item_satanic","item_ultimate_orb","item_skadi","item_rapier","item_ultimate_scepter_2","item_blink","item_swift_blink","item_rapier","item_pers","item_pers",
+		"item_quelling_blade","item_tango","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_wraith_band","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_blade_of_alacrity","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_broadsword","item_lesser_crit","item_greater_crit","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_lifesteal","item_claymore","item_satanic","item_quarterstaff","item_blink","item_butterfly","item_blink","item_eagle","item_swift_blink",
 	},
-	{ {3,2,1,4,5,}, {4,4,1,5,2,}, 0.1 },
+	{ {3,3,5,1,1,}, {4,4,4,1,5,}, 0.1 },
 	{
 		"Rocket Barrage","Homing Missile","Flak Cannon","Call Down","+30 Movement Speed during Rocket Barrage","+200 Health","+0.4s Homing Missile Stun Duration","+3 Flak Cannon Attacks","+40 Flak Cannon Damage","+16 Rocket Barrage Damage","-6s Flak Cannon Cooldown","3x Call Down",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"gyrocopter_rocket_barrage", ABILITY_TYPE.NUKE},
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

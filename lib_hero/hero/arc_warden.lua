@@ -1,10 +1,10 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
+	{3, 1, 3, 1, 1, 4, 3, 3, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_ward_observer","item_magic_stick","item_enchanted_mango","item_magic_wand","item_boots","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_rod_of_atos","item_gungir","item_ultimate_orb","item_void_stone","item_sphere","item_aether_lens","item_octarine_core","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_black_king_bar","item_aghanims_shard","item_ultimate_scepter_2","item_sheepstick","item_moon_shard","item_moon_shard",
+		"item_quelling_blade","item_slippers","item_slippers","item_tango","item_branches","item_branches","item_circlet","item_branches","item_wraith_band","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_boots","item_magic_wand","item_rod_of_atos","item_gungir","item_aether_lens","item_soul_booster","item_octarine_core","item_blink","item_reaver","item_overwhelming_blink","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_ultimate_scepter","item_ultimate_scepter_2","item_dagon_5L","item_aghanims_shard",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{
 		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+200 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed","+125 Spark Wraith Damage","+40 Flux Damage","+40% Tempest Double Cooldown Reduction","+12s Tempest Double Duration",
 	}
@@ -41,6 +41,7 @@ local HAND_OF_MIDAS_SCORE = T_ITEM_FUNCS["item_hand_of_midas"][ITEM_FUNCS_I.SCOR
 
 local max = math.max
 local min = math.min
+local sqrt = math.sqrt
 
 local fight_kill_commit_task_handle = FightKillCommit_GetTaskHandle()
 local fight_harass_task_handle = FightHarass_GetTaskHandle()
@@ -128,7 +129,7 @@ local function tempest_double_think(genericAbilityThink)
 			end
 			return;
 		end
-		-- TODO port to an actively defended defensible right as any aggresive behaviour begins while allies are behind the tower
+		-- TODO port to an actively defended defensible right as any aggresive behavior begins while allies are behind the tower
 	end
 	if genericAbilityThink(tempestDouble) then
 		--print("non-ability")
@@ -158,6 +159,7 @@ end
 			end
 			return;
 		end
+		--print('b')
 		if nearbyEnemies[1] then
 			--print("tempest in attack")
 			if hUnit:IsCastingAbility() then
@@ -165,10 +167,13 @@ end
 				return;
 			end
 			local sparkWraith = hUnit:GetAbilityInSlot(2)
-			if hUnit:GetRemainingLifespan() < 0.67
+			if hUnit:GetRemainingLifespan() * sqrt(tempestHealthPercent) < (tempestDouble.lastSeenMana
+						/ sparkWraith:GetManaCost())
+						* 3
 					and sparkWraith:GetCooldownTimeRemaining() == 0
 					and tempestDouble.lastSeenMana > sparkWraith:GetManaCost()
 					and not hUnit:IsSilenced()
+					and not pUnit_IsNullOrDead(lowestPlayer)
 					and (lowestPlayer.lastSeenHealth > hUnit:GetAttackDamage()
 						or Vector_PointDistance2D(hUnit:GetLocation(), lowestPlayer.lastSeen.location)
 								> tempestDouble.attackRange
@@ -178,6 +183,7 @@ end
 						tempestDouble.lastSeen.location, extrapolated,
 						1, sparkWraith:GetCastRange()
 					)
+				extrapolated.z = lowestPlayer.lastSeen.location.z
 				--print("end of lifespan spark")
 				hUnit:Action_UseAbilityOnLocation(sparkWraith, extrapolated)
 				return;
@@ -195,6 +201,7 @@ end
 				Positioning_ZSAttackRangeUnitHugAllied(tempestDouble, lowestPlayer.lastSeen.location, SET_ENEMY_HERO, 50, 0.15)
 			end
 		end
+		--print('mid')
 		local owned, midas = Item_ItemOwnedAnywhere(tempestDouble, "item_hand_of_midas")
 		if owned then
 			local target = HAND_OF_MIDAS_SCORE(tempestDouble, midas)
@@ -233,6 +240,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
@@ -342,10 +350,12 @@ d = {
 					if AbilityLogic_AbilityCanBeCast(gsiPlayer, sparkWraith) 
 							and (gsiPlayer.isTempest or AbilityLogic_HighUseAllowOffensive(gsiPlayer, sparkWraith, HIGH_USE_S_W_REMAINING_MANA, Unit_GetHealthPercent(nearestEnemyIncludesFog))) then
 						--print("ARC WARDEN -- USE SPARK SAFE")
-						local unitFacingDirectional = Vector_UnitDirectionalFacingDirection(gsiPlayer.hUnit:GetFacing())
-						local aheadOfPlayer = Vector_Addition(gsiPlayer.lastSeen.location, Vector_ScalarMultiply2D(unitFacingDirectional, 400))
+						local aheadOfPlayer = Vector_UnitDirectionalFacingDegrees(gsiPlayer.lastSeen.facingDegrees)
+						aheadOfPlayer = Vector_Addition(gsiPlayer.lastSeen.location,
+								Vector_ScalarMultiply2D(aheadOfPlayer, 300)
+							)
 						USE_ABILITY(gsiPlayer, sparkWraith, aheadOfPlayer, 400)
-						return
+						return;
 					end
 				end
 				if nearbyEnemies[1] then
@@ -355,6 +365,23 @@ d = {
 							USE_ABILITY(gsiPlayer, flux, nearbyEnemies[1], 400)
 							return
 						end
+					end
+				end
+			end
+			if AbilityLogic_AbilityCanBeCast(gsiPlayer, sparkWraith)
+					and AbilityLogic_HighUseAllowOffensive(gsiPlayer, sparkWraith,
+						gsiPlayer.highUseManaSimple, 0.75
+					) then
+				local revealAbilityLoc, bez
+						= SearchFog_GetRevealLocNearby(gsiPlayer.lastSeen.location,
+								sparkWraith:GetCastRange()
+							)
+				if bez then
+					revealAbilityLoc = bez:computeForwards(0.1)
+					if Vector_PointDistance(revealAbilityLoc, gsiPlayer.lastSeen.location)
+							< sparkWraith:GetCastRange() then
+						USE_ABILITY(gsiPlayer, sparkWraith, revealAbilityLoc, 400)
+						return;
 					end
 				end
 			end

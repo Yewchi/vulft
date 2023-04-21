@@ -165,6 +165,28 @@ function Farm_JungleCampClearViability(gsiPlayer, difficulty)
 end
 local clear_viability = Farm_JungleCampClearViability
 
+function FarmJungle_GetGreedyCantJungle(gsiPlayer, players, dontIndex)
+	local timeData = gsiPlayer.time.data
+	if not dontIndex and timeData.greedyPlayer then
+		return timeData.greedyPlayer
+	end
+	local greedyPlayer
+	local greedyWeakScore = 0
+	for i=1,#players do
+		local thisPlayer = players[i]
+		local score = thisPlayer.vibe.greedRating
+				* 1/Farm_JungleCampClearViability(thisPlayer, JUNGLE_CAMP_ANCIENT)
+		if score > greedyWeakScore then
+			greedyPlayer = thisPlayer
+			greedyWeakScore = score
+		end
+	end
+	if not dontIndex then
+		timeData.greedyPlayer = greedyPlayer
+	end
+	return greedyPlayer
+end
+
 local function get_difficulty_limit(gsiPlayer)
 	local viabilityRequired = gsiPlayer.isRanged and 0.66 or 1
 	for i=4,1,-1 do
@@ -365,12 +387,13 @@ function FarmJungle_GetNearestUncertainUncleared(gsiUnit, difficultyLimit)
 end
 local get_nearest_uncertain_uncleared = FarmJungle_GetNearestUncertainUncleared
 
-function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarmed)
+function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarmed,
+		withinRangeOf, range)
 	-- Temporary
 	local difficultyLimit = get_difficulty_limit(gsiPlayer)
 	if not difficultyLimit then
 		--print(gsiPlayer.shortName, "no difficulty")
-		return false
+		return false;
 	end
 	local loc, available, creeps = get_nearest_uncertain_uncleared(gsiPlayer, difficultyLimit)
 	if VERBOSE then
@@ -384,12 +407,16 @@ function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarme
 	end
 	if not loc then
 		--print("no loc")
-		return false
+		return false;
+	elseif withinRangeOf and range and Vector_PointDistance2D(withinRangeOf, loc)
+				> range then
+		DEBUG_print("[farm_jungle] EXIT; too far from %s to %s", withinRangeOf, loc)
+		return false;
 	end
 	if not creeps or not creeps[1] then
 		--print("no creeps")
-		gsiPlayer.hUnit:Action_MoveDirectly(loc)
-		return true
+		Positioning_MoveDirectly(gsiPlayer, loc)
+		return true;
 	end
 	local lowHp = 0xFFFF
 	local lowCreep = nil
@@ -401,7 +428,7 @@ function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarme
 	end
 	if not lowCreep then
 		--print("no low")
-		return false
+		return false;
 	end
 	--print(lowCreep, "low", lowHp*1.66 > gsiPlayer.lastSeenHealth, lowCreep and Lhp_CageFightKillTime(gsiPlayer, cUnit_NewSafeUnit(lowCreep)))
 	-- the line below requires persistance for units which do not have the required combat efficiency
@@ -423,7 +450,7 @@ function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarme
 		--print(gsiPlayer.shortName, "attacking")
 	else
 		--print(gsiPlayer.shortName, "moving after attack")
-		gsiPlayer.hUnit:Action_MoveDirectly(
+		Positioning_MoveDirectly(gsiPlayer,
 				Vector_Addition(
 						gsiPlayer.lastSeen.location, 
 						desiredAfterFarmed or Vector_ScalarMultiply2D(
@@ -436,5 +463,5 @@ function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarme
 					)
 			)
 	end
-	return true
+	return true;
 end

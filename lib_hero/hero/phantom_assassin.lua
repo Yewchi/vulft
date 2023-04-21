@@ -1,12 +1,12 @@
 local hero_data = {
 	"phantom_assassin",
-	{1, 2, 1, 3, 1, 4, 2, 2, 2, 5, 3, 4, 1, 3, 8, 3, 4, 10, 11},
+	{1, 2, 1, 3, 1, 4, 2, 2, 2, 5, 1, 4, 3, 3, 8, 3, 4, 10, 11},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_branches","item_slippers","item_magic_stick","item_boots_of_elves","item_gloves","item_power_treads","item_broadsword","item_claymore","item_void_stone","item_ring_of_health","item_bfury","item_blight_stone","item_mithril_hammer","item_desolator","item_mithril_hammer","item_ogre_axe","item_aghanims_shard","item_black_king_bar","item_aghanims_shard","item_mithril_hammer","item_belt_of_strength","item_basher","item_vanguard","item_abyssal_blade","item_magic_wand","item_ultimate_scepter","item_sphere","item_nullifier","item_ultimate_scepter_2",
+		"item_tango","item_blight_stone","item_branches","item_quelling_blade","item_branches","item_orb_of_venom","item_fluffy_hat","item_orb_of_corrosion","item_magic_wand","item_boots_of_elves","item_boots","item_power_treads","item_claymore","item_void_stone","item_broadsword","item_bfury","item_orchid","item_mage_slayer","item_bloodthorn","item_blade_of_alacrity","item_staff_of_wizardry","item_ogre_axe","item_point_booster","item_mithril_hammer","item_ultimate_scepter","item_black_king_bar","item_basher","item_abyssal_blade","item_helm_of_iron_will","item_ultimate_scepter_2","item_relic","item_moon_shard","item_nullifier","item_refresher",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Stifling Dagger","Phantom Strike","Blur","Fan of Kinves","Coup de Grace","+0.5s Phantom Strike Duration","-2.0s Stifling Dagger Cooldown","+25% Blur Evasion","+250 Phantom Strike Cast Range","+20% Stifling Dagger Damage","+60 Phantom Strike Attack Speed","+7% Coup de Grace chance","Triple Strike Stifling Dagger",
+		"Stifling Dagger","Phantom Strike","Blur","Coup de Grace","+0.5s Phantom Strike Duration","-2.0s Stifling Dagger Cooldown","+25% Blur Evasion","+250 Phantom Strike Cast Range","+20% Stifling Dagger Damage","+60 Phantom Strike Attack Speed","+7% Coup de Grace chance","Triple Strike Stifling Dagger",
 	}
 }
 --@EndAutomatedHeroData
@@ -46,6 +46,8 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		t_player_abilities[gsiPlayer.nOnTeam][1] = gsiPlayer.hUnit:GetAbilityInSlot(1)
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

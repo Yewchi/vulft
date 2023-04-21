@@ -111,6 +111,16 @@ function AbilityLogic_RegisterGenericsModule()
 	AbilityLogic_RegisterGenericsModule = nil
 end
 
+function AbilityLogic_GetTargetBehavior(hAbility)
+	local b = hAbility:GetBehavior()
+	local team = hAbility:GetTargetTeam()
+	local types = hAbility:GetTargetFlags()
+	return B_AND(team, ABILITY_TARGET_TEAM_FRIENDLY), B_AND(team, ABILITY_TARGET_TEAM_ENEMY),
+			B_AND(types, ABILITY_TARGET_TYPE_HERO), B_AND(b, ABILITY_BEHAVIOR_AOE),
+			B_AND(b, ABILITY_BEHAVIOR_UNIT_TARGET), B_AND(b, ABILITY_BEHAVIOR_POINT_TARGET),
+			B_AND(b, ABILITY_BEHAVIOR_NO_TARGET), B_AND(types, ABILITY_BEHAVIOR_TREE)
+end
+
 -- Return: funcName, targetType, targetTeam
 function AbilityLogic_GetBestFitCastFunc(gsiPlayer, hAbility, target, asString)
 	local behaviorFlags = hAbility:GetBehavior()
@@ -120,7 +130,8 @@ function AbilityLogic_GetBestFitCastFunc(gsiPlayer, hAbility, target, asString)
 	if B_AND(behaviorFlags, ABILITY_BEHAVIOR_AUTOCAST) > 0 then
 		funcStr = asString and "ToggleAutoCast" or hAbility.ToggleAutoCast
 		if TEST then print(gsiPlayer.shortName, hAbility:GetName(), "ToggleAutoCast", funcStr) end
-	elseif B_AND(behaviorFlags, ABILITY_BEHAVIOR_POINT) > 0 and (not target or target.x) then
+	elseif B_AND(behaviorFlags, ABILITY_BEHAVIOR_POINT) > 0 and (not target or target.x
+			or B_AND(behaviorFlags, ABILITY_BEHAVIOR_UNIT_TARGET) == 0) then
 		funcStr = asString and "Action_UseAbilityOnLocation" or gsiPlayer.hUnit.Action_UseAbilityOnLocation
 		if TEST then print(gsiPlayer.shortName, hAbility:GetName(), "UseAbilityOnLocation", funcStr) end
 	elseif B_AND(behaviorFlags, ABILITY_BEHAVIOR_UNIT_TARGET) > 0 and (
@@ -334,7 +345,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 			-- target ground infront of self
 			target = Vector_Addition(
 					target,
-					Vector_ScalarMultiply(
+					Vector_ScalarMultiply2D(
 							Vector_UnitDirectionalFacingDirection(gsiPlayer.hUnit:GetFacing()),
 							castRange
 						)
@@ -365,7 +376,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 			if distToTarget < castRange*0.88 then
 				target = Vector_Addition(
 						gsiPlayer.lastSeen.location,
-						Vector_ScalarMultiply(
+						Vector_ScalarMultiply2D(
 								Vector_UnitDirectionalPointToPoint(gsiPlayer.lastSeen.location, target),
 								min(castRange, distToTarget + 175)
 							)
@@ -389,7 +400,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 						gsiPlayer.lastSeen.location,
 						target.x and target or target.lastSeen.location
 					) then -- BEST_FIT_CAST was not informed we were using a location if we are. use_ability will confirm
-			UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, hAbility, target, 400)
+			UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, hAbility, target.x and gsiPlayer or target, 400)
 			return true
 		end
 	elseif castFunc == "Action_UseAbility" then
@@ -405,10 +416,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 		end
 		if TEST then print(gsiPlayer.shortName, hAbility:GetName(), "out of range.") end
 	elseif castFunc == "ToggleAutoCast" then
-		if TEST then print(setAutoCastOn, hAbility:GetAutoCastState()) end
-		if setAutoCastOn and not hAbility:GetAutoCastState() or (not setAutoCastOn and hAbility:GetAutoCastState()) then
-			hAbility:ToggleAutoCast()
-		end
+		AbilityLogic_HandleAutocastGeneric(gsiPlayer, hAbility)
 		return false -- shouldn't matter for toggle auto
 	end
 	return false

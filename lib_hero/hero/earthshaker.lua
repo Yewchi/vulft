@@ -1,10 +1,10 @@
 local hero_data = {
 	"earthshaker",
-	{1, 2, 3, 1, 1, 4, 1, 3, 3, 3, 6, 4, 2, 2, 8, 2, 4, 10, 11},
+	{1, 3, 2, 1, 1, 4, 1, 3, 3, 6, 3, 4, 2, 2, 8, 2, 4, 9, 12},
 	{
-		"item_tango","item_enchanted_mango","item_clarity","item_ward_sentry","item_boots","item_arcane_boots","item_blink","item_aghanims_shard","item_wind_lace","item_void_stone","item_cyclone","item_void_stone","item_aether_lens","item_soul_booster",
+		"item_ward_observer","item_quelling_blade","item_branches","item_branches","item_bottle","item_boots","item_blink","item_lesser_crit","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_arcane_boots","item_aether_lens","item_point_booster","item_vitality_booster","item_octarine_core","item_reaver","item_overwhelming_blink","item_black_king_bar","item_silver_edge","item_ultimate_scepter_2","item_ultimate_orb","item_pers","item_sphere",
 	},
-	{ {5,5,5,3,3,}, {4,4,4,4,4,}, 0.1 },
+	{ {3,3,3,2,2,}, {4,4,4,4,2,}, 0.1 },
 	{
 		"Fissure","Enchant Totem","Aftershock","Echo Slam","+40 Base Damage","+90 Fissure Damage","+50% Enchant Totem Damage","+50 Aftershock Damage","+40 Echo Damage","+320 Fissure Range","+200 Aftershock Range","-1.5s Enchant Totem Cooldown",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

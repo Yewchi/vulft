@@ -1,8 +1,8 @@
 local hero_data = {
 	"enigma",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 7, 3, 4, 10},
+	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 7, 3, 4, 10, 12},
 	{
-		"item_buckler","item_magic_wand","item_tango","item_branches","item_boots","item_arcane_boots","item_chainmail","item_headdress","item_mekansm","item_buckler","item_guardian_greaves","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_void_stone","item_aether_lens","item_vitality_booster","item_energy_booster","item_point_booster","item_octarine_core","item_ring_of_health","item_pers",
+		"item_quelling_blade","item_tango","item_sobi_mask","item_branches","item_branches","item_enchanted_mango","item_enchanted_mango","item_boots","item_energy_booster","item_arcane_boots","item_gloves","item_hand_of_midas","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aether_lens","item_octarine_core","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

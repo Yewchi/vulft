@@ -1,8 +1,8 @@
 local hero_data = {
 	"abyssal_underlord",
-	{1, 3, 1, 2, 1, 4, 1, 2, 3, 6, 3, 4, 2, 2, 8, 3, 4, 9, 11},
+	{1, 3, 1, 2, 1, 2, 1, 4, 2, 6, 2, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_enchanted_mango","item_boots","item_energy_booster","item_arcane_boots","item_crown","item_crown","item_magic_wand","item_staff_of_wizardry","item_rod_of_atos","item_ring_of_basilius","item_crown","item_cloak","item_veil_of_discord","item_ring_of_health","item_hood_of_defiance","item_headdress","item_pipe","item_void_stone","item_aether_lens","item_ghost","item_aghanims_shard","item_staff_of_wizardry","item_robe","item_ethereal_blade","item_arcane_boots","item_octarine_core",
+		"item_tango","item_magic_stick","item_quelling_blade","item_branches","item_branches","item_enchanted_mango","item_boots","item_magic_wand","item_arcane_boots","item_broadsword","item_ring_of_health","item_cloak","item_hood_of_defiance","item_broadsword","item_chainmail","item_blade_mail","item_headdress","item_aghanims_shard","item_chainmail","item_mekansm","item_pipe","item_buckler","item_guardian_greaves","item_fluffy_hat","item_staff_of_wizardry","item_force_staff",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
@@ -48,6 +48,7 @@ local d
 d = {
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)

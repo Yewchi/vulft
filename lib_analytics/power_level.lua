@@ -31,37 +31,77 @@ local max = math.max
 local sqrt = math.sqrt
 local abs = math.abs
 
+local CRAZY_VERBOSE = VERBOSE and false
+
 local BASIC_ONE_LEVEL_OVER_POWER = 1/5 -- On average how much more powerful a player of one level higher is than another
 
-local function game_state_sensibility(nearbyHeroes, dangerLevel)
-	
-end
-
-function Analytics_GetPowerLevel(gsiPlayer, kda) -- TODO Needs AFK core and jungler consideration
+local highHealthFactor = 1100
+function Analytics_GetPowerLevel(gsiPlayer, kda, notRelative) -- TODO Needs AFK core and jungler consideration
 	-- TODO mana, ability types
 	
+	local healthFactor
+	local physicalTaken = gsiPlayer.armor or 2 + gsiPlayer.level * 0.33
+	physicalTaken = (1 - 0.035*physicalTaken/(1+0.06*physicalTaken)) -- halfed (upwards)
+	local doesntEvade = gsiPlayer.evasion and (1 - gsiPlayer.evasion/2) or 0
+	local magicTaken = gsiPlayer.magicTaken and 0.5 + gsiPlayer.magicTaken/2 or 0.875
+	local healthPercFactor = 0.8 + 0.2*gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
+	if notRelative then
+		healthFactor = healthPercFactor -- lazy incorporate hero design
+				* ( gsiPlayer.lastSeenHealth/1024 -- ALL co-factors to this; 1024
+					* (1 - physicalTaken * doesntEvade * magicTaken)
+					/ sqrt(gsiPlayer.maxHealth)
+				)^(1/2)
+	else
+		healthFactor = healthPercFactor -- lazy incorporate hero design
+				* gsiPlayer.lastSeenHealth -- ALL co-factors to this
+					* (1 - physicalTaken * doesntEvade * magicTaken)
+					/ sqrt(gsiPlayer.maxHealth) -- incorporate the design of the hero, by lazy magic TODO
+		highHealthFactor = highHealthFactor
+				+ (healthFactor - highHealthFactor)
+					* (healthFactor > highHealthFactor and 0.15 or 0.025)
+		healthFactor = healthFactor / highHealthFactor + (healthFactor/1024)^(1/2) -- 1024
+	end
 	local powerLevel = min(0.67,
 			max(1.65,	
 					kda or GSI_GetKDA(gsiPlayer)
 				)
 			) * (1+gsiPlayer.level*BASIC_ONE_LEVEL_OVER_POWER)
-			* max(0.143, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth)
+			* max(0.143, healthFactor)
 			* (0.775
-					+ 0.225 * (gsiPlayer.lastSeenMana and max(0, (gsiPlayer.lastSeenMana / gsiPlayer.maxMana))
+					+ (0.125+0.1*healthPercFactor)
+						* (gsiPlayer.lastSeenMana and max(0, (gsiPlayer.lastSeenMana / gsiPlayer.maxMana))
 							or 1
 						)
 				)
-	if gsiPlayer.modPowerLevel then
-		return gsiPlayer.modPowerLevel(gsiPlayer, powerLevel)
-	end
+	powerLevel = gsiPlayer.modPowerLevel and gsiPlayer.modPowerLevel(gsiPlayer, powerLevel)
+			or powerLevel
+	gsiPlayer.lastSeen.powerLevel = powerLevel
+	if string.find(tostring(highHealthFactor), "nan") then highHealthFactor = 1100 if DEBUG then DEBUG_PrintUntilErroredNone(gsiPlayer) Util_ThrowError() end end
 	return powerLevel
 end
 local GetPowerLevel = Analytics_GetPowerLevel
 
-local false_pub_stomper = {lastSeenHealth = 2000, maxHealth = 2000}
+local false_player = {
+		lastSeen = {},
+		lastSeenHealth = 700,
+		maxHealth = 700,
+		level = 1
+	}
 function Analytics_GetPerfectKDAPowerLevel(level)
-	false_pub_stomper.level = level
-	return GetPowerLevel(false_pub_stomper, 10)
+	false_player.level = level
+	false_player.lastSeenHealth = 650 + 50 * level
+	false_player.maxHealth = false_player.lastSeenHealth
+	
+
+	return GetPowerLevel(false_player, 10, true)
+end
+
+function Analytics_GetKDAPowerLevel(level, kda)
+	false_player.level = level
+	false_player.lastSeenHealth = 650 + 50 * level
+	false_player.maxHealth = false_player.lastSeenHealth
+
+	return GetPowerLevel(false_player, kda, true)
 end
 
 function Analytics_RegisterGetKnownTheorizedEngageablesToPowerLevel(getKnownTheorizedEngageables)
@@ -107,35 +147,53 @@ function Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies, location)
 	end
 
 	nearbyAllies = nearbyAllies or Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 4000)
+	--local lowestEhp = 1-(0.06*hUnit:GetArmor()/(1+0.06*unitArmor))
+	--local lowestEhpPlayer = gsiPlayer
 	local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 4000)
 	local playerPower = GetPowerLevel(gsiPlayer)
 	local knownEngageables, theorizedEngageables, theorizedDangerAmount
 			= Analytics_GetKnownTheorizedEngageables(gsiPlayer, location) -- TIMEDATA known/theorizedEngables set
 	theorizedDangerAmount = theorizedDangerAmount * playerPower -- Reverse the mimic score to raw power of enemies
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print("THEORETICAL DANGER CHECK", theorizedDangerAmount)
-	end
+	
 	--local theorizedDangerAmount = 0
 	local playerLoc = gsiPlayer.lastSeen.location
-	for i=1, #nearbyEnemies do
+	-- TODO YOU FEEL ASLEEP HARD ON THE DESK TRYIN TO FIX THIS GOODNIGHT
+	for i=1,#nearbyEnemies do
+		-- Process true enemies
 		local thisEnemy = nearbyEnemies[i]
 		theorizedDangerAmount = theorizedDangerAmount + GetPowerLevel(thisEnemy)
 				/ sqrt(max(1, (Vector_PointDistance2D(thisEnemy.lastSeen.location, playerLoc)-900)/900))
 	end
+	if #knownEngageables < ENEMY_TEAM_NUMBER_OF_PLAYERS and #nearbyEnemies > 0 then
+		-- because 'consider known' from fow_logic
+		local kIndex = 1
+		while(kIndex < #knownEngageables) do
+			-- get the enemies we didn't process due to fog
+			local thisEnemy = knownEngageables[i]
+			local i=1
+			repeat
+				if i>#nearbyEnemies then
+					local hpp = thisEnemy.lastSeenHealth/thisEnemy.maxHealth
+					theorizedDangerAmount = theorizedDangerAmount + (thisEnemy.lastSeen.powerLevel
+								or 0.5+0.5*hpp+BASIC_ONE_LEVEL_OVER*thisEnemy.level*(hpp))
+							/ sqrt(max(1, (Vector_PointDistance2D(thisEnemy.lastSeen.location, playerLoc)-900)/900))
+				end
+				if nearbyEnemies[i] == thisEnemy then break; end
+				i = i + 1
+			until(true)
+			kIndex = kIndex + 1
+		end
+	end
 	local nearbyEnemyTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
 	local nearbyTeamTower = Set_GetNearestTeamTowerToPlayer(TEAM, gsiPlayer)
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print('enemy power', theorizedDangerAmount)
-	end
+	
 	if nearbyEnemyTower then 
 		local enemyDangerTowerFactor = 1.2 - sqrt(0.00005
 			* max(0, (Vector_PointDistance2D(playerLoc, nearbyEnemyTower.lastSeen.location) - 0.035))
 		)
 		theorizedDangerAmount = theorizedDangerAmount * max(0.91, enemyDangerTowerFactor)
 	end
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print(theorizedDangerAmount)
-	end
+	
 	local alliedPower = 0
 	for i=1, #nearbyAllies do
 		local thisAllied = nearbyAllies[i]
@@ -143,31 +201,21 @@ function Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies, location)
 				/ sqrt(max(1, (Vector_PointDistance2D(thisAllied.lastSeen.location, playerLoc)-900)/900))
 	end
 	alliedPower = alliedPower + playerPower
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print("allied power", alliedPower)
-	end
+	
 	alliedPower = alliedPower * max(1, sqrt(playerPower / (alliedPower / (1+#nearbyAllies))))
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print(alliedPower)
-	end
+	
 	if nearbyTeamTower then
 		local teamSafetyTowerFactor = 1.2 - sqrt(0.00005
 				* max(0, (Vector_PointDistance2D(playerLoc, nearbyTeamTower.lastSeen.location) - 0.02))
 			)
 		alliedPower = alliedPower * max(0.9, teamSafetyTowerFactor)
 	end
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print(alliedPower)
-	end
+	
 	theorizedDangerAmount = theorizedDangerAmount - alliedPower
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print('pre shift', theorizedDangerAmount)
-	end
+	
 	theorizedDangerAmount = theorizedDangerAmount < 0 and -sqrt(abs(theorizedDangerAmount))
 			or sqrt(theorizedDangerAmount + 0.0001)
-	if DEBUG and DEBUG_IsBotTheIntern() then
-		print('pre shift', theorizedDangerAmount)
-	end
+	
 	if allowCache then
 		local backupDangerAmount = dangerBackup[gsiPlayer.nOnTeam]
 		if not (backupDangerAmount < theorizedDangerAmount or plummets_allowed) then

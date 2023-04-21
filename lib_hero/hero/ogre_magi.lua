@@ -1,10 +1,10 @@
 local hero_data = {
 	"ogre_magi",
-	{2, 1, 2, 1, 1, 4, 3, 1, 3, 3, 3, 4, 2, 2, 8, 5, 4, 9, 12},
+	{2, 1, 2, 1, 2, 4, 2, 3, 3, 3, 3, 4, 1, 1, 8, 5, 4, 10, 12},
 	{
-		"item_tango","item_magic_wand","item_boots","item_arcane_boots","item_gloves","item_hand_of_midas","item_void_stone","item_aether_lens","item_arcane_boots","item_blink","item_chainmail","item_headdress","item_mekansm","item_buckler","item_guardian_greaves","item_cloak","item_aghanims_shard","item_vitality_booster","item_energy_booster","item_octarine_core","item_hood_of_defiance","item_pipe",
+		"item_tango","item_magic_stick","item_enchanted_mango","item_branches","item_ward_sentry","item_ward_observer","item_ward_sentry","item_boots","item_gloves","item_hand_of_midas","item_magic_wand","item_arcane_boots","item_aether_lens","item_point_booster","item_vitality_booster","item_octarine_core","item_wind_lace","item_tranquil_boots","item_ancient_janggo",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,3,3,}, 0.1 },
+	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Fireblast","Ignite","Bloodlust","Multicast","+16 Ignite DPS","-1.0s Fireblast Cooldown","+80 Damage","+250 Health","+30 Strength","+25 Bloodlust AS","17% Fireblast chance on attack","+240 Fireblast Damage",
 	}
@@ -47,6 +47,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

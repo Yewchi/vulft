@@ -43,6 +43,11 @@ local DECREASE_FEAR_PER_SECOND = 20
 
 local t_stay_feared_score = {}
 
+local t_start_avoid_hide_with_creep_agro = {}
+
+local t_enemy_players
+local t_team_players
+
 local task_handle = Task_CreateNewTask()
 
 local increase_safety_handle
@@ -56,6 +61,9 @@ end
 local function task_init_func(taskJobDomain)
 	Blueprint_RegisterTaskName(task_handle, "avoid_and_hide")
 	if VERBOSE then VEBUG_print(string.format("avoid_and_hide: Initialized with handle #%d.", task_handle)) end
+
+	t_enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
+	t_team_players = GSI_GetTeamPlayers(TEAM)
 
 	for i=1,TEAM_NUMBER_OF_PLAYERS do
 		t_stay_feared_score[i] = XETA_SCORE_DO_NOT_RUN
@@ -87,6 +95,24 @@ blueprint = {
 		local nearbyFriendlyTower, distanceToTower = Set_GetNearestTeamTowerToPlayer(TEAM, gsiPlayer) -- nb. "nearby" because "nearest" betrays a potential switch to higher tier
 		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1750, 8)
 		local theorizedDanger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+
+		local currTime = GameTime()
+
+		local getAgroIfLaning = t_start_avoid_hide_with_creep_agro[gsiPlayer.nOnTeam]
+		if getAgroIfLaning then
+			if getAgroIfLaning < currTime or theorizedDanger > 1.5 then
+				t_start_avoid_hide_with_creep_agro[gsiPlayer.nOnTeam] = nil
+			elseif getAgroIfLaning - currTime < 0.15 then
+				local enemyPlayers = t_enemy_players
+				local targetEnemy
+				targetEnemy = gsiPlayer.hUnit:GetDifficulty() < 5 and Set_GetNearestEnemyHeroToLocation(gsiPlayer.lastSeen.location, 0)
+						or Set_GetFurthestEnemyHeroToLocation(gsiPlayer.lastSeen.location, 0)
+				if targetEnemy then
+					gsiPlayer.hUnit:Action_AttackUnit(targetEnemy.hUnit, false)
+					return xetaScore
+				end
+			end
+		end
 		
 		if not forceRun and theorizedDanger < 0 then
 			return XETA_SCORE_DO_NOT_RUN
@@ -101,7 +127,15 @@ blueprint = {
 			local enemiesCenter = nearestEnemy and Set_GetCrowdedRatingToSetTypeAtLocation(nearestEnemy.lastSeen.location, SET_HERO_ENEMY)
 			local healthDiffOutnumbered = FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
 			local higherTierTower = GSI_GetHigherTierTower(nearbyFriendlyTower)
-			if higherTierTower == nil then print("/VUL-FT/ <DEBUG> No higher tier!!!! --", nearbyFriendlyTower.team, nearbyFriendlyTower.lane, nearbyFriendlyTower.tier, bUnit_IsNullOrDead(nearbyFriendlyTower)) higherTierTower = GSI_GetTeamFountainUnit(TEAM) end
+			if higherTierTower == nil then
+				WARN_print(string.format("[avoid_and_hide] Warning - No higher tier nor fountain unit from nearby tower!"..
+								"-- nearbyTower: %s, lane %d, T%d, dead:%s",
+							nearbyFriendlyTower.team == TEAM_DIRE and "D" or "R", nearbyFriendlyTower.lane,
+							nearbyFriendlyTower.tier, bUnit_IsNullOrDead(nearbyFriendlyTower)
+						)
+					)
+				higherTierTower = GSI_GetTeamFountainUnit(TEAM)
+			end
 			local enemyDistanceToNearbyTower = nearestEnemy
 					and Math_PointToPointDistance2D(
 							nearbyFriendlyTower.lastSeen.location,
@@ -131,13 +165,13 @@ blueprint = {
 						Vector_UnitDirectionalPointToPoint(
 							avoidedLocation,
 							nearbyTowerLoc
-						), 800
+						), 800 + max(0, 2000 - (gsiPlayer.locationVariation or 1500))
 					)
 				)
 			 if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, behindTowerFromEnemy, 255, 255, 255) end
 		
 			if distanceToTower < 1400 then -- Get to tha chopper
-				Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 150, 1000, true)
+				Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 150, 1000, 0)
 			elseif distanceToTower < 5000 then -- Try to 1-2 past your allies 
 				local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 5000)
 				if #nearbyAllies > 0 then
@@ -151,7 +185,7 @@ blueprint = {
 						)
 					local escapeChannelHead = Vector_Addition(
 							crowdedCenter,
-							Vector_ScalarMultiply(
+							Vector_ScalarMultiply2D(
 								Vector_ToDirectionalUnitVector(
 									Vector_CartesianNormal(
 										Vector_PointToPointLine(crowdedCenter, behindTowerFromEnemy)
@@ -162,23 +196,23 @@ blueprint = {
 						)
 					local moveLocation = Vector_Addition(
 							behindTowerFromEnemy,
-							Vector_ScalarMultiply(
+							Vector_ScalarMultiply2D(
 									Vector_UnitDirectionalPointToPoint(behindTowerFromEnemy, escapeChannelHead),
 									min(1100, Vector_PointDistance2D(gsiPlayer.lastSeen.location, behindTowerFromEnemy))
 								)
 						)
 					--[[DEBUG]]if DEBUG then DebugDrawLine(escapeChannelHead, behindTowerFromEnemy, 255, 150, 150) end
 					moveLocation = Vector_PointBetweenPoints(escapeChannelHead, behindTowerFromEnemy)
-					Positioning_ZSMoveCasual(gsiPlayer, moveLocation, 150, 1000, true)
+					Positioning_ZSMoveCasual(gsiPlayer, moveLocation, 150, 1000, 0)
 				else
-					Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 150, 1000, true)
+					Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 150, 1000, 0)
 				end
 			else -- lead the enemy across the face of the plane that your nearby allies create, or towards fountain with a 45 degree shift from an ally
-				Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 150, 1000, true)
+				Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 150, 1000, 0)
 			end
 		else
 			-- no towers remain
-			Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 150, 1000, true)
+			Positioning_ZSMoveCasual(gsiPlayer, TEAM_FOUNTAIN, 150, 1000, 0)
 		end
 		return xetaScore
 	end,
@@ -187,6 +221,8 @@ blueprint = {
 		-- TODO On a throttle, calculate the odds of a successful escape, drop score and greatly
 		-- -| incentivise fight harass if we seem to be dying
 		local danger, knownEngageables, theorizedEngageables = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local farmCreep, farmAttackInTime, farmScore = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+		local lastHitIsNow = - (farmAttackInTime < 1.33 and farmScore / (0.95 + gsiPlayer.level*0.05)  or 0)
 		if #knownEngageables + #theorizedEngageables == 0 then
 			local thisFearedScore = t_stay_feared_score[gsiPlayer.nOnTeam]
 			if thisFearedScore < -50 then
@@ -198,7 +234,8 @@ blueprint = {
 				t_stay_feared_score[gsiPlayer.nOnTeam] = thisFearedScore
 						- max(decreaseByBasic, decreaseByBasic*(1-danger))
 			end
-			return gsiPlayer, t_stay_feared_score[gsiPlayer.nOnTeam] 
+			return gsiPlayer, t_stay_feared_score[gsiPlayer.nOnTeam]
+						+ lastHitIsNow
 		end
 		if #knownEngageables > 0 and #theorizedEngageables == 0 then
 			local foundClose = false
@@ -224,11 +261,20 @@ blueprint = {
 			)
 		local averageEnemyLevel = GSI_GetTeamAverageLevel(ENEMY_TEAM)
 		t_stay_feared_score[gsiPlayer.nOnTeam] = thisAvoidScore
-		return gsiPlayer, thisAvoidScore
+		
+		return gsiPlayer, thisAvoidScore + lastHitIsNow
 	end,
 	
 	init = function(gsiPlayer, objective, extrapolatedXeta)
 		UseAbility_ClearQueuedAbilities(gsiPlayer)
+		if gsiPlayer.lastSeenHealth / 10 > extrapolatedXeta
+				and (not t_start_avoid_hide_with_creep_agro[gsiPlayer.nOnTeam]
+					or t_start_avoid_hide_with_creep_agro[gsiPlayer.nOnTeam] < GameTime()) then
+			local farmCreep, farmAttackInTime, farmScore = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+			if farmCreep and Vector_PointDistance2D(farmCreep.lastSeen.location, gsiPlayer.lastSeen.location) < 600 then
+				t_start_avoid_hide_with_creep_agro[gsiPlayer.nOnTeam] = GameTime() + 8
+			end
+		end
 		return extrapolatedXeta
 	end
 }

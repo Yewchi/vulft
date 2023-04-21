@@ -2,7 +2,7 @@ local hero_data = {
 	"keeper_of_the_light",
 	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 2, 2, 7, 6, 4, 9, 12},
 	{
-		"item_crown","item_branches","item_tango","item_ward_observer","item_magic_stick","item_ward_sentry","item_ring_of_health","item_meteor_hammer","item_magic_wand","item_wind_lace","item_boots","item_force_staff","item_staff_of_wizardry","item_crown","item_dagon_5","item_dagon_2L","item_dagon_3L","item_aether_lens","item_energy_booster","item_vitality_booster","item_octarine_core","item_dagon_4L","item_dagon_5L","item_ultimate_orb","item_sheepstick","item_ethereal_blade","item_sphere","item_point_booster","item_ultimate_scepter_2","item_aghanims_shard",
+		"item_circlet","item_branches","item_magic_stick","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_boots","item_magic_wand","item_staff_of_wizardry","item_staff_of_wizardry","item_wind_lace","item_crown","item_dagon_5","item_dagon_3L","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ghost","item_staff_of_wizardry","item_robe","item_kaya","item_ethereal_blade","item_aether_lens","item_octarine_core","item_dagon_4L","item_dagon_5L","item_mystic_staff","item_sheepstick",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

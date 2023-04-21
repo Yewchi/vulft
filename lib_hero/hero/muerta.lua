@@ -1,16 +1,16 @@
 local hero_data = {
 	"muerta",
-	{1, 2, 1, 2, 1, 4, 1, 2, 3, 5, 3, 4, 3, 3, 2, 8, 4, 11, 10},
+	{1, 2, 1, 3, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 7, 2, 4, 9, 12},
 	{
-		"item_ward_observer","item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_branches","item_bottle","item_gloves","item_boots","item_robe","item_power_treads","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_staff_of_wizardry","item_hurricane_pike","item_ultimate_orb","item_pers","item_sphere","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_ultimate_orb","item_manta","item_demon_edge","item_monkey_king_bar",
+		"item_branches","item_branches","item_tango","item_enchanted_mango","item_circlet","item_mantle","item_fluffy_hat","item_null_talisman","item_blades_of_attack","item_magic_wand","item_fluffy_hat","item_boots","item_falcon_blade","item_robe","item_power_treads","item_javelin","item_maelstrom","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_hyperstone","item_mjollnir","item_lesser_crit","item_greater_crit","item_dragon_lance","item_hurricane_pike","item_blink","item_swift_blink","item_refresher","item_sheepstick","item_moon_shard","item_rapier","item_rapier",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,4,3,}, 0.1 },
+	{ {1,1,2,2,2,}, {1,1,3,4,4,}, 0.1 },
 	{
 		"Dead Shot","The Calling","Gunslinger","Pierce the Veil","+100 Dead Shot damage","+8 Strength","+250 Dead Shot Cast Range","+25 Damage","2 Dead Shot Charges","The Calling summons +2 additional revenants","+20% Gunslinger chance","+25% Magic Resistance",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"muerta_dead_shot", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN},
@@ -336,6 +336,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -390,7 +391,7 @@ d = {
 			end
 			if CAN_BE_CAST(gsiPlayer, calling)
 					and Vector_PointDistance(playerLoc, fhtLoc) < callingCastRange*1.15
-					and HIGH_USE(gsiPlayer, calling, highUse - calling:GetManaCost(), fhtPercHp) then
+					and HIGH_USE(gsiPlayer, calling, highUse - calling:GetManaCost(), fhtPercHp - (#nearbyEnemies + #outerEnemies)*0.1) then
 				local extrapolatedFht = fht.hUnit:GetExtrapolatedLocation(0.7)
 				local crowdingCenter, crowdedRating
 						= CROWDED_RATING(extrapolatedFht, SET_HERO_ENEMY, nearbyEnemies, CALLING_RADIUS+150)
@@ -398,9 +399,7 @@ d = {
 	
 				if POINT_DISTANCE(playerLoc, crowdingCenter) < callingCastRange*1.05
 						and (crowdedRating > 1.15
-							or ( HIGH_USE(gsiPlayer, calling, highUse*1.67, fhtPercHp)
-								and playerHpp < danger^3
-							)
+							or HIGH_USE(gsiPlayer, calling, highUse*1.33, fhtPercHp)
 						) then
 					USE_ABILITY(gsiPlayer, calling, crowdingCenter, 400, nil)
 					return;
@@ -502,13 +501,16 @@ d = {
 				end
 			end
 		end
-		if nearbyEnemies[1] and gsiPlayer.lastSeenHealth < 0.8
-				and CAN_BE_CAST(gsiPlayer, pierce) then
-			damageInTimeline = damageInTimeline or DAMAGE_IN_TIMELINE(gsiPlayer.hUnit)
-			print("muerta check danger dmg timeline", damageInTimeline)
-			if damageInTimeline > gsiPlayer.lastSeenHealth * 0.10
+		damageInTimeline = damageInTimeline or DAMAGE_IN_TIMELINE(gsiPlayer.hUnit)
+		
+		if CAN_BE_CAST(gsiPlayer, pierce)
+				and (nearbyEnemies[1] or 
+					damageInTimeline > gsiPlayer.lastSeenHealth * 0.15)
+				and gsiPlayer.lastSeenHealth < 0.8 then
+			
+			if damageInTimeline > gsiPlayer.lastSeenHealth * 0.05
 					and HIGH_USE(gsiPlayer, pierce, highUse - pierce:GetManaCost(),
-							max( 0.0001, (gsiPlayer.lastSeenHealth - damageInTimeline)/gsiPlayer.maxHealth )
+							max( -0.35, (gsiPlayer.lastSeenHealth - damageInTimeline)/gsiPlayer.maxHealth )
 						) then
 				USE_ABILITY(gsiPlayer, pierce, nil, 400, nil)
 				INCENTIVISE(gsiPlayer, fight_harass_handle, 60, 8)

@@ -1,10 +1,10 @@
 local hero_data = {
 	"bane",
-	{2, 3, 2, 3, 2, 4, 3, 2, 3, 1, 1, 4, 1, 1, 7, 6, 4, 9},
+	{3, 2, 2, 3, 2, 4, 2, 3, 3, 1, 1, 4, 1, 1, 7, 5, 4, 9, 12},
 	{
-		"item_tango","item_tango","item_enchanted_mango","item_enchanted_mango","item_ward_sentry","item_ward_sentry","item_branches","item_branches","item_faerie_fire","item_boots","item_void_stone","item_aether_lens","item_wind_lace","item_tranquil_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_glimmer_cape","item_blink",
+		"item_tango","item_tango","item_ward_sentry","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_branches","item_branches","item_wind_lace","item_magic_wand","item_boots","item_arcane_boots","item_aether_lens","item_tranquil_boots","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_glimmer_cape",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,3,2,}, {5,5,5,4,2,}, 0.1 },
 	{
 		"Enfeeble","Brain Sap","Nightmare","Fiend's Grip","Nightmare Damage Heals Bane","+20% Enfeeble Cast Range Reduction","-3s Brain Sap Cooldown","+5% Fiend's Grip Max Mana Drain","-3s Nightmare Cooldown","+30 Movement Speed","+200 Brain Sap Damage/Heal","+5s Fiend's Grip Duration",
 	}
@@ -70,6 +70,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then

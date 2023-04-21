@@ -24,7 +24,7 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
--- Stores per-player lane and role data and interfaces data for heroes to team, starts hero_behaviour init via hero_data (to ability and item modules)
+-- Stores per-player lane and role data and interfaces data for heroes to team, starts hero_behavior init via hero_data (to ability and item modules)
 
 ---- lib_hero constants --
 --
@@ -53,7 +53,7 @@ LANE_ROLES = TEAM_IS_RADIANT and {{4,3},{2},{5,1}} or {{5,1},{2},{4,3}}
 local DEFAULT_COMMON_ROLE = 4
 
 require(GetScriptDirectory().."/lib_hero/hero_data")
-require(GetScriptDirectory().."/lib_hero/hero_behaviour")
+require(GetScriptDirectory().."/lib_hero/hero_behavior")
 local hero_requires = {}
 
 local player_preferences = {}
@@ -146,9 +146,9 @@ function Hero_Initialize() -- require witch_slayer.lua's present in game.
 	local tPlayers = GSI_GetTeamPlayers(TEAM)
 	for i=1,#tPlayers,1 do
 		local thisPlayer = tPlayers[i]
-		local thisRoleData, fInitializePlayerBehaviour = 
-				HeroData_GetHeroRolePreferencesAndBehaviourInit(thisPlayer.shortName or GSI_GetHeroShortName(thisPlayer))
-		fInitializePlayerBehaviour(thisPlayer)
+		local thisRoleData, fInitializePlayerBehavior = 
+				HeroData_GetHeroRolePreferencesAndBehaviorInit(thisPlayer.shortName or GSI_GetHeroShortName(thisPlayer))
+		fInitializePlayerBehavior(thisPlayer)
 
 		Hero_RegisterPreferences(	thisPlayer, 
 									thisRoleData[HERO_PREFERENCE_I__LANE], 
@@ -163,13 +163,13 @@ function Hero_Initialize() -- require witch_slayer.lua's present in game.
 		end
 	end
 	generate_ordered_preference_score_for_roles()
+	Item_Initialize()
 end
 
 function Hero_EnemyInitialize(gsiPlayer)
-	local thisRoleData, fInitializePlayerBehaviour =
-		HeroData_GetHeroRolePreferencesAndBehaviourInit(gsiPlayer.shortName)
-	fInitializePlayerBehaviour(gsiPlayer)
-
+	local thisRoleData, fInitializePlayerBehavior =
+		HeroData_GetHeroRolePreferencesAndBehaviorInit(gsiPlayer.shortName)
+	fInitializePlayerBehavior(gsiPlayer)
 end
 
 function Hero_RegisterPreferences(thisPlayer, lanes, roles, soloPotentialMultiplier)

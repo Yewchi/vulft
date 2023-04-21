@@ -1,10 +1,10 @@
 local hero_data = {
 	"shadow_demon",
-	{1, 3, 3, 2, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 5, 8, 4, 10, 12},
+	{1, 3, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 8, 2, 4, 10},
 	{
-		"item_ward_dispenser","item_flask","item_enchanted_mango","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_boots","item_ring_of_basilius","item_arcane_boots","item_cloak","item_aghanims_shard","item_shadow_amulet","item_glimmer_cape","item_void_stone","item_aether_lens","item_wind_lace","item_tranquil_boots","item_blink","item_gem","item_gem","item_gem","item_sheepstick","item_gem",
+		"item_sobi_mask","item_branches","item_branches","item_tango","item_branches","item_clarity","item_ward_dispenser","item_wind_lace","item_magic_wand","item_tranquil_boots","item_void_stone","item_energy_booster","item_aether_lens","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_mystic_staff","item_ultimate_orb","item_void_stone","item_sheepstick",
 	},
-	{ {3,3,3,1,5,}, {5,4,4,4,4,}, 0.1 },
+	{ {3,3,3,3,3,}, {4,4,4,4,4,}, 0.1 },
 	{
 		"Disruption","Disseminate","Shadow Poison","Demonic Purge","+15.0% Shadow Poison Damage","+12 Strength","+25 Movement Speed","+200 Demonic Purge Damage","+10% Disseminate Shared Damage","-1.25s Shadow Poison Cooldown","-30.0s Demonic Purge Cooldown","2 Charges of Disruption",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

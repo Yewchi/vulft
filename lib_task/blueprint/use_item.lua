@@ -61,6 +61,7 @@ local INCOMING_TRACKING_PROJECTILES_I__IS_ATTACK = 6
 
 local fight_harass_handle
 local push_handle
+local search_fog_handle
 
 local UrnLogic_ScoreUrnVessel = UrnLogic_ScoreUrnVessel
 
@@ -132,6 +133,11 @@ function generic_on_entity_func(gsiPlayer, target, hItem)
 			t_player_current_use[gsiPlayer.nOnTeam], target.hUnit or target
 		)
 end
+function generic_on_tree_func(gsiPlayer, tree, hItem)
+	gsiPlayer.hUnit:Action_UseAbilityOnTree(
+			t_player_current_use[gsiPlayer.nOnTeam], tree
+		)
+end
 function generic_avoid_magical_dmg_score(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 	-- FUNCTION IS TEMP SOLN
 	if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()
@@ -200,31 +206,31 @@ function use_ward_func(gsiPlayer, targetLoc, hItem)
 	local itemCarriedResult, wardInventorySlot = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
 	if itemCarriedResult == ITEM_NOT_FOUND
 			or itemCarriedResult == ITEM_ENSURE_RESULT_LOCKED then
-		--print("item bad")
+		
 		return false
 	end
 
 	Item_LockInventoryIndex(gsiPlayer, wardInventorySlot, 1)
 
 	if Item_OnItemSwapCooldown(gsiPlayer, hItem) then
-		--print("item on cd, moving")
-		gsiPlayer.hUnit:Action_MoveDirectly(targetLoc)
+		
+		Positioning_MoveDirectly(gsiPlayer, targetLoc)
 		return true
 	end
 
 	if IsLocationVisible(targetLoc) then -- TODO false +ve for flying vision!!!
-		--print("unneeded ward")
+		
 		return false
 	end
 	local skipNow = math.floor(GameTime()) % 2 == 0
 	if skipNow and not VAN_GuideWardAtIndexKillDevalued(
 				gsiPlayer, t_player_current_ward_index[gsiPlayer.nOnTeam], hItem
 			) then
-		--print("Looks devalued or deleted")
-		t_player_current_ward_index[gsiPlayer.nOnTeam] = 0
+		
+		t_player_current_ward_index[gsiPlayer.nOnTeam] = 1
 		return false
 	end
-	--print("continue please", skipNow, gsiPlayer.hUnit:GetCurrentActionType())
+	
 	return gsiPlayer.usableItemCache.wards
 end
 
@@ -234,7 +240,8 @@ local FSTUT_TARGET_INDEX = 1
 local FSTUT_GIVEUP_TIME_INDEX = 2
 local FSTUT_DELAY_IF_UNSTABLE = 3
 local force_staff_to_unit_tbls = {}
-local function force_staff_to_unit_dominate()
+local force_staff_to_unit_dominate
+force_staff_to_unit_dominate = function()
 	-- Fill force_staff_to_unit_tbls for the player, set dominate. Has timeout / impossible kill.
 	local gsiPlayer = GSI_GetBot()
 	local fstut_tbl = force_staff_to_unit_tbls[gsiPlayer.nOnTeam]
@@ -265,7 +272,7 @@ local function force_staff_to_unit_dominate()
 		
 		-- reduce bugs, if applicable, randomly so the player mightn't notice
 		if DEBUG then DebugDrawText(500, 540, gsiPlayer.shortName, 255, 0, 0) end
-		DOMINATE_SetDominateFunc(gsiPlayer, "DIRECTLY_FS", nil, false)
+		DOMINATE_SetDominateFunc(gsiPlayer, "DIRECTLY_FS", force_staff_to_unit_dominate, false)
 		fstut_tbl[3] = GameTime() + 40 + RandomInt(0,300) -- + REDUCE_BUGS_TIME_DEF
 		return
 	end
@@ -277,7 +284,7 @@ local function force_staff_to_unit_dominate()
 		fstut_tbl[1] = false
 		fstut_tbl[2] = 0
 		fstut_tbl[3] = 0
-		DOMINATE_SetDominateFunc(gsiPlayer, "DIRECTLY_FS", nil, false)
+		DOMINATE_SetDominateFunc(gsiPlayer, "DIRECTLY_FS", force_staff_to_unit_dominate, false)
 		if DEBUG then DebugDrawText(500, 540, gsiPlayer.shortName, 255, 0, 255) end
 		return
 	end
@@ -289,12 +296,13 @@ local function force_staff_to_unit_dominate()
 	local playerLoc = gsiPlayer.hUnit:GetLocation()
 	local moveTo = Vector_UnitDirectionalPointToPoint(playerLoc, target.lastSeen.location)
 	if DEBUG then DebugDrawText(500, 550, gsiPlayer.shortName, 255, 255, 255) end
-	moveTo = Vector_ScalarMultiply(moveTo, 10)
+	moveTo = Vector_ScalarMultiply2D(moveTo, 10)
 	moveTo = Vector_Addition(playerLoc, moveTo)
 	DebugDrawLine(playerLoc, moveTo, 255, 0, 0)
 	DebugDrawCircle(target.lastSeen.location, 180, 255, 0, 0)
-	gsiPlayer.hUnit:Action_MoveToLocation(moveTo)
+	gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
 end
+
 
 local ITEM_FUNCS_I__SCORE_FUNC = 1
 local ITEM_FUNCS_I__RUN_FUNC = 2
@@ -496,13 +504,14 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 				if not (hItem:GetCooldownTimeRemaining() == 0 and hItem:IsFullyCastable()) then
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
+				local playerLoc = gsiPlayer.lastSeen.location
 				local currTaskHandle = CURRENT_TASK(gsiPlayer)
 				local theorizedDanger = gsiPlayer.time.data.theorizedDanger
 				local fht = TASK_OBJ(gsiPlayer, fight_harass_handle)
 				if TEST then print("blink", currTaskHandle, theorizedDanger) end
-				if currTaskHandle == fight_harass_handle and fht
+				if (currTaskHandle == fight_harass_handle and fht)
 						and theorizedDanger and theorizedDanger < -2
-						and Vector_PointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
+						and Vector_PointDistance2D(playerLoc, fht.lastSeen.location)
 								> min(350, gsiPlayer.attackRange
 										* (gsiPlayer.currentMovementSpeed
 												/ fht.currentMovementSpeed
@@ -511,15 +520,32 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 					if TEST then print("blink returning") end
 					local blinkLoc = Vector_Addition(
 							fht.lastSeen.location,
-							Vector_ScalarMultiply(
+							Vector_ScalarMultiply2D(
 									Vector_UnitDirectionalPointToPoint(
-											gsiPlayer.lastSeen.location,
+											playerLoc,
 											fht.lastSeen.location
 										),
 									max(200, gsiPlayer.attackRange*0.75)
 								)
 						)
 					return blinkLoc, INSTANT_NO_TURNING_SCORE
+				elseif currTaskHandle == search_fog_handle then
+					local escapeEstimateLoc = SearchFog_GetEscapeEstimate(gsiPlayer)
+					local distToEscapeEstimate = escapeEstimateLoc and Vector_PointDistance2D(
+							playerLoc,
+							escapeEstimateLoc
+						)
+					if escapeEstimateLoc and distToEscapeEstimate > 450 then
+						if Analytics_GetTheoreticalDangerAmount(gsiPlayer, esapceEstimateLoc) < -1 then
+							local blinkLocation = Vector_Addition(playerLoc,
+									Vector_ScalarMultiply(
+										Vector_PointToPointLine(playerLoc, escapeEstimateLoc),
+										600 + 0.75*(distToEscapeEstimate - 600)
+									)
+								)
+							return blinkLocation, INSTANT_NO_TURNING_SCORE
+						end
+					end
 				end
 				local activityType = CURR_ACTIVITY_TYPE(gsiPlayer)
 				if TEST then print(activityType) end
@@ -788,7 +814,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 									nearbyAllies,
 									Vector_Addition(
 											playerLoc,
-											Vector_ScalarMultiply(
+											Vector_ScalarMultiply2D(
 													Vector_UnitDirectionalFacingDirection(
 															gsiPlayer.hUnit:GetFacing()
 														),
@@ -1005,14 +1031,146 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 				end
 				--print("ward", wardIndex, gsiPlayer.time.data.wardScoreIndex, gsiPlayer.time.data.wardNowScore, wardLoc)
 				-- confirm wards on map state is still the same if using time data
-				if wardIndex == gsiPlayer.time.data.wardScoreIndex then
-					local ensureResult, index = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, false, true)
+				if wardIndex == gsiPlayer.time.data.wardScoreIndex--[[ and wardNowScore*0.85 > Task_GetCurrentTaskScore(gsiPlayer)]] then
+					local ensureResult, index = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, false)
 					t_player_current_ward_index[gsiPlayer.nOnTeam] = wardIndex
 					return wardLoc, wardNowScore
 				end
 			end,
 			use_ward_func
 	},
+	["item_quelling_blade"] =  {
+			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
+				if GameTime() % 0.33 < 0.05 then
+					if not (gsiPlayer.hUnit:IsStunned() or gsiPlayer.hUnit:IsRooted())
+							and ( gsiPlayer.hUnit:GetMovementDirectionStability() % 1 == 0
+								or gsiPlayer.recentMoveTo
+									and Vector_UnitFacingLoc(gsiPlayer, gsiPlayer.recentMoveTo) < 0.25
+							) then
+						gsiPlayer.hUnit:GetNearbyTrees(150)
+						return tree, INSTANT_NO_TURNING_SCORE / 1.25
+					end
+				end
+			end,
+			generic_on_tree_func
+	},
+	["item_armlet"] = {
+			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
+				if gsiPlayer.dontToggleArmletExpires then
+					if gsiPlayer.dontToggleArmletExpires < GameTime() then
+						gsiPlayer.dontToggleArmletExpires = false
+					else return; end
+				end
+				local hUnit = gsiPlayer.hUnit
+				local slot = hUnit:FindItemSlot(hItem:GetName())
+				if slot < 0 or slot > ITEM_END_INVENTORY_INDEX then return; end
+
+				local fht = TASK_OBJ(gsiPlayer, fight_harass_handle)
+
+				local armletIsOn = hItem:GetToggleState()
+
+				local override = SpecialBehavior_GetBooleanOr("armletSuggestOverride", nil, gsiPlayer, hItem)
+				if override ~= nil and override ~= armletIsOn then
+					hUnit:Action_UseAbility(hItem)
+					return;
+				end
+
+
+				local inCombat, intent = FightClimate_InvolvedInAnyCombat(gsiPlayer)
+				
+				if nearbyEnemies[1] and inCombat then
+					if intent == gsiPlayer then -- we are not fighting, but their intent is us.
+						if armletIsOn and gsiPlayer.lastSeenHealth
+									< max(150, min(280, 
+										nearbyEnemies[1].hUnit:IsNull() and 60 + 5*nearbyEnemies[1].level
+										or nearbyEnemies[1].hUnit:GetAttackDamage()*1.25)) then
+						print("armlet 6")
+							local projectiles = hUnit:GetIncomingTrackingProjectiles()
+							local playerLoc = gsiPlayer.lastSeen.location
+							for i=1,#projectiles do
+								local proj = projectiles[i]
+								if proj and Vector_PointDistance2D(proj.location, playerLoc) /
+											(proj.caster and not proj.caster:IsNull()
+												and proj.caster:GetAttackProjectileSpeed() or 1000
+											) < 0.6 then
+									return
+								end
+							end
+							
+							gsiPlayer.hUnit:Action_UseAbility(hItem)
+							gsiPlayer.hUnit:Action_UseAbility(hItem)
+						end
+					elseif not armletIsOn and fht
+							and (hUnit:GetAttackTarget() == fht.hUnit
+								or Vector_PointDistance2D(fht.lastSeen.location, gsiPlayer.lastSeen.location)
+									+ (fht.currentMovementSpeed - gsiPlayer.currentMovementSpeed)*2
+									< max(350, gsiPlayer.attackRange*1.5)) then
+						print("armlet 5")
+						hUnit:Action_UseAbility(hItem)
+					end
+				elseif armletIsOn and #nearbyEnemies == 0 and not hUnit:GetAttackTarget()
+						and GameTime() - hUnit:GetLastAttackTime()
+							> hUnit:GetSecondsPerAttack() + 0.5
+						and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.95 then
+						print("armlet 4")
+					hUnit:Action_UseAbility(hItem)
+				elseif not armletIsOn then
+						print("armlet 3")
+					if hUnit:GetDifficulty() > 4 then
+						local projectiles = hUnit:GetIncomingTrackingProjectiles()
+						local playerLoc = gsiPlayer.lastSeen.location
+						for i=0,#projectiles do
+							local proj = projectiles[i]
+							if proj and Vector_PointDistance(proj.location, playerLoc) > 450
+									or gsiPlayer.lastSeenHealth < 700 + 15 * gsiPlayer.level then
+								Util_TablePrint({"ARMELT PROJECTILES", proj})
+						print("armlet 2")
+								hUnit:Action_UseAbility(hItem)
+								break;
+							end
+						end
+					end
+					if hUnit:GetAttackTarget() and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth > 0.75
+							- Analytics_GetTheoreticalDangerAmount(gsiPlayer) * 0.125 then
+						print("armlet 1")
+						hUnit:Action_UseAbility(hItem)
+					end
+				end
+				
+			end,
+			nil
+	},
+	["item_manta_style"] = {
+			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
+				if SpecialBehavior_GetBooleanOr("useItemMantaStyleOverride", nil,
+							gsiPlayer, hItem, nearbyEnemies, nearbyAllies
+						) then
+					return;
+				end
+
+				local hasImmune = gsiPlayer.hUnit:IsMagicImmune()
+				if gsiPlayer.hUnit:IsSilenced()
+						or AbilityLogic_AnyProjectilesDodgeable(gsiPlayer, hasImmune) then
+					gsiPlayer.hUnit:Action_UseItem(hItem)
+					return;
+				end
+			end,
+			generic_no_target_func
+	},
+	["item_satanic"] = {
+			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
+				-- TODO TEMP
+				if gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.45
+						and CURR_ACTIVITY_TYPE(gsiPlayer)
+								<= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then
+					local target = gsiPlayer.hUnit:GetAttackTarget()
+					if target and target:IsHero() then
+						return hItem, INSTANT_NO_TURNING_SCORE
+					end
+				end
+			end,
+			generic_no_target_func
+	}
 }
 -- functional copies TODO temp
 T_ITEM_FUNCS["item_force_staff"] = T_ITEM_FUNCS["item_hurricane_pike"]
@@ -1027,9 +1185,16 @@ T_ITEM_FUNCS["item_ward_sentry"] = T_ITEM_FUNCS["item_ward_dispenser"]
 T_ITEM_FUNCS["item_overwhelming_blink"] = T_ITEM_FUNCS["item_blink"]
 T_ITEM_FUNCS["item_swift_blink"] = T_ITEM_FUNCS["item_blink"]
 T_ITEM_FUNCS["item_arcane_blink"] = T_ITEM_FUNCS["item_blink"]
+T_ITEM_FUNCS["item_bfury"] = T_ITEM_FUNCS["item_quelling_blade"]
 local ITEM_FUNCS_I__SCORE_FUNC = ITEM_FUNCS_I__SCORE_FUNC
 local ITEM_FUNCS_I__RUN_FUNC = ITEM_FUNCS_I__RUN_FUNC
 local T_ITEM_FUNCS = T_ITEM_FUNCS
+
+local t_ignore_on_swap_cd = {
+	["item_ward_observer"] = true,
+	["item_ward_sentry"] = true,
+	["item_ward_dispenser"] = true
+}
 
 local next_player = 1
 
@@ -1042,6 +1207,7 @@ local function task_init_func(taskJobDomain)
 
 	fight_harass_handle = FightHarass_GetTaskHandle()
 	push_handle = Push_GetTaskHandle()
+	search_fog_handle = SearchFog_GetTaskHandle()
 
 	UrnLogic_Initialize()
 
@@ -1066,6 +1232,24 @@ local function task_init_func(taskJobDomain)
 end
 Blueprint_RegisterTask(task_init_func)
 
+local t_recent_cast = {}
+local t_recent_cast_expires = {}
+function UseItem_RegisterCaughtAbility(gsiPlayer, hAbility)
+	if gsiPlayer.team ~= TEAM then return; end
+	t_recent_cast[gsiPlayer.nOnTeam] = hAbility:GetName()
+	t_recent_cast_expires[gsiPlayer.nOnTeam] = GameTime() + 4
+	print(hAbility:GetChannelTime())
+end
+
+function UseItem_IsChanneling(gsiPlayer, itemName)
+	local expires = t_recent_cast_expires[gsiPlayer.nOnTeam]
+	if expires and expires < GameTime() then
+		t_recent_cast[gsiPlayer.nOnTeam] = nil
+	end
+	local isCastingItem = itemName and t_recent_cast[gsiPlayer.nOnTeam] == itemName
+	return isCastingItem, t_recent_cast[gsiPlayer.nOnTeam]
+end
+
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
 		-- TODO Everything
@@ -1078,17 +1262,33 @@ blueprint = {
 						)
 				)
 		end
-		if (itemToUse and currentlyCasting == itemToUse) or itemToUse:IsNull() then
-			-- TODO Doesn't '(bool and bool)' above break channels? Why would I do this.
+		
+		local itemName = itemToUse and not itemToUse:IsNull() and itemToUse:GetName()
+		if (itemToUse and currentlyCasting == itemToUse)
+				or UseItem_IsChanneling(gsiPlayer, itemName)
+				or itemToUse:IsNull() then
+			
 			return xetaScore
 		end
-		itemToUse = gsiPlayer.hUnit:GetItemInSlot(gsiPlayer.hUnit:FindItemSlot(itemToUse:GetName()))
-		if itemToUse and not itemToUse:IsNull() and itemToUse:IsFullyCastable() and itemToUse:GetCooldownTimeRemaining() == 0
-				and not gsiPlayer.hUnit:IsStunned() and not gsiPlayer.hUnit:IsMuted() then
-			if T_ITEM_FUNCS[itemToUse:GetName()][ITEM_FUNCS_I__RUN_FUNC](gsiPlayer, objective, itemToUse) then
+		local itemSlot = gsiPlayer.hUnit:FindItemSlot(itemToUse:GetName())
+		if not t_ignore_on_swap_cd[itemToUse:GetName()]
+				and Item_OnItemSwapCooldown(gsiPlayer, nil, itemSlot) then
+			
+			return XETA_SCORE_DO_NOT_RUN
+		end
+		itemToUse = gsiPlayer.hUnit:GetItemInSlot(itemSlot)
+		if itemToUse and not itemToUse:IsNull() and itemToUse:IsFullyCastable()
+				and itemToUse:GetCooldownTimeRemaining() == 0
+				and not gsiPlayer.hUnit:IsStunned()
+				and not gsiPlayer.hUnit:IsMuted() then
+			-- RUN
+			if T_ITEM_FUNCS[itemToUse:GetName()][ITEM_FUNCS_I__RUN_FUNC](
+						gsiPlayer, objective, itemToUse
+					) then
 				return xetaScore
 			end
 		end
+		
 		return XETA_SCORE_DO_NOT_RUN
 	end,
 	
@@ -1102,6 +1302,7 @@ blueprint = {
 			-- TODO temp
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
+		local currentItem = t_player_current_use[gsiPlayer.nOnTeam]
 		if currentlyCasting and Task_GetCurrentTaskHandle(gsiPlayer) == task_handle
 				and not (t_player_current_use[gsiPlayer.nOnTeam]
 					and string.find(t_player_current_use[gsiPlayer.nOnTeam]:GetName(),
@@ -1150,7 +1351,8 @@ blueprint = {
 			end
 			-- TODO NB. no inventory switching if not in main inventory
 			local itemSlot = hUnit:FindItemSlot(itemName)
-			if thisItem and itemSlot >= 0 and itemSlot <= ITEM_END_BACKPACK_INDEX then
+			if thisItem and itemSlot >= 0 and itemSlot <= ITEM_END_INVENTORY_INDEX
+					and not Item_OnItemSwapCooldown(gsiPlayer, nil, itemSlot) then
 				thisItem = hUnit:GetItemInSlot(itemSlot)
 				local thisScoreFunc = T_ITEM_FUNCS[itemName]
 				thisScoreFunc = thisScoreFunc and thisScoreFunc[ITEM_FUNCS_I__SCORE_FUNC]

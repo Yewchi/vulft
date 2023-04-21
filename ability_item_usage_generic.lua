@@ -28,11 +28,11 @@
 -- NB TEMPORARY HOOK BEFORE HANDOVER TO BOT_GENERIC
 -- --	This is only for picking up river runes at
 -- --	minute 0:00. Bots may flip into default
--- --	Valve behaviour while within 150 units of a
+-- --	Valve behavior while within 150 units of a
 -- --	river rune spawn area, but only when bounties
 -- --	should be present as per 7.22. That is the full
 -- --	extent of Default bot usage of this script.
--- --	Each default behaviour module has it's Think()
+-- --	Each default behavior module has it's Think()
 -- --	funcs overridden to spam the name of the function
 -- --	in the console. This never really occurs, because
 -- --	we are locked to a static priority of 1 in roam Think().
@@ -76,7 +76,7 @@ require(GetScriptDirectory().."/partial_full_handover")
 local this_bot = {hUnit = GetBot()}
 local THIS_BOT_DOMAIN_NAME = "TEMP_DOMAIN_PLAYER"..GSI_GetPlayerNumberOnTeam(this_bot.hUnit:GetPlayerID())
 local job_domain = Job_CreateDomain(THIS_BOT_DOMAIN_NAME)
-local while_dead_behaviour_throttle = Time_CreateThrottle(0.17)
+local while_dead_behavior_throttle = Time_CreateThrottle(0.17)
 
 local dominated_unit_throttle = Time_CreateThrottle(0.2)
 
@@ -84,8 +84,7 @@ local dominated_unit_throttle = Time_CreateThrottle(0.2)
 local err_count = 0
 local err_flag = 0
 local function bot_microthink__job(workingSet) -- The guts of our redefined Think = generic_microthink -> bot_microthink__job
-	if PFH_HaveNotExceededTimeInDefaultBots(this_bot)
-			and DotaTime() > 0 and DotaTime() < 110
+	if this_bot.awaitsDefaultBotsInterruptedFullTakeoverForHookHandoverToFull
 			and ( (GetRuneStatus(RUNE_POWERUP_1) == RUNE_STATUS_AVAILABLE
 						and Vector_PointDistance2D(GetBot():GetLocation(), GetRuneSpawnLocation(RUNE_POWERUP_1))
 							< FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST
@@ -95,10 +94,17 @@ local function bot_microthink__job(workingSet) -- The guts of our redefined Thin
 							< FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST
 					)
 			) then
-		return;
+		return; -- Hope that default bot acts as expected near the rune rather than run the VULFT code via this hook.
 	end
 	--this_bot.hUnit:Action_MoveDirectly(GetRuneSpawnLocation(RUNE_POWERUP_1))
-	if this_bot.disabledAndDominatedFunc then print("calling dominated", this_bot.shortName) this_bot:disabledAndDominatedFunc() return end -- e.g. very low location variation and interaction, bot is diagnosing if stuck and resolving
+	if this_bot.disabledAndDominatedFunc then
+		-- e.g. very low location variation and interaction, bot is diagnosing if stuck and resolving, cut trees, void step to mid, or TP fountain.
+		if TEST then
+			print("calling dominated", this_bot.shortName, this_bot.disabledAndDominatedFuncName)
+		end
+		this_bot:disabledAndDominatedFunc()
+		return;
+	end
 	if DEBUG then if err_flag==1 then
 			err_count = err_count + 1
 		end
@@ -116,9 +122,10 @@ local function bot_microthink__job(workingSet) -- The guts of our redefined Thin
 		Task_CurrentTaskContinue(this_bot)
 		Hero_InvestAbilityPointsAndManageItems(this_bot)
 	else
-		if while_dead_behaviour_throttle:allowed() then
+		if while_dead_behavior_throttle:allowed() then
 			Player_InformDead(this_bot) -- TODO more abstraction
 			Task_InformDeadAndCancelAnyConfirmedDenial(this_bot)
+			Blueprint_InformDead(this_bot)
 			Team_InformDeadTryBuyback(this_bot)
 		end
 	end
@@ -127,10 +134,12 @@ local function bot_microthink__job(workingSet) -- The guts of our redefined Thin
 		local thisDominatedUnit = this_bot.dominatedUnitsHead
 		local fightHarassTarget = Task_GetTaskObjective(this_bot, FightHarass_GetTaskHandle())
 		local attackMoveToLoc = not fightHarassTarget and TEAM_FOUNTAIN
+
 		while(thisDominatedUnit) do
 			local nextUnit = thisDominatedUnit.nextUnit
 			print(this_bot.shortName, "commanding unit", thisDominatedUnit.shortName)
-			if not pUnit_IsDominatedUnitNullOrDead(thisDominatedUnit) then
+			if not pUnit_IsDominatedUnitNullOrDead(thisDominatedUnit)
+					and not thisDominatedUnit.hUnit:GetAttackTarget() then
 				if attackMoveToLoc then
 					thisDominatedUnit.hUnit:Action_AttackMove(attackMoveToLoc)
 				else
@@ -146,18 +155,24 @@ local function bot_microthink__job(workingSet) -- The guts of our redefined Thin
 end
 
 local function reconfigure_stack_entry(workingSet)
+	local thisBot = GSI_GetPlayerFromPlayerID(GetBot():GetPlayerID())
+	
 	if ( GetGameState() == GAME_STATE_GAME_IN_PROGRESS
-				and DotaTime() > 0.1 and DotaTime() < 110
-				and GetRuneStatus(RUNE_POWERUP_1) == RUNE_STATUS_MISSING
-				and GetRuneStatus(RUNE_POWERUP_2) == RUNE_STATUS_MISSING
-			) or DotaTime() > 110 then
-		PFH_TriggerHandoverToBotGeneric()
+				and DotaTime() > 60
+				and Item_NumberItemsCarried(thisBot) > 6
+			) then
+		PFH_TriggerHandoverToBotGeneric(thisBot)
+		return true
 	end
 end
 
 local function bot_initialization_wait_gsi_ready__job(workingSet)
+	local thisBot = GSI_GetPlayerFromPlayerID(GetBot():GetPlayerID())
+	--print(GetBot():GetUnitName(), thisBot and thisBot.role, "thinggg")
 	if GSI_READY then
 		this_bot = GSI_GetBot()
+		this_bot.awaitsDefaultBotsInterruptedFullTakeoverForHookHandoverToFull
+				= true
 
 		INFO_print(
 				string.format("[ability_item_usage_generic*] Register in pre-0:00 bounty hook %s...",
@@ -177,12 +192,13 @@ local function bot_initialization_wait_gsi_ready__job(workingSet)
 				{["gsiPlayer"] = this_bot},
 				"JOB_BOT_UPDATE_Z_NORMAL_SWEEPER"
 			)
+
 		job_domain:RegisterJob(
 				reconfigure_stack_entry,
 				nil,
 				"JOB_RECONFIGURE_BOT_STACK_ENTRY"
 			)
-		
+
 		return true -- Removes this initialization job, bot_microthink__job is taking over the guts of Think
 	end
 end
@@ -197,14 +213,14 @@ local function generic_microthink() -- See Think() counterparts (grander scale t
 						"[ability_item_usage_generic]: %s running temporary hook",
 						GetBot():GetUnitName()
 						)
-					);
+					)
 			end
 			--print(GetBot():GetUnitName(), "is not deleted.")
 			job_domain:DoAllJobs()
 		else
 			job_domain = nil
 			ERROR_print(string.format("[ability_item_usage_generic]: Manually destroying"..
-					" %s's flippable hook to default behaviour.",
+					" %s's flippable hook to default behavior.",
 					GetBot():GetUnitName() )
 				)
 			ItemUsageThink = function() end
@@ -247,7 +263,7 @@ do -- Preliminary Initialization
 	end
 end
 
-PFH_RegisterTempPersonalJobDomain(GetBot(), job_domain) -- we will delete the domain when we handover
+PFH_RegisterTempPersonalJobDomain(GetBot(), job_domain) -- we will delete the domain when we handover -- But not Pos 5.
 
 --MinionThink = function(hUnit) print("hey") hUnit:Action_MoveToLocation(Vector(0, 0, 0)) end
 

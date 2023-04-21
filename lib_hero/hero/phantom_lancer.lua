@@ -1,8 +1,8 @@
 local hero_data = {
 	"phantom_lancer",
-	{1, 2, 3, 3, 3, 4, 3, 2, 2, 6, 2, 4, 1, 1, 7, 1, 4, 9, 11},
+	{1, 3, 2, 3, 3, 4, 3, 2, 2, 6, 2, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_circlet","item_branches","item_wraith_band","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_magic_wand","item_boots_of_elves","item_diffusal_blade_2","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_manta","item_reaver","item_vitality_booster","item_heart","item_aghanims_shard","item_cloak","item_robe","item_mage_slayer","item_blitz_knuckles","item_void_stone","item_claymore","item_bloodthorn","item_butterfly","item_octarine_core",
+		"item_branches","item_magic_stick","item_enchanted_mango","item_branches","item_quelling_blade","item_tango","item_slippers","item_circlet","item_circlet","item_branches","item_branches","item_branches","item_quelling_blade","item_wraith_band","item_boots_of_elves","item_gloves","item_boots","item_power_treads","item_blade_of_alacrity","item_diffusal_blade_2","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_reaver","item_heart","item_blitz_knuckles","item_claymore","item_orchid","item_mage_slayer","item_bloodthorn",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -50,9 +50,17 @@ d = {
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
 		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
+		SpecialBehavior_RegisterBehavior("foundIllusionCancel",
+				function(gsiPlayer, hAbility)
+					if hAbility:GetName() == "phantom_lancer_doppelwalk" then
+						return true
+					end
+				end
+			)
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

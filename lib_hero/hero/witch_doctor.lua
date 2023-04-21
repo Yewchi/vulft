@@ -1,10 +1,10 @@
 local hero_data = {
 	"witch_doctor",
-	{1, 3, 3, 2, 3, 4, 1, 3, 2, 2, 5, 4, 2, 1, 8, 1, 4, 10},
+	{2, 1, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 3, 7, 4, 9, 11},
 	{
-		"item_tango","item_flask","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_faerie_fire","item_branches","item_branches","item_boots","item_magic_wand","item_arcane_boots","item_aghanims_shard","item_shadow_amulet","item_cloak","item_glimmer_cape","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_gem","item_gem","item_arcane_boots","item_black_king_bar","item_gem","item_gem","item_gem",
+		"item_tango","item_slippers","item_slippers","item_circlet","item_branches","item_boots","item_arcane_boots","item_wraith_band","item_wraith_band","item_magic_wand","item_chainmail","item_headdress","item_mekansm","item_cloak","item_buckler","item_guardian_greaves","item_aghanims_shard","item_hood_of_defiance","item_headdress","item_pipe","item_sange","item_heavens_halberd","item_point_booster","item_staff_of_wizardry","item_ogre_axe",
 	},
-	{ {5,1,3,1,4,}, {5,5,5,4,3,}, 0.1 },
+	{ {3,3,3,1,1,}, {3,3,3,5,5,}, 0.1 },
 	{
 		"Paralyzing Cask","Voodoo Restoration","Maledict","Death Ward","-25% Voodoo Restoration Mana Per Second","+75 Maledict AoE","+2 Cask Bounces","+300 Health","+100 Death Ward Attack Range","+25% Maledict Burst Damage","+1.5% Max Health Voodoo Restoration Heal/Damage","+60 Death Ward Damage",
 	}
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

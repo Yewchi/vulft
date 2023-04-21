@@ -71,9 +71,15 @@ FIGHT_INTENT_I__HEAT = 3
 local max = math.max
 local min = math.min
 local sqrt = math.sqrt
+local sin = math.sin
+local cos = math.cos
+local B_AND = bit.band
 local EMPTY_TABLE = EMPTY_TABLE
 
-local intent_throttle = Time_CreateThrottle(0.2) -- 3-state behaviour over time system .'. intents updated every 0.6s
+local avoid_hide_handle
+local increase_safety_handle
+
+local intent_throttle = Time_CreateThrottle(0.2) -- 3-state behavior over time system .'. intents updated every 0.6s
 local t_intent = {}
 local t_intent_prev_location = {}
 local t_intent_recent_aggression = {} -- Indexed by attcking player pnot, value is the target player's table ref 
@@ -87,7 +93,7 @@ local t_intent_recent_aggression = {} -- Indexed by attcking player pnot, value 
 --	t_intent_recently_targeted_by[ENEMY_TEAM][i] = {}
 --end
 
-local AGGRESSIVE_BEHAVIOR_EXPIRY = 2
+local AGGRESSIVE_BEHAVIOR_EXPIRY = 1.5
 
 local t_enemy_linkens_tests = {}
 
@@ -96,6 +102,8 @@ local t_enemy_needs_immobile = {}
 local t_enemy_needs_knockback = {}
 local t_enemy_needs_interrupt = {}
 local t_enemy_needs_disarm = {}
+
+local t_enemy_recent_aoe = {}
 
 local t_response_type_tbl = { -- Helps with insertion
 	t_enemy_needs_stunning,
@@ -119,8 +127,6 @@ end
 local function recycle_pair(pair)
 	table.insert(recycle_pairs, pair)
 end
-
-local t_ability_response_type = {} -- indexed by spell name
 
 -- TODO Refactor lane_pressure.lua
 -- scales greatly over 1 for a high ratio of enemy creeps, scales towards 0 for high ratio of allied creeps
@@ -208,57 +214,101 @@ function FightClimate_RegisterReponseTypes(abilities, ...)
 	end
 end
 
-function FightClimate_RegisterAnalyticsJobDomainToFightClimate(gsiDomain)
-
+function FightClimate_IsTryingToEscapeFromPlayer(gsiTarget, gsiAggressor)
+	if gsiAggressor.team == gsiTarget.team then return false, -0 end
+	local aggressorIsTeam = gsiAggressor.team == TEAM
+	local danger = Analytics_GetTheoreticalDangerAmount(
+			aggressorIsTeam and gsiAggressor or gsiTarget
+		)
+	if not aggressorIsTeam then
+		local currTask = Task_GetCurrentTaskHandle(gsiTarget)
+		if currTask == avoid_hide_handle or currTask == increase_safety_handle then
+			return true, max(0, 1 - danger)
+		end
+	end
+	local nearbyTargetTower = Set_GetNearestTeamTowerToLocation(gsiTarget.team, gsiTarget.lastSeen.location)
+	
 end
 
-function FightClimate_ImmediatelyExposedToAttack(gsiAllied, enemyHeroes)
-	local exposedCount = 0
-	local playerLoc = gsiAllied.lastSeen.location
+function Analytics_RegisterAnalyticsJobDomainToFightClimate(gsiDomain)
+	avoid_hide_handle = AvoidHide_GetTaskHandle()
+	increase_safety_handle = IncreaseSafety_GetTaskHandle()
+end
 
-	enemyHeroes = enemyHeroes or Set_GetEnemyHeroesInPlayerRadius(gsiAllied, 1500, 10)
-	local tblNum = #enemyHeroes
+function FightClimate_ImmediatelyExposedToAttack(gsiTargetted, enemyHeroesToTargeted, timeCheck, minRange)
+	local exposedCount = 0
+	local playerLoc = gsiTargetted.lastSeen.location
+
+	enemyHeroesToTargetted = enemyHeroesToTargetted
+			or Set_GetTeamHeroesInLocRad(gsiTargetted.team == TEAM and ENEMY_TEAM or TEAM,
+					gsiTargetted.lastSeen.location,
+					1500,
+					timeCheck or 2
+				)
+	local tblNum = #enemyHeroesToTargetted
 	local i = 1
 	while(i <= tblNum) do
-		local thisEnemy = enemyHeroes[i]
-		if thisEnemy.attackRange + min(200, thisEnemy.attackRange*0.25)
+		local thisEnemy = enemyHeroesToTargetted[i]
+		if thisEnemy.attackRange + max(minRange or 0, min(200, thisEnemy.attackRange*0.25))
 				> Vector_PointDistance2D(playerLoc, thisEnemy.lastSeen.location) then
 			exposedCount = exposedCount + 1
 			i = i + 1
 		else
-			enemyHeroes[i] = enemyHeroes[tblNum]
+			enemyHeroesToTargetted[i] = enemyHeroesToTargetted[tblNum]
 			tblNum = tblNum - 1
 		end
 	end
 	if tblNum > 0 then
-		return true, tblNum, select(2, GSI_GetTotalDpsOfUnits(enemyHeroes))
+		return true, tblNum, select(2, GSI_GetTotalDpsOfUnits(enemyHeroesToTargetted))
 	end
 	return false, 0, 0
 end
 
-function FightClimate_GetBestInterruptTarget(gsiCasting, hCast, peircesMagicImmune, forceCast, gsiPlayerTbl)
+function FightClimate_GetBestInterruptTarget(gsiCasting, hCast, gsiPlayerTblOrRange, peircesMagicImmune, forceCast)
 --	will remove the required interrupt or stun on find. Upper code is expected to be 'found' -> 'cast'.
 --	if heroes fail to cast the spell due to being disabled they 'should' re-register the response themselves
+	local gsiPlayersTbl = type(gsiPlayerTblOrRange) == "number"
+			and Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, gsiPlayerTblOrRange)
+			or gsiPlayerTblOrRange
 	local numPlayers = #gsiPlayersTbl
 	if t_enemy_needs_interrupt[1] then
 		for i=1,#t_enemy_needs_interrupt do
 			for iPlayer=1,numPlayers do
-				if t_enemy_needs_interrupt[i][1] == gsiPlayersTbl[iPlayer] then
+				local thisEnemy = gsiPlayersTbl[iPlayer]
+				local hUnit = thisEnemy.hUnit
+				if t_enemy_needs_interrupt[i][1] == thisEnemy
+						and (piercesMagicImmune or hUnit:IsMagicImmune())
+						and not hUnit:IsInvulnerable() then
 					recycle_pair(table.remove(t_enemy_needs_interupt[i]))
-					return gsiPlayersTbl[iPlayer]
+					return thisEnemy
 				end
 			end	
 		end
 	elseif t_enemy_needs_stun[1] then
 		for i=1,#t_enemy_needs_stun do
 			for iPlayer=1,numPlayers do
-				if t_enemy_needs_stun[i][1] == gsiPlayersTbl[iPlayer] then
+				local thisEnemy = gsiPlayersTbl[iPlayer]
+				local hUnit = thisEnemy.hUnit
+				if t_enemy_needs_stun[i][1] == thisEnemy
+						and (piercesMagicImmune or hUnit:IsMagicImmune())
+						and not hUnit:IsInvulnerable() then
 					recycle_pair(table.remove(t_enemy_needs_stun[i]))
-					return gsiPlayersTbl[iPlayer]
+					return thisEnemy
 				end
 			end	
 		end
 	end
+end
+
+function FightClimate_CountUnitsMagicImmune(gsiUnits)
+	local count = 0
+	for i=1,#gsiUnits do
+		local thisUnit = gsiUnits[i]
+		if thisUnit.hUnit:IsMagicImmune() then
+			count = count + 1
+		end
+	end
+	return count, count / #gsiUnit
 end
 
 -- Intent data update func used by LHP.
@@ -279,6 +329,23 @@ function FightClimate_RegisterRecentHeroAggression(gsiPlayer, gsiTarget, isAbili
 
 	end
 
+end
+
+-------- FightClimate_InformAbilityCast()
+function FightClimate_InformAbilityCast(gsiPlayer, hAbility, castInfo)
+	--[[
+	local behavior = hAbility:GetBehavior()
+	local bAlly, bEnemy, bHeroes, bAoe, bUnit, bPoint, bNo, bTree
+			= AbilityLogic_GetTargetBehvior(hAbility)
+	local target, targetDist
+	if bPoint and bHeroes then
+		target, targetDist = bAllies and bEnemy
+			and B_AND(hAbiilty:GetTargetFlags(), ABIILTY_Set_GetNearestHeroToLocation(castInfo.location)
+	local targetEnemy, targetEnemyDist = 
+	local nearbyAllies = castInfo.location
+			and Set_GetAlliedHeroesInLocRadius(gsiPlayer, castInfo.location, 1200)
+	if target and targetDist < 800
+	]]
 end
 
 local state = 0
@@ -369,7 +436,7 @@ function FightClimate_GetIntent(gsiPlayer)
 			end
 			for i=1,numEnemies do
 				local thisEnemy = enemies[i]
-				-- + aggressive behaviour recent
+				-- + aggressive behavior recent
 				local thisIntent = t_intent_recent_aggression[thisEnemy]
 				t_intent[thisEnemy] = thisIntent and thisIntent[3] > 0.5 and thisIntent[1] or false
 				if not thisEnemy.typeIsNone then
@@ -447,12 +514,13 @@ function FightClimate_HelpMeFightNow(gsiPlayer, nearbyAllies, nearbyEnemies)
 end
 
 function FightClimate_InvolvedInAnyCombat(gsiPlayer)
+	-- TODO return how much fighting each other.
 	local intent = FightClimate_GetIntent(gsiPlayer)
 	if intent then return true, intent end
 	local otherTeam = GSI_GetTeamPlayers(gsiPlayer.team == TEAM and ENEMY_TEAM or TEAM)
 	for i=1,#otherTeam do
 		local intent = FightClimate_GetIntent(otherTeam[i])
-		if intent then
+		if intent == gsiPlayer then
 			return true, intent
 		end
 	end
@@ -507,14 +575,15 @@ function FightClimate_GetIntentCageFightSaveJIT(gsiPlayer, nearbyAllies, nearbyE
 	return bestSaveFrom, bestSave, bestSaveTime
 end
 
-function FightClimate_GetEnemiesTotalHeat(enemyTbl)
+function FightClimate_GetEnemiesTotalHeat(enemyTbl, giveNulls)
 	local heat = 0
 	local countEnemies = #enemyTbl
 	local currTime = GameTime()
 	for i=1,countEnemies do
 		local thisEnemy = enemyTbl[i]
 		local hUnitEnemy = thisEnemy.hUnit
-		if hUnitEnemy and hUnitEnemy.IsNull and not hUnitEnemy:IsNull() and IsHeroAlive(thisEnemy.playerID) then
+		if hUnitEnemy and (giveNulls or hUnitEnemy.IsNull and not hUnitEnemy:IsNull())
+				and IsHeroAlive(thisEnemy.playerID) then
 			-- "thisRecentAggression" rather than "thisIntent" which are wrongly named throughout file TODO
 			local thisRecentAggression = t_intent_recent_aggression[thisEnemy]
 			if thisRecentAggression and thisRecentAggression[3] and thisRecentAggression[2] < currTime then

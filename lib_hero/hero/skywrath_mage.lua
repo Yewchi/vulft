@@ -1,10 +1,10 @@
 local hero_data = {
 	"skywrath_mage",
-	{2, 1, 2, 1, 2, 4, 2, 3, 3, 3, 3, 4, 1, 1, 7, 5, 4, 9, 12},
+	{2, 1, 2, 3, 2, 4, 3, 3, 3, 2, 1, 4, 1, 1, 7, 6, 4, 10},
 	{
-		"item_tango","item_enchanted_mango","item_branches","item_branches","item_mantle","item_circlet","item_ward_sentry","item_ward_observer","item_null_talisman","item_boots","item_aghanims_shard","item_cloak","item_shadow_amulet","item_glimmer_cape","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_vitality_booster","item_energy_booster","item_aeon_disk",
+		"item_tango","item_enchanted_mango","item_enchanted_mango","item_clarity","item_clarity","item_mantle","item_branches","item_ward_sentry","item_branches","item_branches","item_boots","item_arcane_boots","item_crown","item_crown","item_staff_of_wizardry","item_rod_of_atos","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_aether_lens",
 	},
-	{ {5,1,3,3,3,}, {4,4,4,4,5,}, 0.1 },
+	{ {5,3,3,1,3,}, {4,4,4,4,5,}, 0.1 },
 	{
 		"Arcane Bolt","Concussive Shot","Ancient Seal","Mystic Flare","+175 Health","+8 Intelligence","-8s Ancient Seal Cooldown","+1 Arcane Bolt Per Cast","Global Concussive Shot","+-12% Ancient Seal Increased Magic Damage","Arcane Bolt Pierces Spell Immunity","+450 Mystic Flare Damage",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -40,6 +40,7 @@ end
 
 require(GetScriptDirectory().."/lib_hero/item/item")
 require(GetScriptDirectory().."/lib_hero/ability/ability")
+require(GetScriptDirectory().."/lib_hero/special_behaviour")
 
 function Hero_InvestAbilityPointsAndManageItems(gsiPlayer)
 	--[BENCH]]local prevFrame = RealTime()

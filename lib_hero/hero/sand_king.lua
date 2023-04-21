@@ -1,10 +1,10 @@
 local hero_data = {
 	"sand_king",
-	{1, 3, 2, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 12},
+	{3, 1, 2, 2, 2, 4, 2, 1, 1, 1, 6, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_tango","item_ward_observer","item_branches","item_branches","item_ring_of_health","item_pers","item_crown","item_meteor_hammer","item_boots","item_magic_wand","item_blink","item_void_stone","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_aghanims_shard","item_ogre_axe","item_belt_of_strength","item_sange","item_staff_of_wizardry","item_robe","item_kaya_and_sange","item_platemail",
+		"item_quelling_blade","item_tango","item_gauntlets","item_circlet","item_branches","item_branches","item_bracer","item_crown","item_magic_wand","item_veil_of_discord","item_boots","item_tranquil_boots","item_blink","item_staff_of_wizardry","item_kaya","item_aghanims_shard","item_ghost","item_ethereal_blade","item_staff_of_wizardry","item_wind_lace","item_cyclone","item_aether_lens","item_octarine_core",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.5s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Base Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
 	}
@@ -66,6 +66,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then

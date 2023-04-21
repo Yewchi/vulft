@@ -335,7 +335,7 @@ function AbilityLogic_TryConfirmValidSkillBuild(gsiPlayer, skillBuildsTbl)
 end
 
 local squelch_after = HIGH_32_BIT
-function AbilityLogic_SetCurrentSkillBuildIndex(gsiPlayer, skillBuildTbl) -- helps with reloads or restore behaviour after an error
+function AbilityLogic_SetCurrentSkillBuildIndex(gsiPlayer, skillBuildTbl) -- helps with reloads or restore behavior after an error
 	local skillBuild = skillBuildTbl[gsiPlayer.nOnTeam]
 	local nthSkillUp = 1
 	local abilityPointsAllocatedTo = {}
@@ -826,6 +826,65 @@ function AbilityLogic_GetSmite(gsiPlayer) -- Zues Ult Now!
 
 end
 
+-------- AbilityLogic_AnyProjectilesImmunable()
+function AbilityLogic_AnyProjectilesImmunable(gsiPlayer, onlyUndodgeable)
+	local pjt = gsiPlayer.hUnit:GetIncomingTrackingProjectiles()
+	for i=1,#pjt do
+		local pj = pjt[i]
+		
+		if pj and pj.ability and pj.caster and pj.caster:GetTeam() ~= gsiPlayer.team
+				and B_AND(pj.ability:GetTargetFlags(),
+						ABILITY_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES
+					) == 0 then
+			
+			if (not onlyUndodgeable or not pj.is_dodgeable)
+					and GSI_DifficultyDiv(25) then
+				return true, pj.ability, Unit_GetSafeUnit(pj.caster);
+			end
+		end
+	end
+	return false, nil, nil;
+end
+
+-------- AbilityLogic_AnyProjectilesDodgeable()
+function AbilityLogic_AnyProjectilesDodgeable(gsiPlayer, onlyPiercesImmunity)
+	local pjt = gsiPlayer.hUnit:GetIncomingTrackingProjectiles()
+	for i=1,#pjt do
+		local pj = pjt[i]
+		
+		if pj and pj.ability and pj.caster and pj.caster:GetTeam() ~= gsiPlayer.team
+				and pj.is_dodgeable then
+			if (not onlyPiercesImmunity
+					or B_AND(pj.ability:GetTargetFlags(),
+						ABILITY_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES) > 0
+					) and GSI_DifficultyDiv(25) then
+				return true, pj.ability, Unit_GetSafeUnit(pj.caster);
+			end
+		end
+	end
+	return false, nil, nil;
+end
+
+-------- AbilityLogic_AnyProjectiles()
+function AbilityLogic_AnyProjectiles(gsiPlayer, fromAllies)
+	local pjt = gsiPlayer.hUnit:GetIncomingTrackingProjectiles()
+	for i=1,#pjt do
+		local pj = pjt[i]
+		
+		if pj and pj.ability and pj.caster
+				and pj.caster:GetTeam()
+					== (fromAllies and gsiPlayer.team or ENEMY_TEAM) then
+			if --[[(not onlyPiercesImmunity
+					or B_AND(pj.ability:GetTargetFlags(),
+						ABILITY_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES) > 0
+					) and--]] GSI_DifficultyDiv(25) then
+				return true, pj.ability, Unit_GetSafeUnit(pj.caster);
+			end
+		end
+	end
+	return false, nil, nil;
+end
+
 local INVIS_ITEMS = INVIS_ITEMS
 function AbilityLogic_HasInvisAbility(gsiPlayer, checkItems)
 	if checkItems and not pUnit_IsNullOrDead(gsiPlayer) then
@@ -881,6 +940,8 @@ function AbilityLogic_PierceTeamRelationFlagsPossible(sameTeam, targetFlags)
 end
 local PIERCES_TEAM_RELATION_FLAGS_POSSIBLE = AbilityLogic_PierceTeamRelationFlagsPossible
 
+-- No armor checks
+-------- AbilityLogic_CastOnTargetWillSucceed()
 function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
 	if target == nil or type(target) == "number" or target.x then return 1 end
 	if not abilityData then
@@ -896,8 +957,13 @@ function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
 			and t_ability_index[hAbility][ABILITY_I__ADDITIONAL_FLAGS] or EMPTY_TABLE
 	local hUnit = target.hUnit
 	if target.typeIsNone or Unit_IsNullOrDead(target) or not hUnit.IsMagicImmune then
-		-- Sometimes IsMagicImmune is not defined, despite a valid hUnit
-		return 0.67 -- Temporary
+		-- Sometimes IsMagicImmune is not defined, despite a non-null hUnit
+		if damageType == DAMAGE_TYPE_MAGICAL then
+			return target.magicTaken or 0.67
+		elseif damageType == DAMAGE_TYPE_PHYSICAL then
+			return 1 - target.evasion or 1
+		end
+		return 0.999
 	end
 	local targetFlags = hAbility:GetTargetFlags()
 	if hUnit:IsMagicImmune()
@@ -923,6 +989,53 @@ function AbilityLogic_CastOnTargetWillSucceed(gsiCaster, target, hAbility)
 end
 local AbilityLogic_CastOnTargetWillSucceed = AbilityLogic_CastOnTargetWillSucceed
 
+-------- AbilityLogic_BestBlockedByAbilities()
+function AbilityLogic_BestBlockedByAbilities(gsiTarget, gsiCaster, ability, ...)
+	if not ability or ability:IsNull() then return false, nil end
+
+	local blockingAbilities = {...}
+	local additionalFlags = t_ability_index[hAbility]
+			and t_ability_index[hAbility][ABILITY_I__ADDITIONAL_FLAGS] or EMPTY_TABLE
+	local targFlags = ability:GetTargetFlags()
+	local blocksByMgk = PIERCES_TEAM_RELATION_FLAGS_POSSIBLE(
+			gsiTarget.team == gsiCaster.team,
+			targFlags
+		)
+	local blocksByEvade = not additionalFlags[FLAGS2_I__IGNORES_EVASION]
+
+	local bestBlock
+	local lowestCooldown = 0xFFFF
+	-- blockingAbility
+	-- lowest cd blocking the dmg type wins
+	return bestBlock, lowestCooldown
+end
+
+-------- AbilityLogic_SetExpendManaNow()
+function AbilityLogic_SetExpendManaNow(gsiPlayer, mana, duration, softOverride)
+	local expendNow = gsiPlayer.highUseManaExpendNow
+	if softOverride and expendNow.mana > 0 then
+		local high
+		local low
+		local prevExpend = expendNow.mana
+		if prevExpend > mana then
+			high = prevExpand
+			low = mana
+			duration = expendNow.c
+		else
+			low = expendNow.mana
+			high = mana
+		end
+		local lowHigh = 0.67 + 0.33 * low/high
+		expendNow.mana = lowHigh * high
+		-- (prevMana * 0.33 / prevDuration) * 0.33 + (mana * 0.33 / duration) * 0.66
+		expendNow.decrement = expendNow.decrement * 0.33 + mana * 0.222 / duration
+	else
+		expendNow.mana = mana
+		expendNow.decrement = mana * 0.333 / duration
+	end
+	expendNow.next = GameTime() + 0.33
+end
+
 -- TODO NOTE THAT THE USE OF INVERSE HEALTH PERCENT IN HIGHUSE IS VERY DEGENERATE.
 -- -- IT DOES NOT HELP ANYTHING EXCEPT FOR ENEMIES THAT TAKE PERCENT REMAINING HEALTH
 -- -- DAMAGE. NEED TO RESOLVE IN HERO FILES WHERE THIS INSANITY WAS USED AS LAX SAFETY
@@ -933,19 +1046,29 @@ local AbilityLogic_CastOnTargetWillSucceed = AbilityLogic_CastOnTargetWillSuccee
 -- "high use", meaning, the full use of ones mana before death, and in order to secure
 -- - kills. The situational volatility.
 function AbilityLogic_HighUseAllowOffensive(gsiPlayer, hAbility, highUseMana, enemyHealthPercent)
-	--[DEBUG]]]print(gsiPlayer.lastSeenMana - hAbility:GetManaCost(), "highuse>>", (enemyHealthPercent > 0.57 and highUseMana*1.5 or highUseMana*max(0, enemyHealthPercent-0.35)*6.67))
-	--[DEBUG]]]print("health percent is min(", enemyHealthPercent, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth + 0.15)
+	
+	
 	enemyHealthPercent = min(enemyHealthPercent, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth + 0.15)
 	-- TODO the reason I used +0.15 player health was to mitigate just having a bad lane and like, waiting for regen on courier. But the truth is that the value to inform unloading all your mana would be an evaluation of how likely you are to die soon in the future.
-	return gsiPlayer.lastSeenMana - hAbility:GetManaCost()
-			> ( enemyHealthPercent > 0.57 and highUseMana*1.5
-				or highUseMana*max(0, enemyHealthPercent-0.35)*6.67 )
+	local expendNow = gsiPlayer.highUseManaExpendNow
+	local highManaUse = gsiPlayer.lastSeenMana - hAbility:GetManaCost()
+			+ ( expendNow.mana or 0 )
+				> ( enemyHealthPercent > 0.57 and highUseMana*1.5
+					or highUseMana*max(0, enemyHealthPercent-0.35)*6.67
+				)
+	if expendNow.mana > 0 and expendNow:allowed() then
+		expendNow.mana = max(0, expendNow.mana - expendNow.decrement)
+	end
+	return highManaUse
 end
 
 -- See above "high use" def.
 function AbilityLogic_HighUseAllowSafe(gsiPlayer, hAbility, highUseMana, safety)
 	return gsiPlayer.lastSeenMana - hAbility:GetManaCost()
-			> ( safety > 0.57 and highUseMana*1.5 or highUseMana*max(0, safety-0.35)*6.67 )
+			+ (gsiPlayer.highUseManaExpendNow and gsiPlayer.highUseManaExpendNow.mana or 0)
+				> ( safety > 0.57 and highUseMana*1.5
+					or highUseMana*max(0, safety-0.35)*6.67
+				)
 end
 
 local t_neutrals_ability_funcs = {
@@ -996,10 +1119,12 @@ local t_neutrals_ability_funcs = {
 					return bestTarget
 				end
 			end,
-		["furbolg_ursa_warrior_thunder_clap"] = function(gsiUnit, ability)
+		["polar_furbolg_ursa_warrior_thunder_clap"] = function(gsiUnit, ability)
 				local nearestEnemy, dist = Set_GetNearestEnemyHeroToLocation(gsiUnit.lastSeen.location)
-				print(gsiUnit.shortName, "clap-like", ability:GetSpecialValueFloat("radius"))
-				if dist < ability:GetSpecialValueFloat("radius") * 0.85 then
+
+				
+				if dist < ability:GetSpecialValueFloat("radius") * 0.85
+						and nearestEnemy.hUnit:IsStunned() then
 					return true
 				end
 			end,
@@ -1096,7 +1221,7 @@ local t_neutrals_ability_funcs = {
 			end,
 	}
 t_neutrals_ability_funcs["warpine_raider_seed_shot"] = t_neutrals_ability_funcs["mud_golem_hurl_boulder"]
-t_neutrals_ability_funcs["polar_furbolg_ursa_warrior_thunder_clap"] = t_neutrals_ability_funcs["centaur_khan_war_stomp"]
+t_neutrals_ability_funcs["centaur_khan_war_stomp"] = t_neutrals_ability_funcs["polar_furbolg_ursa_warrior_thunder_clap"]
 function AbilityLogic_DetectValidNeutralsAbilityUse(gsiUnit, ability)
 	
 	if t_neutrals_ability_funcs[ability:GetName()]
@@ -1131,22 +1256,28 @@ end
 
 -- does not consider player's danger, only kill-secure and mana / cooldown management
 function AbilityLogic_AllowOneHitKill(gsiPlayer, target, castRange, damage, damageType, nearbyEnemies)
-	local targetAggressive = target.hUnit:GetAttackTarget()
+	local targetReal = not target.typeIsNone or Unit_IsNullOrDead(target) or not target.hUnit.GetUnitName
+	local targetAggressive = targetReal and target.hUnit:GetAttackTarget() or false
 	local nearbyEnemies = nearbyEnemies or Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1300)
 	targetAggressive = targetAggressive and targetAggressive:IsHero() or false
 	local dangerOverkillFactor = gsiPlayer.time.data.theorizedDanger
-			and 1 / (1 + 2^(-gsiPlayer.time.data.theorizedDanger)) or 1
-	local resistMultiplier = damageType == DAMAGE_TYPE_PHYSICAL and 1-target.hUnit:GetArmor()
-			or damageType == DAMAGE_TYPE_MAGICAL and 1-target.hUnit:GetMagicResist()
+			or Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+	dangerOverkillFactor = 1 / (1 + 2^(-dangerOverkillFactor))
+	local resistMultiplier = damageType == DAMAGE_TYPE_PHYSICAL and target.armor or 0.75
+			or damageType == DAMAGE_TYPE_MAGICAL and target.magicTaken or 0.75
 			or 1.0
 	local overkill = damage*resistMultiplier - target.lastSeenHealth
 	if TEST then print("OHK", gsiPlayer.shortName, target.shortName, castRange, damage, damageType, overkill, #nearbyEnemies) end
 	if overkill > 0	and (targetAggressive
-					or (target.currentMovementSpeed > gsiPlayer.currentMovementSpeed*0.66
-							and Math_PointToPointDistance2D(
-								gsiPlayer.lastSeen.location,
-								target.lastSeen.location
-							) > min(castRange*0.75, gsiPlayer.attackRange * 0.66)
+					or (castRange > 12000
+							or ( target.currentMovementSpeed > gsiPlayer.currentMovementSpeed*0.66
+								and Math_PointToPointDistance2D(
+										gsiPlayer.lastSeen.location,
+										target.lastSeen.location
+									) > min(castRange*0.75,
+										gsiPlayer.attackRange * 0.66
+									)
+								)
 					) or dangerOverkillFactor*damage > overkill
 					or #nearbyEnemies > 1
 			) then
@@ -1155,7 +1286,7 @@ function AbilityLogic_AllowOneHitKill(gsiPlayer, target, castRange, damage, dama
 	return false
 end
 
-function AbilityLogic_DetectUnsafeChannels(gsiPlayer, abilityName, intense)
+function AbilityLogic_DetectUnsafeChannels(gsiPlayer, abilityName, intense, dryRun)
 	local currActiveAbility = gsiPlayer.hUnit:GetCurrentActiveAbility()
 	if currActiveAbility and currActiveAbility:GetName() == abilityName then
 		if Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit) > gsiPlayer.lastSeenHealth/20
@@ -1164,6 +1295,7 @@ function AbilityLogic_DetectUnsafeChannels(gsiPlayer, abilityName, intense)
 				-- TODO do more analytics
 				-- return if fine
 			end
+			if dryRun then return true; end
 			UseAbility_ClearQueuedAbilities(gsiPlayer)
 			return true
 		end
@@ -1174,7 +1306,7 @@ end
 function AbilityLogic_CreatePlayerAbilitiesIndex(abilitiesIndex, gsiPlayer, abilities)
 	local iAbilityIndex = 1
 	local nOnTeam = gsiPlayer.nOnTeam
-	abilitiesIndex[nOnTeam] = {}
+	abilitiesIndex[nOnTeam] = abilitiesIndex[nOnTeam] or {}
 	for iAbility=0,MAX_ABILITY_SLOT do
 		local thisAbilityData = abilities[iAbility]
 
@@ -1198,13 +1330,36 @@ function AbilityLogic_CreatePlayerAbilitiesIndex(abilitiesIndex, gsiPlayer, abil
 				t_ability_index[thisAbility] = thisAbilityData -- nb. using index in AbilityHasAdditionalEffect
 				if TEST then
 					print(thisAbility:GetName(), 'tFlags', thisAbility:GetTargetFlags(), 'tTypeFlags',
-						thisAbility:GetTargetType(), 'behaviour flags', thisAbility:GetBehavior())
+						thisAbility:GetTargetType(), 'behavior flags', thisAbility:GetBehavior())
 				end
 				thisAbilityData[ABILITY_I__ADDITIONAL_FLAGS] = {
 						AbilityLogic_AbilityHasAdditionalEffect(thisAbility),
 						B_AND(thisAbility:GetTargetFlags(), ABILITY_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES) > 0,
-						not (B_AND(thisAbility:GetTargetFlags(), ABILITY_TARGET_FLAG_NOT_ATTACK_IMMUNE) > 0),
+						B_AND(thisAbility:GetTargetFlags(), ABILITY_TARGET_FLAG_NOT_ATTACK_IMMUNE) == 0,
 					}
+			end
+		end
+	end
+end
+
+function AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, playerIndex, abilities)
+	local iAbilityIndex = 1
+	for iAbility=0,MAX_ABILITY_SLOT do
+		local thisAbilityData = abilities[iAbility]
+		if thisAbilityData then
+			local thisAbility
+					= gsiPlayer.hUnit:GetAbilityByName(abilities[iAbility][ABILITY_I__ABILITY_NAME])
+			if thisAbility then
+				playerIndex[iAbilityIndex] = thisAbility
+				iAbilityIndex = iAbilityIndex + 1
+				thisAbilityData[ABILITY_I__ADDITIONAL_FLAGS][FLAGS2_I__PIERCES_IMMUNITY]
+						= B_AND(thisAbility:GetTargetFlags(),
+								ABILITY_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES
+							) > 0
+				thisAbilityData[ABILITY_I__ADDITIONAL_FLAGS][FLAGS2_I__IGNORES_EVASION]
+						= B_AND(thisAbility:GetTargetFlags(),
+								ABILITY_TARGET_FLAG_NOT_ATTACK_IMMUNE
+							) == 0
 			end
 		end
 	end
@@ -1399,6 +1554,30 @@ function AbilityLogic_GetCastSucceedsUnits(gsiPlayer, units, hAbility)
 	return unitsPlatter
 end
 
+function AbilityLogic_HighestPowerOHK(gsiPlayer, hAbility, units, dmg, ignoreMana)
+	if not ignoreMana or gsiPlayer.lastSeenMana < foD:GetManaCost() then
+		return nil, 4000
+	end
+	local highestPowerKill = nil
+	local highestPower = -0xFFFF
+	for i=1,#units do
+		local thisUnit = units[i]
+		local thisPowerLevel = Analytics_GetPowerLevel(thisUnit)
+		if not pUnit_IsNullOrDead(units)
+				and thisPowerLevel > highestPower then
+			if AbilityLogic_AllowOneHitKill(
+						gsiPlayer,
+						thisUnit,
+						foD:GetCastRange(),
+						dmg
+					) then
+				highestPowerKill = thisUnit
+				highestPower = thisPowerLevel
+			end
+		end
+	end
+end
+
 local al_gekv_platter = {}
 -- Good for searching for smites, however dots and allies may be in the fight
 -- -| best to be using a damage tracker to exclude units
@@ -1453,18 +1632,21 @@ end
 function AbilityLogic_UpdateHighUseMana(gsiPlayer, abilities)
 	if not gsiPlayer.updateHighUseMana then
 		gsiPlayer.updateHighUseMana = AbilityLogic_UpdateHighUseMana
+		gsiPlayer.highUseManaExpendNow = Time_CreateThrottle(0.33)
+		gsiPlayer.highUseManaExpendNow.mana = 0
+		gsiPlayer.highUseManaExpendNow.decrement = 0
 	end
 	local totalMana = 0
 	local abilityCount = 0
 	for i=0,MAX_ABILITY_SLOT do
 		local hAbility = abilities[i]
-		if hAbility and type(hAbility) == "table" then
+		if hAbility and type(hAbility) == "table" and hAbility:GetLevel() > 0 then
 			totalMana = totalMana + hAbility:GetManaCost()
 			abilityCount = abilityCount + 1
 		end
 	end
 	-- 30/03/23 - Due to the bug meaning high use mana has been 0 for
-	-- -| all bots, and for a while, it is decreased so that behavioural
+	-- -| all bots, and for a while, it is decreased so that behavioral
 	-- -| changes are not drastic.. untested. TODO
-	gsiPlayer.highUseManaSimple = totalMana*0.5 * 0.66
+	gsiPlayer.highUseManaSimple = min(gsiPlayer.maxMana*0.67, totalMana * 0.67)
 end

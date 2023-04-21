@@ -7,7 +7,7 @@ These are to help you install the bots, as it requires moving some workshop file
 | Language | Link |
 | :--- | :---: |
 | Arabic | [العربية](README-Arabic.ara.md) |
-| Chinese (Simplified) | [简体中文](https://steamcommunity.com/groups/VULFT/discussions/0/5940851423460775827/) |
+| Chinese (Simplified) | [简体中文](https://steamcommunity.com/sharedfiles/filedetails/?id=2955850633) (Steam Workshop)|
 | Filipino | [Filipino](README-Filipino.fil.md) |
 | French | [Français](README-French.fra.md) |
 | German | [Deutche](README-German.deu.md) |
@@ -16,6 +16,8 @@ These are to help you install the bots, as it requires moving some workshop file
 | Japanese | [日本語](README-Japanese.jpn.md) |
 | Korean | [한국어](README-Korean.kor.md) |
 | Portuguese | [Português](README-Portuguese.por.md) |
-| Russian | [русский](README-Russian.rus.md) |
+| Russian | [русский](README-Russian.rus.md) (Steam Workshop coming soon)|
 | Spanish | [Español](README-Spanish.spa.md) |
 | Ukrainian | [Українці](README-Ukranian.ukr.md) |
+
+Translation workshop pages (Chinese, Russian) set the default locale to the page's language.

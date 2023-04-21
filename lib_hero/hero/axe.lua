@@ -1,8 +1,8 @@
 local hero_data = {
 	"axe",
-	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 6, 4, 2, 2, 8, 2, 4, 9, 11},
+	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 8, 2, 4, 9, 11},
 	{
-		"item_ring_of_protection","item_magic_stick","item_branches","item_branches","item_tango","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_blink","item_magic_wand","item_wind_lace","item_staff_of_wizardry","item_void_stone","item_cyclone","item_ogre_axe","item_chainmail","item_blades_of_attack","item_phase_boots","item_mithril_hammer","item_black_king_bar","item_blade_mail","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange",
+		"item_tango","item_faerie_fire","item_magic_stick","item_branches","item_quelling_blade","item_branches","item_ring_of_protection","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_chainmail","item_magic_wand","item_blades_of_attack","item_phase_boots","item_blink","item_blade_mail","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_cloak","item_hood_of_defiance","item_pipe",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -105,7 +105,7 @@ blueprint = {
 			moveToScalar = moveToScalar - adjustScalar
 
 			local awayFromTower = Vector_UnitDirectionalPointToPoint(towerLoc, playerLoc)
-			adjustVector = Vector_ScalarMultiply(
+			adjustVector = Vector_ScalarMultiply2D(
 					awayFromTower,
 					adjustScalar
 				)
@@ -115,7 +115,7 @@ blueprint = {
 		end
 		moveTo = Vector_Addition(
 				playerLoc,
-				Vector_ScalarMultiply(
+				Vector_ScalarMultiply2D(
 						moveTo,
 						moveToScalar
 					)
@@ -126,7 +126,7 @@ blueprint = {
 					adjustVector
 				)
 		end
-		gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
+		Positioning_MoveDirectly(gsiPlayer, moveTo)
 		return xetaScore
 		-- else
 			-- --print(gsiPlayer.shortName, "ATTEMPTING DEFENSIVE", defensives_in_use[gsiPlayer.nOnTeam]:GetName() or Util_PrintableTable(defensives_in_use[gsiPlayer.nOnTeam]))

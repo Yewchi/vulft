@@ -1,10 +1,10 @@
 local hero_data = {
 	"death_prophet",
-	{1, 3, 1, 3, 3, 4, 1, 3, 1, 6, 2, 4, 2, 2, 7, 2, 4, 9, 11},
+	{1, 3, 3, 1, 3, 4, 3, 1, 1, 2, 6, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_branches","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_tango","item_bottle","item_boots","item_gloves","item_robe","item_power_treads","item_magic_wand","item_void_stone","item_wind_lace","item_cyclone","item_staff_of_wizardry","item_robe","item_kaya","item_belt_of_strength","item_ogre_axe","item_kaya_and_sange","item_mithril_hammer","item_black_king_bar","item_platemail","item_mystic_staff","item_shivas_guard","item_aghanims_shard","item_blink","item_reaver","item_overwhelming_blink",
+		"item_tango","item_magic_stick","item_circlet","item_circlet","item_branches","item_branches","item_tango","item_branches","item_cloak","item_hood_of_defiance","item_boots","item_wind_lace","item_magic_wand","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_wraith_band","item_platemail","item_pers","item_reaver","item_vitality_booster","item_heart","item_ring_of_health","item_void_stone","item_lotus_orb","item_vladmir",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
 		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+300 Health","-2.0s Crypt Swarm Cooldown","20.0% Spirit Siphon Move Speed Slow","+30 Spirit Siphon Damage/Heal","-20s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
 	}
@@ -66,10 +66,12 @@ local function try_spirit_siphon_target(gsiPlayer, hAbility, target)
 			(SIPHON_BREAK_RANGE-distToTarget)/easeOfMaintainingLink
 				+ 0.1*(1+Vector_UnitFacingUnit(gsiPlayer, target))
 		)
-	print("ttga siphon", max(0,
-			(SIPHON_BREAK_RANGE-distToTarget)/easeOfMaintainingLink
-				+ 0.1*(1+Vector_UnitFacingUnit(gsiPlayer, target))
-		), (SIPHON_BREAK_RANGE-distToTarget), easeOfMaintainingLink, 0.1*(1+Vector_UnitFacingUnit(gsiPlayer, target)))
+
+
+
+
+
+
 	if timeToGetAway > 0
 			and HIGH_USE(gsiPlayer, hAbility, gsiPlayer.highUseManaSimple, targetHpp) then
 		USE_ABILITY(gsiPlayer, hAbility, target, 400, nil)
@@ -90,6 +92,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then

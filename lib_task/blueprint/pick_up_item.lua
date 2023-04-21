@@ -42,6 +42,11 @@ local DROP_IN_FOUNTAIN_DIST = 500
 local AVOID_UNNEEDED_NEAR_FOUNTAIN_DIST = 1000
 local DROP_EXTRA_JUNGLE_FOR_DELIVERY_SPACE_DIST = 4000
 
+local ITEMS_GOODIES = ITEM_GOODIES
+
+local t_whose_rapier = {}
+
+
 local task_handle = Task_CreateNewTask()
 
 local blueprint
@@ -52,6 +57,23 @@ local sqrt = math.sqrt
 local farm_lane_handle
 
 local t_team_humans
+
+local function open_jungle_token_item(gsiPlayer, hItem)
+	--[[
+	local hUnit = gsiPlayer.hUnit
+	print(hItem:GetName())
+	if hItem and hItem.GetName and string.find(hItem:GetName(), "item_tier") then
+		print("DOING NEW THING", hItem:GetName())
+		gsiPlayer.hUnit:Action_UseAbility(hItem)
+		if RandomInt(1,2) == 1 then
+			print("DIS")
+			hUnit:ActionImmediate_DisassembleItem(hItem)
+		else
+			print("LOC")
+			hUnit:Action_UseAbilityOnLocation(hItem, gsiPlayer.lastSeen.location)
+		end
+	end--]]
+end
 
 local function estimated_time_til_completed(gsiPlayer, objective)
 	return 0
@@ -76,7 +98,7 @@ local function task_init_func(taskJobDomain)
 							local thisHuman = t_team_humans[i]
 							local hUnitHuman = thisHuman.hUnit
 							local jungleItemSlotted = hUnitHuman:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)
-							if jungleItemSlotted then
+							if jungleItemSlotted and jungleItems[jungleItemSlotted:GetName()] then
 								-- Set to slotted tier + 1 desire
 								thisHuman.giveMeAJungleItemTier = jungleItems[jungleItemSlotted:GetName()]+1
 							end
@@ -117,6 +139,7 @@ blueprint = {
 		local currSlottedJungle = gsiPlayer.hUnit:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)
 		Util_TablePrint(getmetatable(objective))
 		if currSlottedJungle and objective.item
+				and ITEMS_JUNGLE[objective.item:GetName()]
 				and objective.item:GetName()
 					~= (currSlottedJungle and currSlottedJungle:GetName() or "!") then
 			
@@ -130,6 +153,7 @@ blueprint = {
 						objective.location
 					) < 1000 then
 			gsiPlayer.hUnit:Action_PickUpItem(objective.item)
+			gsiPlayer.recentMoveTo = objective.location
 			return xetaScore
 		end
 		return XETA_SCORE_DO_NOT_RUN
@@ -141,6 +165,7 @@ blueprint = {
 		
 		
 		--Util_TablePrint(table.sort(getmetatable(gsiPlayer.hUnit)))
+		
 		local countHeld = 0
 		local hUnit = gsiPlayer.hUnit
 		local jungleItemLoose
@@ -175,6 +200,10 @@ blueprint = {
 		else
 			gsiPlayer.giveMeAJungleItemTier = jungleItemKeys[jungleItemSlotted:GetName()]+1
 					or math.floor(MAX_JUNGLE_ITEM_TIER / 2)
+		end
+
+		if jungleItemSlotted then
+			open_jungle_token_item(gsiPlayer, jungleItemSlotted)
 		end
 
 		local nearbyAllies
@@ -230,6 +259,11 @@ blueprint = {
 					bestItemDist = thisDist
 				end
 			end
+		--	local thisScoreOrNilGoodie = ITEMS_GOODIES[thisItem.item:GetName()]
+		--	if thisScoreOrNilGoodie then
+		--		if thisScore - thisDist / 40 > 
+
+		--	end
 		end
 		
 		if not bestItem then

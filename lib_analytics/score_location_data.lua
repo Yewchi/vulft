@@ -95,14 +95,15 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 			local distanceFromBase = sqrt((lastSeenLoc.x - base.x)^2 + (lastSeenLoc.y - base.y))
 			local approxExtrapolateT = releaseDeltaT + distanceFromBase/shotSpeed
 			local extrapolatedLoc = not pUnit_IsNullOrDead(thisUnit)
-					and Vector_ScalarMultiply(
+					and Vector_ProgressBetweenPoints(
+							lastSeenLoc,
 							thisUnit.hUnit:GetExtrapolatedLocation(approxExtrapolateT),
-							thisUnit.hUnit:GetMovementDirectionStability()
+							max(0.15, thisUnit.hUnit:GetMovementDirectionStability())
 						)
 			if not extrapolatedLoc
 					and currTime - lastSeen.previousTimeStamp < UPDATE_PREVIOUS_SEEN_LOC_DELTA then
 				-- i.e. only use a normal interval previous, otherwise they were probably in fog, crazy vecs
-				extrapolatedLoc =  Vector_Addition(lastSeenLoc,
+				extrapolatedLoc = Vector_Addition(lastSeenLoc,
 						Vector_ScalarMultiply(
 								Vector(lastSeenPrevious.x - lastSeenLoc.x, lastSeenPrevious.y - lastSeenLoc.y, 0),
 								approxExtrapolateT/(lastSeen.timeStamp - lastSeen.previousTimeStamp)
@@ -135,10 +136,12 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 					-- baseToEx (X) forwardsVec sidedness
 					if baseToExtrapolated.x*forwardsVec.y - baseToExtrapolated.y*forwardsVec.x > 0 then
 						-- left-hand side
+			
 						if distFromCenter > greatestDistCcw then
 							greatestDistCcw = distFromCenter
 						end
 					elseif distFromCenter > greatestDistCw then -- rhs
+			
 						greatestDistCw = distFromCenter
 					end
 				end
@@ -146,7 +149,7 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 		end
 	end
 
-	-- Use shift left because baked normal to the forwardsvec uses an orthonal +ve z coordinate
+	-- Use shift left because baked normal to the forwardsvec uses an orthogonal +ve z coordinate
 	local shiftLeft = (greatestDistCcw - greatestDistCw)
 	-- topLoc + ortogonal*shiftLeft
 	local hitsBetter = Vector(topLoc.x + forwardsVec.y*shiftLeft/forwardsVecLen,
@@ -288,11 +291,17 @@ function ScoreLocs_ConeHeroes(gsiPlayer, unitsTbl, hAbility, height,
 			local hitsLoc, hitsDeltaT = Projectile_ExtrapolateProjectileToSeenUnit(playerLoc, thisUnit,
 					releaseDeltaT, shotSpeed
 				)
+			
+			
 			if thisUnit ~= intendedTarget then
 				-- Find if the intended target is in the aftershot
 				local thisScore = hitScores[i][1]
 				local extrapolatedTime = releaseDeltaT + hitsDeltaT -- TODO? target could be moving anywhere
 				local extrapolatedLoc = intendedTarget.hUnit:GetExtrapolatedLocation(extrapolatedTime)
+
+				
+				
+
 				local radsProjecting = Vector_PointToPointRads(playerLoc,
 						toZeroNotThrough and ZEROED_VECTOR or hitsLoc
 					)
@@ -377,7 +386,7 @@ function ScoreLocs_ConeSeenUnitsHitsTarget(gsiPlayer, unitsTbl, hAbility, target
 	-- TODO what if a perfect shot is possible some seconds in the future and we are running back to fountain instead
 	-- -| of herding the shot, running orthogonally to the fight from our fountain and returning for the hit; or
 	-- -| keeping our shot angles. This is why positioning needs a method of registering intelligent movement soon.
-	-- TODO How might fighting behaviour be modelled and predicted, whether stupidly quick or smartly slow.
+	-- TODO How might fighting behavior be modelled and predicted, whether stupidly quick or smartly slow.
 	
 	local playerLoc = gsiPlayer.lastSeen.location
 	local targetLoc = target.lastSeen.location

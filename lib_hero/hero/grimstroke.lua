@@ -1,16 +1,16 @@
 local hero_data = {
 	"grimstroke",
-	{1, 3, 1, 2, 3, 4, 3, 1, 3, 6, 1, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 3, 6, 4, 2, 2, 8, 2, 4, 9},
 	{
-		"item_tango","item_ward_observer","item_faerie_fire","item_branches","item_branches","item_branches","item_magic_stick","item_magic_wand","item_bottle","item_boots","item_blink","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_ultimate_orb","item_mystic_staff","item_sheepstick","item_ultimate_scepter","item_aghanims_shard",
+		"item_tango","item_enchanted_mango","item_ward_observer","item_branches","item_wind_lace","item_branches","item_ring_of_basilius","item_boots","item_magic_wand","item_arcane_boots","item_aether_lens","item_tranquil_boots","item_gem","item_staff_of_wizardry","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_aghanims_shard","item_gem","item_blink","item_gem",
 	},
-	{ {3,3,3,1,2,}, {4,4,4,5,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {4,4,4,4,4,}, 0.1 },
 	{
 		"Stroke of Fate","Phantom's Embrace","Ink Swell","Soulbind","+50 Phantom's Embrace DPS","-5.0s Ink Swell Cooldown","+25.0% Soulbind Spell Damage","+16% Ink Swell Movement Speed","+1000 Stroke of Fate Cast Range","+3 Hits to Kill Phantom","+150 Ink Swell Radius","+50% Stroke of Fate Damage",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"grimstroke_dark_artistry", ABILITY_TYPE.SLOW + ABILITY_TYPE.NUKE},
@@ -67,6 +67,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then

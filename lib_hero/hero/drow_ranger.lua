@@ -1,8 +1,8 @@
 local hero_data = {
 	"drow_ranger",
-	{1, 3, 1, 3, 3, 4, 3, 2, 1, 6, 1, 4, 2, 2, 8, 2, 4, 9, 11},
+	{1, 3, 1, 2, 3, 4, 3, 3, 1, 1, 6, 4, 2, 2, 8, 2, 4, 9, 11},
 	{
-		"item_circlet","item_tango","item_quelling_blade","item_slippers","item_branches","item_branches","item_wraith_band","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_aghanims_shard","item_blade_of_alacrity","item_yasha","item_manta","item_ultimate_orb","item_ultimate_orb","item_skadi","item_shadow_amulet","item_blitz_knuckles","item_blades_of_attack","item_invis_sword","item_silver_edge","item_blink","item_swift_blink","item_sphere","item_rapier","item_black_king_bar",
+		"item_quelling_blade","item_circlet","item_tango","item_branches","item_sobi_mask","item_magic_stick","item_wraith_band","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_belt_of_strength","item_blade_of_alacrity","item_staff_of_wizardry","item_dragon_lance","item_force_staff","item_hurricane_pike","item_blade_of_alacrity","item_yasha","item_aghanims_shard","item_manta","item_lifesteal","item_claymore","item_satanic","item_quarterstaff","item_butterfly","item_silver_edge","item_black_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -62,6 +62,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -159,5 +160,3 @@ local hero_access = function(key) return d[key] end
 do
 	HeroData_SetHeroData(hero_data, abilities, hero_access)
 end
-
-

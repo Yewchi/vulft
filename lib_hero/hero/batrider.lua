@@ -1,10 +1,10 @@
 local hero_data = {
 	"batrider",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 2, 4, 2, 2, 7, 5, 4, 10, 12},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 7, 5, 4, 10, 12},
 	{
-		"item_tango","item_branches","item_branches","item_circlet","item_mantle","item_enchanted_mango","item_null_talisman","item_null_talisman","item_boots","item_wind_lace","item_tranquil_boots","item_belt_of_strength","item_robe","item_ancient_janggo","item_boots_of_bearing","item_magic_wand","item_aether_lens","item_point_booster","item_energy_booster","item_ogre_axe","item_octarine_core","item_ogre_axe","item_aghanims_shard","item_black_king_bar","item_aghanims_shard","item_pers","item_ultimate_orb","item_sphere","item_platemail",
+		"item_enchanted_mango","item_tango","item_faerie_fire","item_ward_observer","item_bottle","item_boots","item_wind_lace","item_blitz_knuckles","item_robe","item_chainmail","item_witch_blade","item_aghanims_shard","item_platemail","item_void_stone","item_ring_of_health","item_lotus_orb","item_blink","item_octarine_core","item_gem","item_arcane_blink","item_ultimate_scepter","item_gem","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
 		"Sticky Napalm","Flamebreak","Firefly","Flaming Lasso","+50 Sticky Napalm Radius","+50 Flamebreak Knockback Distance","+20 Movement Speed","-10s Flaming Lasso Cooldown","+4.5s Firefly Duration","+2 Flamebreak Charges","+10 Sticky Napalm Damage","Flamebreak applies +2 Sticky Napalm Stacks",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

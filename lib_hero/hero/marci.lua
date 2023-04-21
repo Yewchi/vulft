@@ -1,10 +1,10 @@
 local hero_data = {
 	"marci",
-	{1, 3, 3, 2, 3, 4, 3, 2, 2, 2, 5, 4, 1, 1, 7, 1, 4, 10, 12},
+	{1, 3, 3, 2, 3, 4, 3, 2, 2, 2, 5, 4, 1, 1, 7, 1, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_circlet","item_gauntlets","item_branches","item_branches","item_gauntlets","item_branches","item_branches","item_helm_of_iron_will","item_gloves","item_boots","item_blades_of_attack","item_armlet","item_belt_of_strength","item_belt_of_strength","item_phase_boots","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_belt_of_strength","item_blink","item_belt_of_strength","item_basher","item_lesser_crit","item_demon_edge","item_greater_crit","item_abyssal_blade",
+		"item_orb_of_venom","item_branches","item_quelling_blade","item_branches","item_tango","item_blight_stone","item_orb_of_corrosion","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_gloves","item_blades_of_attack","item_magic_wand","item_armlet","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_broadsword","item_blades_of_attack","item_lesser_crit","item_blink","item_mithril_hammer","item_belt_of_strength","item_basher","item_greater_crit",
 	},
-	{ {3,3,3,3,1,}, {3,3,3,3,1,}, 0.1 },
+	{ {1,1,1,2,3,}, {1,1,1,2,3,}, 0.1 },
 	{
 		"Dispose","Rebound","Sidekick","Unleash","+125 Rebound Cast/Jump Range","+60 Dispose Damage","+15% Sidekick Lifesteal","-3s Rebound Cooldown","+0.7s Rebound Stun Duration","+15% Unleash Movement Speed","1.5s Unleash Pulse Silence","1.5s Sidekick Spell Immunity",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

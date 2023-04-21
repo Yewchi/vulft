@@ -318,7 +318,9 @@ blueprint = {
 			local nearestTower, nearestTowerDist = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
 			Positioning_ZSMoveCasual(gsiPlayer, objective.lastSeen.location,
 					4.0, 
-					(nearestTowerDist < 1000 and 900)  -- TEST
+					(nearestTowerDist < 1000 and 900),
+					nil,
+					true -- TEST
 				)
 		end
 	end,

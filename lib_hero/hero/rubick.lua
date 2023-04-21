@@ -1,10 +1,10 @@
 local hero_data = {
 	"rubick",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 12},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 11},
 	{
-		"item_ward_dispenser","item_tango","item_enchanted_mango","item_ward_dispenser","item_clarity","item_boots","item_arcane_boots","item_void_stone","item_magic_wand","item_aether_lens","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_aghanims_shard","item_arcane_boots","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_arcane_boots","item_vitality_booster","item_aeon_disk","item_vitality_booster","item_energy_booster","item_octarine_core",
+		"item_boots","item_ward_dispenser","item_circlet","item_mantle","item_tango","item_tango","item_faerie_fire","item_null_talisman","item_arcane_boots","item_void_stone","item_aether_lens","item_glimmer_cape","item_blink","item_force_staff","item_aghanims_shard","item_void_stone","item_ultimate_orb","item_gem","item_mystic_staff","item_void_stone","item_sheepstick","item_octarine_core","item_black_king_bar",
 	},
-	{ {3,3,3,1,1,}, {5,5,4,4,4,}, 0.1 },
+	{ {3,3,3,1,4,}, {5,5,3,4,4,}, 0.1 },
 	{
 		"Telekinesis","Fade Bolt","Arcane Supremacy","Spell Steal","+150 Telekinesis Landing Damage","-12% Fade Bolt Damage Reduction","-25% Stolen Spells Cooldown","+0.6s Telekinesis Lift Duration","-5s Fade Bolt Cooldown","+240 Telekinesis Land Distance","-12s Telekinesis Cooldown","+40% Spell Amp For Stolen Spells",
 	}
@@ -47,7 +47,7 @@ Comm_RegisterCallbackFunc("RUBICK_RESPOND",
 		function(event)
 			if not IsPlayerBot(event.player_id) then
 				recent_nonsense = event.string
-				print("TEAM", IsTeamPlayer(event.player_id))
+				
 				recent_nonsense_is_enemy = IsTeamPlayer(event.player_id)
 			end
 		end
@@ -76,6 +76,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if recent_nonsense then

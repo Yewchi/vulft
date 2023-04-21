@@ -1,16 +1,16 @@
 local hero_data = {
 	"snapfire",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 7, 3, 4, 9},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_gauntlets","item_tango","item_branches","item_branches","item_gauntlets","item_faerie_fire","item_bracer","item_bracer","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_magic_wand","item_guardian_greaves","item_aghanims_shard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mystic_staff","item_sheepstick","item_broadsword","item_blades_of_attack","item_lesser_crit",
+		"item_tango","item_circlet","item_gauntlets","item_branches","item_branches","item_faerie_fire","item_enchanted_mango","item_faerie_fire","item_bracer","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_magic_wand","item_buckler","item_guardian_greaves","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_broadsword","item_blades_of_attack","item_lesser_crit","item_demon_edge","item_greater_crit","item_lesser_crit","item_demon_edge","item_greater_crit",
 	},
-	{ {5,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,4,2,}, 0.1 },
 	{
 		"Scatterblast","Firesnap Cookie","Lil' Shredder","Mortimer Kisses","+70 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","Lil' Shredder Uses Your Attack Damage","+60 Mortimer Kisses Impact Damage","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"snapfire_scatterblast", ABILITY_TYPE.SLOW + ABILITY_TYPE.AOE + ABILITY_TYPE.NUKE},
@@ -46,6 +46,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

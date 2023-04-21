@@ -1,10 +1,10 @@
 local hero_data = {
 	"clinkz",
-	{2, 1, 2, 3, 1, 4, 1, 1, 3, 3, 3, 4, 6, 2, 7, 2, 4, 10, 11},
+	{2, 3, 2, 1, 1, 4, 1, 1, 3, 3, 3, 4, 5, 2, 7, 2, 4, 10, 11},
 	{
-		"item_blades_of_attack","item_branches","item_branches","item_sobi_mask","item_quelling_blade","item_branches","item_branches","item_tango","item_gloves","item_boots","item_boots_of_elves","item_javelin","item_power_treads","item_mithril_hammer","item_maelstrom","item_crown","item_crown","item_staff_of_wizardry","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_blades_of_attack","item_broadsword","item_lesser_crit","item_greater_crit","item_void_stone","item_ultimate_orb","item_pers","item_ultimate_orb","item_hurricane_pike","item_sphere","item_black_king_bar",
+		"item_magic_wand","item_branches","item_branches","item_branches","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_boots","item_javelin","item_maelstrom","item_crown","item_crown","item_staff_of_wizardry","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_blades_of_attack","item_dragon_lance","item_lesser_crit","item_greater_crit","item_ultimate_scepter","item_relic","item_rapier","item_staff_of_wizardry","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
 	{
 		"Burning Barrage","Searing Arrows","Skeleton Walk","Death Pact","+20 Searing Arrows Damage","-3.0s Skeleton Walk Cooldown","+20% Death Pact Health","Death Pact Steal creep abilities","+125 Attack Range","+3.0 Burning Barrage arrows","+25% Burning Barrage Damage","Searing Arrows Multishot",
 	}
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then
