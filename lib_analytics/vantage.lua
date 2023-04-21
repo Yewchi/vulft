@@ -52,6 +52,8 @@ for i=1,4 do
 end
 local step_build_dist = 20.0
 
+print(world_bounds[1],world_bounds[2],world_bounds[3],world_bounds[4])
+
 local edges = {--[[left-side high vec to right-side low vec]]}
 
 local t_height_one = {--[[count_close, center_of_known]]}
@@ -68,7 +70,7 @@ local max = math.max
 local min = math.min
 local abs = math.abs
 
-local FAR_AWAY_VEC = Vector(32000, 32000, 32000)
+local FAR_AWAY_VEC = Vector(0xFFFF, 0xFFFF, 0xFFFF)
 
 local team_players
 
@@ -170,7 +172,7 @@ if DEBUG then
 end
 
 				workingSet.x = x + add
-				if (x > bounds[4]) then
+				if (x > bounds[3]) then
 					for i=1,count_reserve_ward_spots do
 						t_ward_loc_reserved[i] = t_height_one[i][2]
 						if VERBOSE then print(string.format('\tVector(%.2f, %.2f, %.2f),', t_ward_loc_reserved[i].x, t_ward_loc_reserved[i].y, t_ward_loc_reserved[i].z)) end
@@ -392,6 +394,7 @@ function VAN_InformDefensibleFell(gsiBuilding)
 
 
 
+
 	while (i <= count_reserve_ward_spots) do
 		local thisLoc = t_ward_loc_reserved[i]
 		if VERBOSE then
@@ -426,6 +429,7 @@ function VAN_InformDefensibleFell(gsiBuilding)
 	end
 	
 	Util_TablePrint(t_ward_loc[1])
+
 
 
 
@@ -617,6 +621,14 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 					tostring(t_ward_loc[wardIndex])
 				)
 			)
+
+
+
+
+
+
+
+
 		t_ward_correction[wardIndex] = t_ward_correction[count_ward_spots]
 		t_ward_correction[count_ward_spots] = false
 		t_ward_loc[wardIndex] = t_ward_loc[count_ward_spots]

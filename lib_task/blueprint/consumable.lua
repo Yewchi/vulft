@@ -207,7 +207,7 @@ function Consumable_TryUseFlask(gsiPlayer, hItem, hUnit)
 	local ensureCarriedResult = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
 	--[[TEST]]if TEST then print("will attacks block flask for", gsiPlayer.shortName, ":", Analytics_RoshanOrHeroAttacksInTimeline(gsiPlayer) and not hUnit:TimeSinceDamagedByAnyHero()) end
 	if ensureCarriedResult and not hUnit:WasRecentlyDamagedByAnyHero(2.0)
-			and Analytics_GetFutureDamageInTimeline(gsiPlayer.hUnit) == 0 then
+			and not Analytics_RoshanOrHeroAttacksInTimeline(gsiPlayer, -2.5) then
 		hUnit:Action_UseAbilityOnEntity(hItem, hUnit)
 	elseif ensureCarriedResult == ITEM_ENSURE_RESULT_WAIT then
 		lock_bags_may_warn(gsiPlayer, ITEM_NEEDED_SWITCH_SLOT_WAIT_TIME, ITEM_SWITCH_ITEM_READY_TIME)
@@ -791,8 +791,10 @@ blueprint = {
 			end
 		end
 		if DotaTime() < 1800 and highestScore < 30 and RandomInt(1, 50) % 50 == 0 and Unit_GetHealthPercent(gsiPlayer) > 0.8 and Unit_GetManaPercent(gsiPlayer) < 0.25 then
-			if Item_GetNextItemBuildItem(gsiPlayer) ~= "item_clarity" and not Item_ItemOwnedAnywhere(gsiPlayer, "item_clarity")
+			if Item_GetNextItemBuildItem(gsiPlayer) ~= "item_clarity"
+					and not Item_ItemOwnedAnywhere(gsiPlayer, "item_clarity")
 					and GetItemStockCount("item_clarity") > 1 then
+				Item_InsertItemToItemBuild(gsiPlayer, "item_clarity")
 				Item_InsertItemToItemBuild(gsiPlayer, "item_clarity")
 			end
 		end

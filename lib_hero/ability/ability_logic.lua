@@ -1048,6 +1048,7 @@ end
 function AbilityLogic_HighUseAllowOffensive(gsiPlayer, hAbility, highUseMana, enemyHealthPercent)
 	
 	
+	
 	enemyHealthPercent = min(enemyHealthPercent, gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth + 0.15)
 	-- TODO the reason I used +0.15 player health was to mitigate just having a bad lane and like, waiting for regen on courier. But the truth is that the value to inform unloading all your mana would be an evaluation of how likely you are to die soon in the future.
 	local expendNow = gsiPlayer.highUseManaExpendNow

@@ -106,8 +106,10 @@ d = {
 					local playerLoc = gsiPlayer.lastSeen.location
 					local fhtLoc = objective.lastSeen.location
 					local bladeFuryRadius = bladeFury:GetSpecialValueFloat("blade_fury_radius")
+					bladeFuryRadius = bladeFuryRadius and bladeFuryRadius > 0 and bladeFuryRadius
+							or 250
 					local danger, knownE = Analytics_GetTheoreticalDangerAmount(gsiPlayer, nil, fhtLoc)
-					local crowdedLoc, crowdedRating = CROWDED_RATING(fhtLoc, SET_HERO_ENEMY, nil, radius)
+					local crowdedLoc, crowdedRating = CROWDED_RATING(fhtLoc, SET_HERO_ENEMY, nil, bladeFuryRadius)
 					
 					if crowdedRating > 1.1 then
 						
@@ -127,9 +129,9 @@ d = {
 
 					if moveTo and GSI_UnitCanStartAttack(gsiPlayer)
 							and Vector_PointDistance2D(moveTo, playerLoc) < 150
-							and (Vector_UnitFacingUnit(fht, gsiPlayer) > 0.67
-								or fht.hUnit:IsStunned() or fht.hUnit:IsRooted()
-								or fht.currentMovementSpeed / gsiPlayer.currentMovementSpeed
+							and (Vector_UnitFacingUnit(objective, gsiPlayer) > 0.67
+								or objective.hUnit:IsStunned() or objective.hUnit:IsRooted()
+								or objective.currentMovementSpeed / gsiPlayer.currentMovementSpeed
 									< 0.45
 							) then
 						-- get procs if they're facing you and you're in the desired loc
@@ -229,7 +231,7 @@ d = {
 
 		local bladeFuryRadius = bladeFury:GetSpecialValueFloat("blade_fury_radius")
 
-		print("jug bladeFuryRadius", bladeFuryRadius)
+		
 
 		local bladeFuryCanCast = CAN_BE_CAST(gsiPlayer, bladeFury)
 		local healingWardCanCast = CAN_BE_CAST(gsiPlayer, healingWard)

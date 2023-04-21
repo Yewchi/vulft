@@ -17,7 +17,7 @@ local abilities = {
 		{"zuus_lightning_bolt", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN},
 		{"zuus_heavenly_jump", ABILITY_TYPE.PASSIVE},
 		{"zuus_cloud", ABILITY_TYPE.SMITE + ABILITY_TYPE.STUN + ABILITY_TYPE.NUKE + ABILITY_TYPE.AOE},
-		{"zuus_static_field", ABILITY_TYPE.MOBILITY + ABILITY_TYPE.SLOW},
+		{"zuus_lightning_hands", ABILITY_TYPE.MOBILITY + ABILITY_TYPE.SLOW},
 		[5] = {"zuus_thundergods_wrath", ABILITY_TYPE.NUKE + ABILITY_TYPE.SMITE},
 }
 

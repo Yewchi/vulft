@@ -1,8 +1,6 @@
 v0.7-230414 (10th April meta)
 > ADDED HERO Juggernaut
 
-> ADDED HERO Kunkka
-
 > Set your role at any time with '!pos [1 to 5]'
 
 > More aggressive pushing when the enemy are dead

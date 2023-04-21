@@ -146,6 +146,7 @@ blueprint = {
 		--[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then DEBUG_print(string.format("push: %s %.2f", gsiPlayer.shortName, theoreticalDanger)) end
 		if gsiPlayer.level - theoreticalDanger > LEVEL_AND_SAFETY_ALLOW_PUSH_TOWERS then
 			for building,attackWontAgroExpires in pairs(t_tower_wont_agro) do
+				removeBuilding = bUnit_IsNullOrDead(building) and building
 				if bUnit_IsNullOrDead(building)
 						or (attackWontAgroExpires < GameTime() and (building.hUnit:GetHealth() > 150
 								or building.hUnit:HasModifier("modifier_backdoor_protection")

@@ -179,6 +179,7 @@ local function check_if_closer_set_rune(fromLoc, currDist, runeNumerical, key)
 	local thisDistance = Math_PointToPointDistance2D(fromLoc, toLoc)
 	if thisDistance < currDist then
 		RUNE_LOCATIONS[key] = {toLoc, runeHandle, GetRuneStatus(runeHandle)}
+		
 		return thisDistance
 	end
 	return currDist
@@ -655,9 +656,9 @@ local function task_init_func(taskJobDomain)
 	local safeLaneTeamTower = GSI_GetLowestTierTeamLaneTower(TEAM, MAP_LOGICAL_SAFE_LANE)
 	local teamBountyCheck = safeLaneTeamTower and safeLaneTeamTower.lastSeen.location
 			or TEAM_IS_RADIANT and Vector(3000, -6000) or Vector(-3000, 6000)
-	local safeLaneEnemyTower = GSI_GetLowestTierTeamLaneTower(TEAM, MAP_LOGICAL_OFF_LANE)
+	local safeLaneEnemyTower = GSI_GetLowestTierTeamLaneTower(ENEMY_TEAM, MAP_LOGICAL_OFF_LANE)
 	local enemyBountyCheck = safeLaneEnemyTower and safeLaneEnemyTower.lastSeen.location
-			or TEAM_IS_RADIANT and Vector(-3000, 6000) or Vector(3000, -6000)
+ 			or TEAM_IS_RADIANT and Vector(-3000, 6000) or Vector(3000, -6000)
 	local northBountyCheck = Vector(-1000, 1000) -- Assumes river rune is closer to center-bottom and center-top than team-map-side bounties from 7.30
 	local southBountyCheck = Vector(1000, -1000)
 	local closestAlliedBounty = HIGH_32_BIT
@@ -685,6 +686,8 @@ local function task_init_func(taskJobDomain)
 	for i=1,BOUNTIES_MAX+1 do
 		RUNE_LOCATIONS[i] = swapTable[i]
 	end
+
+
 
 	-- - task.lua stuff - 
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
@@ -965,7 +968,7 @@ end
 
 			local modStrat = 0
 			local isRegen = GetRuneType(runeObjective.runeHandle) == RUNE_REGENERATION
-			--print("rune", runeObjective.runeHandle, I_POWERS_MAX)
+
 			local missingMana = gsiPlayer.maxMana - gsiPlayer.lastSeenMana
 			local missingHealth = gsiPlayer.maxHealth - gsiPlayer.lastSeenHealth
 			if runeObjective.runeHandle <= I_POWERS_MAX then
@@ -990,13 +993,13 @@ end
 			end
 			local c, tta, cScore = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
 			modStrat = modStrat - (c and max(0, (2-tta)*cScore/3) or 0)
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
 			local countCreeps = gsiPlayer.hUnit:GetNearbyCreeps(750, true)
 			local greep = gsiPlayer.hUnit
 			local creepsPresentFactor = countCreeps and -30*#countCreeps*max(0, 1+danger) / (1+2*alliedNearness)^2 or 0

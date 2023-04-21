@@ -161,7 +161,7 @@ blueprint = {
 		local creep, tta, score = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
 		local standingLoc = get_lexp_standing_loc(gsiPlayer, farmLaneObjective, tta)
 		if standingLoc then
-			print(standingLoc)
+			
 			local underTower = Set_GetTowerOverLocation(standingLoc)
 			local score = (0.3+anyIntendHarmFactor)*(theorizedDangerScore*15) + max(0, farmLaneScoreFactor)
 					-(creep and tta and 50 - 50*min(1, max(0, tta - (Vector_PointDistance(

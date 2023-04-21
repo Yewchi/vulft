@@ -155,9 +155,11 @@ d = {
 					return;
 				end
 			end
-			if (fhtReal or searchingFog) and (not geminate:GetCooldownTimeRemaining() == 0 or
-					Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
-						> gsiPlayer.attackRange
+			if searchingFog or ( fhtReal
+					and ( not geminate:GetCooldownTimeRemaining() == 0 or
+							Vector_PointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
+								> gsiPlayer.attackRange
+						)
 					) then
 				if CAN_BE_CAST(gsiPlayer, shukuchi)
 						and HIGH_USE(gsiPlayer, shukuchi, highUse - shukuchi:GetManaCost(), fhtPercHp) then

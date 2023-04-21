@@ -1,4 +1,4 @@
-VULFT - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 19/03/23. Requires manual install into vscripts/bots folder (all recently released bots have this issue). VUL-FT has no affiliation with DotaBuff.<br/>
+VULFT - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 10/04/23. Requires manual install into vscripts/bots folder (all recently released bots have this issue). VUL-FT has no affiliation with DotaBuff.<br/>
 <br/>
 [Translations of This Page in Other Languages](https://steamcommunity.com/groups/VULFT/announcements/detail/6966546241858334331)<br/>
 <br/>
@@ -105,8 +105,8 @@ These three rune issues are all technically true, but there is a workaround in p
 
 ## == Project State ==
 Alpha version. Please give feedback.<br/>
-Is the project currently stable: Stable, no game crashes or script breaking over 10 matches 30/03/23 (March 30)<br/>
-Last DotaBuff meta update: 19/03/23<br/>
+Is the project currently stable: Experimental, updated for 7.33 21/04/23 (April 21)<br/>
+Last DotaBuff meta update: 10/04/23<br/>
 <br/>
 
 ## == Support ==

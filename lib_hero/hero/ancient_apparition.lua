@@ -118,7 +118,7 @@ local function ice_blast_release_limit_loss_of_range(gsiPlayer, hAbility)
 			ice_blast_parameters[5] = extrapolatedAtExplosionDist
 			if extrapolatedAtExplosionDist < 325 then
 				if AbilityLogic_AbilityCanBeCast(gsiPlayer, hAbility) then
-					print("RELEASED because", extrapolatedAtExplosionDist, ice_blast_parameters[5], currTracerLoc, "also", extrapolatedAtExplosion, currTracerDist)
+					print("AA RELEASED because", extrapolatedAtExplosionDist, ice_blast_parameters[5], currTracerLoc, "also", extrapolatedAtExplosion, currTracerDist)
 					ice_blast_parameters[1] = 0
 					UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, hAbility, nil, 5000, nil, nil, true)
 					return true

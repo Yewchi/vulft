@@ -1084,7 +1084,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 									< max(150, min(280, 
 										nearbyEnemies[1].hUnit:IsNull() and 60 + 5*nearbyEnemies[1].level
 										or nearbyEnemies[1].hUnit:GetAttackDamage()*1.25)) then
-						print("armlet 6")
+							
 							local projectiles = hUnit:GetIncomingTrackingProjectiles()
 							local playerLoc = gsiPlayer.lastSeen.location
 							for i=1,#projectiles do
@@ -1105,17 +1105,17 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 								or Vector_PointDistance2D(fht.lastSeen.location, gsiPlayer.lastSeen.location)
 									+ (fht.currentMovementSpeed - gsiPlayer.currentMovementSpeed)*2
 									< max(350, gsiPlayer.attackRange*1.5)) then
-						print("armlet 5")
+						
 						hUnit:Action_UseAbility(hItem)
 					end
 				elseif armletIsOn and #nearbyEnemies == 0 and not hUnit:GetAttackTarget()
 						and GameTime() - hUnit:GetLastAttackTime()
 							> hUnit:GetSecondsPerAttack() + 0.5
 						and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.95 then
-						print("armlet 4")
+						
 					hUnit:Action_UseAbility(hItem)
 				elseif not armletIsOn then
-						print("armlet 3")
+						
 					if hUnit:GetDifficulty() > 4 then
 						local projectiles = hUnit:GetIncomingTrackingProjectiles()
 						local playerLoc = gsiPlayer.lastSeen.location
@@ -1124,7 +1124,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 							if proj and Vector_PointDistance(proj.location, playerLoc) > 450
 									or gsiPlayer.lastSeenHealth < 700 + 15 * gsiPlayer.level then
 								Util_TablePrint({"ARMELT PROJECTILES", proj})
-						print("armlet 2")
+						
 								hUnit:Action_UseAbility(hItem)
 								break;
 							end
@@ -1132,7 +1132,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 					end
 					if hUnit:GetAttackTarget() and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth > 0.75
 							- Analytics_GetTheoreticalDangerAmount(gsiPlayer) * 0.125 then
-						print("armlet 1")
+						
 						hUnit:Action_UseAbility(hItem)
 					end
 				end

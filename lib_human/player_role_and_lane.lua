@@ -173,7 +173,7 @@ PLAYER_ROLE_AND_LANE.DoLaneChoice = function(jobDomain, gsiHuman)
 
 						Captain_Chat(string.format(GetLocalize(STR__SET_LANE_INSTRUCTIONS), 
 									GetLocalize(gsiHuman.role),
-									select(2, GetLocalize(COMM.READABLE_LANE[Team_GetRoleBasedLane(gsiHuman)])),
+									GetLocalize(COMM.READABLE_LANE[Team_GetRoleBasedLane(gsiHuman)]),
 									META_DATE
 								), false
 							)

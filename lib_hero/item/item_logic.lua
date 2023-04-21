@@ -690,8 +690,8 @@ function Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, forceSlot, dryRun) 
 				or thisItemSlot == forceSlot
 			) then
 		local swapCd = t_swap_index_time[gsiPlayer.nOnTeam][thisItemSlot]
-	
-	
+
+
 	return swapCd and swapCd > GameTime()
 				and ITEM_ENSURE_RESULT_WAIT or ITEM_ENSURE_RESULT_READY,
 				thisItemSlot

@@ -204,7 +204,8 @@ function Vector_PointToPointLimitedMin2D(p1, p2, limit)
 		pt2pt.x = p2.x; pt2pt.y = p2.y; -- safer than p2 itself
 		return pt2pt
 	end
-	pt2pt.x = p1.x + pt2pt.x*limit; pt2pt.y = p1.y + pt2pt.y*limit;
+	len = limit/len
+	pt2pt.x = p1.x + pt2pt.x*len; pt2pt.y = p1.y + pt2pt.y*len;
 	return pt2pt
 end
 

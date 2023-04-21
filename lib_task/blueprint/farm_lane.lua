@@ -290,6 +290,7 @@ blueprint_farm_lane = {
 		if Unit_IsNullOrDead(objective) then tickRateOneFrameGo.next = 0 --[[print(gsiPlayer.shortName, "returning dead farm_lane")--]] return XETA_DO_NOT_SCORE end -- Creep died on the millisecond, or we're back from a different task that dropped score, rescore.
 		local attackNowForBestLastHit = false
 		local timeTillStartAttack = 0
+
 		--print(GameTime(), gsiPlayer.shortName, "trying farm lane")
 		if not t_utilizing_lane_safety_value[gsiPlayer.nOnTeam] then
 			FarmJungle_IncentiviseJungling(gsiPlayer, objective)

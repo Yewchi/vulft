@@ -59,20 +59,47 @@ local farm_lane_handle
 local t_team_humans
 
 local function open_jungle_token_item(gsiPlayer, hItem)
-	--[[
-	local hUnit = gsiPlayer.hUnit
-	print(hItem:GetName())
-	if hItem and hItem.GetName and string.find(hItem:GetName(), "item_tier") then
-		print("DOING NEW THING", hItem:GetName())
-		gsiPlayer.hUnit:Action_UseAbility(hItem)
-		if RandomInt(1,2) == 1 then
-			print("DIS")
-			hUnit:ActionImmediate_DisassembleItem(hItem)
-		else
-			print("LOC")
-			hUnit:Action_UseAbilityOnLocation(hItem, gsiPlayer.lastSeen.location)
+	if nil and DEBUG then 
+		--[[
+		print("use", gsiPlayer.hUnit:Action_UseAbility(hItem))
+		for k,_ in pairs(ITEMS_JUNGLE) do
+			print("purchase", k, gsiPlayer.hUnit:ActionImmediate_PurchaseItem(k))
 		end
-	end--]]
+		print("sell", hItem and hItem:GetName(), hItem and gsiPlayer.hUnit:ActionImmediate_SellItem(hItem))
+		for i=0,40 do
+			print("move", i, JUNGLE_ITEM_ITEM_SLOT)
+			print(gsiPlayer.hUnit:ActionImmediate_SwapItems(i, JUNGLE_ITEM_ITEM_SLOT))
+		end
+		for i=0,40 do
+			print("move", JUNGLE_ITEM_ITEM_SLOT, i)
+			print(gsiPlayer.hUnit:ActionImmediate_SwapItems(i, JUNGLE_ITEM_ITEM_SLOT))
+		end
+		print("use on me", gsiPlayer.hUnit:Action_UseAbilityOnEntity(hItem, gsiPlayer.hUnit))]]
+		print("use on digit", gsiPlayer.hUnit:Action_UseAbilityOnTree(hItem, 1))
+		for k,v in pairs(getmetatable(hItem).__index) do
+			print(hItem:GetName(), k, v)
+		end
+		local b = hItem:GetBehavior()
+		a = 1
+		while a < 0xFFFFFFFF do
+			print(hItem:GetName(), "band", a, bit.band(b, a))
+			a = a *2
+		end
+		--[[
+		local hUnit = gsiPlayer.hUnit
+		print(hItem:GetName())
+		if hItem and hItem.GetName and string.find(hItem:GetName(), "item_tier") then
+			print("DOING NEW THING", hItem:GetName())
+			gsiPlayer.hUnit:Action_UseAbility(hItem)
+			if RandomInt(1,2) == 1 then
+				print("DIS")
+				hUnit:ActionImmediate_DisassembleItem(hItem)
+			else
+				print("LOC")
+				hUnit:Action_UseAbilityOnLocation(hItem, gsiPlayer.lastSeen.location)
+			end
+		end--]]
+	end
 end
 
 local function estimated_time_til_completed(gsiPlayer, objective)

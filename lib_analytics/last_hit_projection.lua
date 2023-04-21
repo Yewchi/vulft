@@ -898,16 +898,23 @@ function Analytics_GetTotalDamageNumberAttackers(gsiPlayer) -- for team players
 end
 
 -------- Analytics_RoshanOrHeroAttacksInTimeline()
-function Analytics_RoshanOrHeroAttacksInTimeline(gsiUnit)
+function Analytics_RoshanOrHeroAttacksInTimeline(gsiUnit, offset)
 	local damageList = future_damage_lists[gsiUnit.hUnit]
 	if damageList then
-		local currNode = damageList.oldestNode
+		local currNode = offset and offset >= 0 and damageList.firstNodeFromNow
+				or damageList.oldestNode
+		local afterTime = offset and GameTime() + offset or 0
 		local m = 1
 		while(currNode) do
 			m=m+1 if m > 1000 then ERROR_print("[LHP] R") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) return end
-			local thisUnit = currNode.fromUnit
-			if not Unit_IsNullOrDead(thisUnit) and (string.find(thisUnit:GetUnitName(), "hero") or string.find(thisUnit:GetUnitName(), "roshan")) then
-				return true
+			if currNode.timeLanding >= afterTime then
+				local thisUnit = currNode.fromUnit
+				if not thisUnit:IsNull()
+						and ((string.find(thisUnit:GetUnitName(), "hero")
+							and IsHeroAlive(thisUnit:GetPlayerID())
+						) or string.find(thisUnit:GetUnitName(), "roshan")) then
+					return true
+				end
 			end
 			currNode = currNode.nextNode
 		end

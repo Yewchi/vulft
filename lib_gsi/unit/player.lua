@@ -159,7 +159,8 @@ local function update_players_data()
 
 		thisPlayer.illusionsUp = false
 
-		if thisEnemyPlayerHeroUnit:IsNull() then DEBUG_KILLSWITCH = true end
+		if thisEnemyPlayerHeroUnit:IsNull() then if DEBUG then DEBUG_PrintUntilErroredNone(thisEnemyPlayerHeroUnit); Util_ThrowError(); end goto NEXT; end
+		if not IsHeroAlive(thisEnemyPlayerHeroUnit:GetPlayerID()) then goto NEXT; end
 
 		if thisPlayer.knownNonIllusionUnit and (thisPlayer.knownNonIllusionUnit:IsNull() or not thisPlayer.knownNonIllusionUnit:IsAlive()) then -- If the unit is dead, this implies an incorrect nonIllusion or in-between state with IsDead but still in GetUnitList
 			thisPlayer.knownNonIllusionUnit = false

@@ -32,31 +32,7 @@ local Math_GetFastThrottledBounded = Math_GetFastThrottledBounded
 local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
 
 local HALF_PUSH_DISIRE_TIME = 26*60 -- .'. theoretically, you would want to push twice as much at minute 52 than minute 26, if you have alive advantage.
---[[
-print("s")
-local a = GetUnitList(UNIT_LIST_ALLIED_OTHER)
-for k,v in pairs(a) do
-	print(v and v.GetName and v.GetName() or v and v.GetUnitName and v:GetUnitName())
-end
-print("s")
-local a = GetUnitList(UNIT_LIST_THINKERS)
-for k,v in pairs(a) do
-	print(v and v.GetName and v.GetName() or v and v.GetUnitName and v:GetUnitName())
-	if RandomInt(1, 10) == 1 then
-		--GetBot():ActionImmediate_Ping(v:GetLocation().x, v:GetLocation().y, true)
-	end
-		print(v:GetLocation())
-end
-print("s")
-local a = GetUnitList(UNIT_LIST_ENEMY_BUILDINGS)
-for k,v in pairs(a) do
-	print(v and v.GetName and v.GetName() or v and v.GetUnitName and v:GetUnitName())
-end
 
-print("s")
-print(GetShrine(2, 1))
-print(GetOutpost(1):GetUnitName())
-print(GetOutpost(8))]]
 local task_handle = Task_CreateNewTask()
 
 local blueprint
