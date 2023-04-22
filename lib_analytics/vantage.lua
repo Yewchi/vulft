@@ -48,11 +48,9 @@ local view_advantage = {--[[{loc, radius},...]]}
 
 local world_bounds = GetWorldBounds()
 for i=1,4 do
-	world_bounds[i] = world_bounds[i]*0.75
+	world_bounds[i] = world_bounds[i]*0.66
 end
 local step_build_dist = 20.0
-
-print(world_bounds[1],world_bounds[2],world_bounds[3],world_bounds[4])
 
 local edges = {--[[left-side high vec to right-side low vec]]}
 

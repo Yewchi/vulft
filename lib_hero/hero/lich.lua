@@ -2,7 +2,7 @@ local hero_data = {
 	"lich",
 	{1, 2, 1, 3, 2, 4, 1, 2, 3, 5, 3, 4, 3, 1, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_ward_sentry","item_enchanted_mango","item_enchanted_mango","item_ward_dispenser","item_magic_wand","item_boots","item_ring_of_basilius","item_crown","item_veil_of_discord","item_tranquil_boots","item_aghanims_shard","item_void_stone","item_energy_booster","item_aether_lens","item_blink","item_gem","item_mystic_staff","item_ultimate_orb","item_sheepstick",
+		"item_tango","item_faerie_fire","item_branches","item_branches","item_ward_sentry","item_enchanted_mango","item_enchanted_mango","item_ward_observer","item_magic_wand","item_boots","item_ring_of_basilius","item_crown","item_veil_of_discord","item_tranquil_boots","item_aghanims_shard","item_void_stone","item_energy_booster","item_aether_lens","item_blink","item_gem","item_mystic_staff","item_ultimate_orb","item_sheepstick",
 	},
 	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
 	{

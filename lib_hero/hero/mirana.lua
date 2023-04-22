@@ -2,7 +2,7 @@ local hero_data = {
 	"mirana",
 	{1, 3, 2, 1, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_magic_stick","item_branches","item_ward_dispenser","item_branches","item_tango","item_tango","item_faerie_fire","item_boots","item_arcane_boots","item_wind_lace","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_ancient_janggo","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_boots_of_bearing","item_ring_of_health","item_pers","item_pers","item_lotus_orb",
+		"item_magic_stick","item_branches","item_ward_observer","item_branches","item_tango","item_tango","item_faerie_fire","item_boots","item_arcane_boots","item_wind_lace","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_ancient_janggo","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_boots_of_bearing","item_ring_of_health","item_pers","item_pers","item_lotus_orb",
 	},
 	{ {3,3,3,2,1,}, {4,4,4,4,5,}, 0.1 },
 	{

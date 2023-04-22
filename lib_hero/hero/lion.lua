@@ -2,7 +2,7 @@ local hero_data = {
 	"lion",
 	{1, 3, 3, 1, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 8, 2, 4, 10},
 	{
-		"item_ward_dispenser","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_flask","item_wind_lace","item_branches","item_boots","item_tranquil_boots","item_fluffy_hat","item_magic_wand","item_aghanims_shard","item_blink","item_staff_of_wizardry","item_force_staff","item_gem","item_aeon_disk","item_point_booster","item_ultimate_scepter","item_gem",
+		"item_ward_observer","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_flask","item_wind_lace","item_branches","item_boots","item_tranquil_boots","item_fluffy_hat","item_magic_wand","item_aghanims_shard","item_blink","item_staff_of_wizardry","item_force_staff","item_gem","item_aeon_disk","item_point_booster","item_ultimate_scepter","item_gem",
 	},
 	{ {1,1,1,3,5,}, {5,5,5,4,4,}, 0.1 },
 	{

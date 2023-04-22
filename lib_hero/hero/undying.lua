@@ -2,7 +2,7 @@ local hero_data = {
 	"undying",
 	{1, 3, 3, 2, 1, 4, 1, 3, 3, 6, 2, 4, 2, 2, 8, 1, 4, 9},
 	{
-		"item_ward_dispenser","item_boots","item_blades_of_attack","item_chainmail","item_magic_wand","item_phase_boots","item_belt_of_strength","item_wind_lace","item_robe","item_ancient_janggo","item_tranquil_boots","item_boots_of_bearing","item_broadsword","item_gem","item_chainmail","item_blade_mail","item_ogre_axe","item_gem","item_mithril_hammer","item_black_king_bar","item_blink",
+		"item_ward_observer","item_boots","item_blades_of_attack","item_chainmail","item_magic_wand","item_phase_boots","item_belt_of_strength","item_wind_lace","item_robe","item_ancient_janggo","item_tranquil_boots","item_boots_of_bearing","item_broadsword","item_gem","item_chainmail","item_blade_mail","item_ogre_axe","item_gem","item_mithril_hammer","item_black_king_bar","item_blink",
 	},
 	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{

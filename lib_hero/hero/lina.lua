@@ -136,16 +136,16 @@ d = {
 				return;
 			end
 		end
-		print(CAN_BE_CAST(gsiPlayer, langua),
-				fhtReal, langua:GetName(),
-					gsiPlayer.lastSeenMana > langua:GetManaCost(),
-					fhtReal and AbilityLogic_AllowOneHitKill(
-						gsiPlayer,
-						fht,
-						langua:GetCastRange(),
-						langua:GetSpecialValueInt("damage"),
-						langua:GetDamageType()
-					))
+
+
+
+
+
+
+
+
+
+
 		if CAN_BE_CAST(gsiPlayer, langua) and fhtReal 
 				and gsiPlayer.lastSeenMana > langua:GetManaCost()
 				and AbilityLogic_AllowOneHitKill(

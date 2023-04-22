@@ -245,7 +245,7 @@ function Item_HandleItemShop(gsiPlayer)
 	--		(gsiPlayer.hCourier and gsiPlayer.hCourier:DistanceFromSecretShop() > 0),
 	--		GetCourierState(gsiPlayer.hCourier))
 	if IsItemPurchasedFromSecretShop(nextPurchase)
-			and gsiPlayer.hUnit:GetGold()+GSI_GetPlayerGPM(gsiPlayer)/4 > GetItemCost(nextPurchase)
+			and gold + GSI_GetPlayerGPM(gsiPlayer)/4 > GetItemCost(nextPurchase)
 			and gsiPlayer.hUnit:DistanceFromSecretShop() > 0
 			and (gsiPlayer.hCourier and gsiPlayer.hCourier:DistanceFromSecretShop() > 0) then
 		if GetCourierState(gsiPlayer.hCourier) < COURIER_STATE_MOVING
@@ -302,7 +302,8 @@ function Item_HandleItemShop(gsiPlayer)
 		--	end
 		elseif purchaseResult == PURCHASE_ITEM_INVALID_ITEM_NAME then
 			-- Skip invalid item names
-			--print(string.format("/VUL-FT/ <WARN> hero_behavior: %s attempted to purchase invalid item name '%s'.", gsiPlayer.shortName, nextPurchase))
+			
+			
 			t_item_build_order_next[gsiPlayer.nOnTeam] = t_item_build_order_next[gsiPlayer.nOnTeam] + 1
 		elseif purchaseResult == PURCHASE_ITEM_OUT_OF_STOCK
 				or purchaseResult == PURCHASE_ITEM_DISALLOWED_ITEM then 
@@ -312,6 +313,9 @@ function Item_HandleItemShop(gsiPlayer)
 			while(GameTime() < Item_ItemTimedRequirement(newNext)) do -- search forward for an item that we can buy time-wise
 				rotatedItemNum = rotatedItemNum + 1
 				newNext = itemBuild[nextItemBuildIndex+rotatedItemNum]
+				if nextItemBuildIndex+rotatedItemNum > #itemBuild then
+					break;
+				end
 			end
 			local prevItem = nextPurchase
 			itemBuild[nextItemBuildIndex] = newNext
@@ -382,10 +386,9 @@ end
 function Item_ItemTimedRequirement(item)
 	local itemPurchaseTimeRequirement = ITEM_PURCHASE_TIME_REQUIREMENT[item]
 	if item == "item_tome_of_knowledge" then
+		-- DEPRECIATED > 7.32e
 		return GameTime() < itemPurchaseTimeRequirement and itemPurchaseTimeRequirement
 				or GameTime() % itemPurchaseTimeRequirement < 5 and 0 or HIGH_32_BIT
-		-- Only attempt to buy a tome of knowledge in the first 2 seconds of it being available
-		-- TODO [low] Hack. Could just check purchase success
 	end
 	return ITEM_PURCHASE_TIME_REQUIREMENT[item] or 0
 end
@@ -1443,6 +1446,17 @@ end
 
 function Item_GetNextItemBuildItem(gsiPlayer)
 	return t_player_item_build[gsiPlayer.nOnTeam][t_item_build_order_next[gsiPlayer.nOnTeam]]
+end
+
+function Item_ItemInBuild(gsiPlayer, itemName, inFuture)
+	local itemBuild = t_player_item_build[gsiPlayer.nOnTeam]
+	local startIndex = inFuture and t_item_build_order_next[gsiPlayer.nOnTeam] or 1
+	for i=1,#itemBuild do
+		if itemName == itemBuild[i] then
+			return true
+		end
+	end
+	return false
 end
 
 function Item_ItemInHeroStorage(gsiPlayer, itemName)

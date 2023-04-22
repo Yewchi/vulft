@@ -2,7 +2,7 @@ local hero_data = {
 	"chen",
 	{2, 1, 2, 1, 2, 4, 2, 1, 3, 5, 1, 4, 3, 3, 3, 7, 4},
 	{
-		"item_tango","item_headdress","item_ward_dispenser","item_ring_of_basilius","item_chainmail","item_mekansm","item_boots","item_arcane_boots","item_buckler","item_guardian_greaves","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_platemail","item_hyperstone","item_buckler","item_assault",
+		"item_tango","item_headdress","item_ward_observer","item_ring_of_basilius","item_chainmail","item_mekansm","item_boots","item_arcane_boots","item_buckler","item_guardian_greaves","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_platemail","item_hyperstone","item_buckler","item_assault",
 	},
 	{ {1,1,3,4,4,}, {5,5,5,3,4,}, 0.1 },
 	{

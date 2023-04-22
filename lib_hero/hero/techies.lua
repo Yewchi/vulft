@@ -2,7 +2,7 @@ local hero_data = {
 	"techies",
 	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_tango","item_enchanted_mango","item_faerie_fire","item_magic_stick","item_enchanted_mango","item_enchanted_mango","item_branches","item_ward_dispenser","item_boots","item_arcane_boots","item_magic_wand","item_aghanims_shard","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_gem","item_fluffy_hat","item_force_staff","item_black_king_bar","item_gem","item_gem","item_gem","item_gem",
+		"item_tango","item_enchanted_mango","item_faerie_fire","item_magic_stick","item_enchanted_mango","item_enchanted_mango","item_branches","item_ward_observer","item_boots","item_arcane_boots","item_magic_wand","item_aghanims_shard","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_gem","item_fluffy_hat","item_force_staff","item_black_king_bar","item_gem","item_gem","item_gem","item_gem",
 	},
 	{ {3,3,3,3,2,}, {4,4,4,4,2,}, 0.1 },
 	{

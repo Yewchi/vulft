@@ -2,7 +2,7 @@ local hero_data = {
 	"shadow_demon",
 	{1, 3, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 8, 2, 4, 10},
 	{
-		"item_sobi_mask","item_branches","item_branches","item_tango","item_branches","item_clarity","item_ward_dispenser","item_wind_lace","item_magic_wand","item_tranquil_boots","item_void_stone","item_energy_booster","item_aether_lens","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_mystic_staff","item_ultimate_orb","item_void_stone","item_sheepstick",
+		"item_sobi_mask","item_branches","item_branches","item_tango","item_branches","item_clarity","item_ward_observer","item_wind_lace","item_magic_wand","item_tranquil_boots","item_void_stone","item_energy_booster","item_aether_lens","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_mystic_staff","item_ultimate_orb","item_void_stone","item_sheepstick",
 	},
 	{ {3,3,3,3,3,}, {4,4,4,4,4,}, 0.1 },
 	{

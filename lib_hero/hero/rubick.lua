@@ -2,7 +2,7 @@ local hero_data = {
 	"rubick",
 	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 11},
 	{
-		"item_boots","item_ward_dispenser","item_circlet","item_mantle","item_tango","item_tango","item_faerie_fire","item_null_talisman","item_arcane_boots","item_void_stone","item_aether_lens","item_glimmer_cape","item_blink","item_force_staff","item_aghanims_shard","item_void_stone","item_ultimate_orb","item_gem","item_mystic_staff","item_void_stone","item_sheepstick","item_octarine_core","item_black_king_bar",
+		"item_boots","item_ward_observer","item_circlet","item_mantle","item_tango","item_tango","item_faerie_fire","item_null_talisman","item_arcane_boots","item_void_stone","item_aether_lens","item_glimmer_cape","item_blink","item_force_staff","item_aghanims_shard","item_void_stone","item_ultimate_orb","item_gem","item_mystic_staff","item_void_stone","item_sheepstick","item_octarine_core","item_black_king_bar",
 	},
 	{ {3,3,3,1,4,}, {5,5,3,4,4,}, 0.1 },
 	{

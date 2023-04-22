@@ -780,20 +780,36 @@ blueprint = {
 				end
 			end
 		end
-		if DotaTime() < 600 and highestScore < 30 and Unit_GetHealthPercent(gsiPlayer) < 0.85 and RandomInt(1, 50) % 50 == 0 and Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) < 1 then
-			if Unit_GetHealthPercent(gsiPlayer) < 0.45 and Item_GetNextItemBuildItem(gsiPlayer) ~= "item_flask" and not Item_ItemOwnedAnywhere(gsiPlayer, "item_flask") then
+		if DotaTime() < 600 and highestScore < 30
+				and Unit_GetHealthPercent(gsiPlayer) < 0.85
+				and RandomInt(1, 50) % 50 == 0
+				and not Item_ItemInBuild(gsiPlayer, "item_flask", true)
+				and not Item_ItemInBuild(gsiPlayer, "item_tango", true)
+				and Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) < 1 then
+			if Unit_GetHealthPercent(gsiPlayer) < 0.45
+					and GetItemStockCount("item_flask")
+						> 2.1 - gsiPlayer.vibe.greedRating * 2
+					and not Item_ItemOwnedAnywhere(gsiPlayer, "item_flask") then
 				Item_InsertItemToItemBuild(gsiPlayer, "item_flask")
-				Task_IncentiviseTask(gsiPlayer, AvoidHide_GetTaskHandle(), 20, 0.33)
-				Task_IncentiviseTask(gsiPlayer, LeechExperience_GetTaskHandle(), 20, 0.33)
-				Task_IncentiviseTask(gsiPlayer, IncreaseSafety_GetTaskHandle(), 20, 0.33)
-			elseif Item_GetNextItemBuildItem(gsiPlayer) ~= "item_tango" and not Item_ItemOwnedAnywhere(gsiPlayer, "item_tango") and not Item_ItemOwnedAnywhere(gsiPlayer, "item_tango") then
+			elseif not Item_ItemOwnedAnywhere(gsiPlayer, "item_tango")
+					and GetItemStockCount("item_tango")
+						> 2.1 - gsiPlayer.vibe.greedRating * 2 then
 				Item_InsertItemToItemBuild(gsiPlayer, "item_tango")
 			end
 		end
-		if DotaTime() < 1800 and highestScore < 30 and RandomInt(1, 50) % 50 == 0 and Unit_GetHealthPercent(gsiPlayer) > 0.8 and Unit_GetManaPercent(gsiPlayer) < 0.25 then
-			if Item_GetNextItemBuildItem(gsiPlayer) ~= "item_clarity"
+		if DotaTime() < 1800 and highestScore < 30 and RandomInt(1, 50) % 50 == 0
+				and Unit_GetHealthPercent(gsiPlayer) > 0.8
+				and gsiPlayer.lastSeenMana < gsiPlayer.highUseManaSimple*1.33
+				and ( gsiPlayer.lastSeenMana + gsiPlayer.hUnit:GetManaRegen() * 20
+					) / gsiPlayer.maxMana < 0.65
+				and ( gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth > 0.45
+					or Item_ItemOwnedAnywhere(gsiPlayer, "item_flask")
+					or Item_ItemOwnedAnywhere(gsiPlayer, "item_tango")
+				) then
+			if not Item_ItemInBuild(gsiPlayer, "item_clarity", true) 
 					and not Item_ItemOwnedAnywhere(gsiPlayer, "item_clarity")
-					and GetItemStockCount("item_clarity") > 1 then
+					and GetItemStockCount("item_clarity")
+						> 2.1 - gsiPlayer.vibe.greedRating * 2 then
 				Item_InsertItemToItemBuild(gsiPlayer, "item_clarity")
 				Item_InsertItemToItemBuild(gsiPlayer, "item_clarity")
 			end

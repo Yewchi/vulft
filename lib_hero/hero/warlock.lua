@@ -2,7 +2,7 @@ local hero_data = {
 	"warlock",
 	{2, 1, 2, 3, 3, 4, 3, 3, 2, 2, 1, 4, 1, 1, 7, 5, 4, 9, 12},
 	{
-		"item_tango","item_magic_stick","item_enchanted_mango","item_faerie_fire","item_ward_dispenser","item_ring_of_basilius","item_magic_wand","item_boots","item_aghanims_shard","item_headdress","item_arcane_boots","item_fluffy_hat","item_holy_locket","item_headdress","item_chainmail","item_buckler","item_mekansm","item_guardian_greaves","item_buckler","item_vladmir","item_wraith_pact",
+		"item_tango","item_magic_stick","item_enchanted_mango","item_faerie_fire","item_ward_observer","item_ring_of_basilius","item_magic_wand","item_boots","item_aghanims_shard","item_headdress","item_arcane_boots","item_fluffy_hat","item_holy_locket","item_headdress","item_chainmail","item_buckler","item_mekansm","item_guardian_greaves","item_buckler","item_vladmir","item_wraith_pact",
 	},
 	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
