@@ -1,4 +1,4 @@
-v0.7-230414 (10th April meta)
+v0.7b-230414 (10th April meta) - Updated for 7.33
 > ADDED HERO Juggernaut
 
 > Set your role at any time with '!pos [1 to 5]'
@@ -8,22 +8,38 @@ v0.7-230414 (10th April meta)
 	-| Still high but slightly reduced aggresivity unless enemies are dead in the very late game.
 	-| See "Metrics" on the git wiki for more info, if you know where that is and you are able to access that.
 
-> Slightly increased denying creeps in lane.
-
-> Higher aggression when a deny is difficult, or unknown to succeed (atk dmg variation)
-
-> Slightly reduced aggression when below HighUseMana value (the mana required to cast almost every spell known)
+> search_fog (for recently fogged, vulnerable enemies) curves
+	-| search_fog now creates a bezier curve for a hero that has just gone missing.
+	-| the missing hero travels along it's facing direction and curves up into the enemy fountain at their movement speed.
+	-| these curves can be used for casting spells like spark wraith, ice vortex, lightning bolt in fog when an enemy was known to be worth searching for.
+	-| Still in testing, I need to push the initial point deeper so that heroes start movement wobble when they're at the expected point, not before.
 
 > Greatly improved last-hitting
-	-| Still unfinished
 	-| Incorporated hit-box to start attack time.
 	-| Fixed a data bug that causes last hit time landing to incorporate the walking distance to attack in the projectile distance.
 	-| Check for where a projectile leaves the hero and averages to new last hits before projectile release.
 	-| True attack point check.
 	-| FindTurnRate: Bots find their turn rate in [radians/sec] at the start of the match.
+	-| Still unfinished
+
+> Improved warding
+	-| Fixed a bug where bots wouldn't know they owned wards after combining sentries and observers
+	-| However, warding is not working after the early game, investigating.
+	-| There were bugs in the auto-generation of ward high-ground spots that are showing themselves with the new map.
+	-| This will be used to improve the generic code for the future.
+
+> Melee core laning perfomance
+	-| Melee cores switching to avoid_hide without a last hit may now agro the creep wave before they start to run away.
+	-| May help improve positioning for getting thier last hits
+
+> Slightly increased denying creeps in lane.
+
+> Slightly higher aggression when a deny is difficult, or unknown to succeed (atk dmg variation)
+
+> Slightly reduced aggression when below HighUseMana value (the mana required to cast almost every spell known)
 
 > Late-game ability use improved for some heroes
-	-| Fixed a bug where talents taken changing an ability's behavoiur would be unusable.
+	-| Fixed a bug where talents taken that changed an ability's behavoiur would be unusable.
 	-| Fixes things AoE Cold Feet, or AoE snot after buying aghs then leveling up.
 	-| Some abilities may still break but the main source of the issue is removed.
 
@@ -34,15 +50,6 @@ v0.7-230414 (10th April meta)
 
 > Added a time-till-attack threshold before engaging avoid_hide behaviour when laning near to creeps.
 	-| May help increase last-hitting performance.
-
-> Melee core laning perfomance
-	-| Melee cores switching to avoid_hide without a last hit may now agro the creep wave before they start to run away.
-	-| May help improve positioning for getting thier last hits
-
-> search_fog (for recently fogged, vulnerable enemies) curves
-	-| search_fog now creates a bezier curve for a hero that has just gone missing.
-	-| the missing hero travels along it's facing direction and curves up into the enemy fountain at their movement speed.
-	-| these curves can be used for casting spells like spark wraith, ice vortex, lightning bolt in fog when an enemy was known to be worth searching for.
 
 > Reduced use tango on tree causing missed last hits
 
@@ -64,9 +71,6 @@ v0.7-230414 (10th April meta)
 	-| ZoneDefend improved to find the danger of the zone defend location rather than the hero's current location.
 	-| Reverting a dangerous teleport to a higher tier tower needlessly, and teleporting into danger reduced.
 	-| Lane choice greatly improved, heroes are more likely leave dangerous lanes; not likely enough yet as they see far off lanes as a loss of score in time.
-
-> Improved warding
-	-| Fixed a bug where bots wouldn't know they owned wards after combining sentries and observers
 
 > Other improvement and tweaks.
 

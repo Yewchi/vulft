@@ -213,6 +213,9 @@ blueprint = {
 	
 		-- Put your only jungle item held in the jungle slot
 		local jungleItemSlotted = gsiPlayer.hUnit:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)
+		if jungleItemSlotted and not jungleItemKeys[jungleItemSlotted:GetName()] then
+			jungleItemKeys[jungleItemSlotted:GetName()] = 0
+		end
 		if not jungleItemSlotted
 				or (jungleItemLoose
 					and jungleItemKeys[jungleItemSlotted:GetName()]
@@ -224,7 +227,7 @@ blueprint = {
 				return false, XETA_SCORE_DO_NOT_RUN;
 			end
 			gsiPlayer.giveMeAJungleItemTier = 0
-		else
+		elseif jungleItemKeys[jungleItemSlotted:GetName()] then
 			gsiPlayer.giveMeAJungleItemTier = jungleItemKeys[jungleItemSlotted:GetName()]+1
 					or math.floor(MAX_JUNGLE_ITEM_TIER / 2)
 		end

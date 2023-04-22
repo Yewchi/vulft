@@ -57,6 +57,24 @@ local function handle_player_spell_or_item_cast(castInfo, abc)
 	local thisPlayer = GSI_GetPlayerFromPlayerID(castInfo.player_id)
 	
 	local ability = castInfo.ability
+
+	if VERBOSE then
+		local unit = castInfo.unit
+		if unit then
+			if unit and not unit:IsNull() then
+				print(unit:GetUnitName())
+				print(unit)
+				print(unit:GetHealth())
+			else
+				if not seenThatBefore then DEBUG_KILLSWITCH = true end
+				VEBUG_print("[player] ability has a nulled unit")
+			end
+		end
+		if not thisPlayer.hUnit:IsNull() then
+			print(thisPlayer.shortName, thisPlayer.hUnit:GetAnimActivity(), thisPlayer.hUnit:GetCurrentActionType(),
+				thisPlayer.hUnit:GetBoundingRadius())
+		end
+	end
 	
 	if thisPlayer.team == TEAM then
 		UseAbility_IndicateCastCompleted(castInfo)

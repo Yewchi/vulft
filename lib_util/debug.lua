@@ -370,7 +370,7 @@ if DEBUG
 					end
 				end
 				gary = GSI_GetLowestTierTeamLaneTower(ENEMY_TEAM, 2)
-				gary = GSI_GetPlayerByName(DEBUG_SHORTNAME)
+				gary = GSI_GetPlayerByName("venomancer")
 				if not gary or gary.hUnit == nil then gary = nil return end
 				garyhUnit = gary.hUnit
 				TEAM_CAPTAIN_UNIT:ActionImmediate_Chat("Starting debug creep tracking", true)
@@ -432,6 +432,7 @@ if DEBUG
 							"TTLProj:%.2f\n"..
 							"GNACProj:%.2f\n"..
 							"lastAttackTime:%.4f\n"..
+							"actionType:%d\n"..
 							"animActivity:%d\n"..
 							"animCycleAtRelease:%.4f\n"..
 							"landingTime:%.4f\n"..
@@ -458,6 +459,7 @@ if DEBUG
 							)) or -0,
 						select(2, Projectile_GetNextAttackComplete(gary)) or -0,
 						garyhUnit:GetLastAttackTime(),
+						garyhUnit:GetCurrentActionType(),
 						garyhUnit:GetAnimActivity(),
 						animCycleAtRelease,
 						landingTime,
