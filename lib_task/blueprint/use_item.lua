@@ -294,7 +294,7 @@ function use_ward_func(gsiPlayer, targetLoc, hItem)
 		return false
 	end
 
-	Item_LockInventoryIndex(gsiPlayer, wardInventorySlot, 1)
+	Item_LockInventoryIndex(gsiPlayer, wardInventorySlot, 6)
 
 	if Item_OnItemSwapCooldown(gsiPlayer, hItem) then
 		
@@ -617,7 +617,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 						if Analytics_GetTheoreticalDangerAmount(gsiPlayer, nil, escapeEstimate) < -1 then
 							local blinkLocation = Vector_Addition(playerLoc,
 									Vector_ScalarMultiply(
-										Vector_PointToPointLine(playerLoc, escapeEstimate),
+										Vector_UnitDirectionalPointToPoint(playerLoc, escapeEstimate),
 										600 + 0.75*(distToEscapeEstimate - 600)
 									)
 								)
@@ -1162,6 +1162,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 				if wardIndex == gsiPlayer.time.data.wardScoreIndex--[[ and wardNowScore*0.85 > Task_GetCurrentTaskScore(gsiPlayer)]] then
 					local ensureResult, index = Item_EnsureCarriedItemInInventory(gsiPlayer,
 							hItem, false, wardNowScore < Task_GetCurrentTaskScore(gsiPlayer)) -- TODO shoddy, what's current frame best? Causes mistakes rarely but switch items is a whole thing in terms of item logic.
+					Item_LockInventoryIndex(gsiPlayer, index, 6)
 					t_player_current_ward_index[gsiPlayer.nOnTeam] = wardIndex
 					return wardLoc, wardNowScore
 				end

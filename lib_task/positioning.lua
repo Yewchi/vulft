@@ -698,11 +698,11 @@ function Positioning_ZSAttackRangeUnitHugAllied(
 			and Math_PointToPointDistance2D(location, locationOfUnit)
 				> gsiPlayer.attackRange - 10 then
 		location = Vector_Addition(
-				location,
+				locationOfUnit,
 				Vector_ScalarMultiply2D(
 						Vector_UnitDirectionalPointToPoint(
-								location, 
-								locationOfUnit),
+								locationOfUnit, 
+								location),
 						gsiPlayer.attackRange - 10
 					)
 			)

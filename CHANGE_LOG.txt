@@ -1,4 +1,14 @@
-v0.8 // 2023-04-27 (25th April meta) -- Dota 2 7.33
+v0.8a // 2023-04-29 (25th April meta) -- Dota 2 7.33
+> Positioning
+	-| Fixed a positioning bug that made units stand strangely when near to attack times of creeps
+
+> Warding
+	-| Increased the odds a hero will successfully ward when putting wards into the inventory rather than putting them back into the backpack.
+	-| Temporary fix
+
+~~~~
+
+v0.8 // 2023-04-29 (25th April meta) -- Dota 2 7.33
 > ADDED Capturing Outposts
 	-| Will try to clutch the capture if it gets dangerous
 	-| Abandons capture if it becomes too dangerous and the cast time is high, probably.
