@@ -42,6 +42,7 @@ ENEMY_TEAM_NUMBER_OF_HUMANS = 0 -- tentative
 RADIANT_NUMBER_OF_PLAYERS = #GetTeamPlayers(TEAM_RADIANT)
 DIRE_NUMBER_OF_PLAYERS = #GetTeamPlayers(TEAM_DIRE)
 TEAM_IS_RADIANT = TEAM == TEAM_RADIANT
+TEAM_NUETRAL = TEAM_NEUTRAL
 
 BOTH_TEAMS = -1
 
@@ -119,7 +120,6 @@ function GSI_Initialize()
 		--end
 	end
 	TEAM_NUMBER_OF_HUMANS = TEAM_NUMBER_OF_PLAYERS - TEAM_NUMBER_OF_BOTS
-	Time_InitializePlayerTimeData()
 	pUnit_hCourierFindAndLoad()
 	
 	-- Enemies
@@ -130,6 +130,8 @@ function GSI_Initialize()
 		pUnit_LoadEnemyPlayer(enemyPlayerIDs[i], i)
 	end
 	ENEMY_TEAM_NUMBER_OF_HUMANS = ENEMY_TEAM_NUMBER_OF_PLAYERS - ENEMY_TEAM_NUMBER_OF_BOTS
+
+	Time_InitializePlayerTimeData()
 	
 	GSI_RegisterGSIJobDomainToScoreboard(job_domain)
 	GSI_RegisterGSIJobDomainToSet(job_domain)

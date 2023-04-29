@@ -410,7 +410,7 @@ function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarme
 		return false;
 	elseif withinRangeOf and range and Vector_PointDistance2D(withinRangeOf, loc)
 				> range then
-		DEBUG_print("[farm_jungle] EXIT; too far from %s to %s", withinRangeOf, loc)
+		
 		return false;
 	end
 	if not creeps or not creeps[1] then
@@ -447,9 +447,9 @@ function FarmJungle_SimpleRunLimitTime(gsiPlayer, timeAllowed, desiredAfterFarme
 				) / gsiPlayer.currentMovementSpeed
 			or Vector_UnitFacingUnit(lowCreep, gsiPlayer) < 0 then
 		gsiPlayer.hUnit:Action_AttackUnit(lowCreep, false)
-		--print(gsiPlayer.shortName, "attacking")
+		
 	else
-		--print(gsiPlayer.shortName, "moving after attack")
+		
 		Positioning_MoveDirectly(gsiPlayer,
 				Vector_Addition(
 						gsiPlayer.lastSeen.location, 

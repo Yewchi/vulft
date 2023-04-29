@@ -1,12 +1,12 @@
 local hero_data = {
 	"winter_wyvern",
-	{1, 2, 2, 1, 2, 4, 2, 1, 1, 6, 3, 4, 3, 3, 8, 3, 4, 10, 12},
+	{1, 2, 2, 3, 2, 4, 2, 1, 1, 6, 1, 4, 3, 3, 8, 3, 4, 10},
 	{
-		"item_quelling_blade","item_faerie_fire","item_circlet","item_ward_observer","item_branches","item_bottle","item_null_talisman","item_boots","item_blitz_knuckles","item_robe","item_aghanims_shard","item_robe","item_chainmail","item_witch_blade","item_blade_of_alacrity","item_ogre_axe","item_ultimate_scepter","item_void_stone","item_pers","item_ultimate_orb","item_sphere","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_force_staff","item_hurricane_pike","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
+		"item_tango","item_circlet","item_faerie_fire","item_faerie_fire","item_circlet","item_null_talisman","item_null_talisman","item_boots","item_gloves","item_belt_of_strength","item_power_treads","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_cornucopia","item_ultimate_orb","item_sphere","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange",
 	},
-	{ {3,3,3,2,2,}, {3,3,2,4,2,}, 0.1 },
+	{ {3,3,3,2,5,}, {4,4,4,3,2,}, 0.1 },
 	{
-		"Arctic Burn","Splinter Blast","Cold Embrace","Winter's Curse","+25.0HP/s Cold Embrace Heal","+35 Damage","+2.0s Arctic Burn Debuff Duration","+400 Splinter Blast Shatter Radius","+12% Arctic Burn Slow","+100 Splinter Blast Damage","+1.5s Winter's Curse Duration","Splinter Blast 1.5s Stun",
+		"Arctic Burn","Splinter Blast","Cold Embrace","Winter's Curse","+25.0HP/s Cold Embrace Heal","+35 Damage","+2.0s Arctic Burn Debuff Duration","+400 Splinter Blast Shatter Radius","+12% Arctic Burn Slow","+100 Splinter Blast Damage","+1.25s Winter's Curse Duration","Splinter Blast 1.5s Stun",
 	}
 }
 --@EndAutomatedHeroData

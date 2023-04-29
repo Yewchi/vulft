@@ -1,12 +1,12 @@
 local hero_data = {
 	"chaos_knight",
-	{1, 3, 2, 3, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 8, 5, 4, 10, 11},
+	{1, 2, 3, 3, 3, 4, 3, 2, 2, 2, 5, 4, 1, 1, 7, 1, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_slippers","item_circlet","item_branches","item_branches","item_wraith_band","item_boots","item_gloves","item_power_treads","item_gloves","item_helm_of_iron_will","item_blades_of_attack","item_armlet","item_quarterstaff","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_mage_slayer","item_ultimate_orb","item_ultimate_orb","item_skadi","item_blitz_knuckles","item_claymore","item_bloodthorn","item_aghanims_shard","item_arcane_blink",
+		"item_circlet","item_magic_stick","item_tango","item_quelling_blade","item_wraith_band","item_gloves","item_boots","item_power_treads","item_gloves","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_quarterstaff","item_robe","item_echo_sabre","item_diadem","item_harpoon","item_blink","item_aghanims_shard","item_blitz_knuckles","item_cornucopia","item_orchid","item_bloodthorn",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Chaos Bolt","Reality Rift","Chaos Strike","Phantasm","+22% Chaos Strike Lifesteal","+225 Reality Rift Pull Distance","-3s Chaos Bolt Cooldown","--75% Phantasm Illusion Incoming Damage","+0.75 Min/Max Chaos Bolt Duration","Reality Rift Pierces Spell Immunity","+10% Chaos Strike Chance","+10.0s Phantasm Duration",
+		"Chaos Bolt","Reality Rift","Chaos Strike","Phantasm","+25% Chaos Strike Lifesteal","+225 Reality Rift Pull Distance","-3s Chaos Bolt Cooldown","--75% Phantasm Illusion Incoming Damage","+0.6 Min/Max Chaos Bolt Duration","Reality Rift Pierces Spell Immunity","+10% Chaos Strike Chance","+10.0s Phantasm Duration",
 	}
 }
 --@EndAutomatedHeroData

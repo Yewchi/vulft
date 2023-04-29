@@ -42,6 +42,10 @@ local DROP_IN_FOUNTAIN_DIST = 500
 local AVOID_UNNEEDED_NEAR_FOUNTAIN_DIST = 1000
 local DROP_EXTRA_JUNGLE_FOR_DELIVERY_SPACE_DIST = 4000
 
+local VERBOSE = VERBOSE or DEBUG_TARGET and string.find(DEBUG_TARGET, "pick_up_item")
+local DEBUG = VERBOSE or DEBUG
+local TEST = TEST
+
 local ITEMS_GOODIES = ITEM_GOODIES
 
 local t_whose_rapier = {}
@@ -164,7 +168,6 @@ Blueprint_RegisterTask(task_init_func)
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
 		local currSlottedJungle = gsiPlayer.hUnit:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)
-		Util_TablePrint(getmetatable(objective))
 		if currSlottedJungle and objective.item
 				and ITEMS_JUNGLE[objective.item:GetName()]
 				and objective.item:GetName()

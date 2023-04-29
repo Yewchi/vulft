@@ -44,21 +44,26 @@ local ITEM_NAME_SEARCH_START = ITEM_NAME_SEARCH_START
 ITEM_ENSURE_RESULT_READY = true
 ITEM_ENSURE_RESULT_WAIT = 1
 ITEM_ENSURE_RESULT_LOCKED = false
+local ITEM_ENSURE_RESULT_READY = ITEM_ENSURE_RESULT_READY
+local ITEM_ENSURE_RESULT_WAIT = ITEM_ENSURE_RESULT_WAIT
+local ITEM_ENSURE_RESULT_LOCKED = ITEM_ENSURE_RESULT_LOCKED
 
 local ITEM_HAVE_AGHS_SHARD_MYSTERIOUS = ITEM_HAVE_AGHS_SHARD_MYSTERIOUS
 
 ITEM_NOT_FOUND = -1 -- the fail result of FindItemInSlot
+local ITEM_NOT_FOUND = ITEM_NOT_FOUND
 
 ITEM_SWITCH_ITEM_READY_TIME = 7.0
+local ITEM_SWITCH_ITEM_READY_TIME = ITEM_SWITCH_ITEM_READY_TIME
 
 local ITEM_WAVE_CLEAR_NOT_ATTACK = ITEM_WAVE_CLEAR_NOT_ATTACK
 local ITEM_WAVE_CLEAR_ATTACK = ITEM_WAVE_CLEAR_ATTACK
 
 APPROX_MJOL_STATIC_TAKEN_PER_HIT = 0.75*200/5
+local APPROX_MJOL_STATIC_TAKEN_PER_HIT = APPROX_MJOL_STATIC_TAKEN_PER_HIT
 
 local max = math.max
 local min = math.min
-local sqrt = math.sqrt
 
 local ITEM_RES_MAP_COMPONENTS_I__COMBINES_TO = 0
 local item_resolution_map = {} -- end of file init
@@ -70,13 +75,14 @@ local PLACEHOLDER_PURCHASE_SUCCESS = -1 -- Not sure, observed return when courie
 
 local CONSUMABLE_ITEM_SEARCH = {
 		"faer", --2, -- item_faerie_fire -- N.B. Requires string.find, shares behavior # with what looks like a 'basic' item number.
-		"tang", --8, -- item_tango
-		"ward", --8240, -- item_ward_* (dispenser, observer, sentry)
-		"flas", --33556488, -- item_flask, -- item_clarity
-		"clarity",
-		"dust",
-		"ench", --33564676, -- item_enchanted_mango
-		"smok", --33554436, -- item_smoke_of_deceit
+		"tem_tang", --8, -- item_tango
+		"tem_ward", --8240, -- item_ward_* (dispenser, observer, sentry)
+		"tem_flas", --33556488, -- item_flask, -- item_clarity
+		"_clarity",
+		"tem_dust",
+		"ant_mang", --33564676, -- item_enchanted_mango
+		"smoke_of", --33554436, -- item_smoke_of_deceit
+		"lood_gre"
 }
 local HEALTH_ON_USE_ITEM_SEARCH = {
 		"faer",
@@ -161,7 +167,8 @@ local t_player_buying_aghs = {} -- Aghs components are removed from next item bu
 local PRIMARY_ATTRIBUTE_TREADS_ITEM = {
 	[0] = "item_belt_of_strength",
 	[1] = "item_boots_of_elves",
-	[2] = "item_robe"
+	[2] = "item_robe",
+	[3] = "item_belt_of_strength"
 }
 
 local function get_item_components(itemName, ownersPrimaryAttribute) -- for #arr
@@ -419,7 +426,7 @@ function Item_DistanceToAliveCourier(gsiPlayer)
 	if hCourier then
 		local courierLoc = hCourier:GetLocation()
 		local playerLoc = gsiPlayer.lastSeen.location
-		return sqrt((courierLoc.x+playerLoc.x)^2 + (courierLoc.y+playerLoc.y^2))
+		return ((courierLoc.x-playerLoc.x)^2 + (courierLoc.y-playerLoc.y^2))^0.5
 	end
 	return 20000
 end
@@ -452,7 +459,15 @@ function Item_UseBottleIntelligently(gsiPlayer, forceHold, forceUse)
 	if not bottle then return end
 	local couldUse = bottle:GetCurrentCharges() > 0 and bottle:GetCooldownTimeRemaining() == 0
 	if forceHold or couldUse then 
-		if couldUse and Item_EnsureCarriedItemInInventory(gsiPlayer, bottle) == ITEM_ENSURE_RESULT_READY then
+		if gsiPlayer.usableItemCache.powerTreads
+				and gsiPlayer.hUnit:FindItemSlot("item_power_treads")
+						< ITEM_END_INVENTORY_INDEX then
+			UseItem_PowerTreadsStatLock(gsiPlayer, ATTRIBUTE_AGILITY,
+					bottle:GetSpecialValueFloat("restore_time"), 500
+				)
+		end
+		if couldUse and Item_EnsureCarriedItemInInventory(gsiPlayer, bottle)
+					== ITEM_ENSURE_RESULT_READY then
 			Item_LockInventorySwitching(gsiPlayer, 3)
 			if not UseAbility_IsPlayerLocked(gsiPlayer) 
 					and not gsiPlayer.hUnit:HasModifier("modifier_bottle_regeneration") then
@@ -670,13 +685,15 @@ function Item_OnItemSwapCooldown(gsiPlayer, hItem, itemSlot)
 	local itemSlot = itemSlot or gsiPlayer.hUnit:FindItemSlot(hItem:GetName())
 	local swapTime = t_swap_index_time[gsiPlayer.nOnTeam][itemSlot]
 	if itemSlot > ITEM_END_INVENTORY_INDEX --[[and itemSlot < ITEM_END_BACKPACK_INDEX]] then
-		ALERT_print(
-				string.format(
-					"[item_logic]: %s Query on item not in the inventory.",
-					Util_ParamString("Item_OnItemSwapCooldown", gsiPlayer, hItem, itemSlot)
+		if VERBOSE then 
+			ALERT_print(
+					string.format(
+						"[item_logic]: %s Query on item not in the inventory.",
+						Util_ParamString("Item_OnItemSwapCooldown", gsiPlayer, hItem, itemSlot)
+					)
 				)
-			)
-		return true, "backpack"
+			return true, itemSlot
+		end
 	end
 	swapTime = swapTime and swapTime or 0
 	--print("swap time is", swapTime, GameTime())
@@ -695,7 +712,7 @@ function Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, forceSlot, dryRun) 
 		local swapCd = t_swap_index_time[gsiPlayer.nOnTeam][thisItemSlot]
 
 
-	return swapCd and swapCd > GameTime()
+		return swapCd and swapCd > GameTime()
 				and ITEM_ENSURE_RESULT_WAIT or ITEM_ENSURE_RESULT_READY,
 				thisItemSlot
 	elseif not Item_IsInventorySwitchingAllowed(gsiPlayer) then 
@@ -854,9 +871,9 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 			if thisItem then
 				local thisItemName = thisItem:GetName()
 				local thisItemCost = GetItemCost(thisItemName)
-				if string.find(thisItemName, "reci", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
+				if string.find(thisItemName, "m_recipe", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
 					--continue
-				elseif string.find(thisItemName, "magic_", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_l", ITEM_NAME_SEARCH_START) then
+				elseif string.find(thisItemName, "tem_magi", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_loc", ITEM_NAME_SEARCH_START) then
 					thisItemCost = thisItemCost + thisItem:GetCurrentCharges() * WAND_CHARGE_VALUE
 					if thisItemCost > highestValueConsumableBackpack then
 						highestValueConsumableBackpack = thisItemCost -- Beat all consumables but rosh.
@@ -869,9 +886,9 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 				elseif Item_IsConsumable(thisItemName) then
 					if thisItemCost == FAERIE_FIRE_MANGO_VALUE then thisItemCost = FAERIE_FIRE_MANGO_CARRIED_VALUE end
 					--print(gsiPlayer.shortName, "checking", thisItemName)
-					if string.find(thisItemName, "ward") then
+					if string.find(thisItemName, "tem_ward") then
 						if foundWardIndex then
-							gsiPlayer.hUnit:ActionImmediate_SwapItems(thisBackpackSlot, foundWardIndex)
+							--gsiPlayer.hUnit:ActionImmediate_SwapItems(thisBackpackSlot, foundWardIndex)
 						else
 							foundWardIndex = thisBackpackSlot
 						end
@@ -881,7 +898,7 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 						highestValueConsumableBackpackSlot = thisBackpackSlot
 					end
 				else
-					if string.find(thisItemName, "boot", ITEM_NAME_SEARCH_START) then
+					if ITEMS_BOOTS[thisItemName] then
 						thisItemCost = thisItemCost + ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
 					end
 					if thisItemCost > highestValueBackpack then
@@ -906,11 +923,11 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 				local thisItemName = thisItem:GetName()
 				local thisItemCost = GetItemCost(thisItemName)
 				--if thisItemName == "item_ward_observer" then print("obs cost", thisItemCost) end
-				if string.find(thisItemName, "reci", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
+				if string.find(thisItemName, "m_recipe", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
 					lowestValue = -1 
 					lowestValueSlot = thisInventorySlot
 					break
-				elseif string.find(thisItemName, "magic_", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_l", ITEM_NAME_SEARCH_START) then
+				elseif string.find(thisItemName, "tem_magi", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_loc", ITEM_NAME_SEARCH_START) then
 					thisItemCost = thisItemCost + thisItem:GetCurrentCharges() * WAND_CHARGE_VALUE
 					if thisItemCost < lowestValueConsumable then -- Probably cheese in inventory
 						if lowestValueConsumableSlot then
@@ -925,7 +942,7 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 					end
 				elseif Item_IsConsumable(thisItemName) then 
 					if thisItemCost == FAERIE_FIRE_MANGO_VALUE then thisItemCost = FAERIE_FIRE_MANGO_CARRIED_VALUE end
-					if string.find(thisItemName, "ward") then
+					if string.find(thisItemName, "tem_ward") then
 						if foundWardIndex then
 							gsiPlayer.hUnit:ActionImmediate_SwapItems(thisInventorySlot, foundWardIndex)
 						else
@@ -943,8 +960,8 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 						lowestValueConsumableSlot = thisInventorySlot
 					end
 				else
-					if string.find(thisItemName, "boot", ITEM_NAME_SEARCH_START) then
-						thisItemCost = ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
+					if ITEMS_BOOTS[thisItemName] then
+						thisItemCost = thisItemCost + ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
 					end
 					if thisItemCost < lowestValue then 
 						lowestValue = thisItemCost
@@ -957,7 +974,7 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 			::CONT_I_TOIO_INVENTORY::
 		end
 		if ( highestValueBackpackSlot and highestValueBackpack ~= -1 ) or highestValueConsumableBackpackSlot then
-			--print(gsiPlayer.shortName, "sees switchable", highestValueBackpackSlot, highestValueConsumableBackpackSlot)
+			
 			if freeInventorySlot then
 				
 				if highestValueBackpackSlot then -- Switch high value items into empty slot
@@ -1451,7 +1468,7 @@ end
 function Item_ItemInBuild(gsiPlayer, itemName, inFuture)
 	local itemBuild = t_player_item_build[gsiPlayer.nOnTeam]
 	local startIndex = inFuture and t_item_build_order_next[gsiPlayer.nOnTeam] or 1
-	for i=1,#itemBuild do
+	for i=startIndex,#itemBuild do
 		if itemName == itemBuild[i] then
 			return true
 		end
@@ -1668,8 +1685,8 @@ function Item_RAUCMitigateDelivery(gsiPlayer)
 	return healthGain, healthTime, manaGain, manaTime
 end
 
-function Item_PassPlayerItemBuild(gsiPlayer, itemBuildTable)
-	if gsiPlayer.team == TEAM then -- Leaving this here so Item_Logic has the control over how it's used for enemies
+function Item_InitializePlayer(gsiPlayer, itemBuildTable)
+	if gsiPlayer.team == TEAM then -- TODO if anything for enemies
 		INFO_print("/VUL-FT/ [item_logic] formulating item build order for %s.", gsiPlayer.shortName)
 		t_player_item_build[gsiPlayer.nOnTeam] = Item_ResolvePartiallyCombinedBuild(gsiPlayer, itemBuildTable)
 		t_item_build_order_next[gsiPlayer.nOnTeam] = Item_DetectNextItemBuildIndex(gsiPlayer, t_player_item_build[gsiPlayer.nOnTeam])

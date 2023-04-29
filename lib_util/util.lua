@@ -33,13 +33,15 @@ HIGH_32_BIT = 0x80000000
 LOW_32_BIT = -0x80000000
 _G.EMPTY_TABLE = {}
 
+
+--DEBUG_TARGET = "Tcaptain|Ttask"
 DEBUG = false
 VERBOSE = true and DEBUG
 TEST = true and DEBUG
 
 RELEASE_STAGE = "Alpha"
-VERSION = "v0.7"
-META_DATE = "10 April 2023"
+VERSION = "v0.8-230429"
+META_DATE = "25 April 2023"
 
 VULFT_VERSION = RELEASE_STAGE
 		
@@ -61,11 +63,25 @@ function INFO_print(str, ...)
 	print(string.format(str, INFO_PRE, ...))
 end
 
+local SQUELCH_AT_COUNT = 5
+local squelch_strs = {}
 local ERROR_PRE = VULFT_STR.." "..ALERT_STR.." <ERROR> "
-function ERROR_print(str, printTraceback)
-	print(ERROR_PRE..str)
-	if printTraceback then
-		print(debug.traceback())
+function ERROR_print(printTraceback, squelches, str, ...)
+	if squelches then
+		squelch_strs[str] = (squelch_strs[str] or -1) + 1
+		if squelch_strs[str] < SQUELCH_AT_COUNT then
+			squelches = false
+		elseif squelch_strs[str] == SQUELCH_AT_COUNT then
+			str = str.."... SQUELCHED"
+			squelches = false
+		end
+	end
+		
+	if not squelches then
+		print(string.format(ERROR_PRE..str, ...))
+		if printTraceback then
+			print(debug.traceback())
+		end
 	end
 end
 
@@ -239,6 +255,7 @@ function Util_Printable(val)
 				and val.shortName)
 				or (type(val.name) == "string" and val.name)
 				or (type(val.x) == "number" and string.format("(%d,%d,%d)", val.x or -0, val.y or -0, val.z or -0))
+				or (val.IsNull and not val:IsNull() and (val.GetName and val:GetName() or val.GetUnitName and val:GetUnitName()))
 				or "?").."'"
 	elseif t == "function" then return "[func]"
 	elseif t == "userdata" then return string.format("[ud] %s", tostring(val))
@@ -247,10 +264,6 @@ function Util_Printable(val)
 	return "[WHAT THE F***]"
 end
 STR = Util_Printable
-
-function roon(gsiPlayer, rune)
-	gsiPlayer.hUnit:Action_PickUpRune(rune)
-end
 
 local table_print_time_limit = 0
 local exiting_time_limit = false
@@ -282,7 +295,7 @@ function printable_table(tbl, depthAllowed)
 end
 
 function Util_PrintableTable(tbl, depthAllowed)
-	table_print_time_limit = RealTime() + 0.0001
+	table_print_time_limit = RealTime() + 0.001
 	exiting_time_limit = false
 	return printable_table(tbl, depthAllowed)
 end
@@ -305,6 +318,7 @@ function Util_TableEmpty(tbl)
 end
 
 function Util_TableCopyArray(t1, t2) -- t1 <- t2. Elements in t1 greater than the #(t2)+2'th index remain in t2
+	t1 = t1 or {}
 	for i=1,#t2,1 do
 		t1[i] = t2[i]
 	end
@@ -353,7 +367,7 @@ function Util_CauseError(msg)
 	local throws=0+nil
 end
 
-if DEBUG
+if DEBUG or DEBUG_TARGET
 
 		then
 	require(GetScriptDirectory().."/lib_util/debug")

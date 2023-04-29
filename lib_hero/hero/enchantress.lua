@@ -1,12 +1,12 @@
 local hero_data = {
 	"enchantress",
-	{1, 2, 2, 1, 2, 1, 1, 8, 3, 3, 3, 5, 3, 6, 9, 2, 5, 11, 13},
+	{1, 2, 2, 1, 2, 5, 1, 1, 3, 3, 3, 5, 3, 6, 8, 2, 5, 10, 12},
 	{
-		"item_ward_observer","item_boots","item_branches","item_branches","item_branches","item_blades_of_attack","item_falcon_blade","item_magic_wand","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_cloak","item_quarterstaff","item_mage_slayer","item_belt_of_strength","item_dragon_lance","item_lifesteal","item_claymore","item_satanic","item_lesser_crit","item_demon_edge","item_greater_crit","item_force_staff","item_hurricane_pike","item_black_king_bar","item_hyperstone","item_ultimate_scepter_2",
+		"item_ward_observer","item_tango","item_blood_grenade","item_branches","item_faerie_fire","item_magic_stick","item_boots","item_gloves","item_robe","item_magic_wand","item_power_treads","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_force_staff","item_hurricane_pike","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_wraith_band","item_ultimate_scepter","item_gem","item_black_king_bar","item_lesser_crit","item_demon_edge","item_greater_crit",
 	},
-	{ {1,1,1,2,4,}, {5,5,5,2,4,}, 0.1 },
+	{ {3,3,3,1,1,}, {5,5,4,4,4,}, 0.1 },
 	{
-		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+10% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","+-65 Untouchable Attack Slow","Enchant Affects Ancients","+6.5% Impetus Damage","+20 Nature's Attendants Heal",
+		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+8% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","+-65 Untouchable Attack Slow","+30%% Enchanted Creep Health/Damage","+8% Impetus Damage","+20 Nature's Attendants Heal",
 	}
 }
 --@EndAutomatedHeroData

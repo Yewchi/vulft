@@ -1,10 +1,10 @@
 local hero_data = {
 	"tusk",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 3, 3, 4, 3, 3, 8, 5, 4, 10, 11},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 3, 3, 4, 3, 3, 8, 6, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_branches","item_ward_observer","item_faerie_fire","item_bottle","item_magic_wand","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_wind_lace","item_falcon_blade","item_mithril_hammer","item_mithril_hammer","item_desolator","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_hyperstone","item_buckler","item_assault","item_moon_shard",
+		"item_quelling_blade","item_branches","item_branches","item_tango","item_faerie_fire","item_blood_grenade","item_ward_observer","item_bottle","item_boots","item_phase_boots","item_blight_stone","item_falcon_blade","item_magic_wand","item_mithril_hammer","item_mithril_hammer","item_desolator","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blink","item_basher","item_vanguard","item_abyssal_blade","item_demon_edge","item_lesser_crit","item_greater_crit","item_swift_blink",
 	},
-	{ {2,2,3,1,5,}, {2,2,3,5,4,}, 0.1 },
+	{ {5,5,3,2,2,}, {4,4,4,2,2,}, 0.1 },
 	{
 		"Ice Shards","Snowball","Tag Team","Walrus PUNCH!","+25 Tag Team Damage","+0.5s Walrus Punch Stun Duration","+325 Health","+120 Snowball Damage","-6s Ice Shards Cooldown","+75% Walrus Punch Crit","12% Chance Walrus Punch","-8s Snowball Cooldown",
 	}

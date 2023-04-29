@@ -62,9 +62,9 @@ local XETA_SCORE_DO_NOT_RUN = XETA_SCORE_DO_NOT_RUN
 local min = math.min
 local max = math.max
 local pairs = pairs
-local DEBUG = DEBUG
-local VERBOSE = VERBOSE
-local TEST = TEST
+local VERBOSE = VERBOSE or DEBUG_TARGET and string.find(DEBUG_TARGET, "Dtask")
+local DEBUG = VERBOSE or DEBUG
+local TEST = TEST or DEBUG_TARGET and string.find(DEBUG_TARGET, "Ttask")
 --
 
 ---- task table indices --
@@ -152,6 +152,13 @@ do
 		)
 end
 
+local DEBUG_timeScoringTask
+local DEBUG_taskScoredCount
+if TEST then
+	DEBUG_timeScoringTask = {}
+	DEBUG_taskScoredCount = {}
+end
+
 -------------- take_and_stitch_nodes()
 local function take_and_stitch_nodes(priorityList, taskTaken)
 	local prevNode = taskTaken[TASK_I__PREV_NODE]
@@ -215,13 +222,30 @@ local function remove_tasks_with_disallowed_objectives(gsiPlayer, disallowedObje
 	end
 end
 
+local score_task_prev_time = 0
 -------------- score_task()
 local function score_task(gsiPlayer, task)
 	local prevObjective = task[TASK_I__OBJECTIVE]
+	local prevToCurrScore = task[TASK_I__SCORE]
+	local taskHandle = task[TASK_I__HANDLE]
 	
-	task[TASK_I__OBJECTIVE], task[TASK_I__SCORE] = task[TASK_I__SCORING_FUNC](gsiPlayer, task[TASK_I__OBJECTIVE], task[TASK_I__SCORE])
-	if not task[TASK_I__SCORE] then DEBUG_print("\n\n           CULPRIT WAS: %d", task[TASK_I__HANDLE]) end
-	task[TASK_I__SCORE] = task[TASK_I__SCORE] + t_task_incentives[gsiPlayer.nOnTeam][task[TASK_I__HANDLE]][1] -- TODO Need to change prevScore return behavior for this
+	if TEST then
+		TEBUG_print("[task] scoring %s::#%d", gsiPlayer.shortName, taskHandle)
+		DEBUG_timeScoringTask[taskHandle] = DEBUG_timeScoringTask[taskHandle] or 0;
+		DEBUG_taskScoredCount[taskHandle] = DEBUG_taskScoredCount[taskHandle] and DEBUG_taskScoredCount[taskHandle] + 1 or 1;
+		score_task_prev_time = RealTime()
+	end
+	task[TASK_I__OBJECTIVE], prevToCurrScore = task[TASK_I__SCORING_FUNC](gsiPlayer, prevObjective, prevToCurrScore)
+	if TEST then
+		DEBUG_timeScoringTask[taskHandle] = DEBUG_timeScoringTask[taskHandle] + RealTime() - score_task_prev_time or 0;
+		if DEBUG_taskScoredCount[taskHandle] > 500 then
+			TEBUG_print("[task::score_task] <BENCH> Task handle %d scoring 500 times took %.4fms", taskHandle, DEBUG_timeScoringTask[taskHandle]*1000)
+			DEBUG_timeScoringTask[taskHandle] = 0
+			DEBUG_taskScoredCount[taskHandle] = 0
+		end
+	end
+	if not prevToCurrScore then DEBUG_print("\n\n           CULPRIT WAS: %d", task[TASK_I__HANDLE]) end
+	task[TASK_I__SCORE] = prevToCurrScore + t_task_incentives[gsiPlayer.nOnTeam][task[TASK_I__HANDLE]][1] -- TODO Need to change prevScore return behavior for this
 	return task[TASK_I__OBJECTIVE] ~= prevObjective
 end
 
@@ -257,7 +281,7 @@ function Task_RegisterTask(taskHandle, nOnTeam, runFunc, scoringFunc, initFunc)
 	local i = 0
 	local iPrio = currNode[TASK_I__CURR_PRIORITY]
 	while(currNode) do
-		if i > 100 then ERROR_print("Reg WTF", i, iPrio) break end
+		if i > 100 then ERROR_print(false, not DEBUG, "Reg WTF %s %s", i, iPrio) break end
 		i = i + 1
 		currNode = currNode[TASK_I__NEXT_NODE]
 	end
@@ -292,7 +316,7 @@ function Task_SetTaskPriority(taskHandle, nOnTeam, priority)
 			local i = 0
 			local iPrio = currNode[TASK_I__CURR_PRIORITY]
 			while(currNode) do
-				if i > 100 then ERROR_print("Set WTF", i, iPrio) break end
+				if i > 100 then ERROR_print(false, not DEBUG, "Set WTF %s %s", i, iPrio) break end
 				i = i + 1
 				currNode = currNode[TASK_I__NEXT_NODE]
 			end
@@ -385,7 +409,7 @@ function Task_HighestPriorityTaskScoringContinue(gsiPlayer)
 	local prevCurrentScore = prevCurrent[TASK_I__SCORE]
 	local prevCurrentBeatScore = prevCurrentScore
 			and (prevCurrentScore > 0 and prevCurrentScore * FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK + 2.5
-					or prevCurrentScore / FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK -- TODO YIKES.. no imaginable standardization of task scoring behavioiur would make this good.
+					or 2*prevCurrentScore - prevCurrentScore * FACTOR_OF_PREVIOUS_SCORE_TO_WIN_CURRENT_TASK + 2.5 -- score + (abs(score)*factor - abs(score)) + 2.5
 			) or XETA_SCORE_DO_NOT_RUN
 	if prevCurrent == taskScoringHighest and taskScoringHighestHasObjectiveChange
 			or ( highestTaskScore > prevCurrentBeatScore
@@ -416,7 +440,7 @@ function Task_HighestPriorityTaskScoringContinue(gsiPlayer)
 				local prevCurrentScore = prevCurrentScore
 				local prevRunnerUpScore = prevRunnerUp[TASK_I__SCORE]
 				if prevCurrentScore and prevRunnerUpScore and prevCurrentScore > prevRunnerUpScore then
-					if VERBOSE then VEBUG_print("#############", gsiPlayer.shortName, "previous task was", prevCurrent[TASK_I__HANDLE], "new is", t_player_task_current[nOnTeam][TASK_I__HANDLE]) end
+					
 					t_player_task_runner_up[nOnTeam] = prevCurrent
 				end
 			end
@@ -517,7 +541,7 @@ function Task_CurrentTaskContinue(gsiPlayer)
 			while(currNode) do
 				DebugDrawText(1400+j*24, 900+i*13, string.format("[%d] ", currNode[TASK_I__HANDLE]), 255, 255, 255)
 				currNode = currNode[TASK_I__NEXT_NODE]
-				if j > 100 then ERROR_print(i, j, "WTF") break end
+				if j > 100 then ERROR_print(false, not DEBUG, "END SCORE WTF %s %s", i, j) break end
 				j=j+1
 			end
 		end
@@ -590,7 +614,7 @@ function Task_TryDecrementIncentives()
 			currIndex = 1
 			local i=1
 			while(currIndex <= t_task_incentives_size[pnot]) do
-				i = i+1 if i > 100 then for i=1, 10 do ERROR_print("DECREMENT WTF") end local a = nil + 1 end
+				i = i+1 if i > 100 then for i=1, 10 do ERROR_print(false, not DEBUG, "DECREMENT WTF") end local a = nil + 1 end
 				local thisIncentive = thisPlayerIncentives[currIndex]
 				if VERBOSE then VEBUG_print(string.format("[task] pnot#%d decrement disincentivise: %.2f, %.2f", pnot, thisIncentive[1], thisIncentive[2])) end
 				thisIncentive[1] = max(0, thisIncentive[1] - thisIncentive[2])

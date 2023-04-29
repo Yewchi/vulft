@@ -1,12 +1,12 @@
 local hero_data = {
 	"nyx_assassin",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 9, 12},
+	{1, 3, 1, 3, 1, 4, 1, 2, 2, 2, 2, 4, 3, 3, 7, 5, 4, 9, 11},
 	{
-		"item_slippers","item_circlet","item_branches","item_branches","item_enchanted_mango","item_tango","item_quelling_blade","item_wraith_band","item_ring_of_health","item_crown","item_meteor_hammer","item_boots","item_wind_lace","item_chainmail","item_phase_boots","item_aghanims_shard","item_null_talisman","item_magic_wand","item_crown","item_staff_of_wizardry","item_dagon_5","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_aether_lens","item_vitality_booster","item_energy_booster","item_octarine_core",
+		"item_circlet","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_magic_wand","item_boots","item_wraith_band","item_arcane_boots","item_diadem","item_voodoo_mask","item_dagon_5","item_dagon_2","item_aghanims_shard","item_wind_lace","item_dagon_3","item_dagon_5","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_blink",
 	},
-	{ {3,3,3,3,5,}, {4,4,4,4,3,}, 0.1 },
+	{ {5,5,3,3,3,}, {4,4,4,4,3,}, 0.1 },
 	{
-		"Impale","Mana Burn","Spiked Carapace","Vendetta","+8% Spell Amplification","+0.25s Impale Stun Duration","+0.5s Spiked Carapace Reflect Duration","+0.5x Mana Burn Intelligence Multiplier","+0.6s Spiked Carapace Stun Duration","+130 Impale Damage","+300 Mana Burn Radius","Vendetta Unobstructed Pathing",
+		"Impale","Mind Flare","Spiked Carapace","Vendetta","+8% Spell Amplification","+0.2s Impale Stun Duration","+0.5s Spiked Carapace Reflect Duration","+0.75x Mind Flare Intelligence Multiplier","+0.45s Spiked Carapace Stun Duration","+130 Impale Damage","+300 Mind Flare Radius","Vendetta Unobstructed Pathing",
 	}
 }
 --@EndAutomatedHeroData

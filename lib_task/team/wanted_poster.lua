@@ -340,7 +340,7 @@ function WP_InformDead(gsiPlayer)
 		thisPoster = thisPoster[POSTER_I__NEXT_POSTER]
 		debugKill = debugKill + 1
 		if debugKill > 100 then
-			ERROR_print("INFORM DEAD WAS CURSED BY CLEANUP CODE")
+			ERROR_print(true, not DEBUG, "INFORM DEAD WAS CURSED BY CLEANUP CODE")
 			break;
 		end
 	end
@@ -370,7 +370,7 @@ function WP_InformAvailable(gsiPlayer)
 	local DEBUG_FAIL = 0
 	while(thisWp) do
 		DEBUG_FAIL = DEBUG_FAIL + 1
-		if DEBUG_FAIL > 100 then ERROR_print("[wp] INFORM AVAIL FOUND WANTED POSTER LINKED LIST INFINITE LOOP. Dump: ", Util_PrintableTable(thisWp)) DEBUG_KILLSWITCH = true break; end
+		if DEBUG_FAIL > 100 then ERROR_print(false, false, "[wp] INFORM AVAIL FOUND WANTED POSTER LINKED LIST INFINITE LOOP. Dump:\n%s", Util_PrintableTable(thisWp)) DEBUG_KILLSWITCH = true break; end
 		if thisWp[POSTER_I__COMMIT_TYPES][pnot] >= WP_COMMIT_TYPES.DEAD_OR_ENGAGED then
 			thisWp[POSTER_I__CHECK_INS] = thisWp[POSTER_I__CHECK_INS] - 1
 			thisWp[POSTER_I__COMMIT_TYPES][pnot] = nil
@@ -720,8 +720,10 @@ if DEBUG then
 			DebugDrawText(80, 480+8*n,
 					string.format("%-18.18s|%d[%d]|%d[%d]|%d[%d]|%d[%d]|%d[%d]",
 						string.sub(not obj and "none"
-								or (type(obj) == "table" and obj.shortName or obj.hUnit
-									and obj.hUnit.GetUnitName and not obj.hUnit:IsNull() and obj.hUnit:GetUnitName()
+								or (type(obj) == "table" and obj.name and obj.shortName or obj.name
+									or obj.hUnit and not obj.hUnit:IsNull()
+										and (obj.hUnit.GetUnitName and obj.hUnit:GetUnitName()
+											or obj.hUnit.GetName and obj.hUnit:GetName())
 								) or tostring(obj), -18),
 					com[1] or -0,pre[1] or -0,com[2] or -0,pre[2] or -0,com[3] or -0,pre[3] or -0,
 					com[4] or -0,pre[4] or -0,com[5] or -0,pre[5] or -0

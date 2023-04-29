@@ -48,6 +48,9 @@ local GSI_GetSafeUnit = GSI_GetSafeUnit
 local EMPTY_TABLE = EMPTY_TABLE
 local GameTime = GameTime
 
+local DEBUG = DEBUG
+local VERBOSE = VERBOSE and nil
+
 local max = math.max
 
 local DEAGRO_UPDATE_PRIORITY
@@ -96,7 +99,7 @@ local function indicate_far_past_is_for_recycling()
 		local foundOlderThan
 		local n = 0
 		while(currNode and currNode.timeLanding < deleteOlderThan) do
-			n = n + 1 if n > 1000 then ERROR_print(string.format("[LHP] '%s' infinite future damage list caught.", atUnit), true) if atUnit.IsNull and not atUnit:IsNull() then DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end Util_TablePrint(future_damage_lists[atUnit]) Util_ThrowError() return end
+			n = n + 1 if n > 1000 then ERROR_print(false, not DEBUG, "[LHP] '%s' infinite future damage list caught.", atUnit) if atUnit.IsNull and not atUnit:IsNull() then DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end Util_TablePrint(future_damage_lists[atUnit]) Util_ThrowError() return end
 			table.insert(t_recyclable_nodes, currNode.prevNode)
 			currNode.prevNode = nil
 			--future_damage_lists[atUnit].numAttacks = future_damage_lists[atUnit].numAttacks - 1
@@ -119,7 +122,7 @@ end
 local function unstitch_and_recycle_node_simple(node)
 	if node.nextNeeds then
 		if node.nextNeeds.nextNeeds then
-			ERROR_print("[LHP] Too many next attacks (>2 total). future damage lists are over-linked, proliferating nodes, or nextNeeds has not been cleared.")
+			ERROR_print(false, not DEBUG, "[LHP] Too many next attacks (>2 total). future damage lists are over-linked, proliferating nodes, or nextNeeds has not been cleared.")
 			Util_TablePrint(node)
 			Util_ThrowError()
 		end
@@ -177,7 +180,7 @@ local function correct_attacker_node_for_projectile(attackerNode, timeLanding)
 	local currNode = attackerNode
 	local m = 1
 	while(currNode.prevNode) do
-		m=m+1 if m > 1000 then ERROR_print("[LHP] V") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
+		m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] V") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
 		if currNode.prevNode.timeLanding > timeLanding then
 			currNode = currNode.prevNode
 			-- the projectile node will be shifted back, below #shiftback, earlier
@@ -206,7 +209,7 @@ local function correct_attacker_node_for_projectile(attackerNode, timeLanding)
 		-- currNode == attackerNode
 		local m = 1
 		while(currNode.nextNode) do
-			m=m+1 if m > 1000 then ERROR_print("[LHP] W") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
+			m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] W") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
 			if currNode.nextNode.timeLanding < currNode.timeLanding then
 				currNode = currNode.nextNode
 				-- the projectile node will be shifted forward, below #shiftforward,
@@ -234,7 +237,7 @@ local function correct_attacker_node_for_projectile(attackerNode, timeLanding)
 	currNode = head.oldestNode
 	local m = 1
 	while(currNode.prevNode) do -- no prev, break;
-		m=m+1 if m > 1000 then ERROR_print("[LHP] X") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
+		m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] X") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
 		currNode = currNode.prevNode
 	end
 	head.oldestNode = currNode
@@ -243,7 +246,7 @@ local function correct_attacker_node_for_projectile(attackerNode, timeLanding)
 	head.firstNodeFromNow = nil
 	local m = 1
 	while(currNode) do
-		m=m+1 if m > 1000 then ERROR_print("[LHP] Y") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
+		m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] Y") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(currNode.fromUnit:GetLocation().x, currNode.fromUnit:GetLocation().y, false) return end
 		if currNode.timeLanding
 				>= GameTime() then
 			head.firstNodeFromNow = currNode
@@ -261,7 +264,7 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 	for i=1,#t_recyclable_nodes do
 		if t_recyclable_nodes == new then
 			DEBUG_KILLSWITCH = true
-			ERROR_print(string.format("FOUND A REPEATED RECYCLE TABLE"))
+			ERROR_print(false, not DEBUG, "FOUND A REPEATED RECYCLE TABLE")
 			Util_TablePrint(new)
 			Util_ThrowError()
 		end
@@ -293,7 +296,7 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 		local currNode = thisUnitDamageList.firstNodeFromNow or thisUnitDamageList.oldestNode
 		local m = 0
 		while(currNode) do
-			m = m + 1 if m > 1000 then Util_TablePrint(thisUnitDamageList) ERROR_print(string.format("[LHP] '%s' infinite future damage list caught.", atUnit), true) if atUnit.IsNull and not atUnit:IsNull() then DEBUG_KILLSWITCH = true GetBot():ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end return end
+			m = m + 1 if m > 1000 then Util_TablePrint(thisUnitDamageList) ERROR_print(true, not DEBUG, "[LHP] '%s' infinite future damage list caught.", atUnit) if atUnit.IsNull and not atUnit:IsNull() then DEBUG_KILLSWITCH = true GetBot():ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end return end
 			if currNode.timeLanding >= timeLanding then
 				if currNode.prevNode then
 					currNode.prevNode.nextNode = new
@@ -339,7 +342,7 @@ local function update_current_attacks__job(workingSet)
 			local m = 0
 			-- Shift to future
 			while(currNode) do
-				m = m + 1 if m > 1000 then ERROR_print(string.format("[LHP] '%s' infinite future damage list caught.", atUnit), true) DEBUG_KILLSWITCH = true if atUnit.IsNull and not atUnit:IsNull() then TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end return end
+				m = m + 1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] '%s' infinite future damage list caught.", atUnit) DEBUG_KILLSWITCH = true if atUnit.IsNull and not atUnit:IsNull() then TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end return end
 				if currNode.timeLanding >= currTime then
 					break
 				end
@@ -353,10 +356,10 @@ local function update_current_attacks__job(workingSet)
 		local currTime = GameTime()
 		-- Remove changed target
 		for fromUnit,node in pairs(t_attacker_to_future_damage_node) do
-			m = m + 1; if m > 1000 then DEBUG_KILLSWITCH = true; ERROR_print("[LHP] L"); TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(fromUnit:GetLocation().x, fromUnit:GetLocation().x, true); return; end
+			m = m + 1; if m > 1000 then DEBUG_KILLSWITCH = true; ERROR_print(true, not DEBUG, "[LHP] L"); TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(fromUnit:GetLocation().x, fromUnit:GetLocation().x, true); return; end
 
 			local atUnit = node.head.atUnit
-			local isNullOrDead = Unit_IsNullOrDead(fromUnit)
+			local isNullOrDead = Unit_IsNullOrDead(fromUnit) or not fromUnit:CanBeSeen()
 			if true or isNullOrDead or not fromUnit:IsTower() then
 				local currAnim = not isNullOrDead and fromUnit:GetAnimCycle() or 0.0
 				local isMelee = not isNullOrDead and (fromUnit:GetAttackProjectileSpeed() == 0
@@ -406,6 +409,7 @@ local function create_future_damage_lists__job(workingSet)
 
 		for i=1,#sets,1 do
 			local sendOneUnagroablePushAlert = true -- push_lane taking advantage of full attack check
+			local sendOneTeamIsSieged = true
 			local thisSetUnits = sets[i].units
 			local currTime = GameTime()
 			local setSize = #thisSetUnits
@@ -413,7 +417,7 @@ local function create_future_damage_lists__job(workingSet)
 			for i=1,setSize,1 do
 				local gsiUnit = thisSetUnits[i]
 
-				if not Unit_IsNullOrDead(gsiUnit) then 
+				if not Unit_IsNullOrDead(gsiUnit) and gsiUnit.hUnit:CanBeSeen() then 
 					local attackerNode = t_attacker_to_future_damage_node[gsiUnit.hUnit]
 
 					
@@ -431,7 +435,9 @@ local function create_future_damage_lists__job(workingSet)
 						if hUnitAttacked:IsBuilding() then
 							-- buildings
 
-							if sendOneUnagroablePushAlert and gsiUnit.team == TEAM
+							local buildingTeam = not hUnitAttacked:IsNull()
+									and hUnitAttacked:GetTeam()
+							if sendOneUnagroablePushAlert and buildingTeam == ENEMY_TEAM
 									and gsiUnit.creepType ~= CREEP_TYPE_SIEGE then
 								if setSize > 1
 										or setSize == 1 and gsiUnit.lastSeenHealth
@@ -447,6 +453,10 @@ local function create_future_damage_lists__job(workingSet)
 								-- Alert fort under attack
 								Team_FortUnderAttack(gsiUnit)
 								fortHasNotAlerted = false
+							end
+							if sendOneTeamIsSieged and buildingTeam == TEAM then
+								LanePressure_InformTeamIsSieged(hUnitAttacked)
+								sendOneTeamIsSieged = false
 							end
 						end
 						-- Inform friendly heroes to prioritize deagroing towers
@@ -848,7 +858,7 @@ function Analytics_GetNearFutureHealth(gsiUnit, t)
 	local attackCount = 0
 	local m=0
 	while(currNode and currNode.timeLanding < t) do
-		m=m+1 if m > 1000 then ERROR_print("[LHP] P") DEBUG_KILLSWITCH = true GetBot():ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) Util_TablePrint(future_damage_lists[gsiUnit.hUnit]) Util_ThrowError() return end
+		m=m+1 if m > 1000 then ERROR_print(false, not DEBUG, "[LHP] P") DEBUG_KILLSWITCH = true GetBot():ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) Util_TablePrint(future_damage_lists[gsiUnit.hUnit]) Util_ThrowError() return end
 		totalDamage = totalDamage + currNode.damage
 		currNode = currNode.nextNode
 		attackCount = attackCount + 1
@@ -883,7 +893,7 @@ function Analytics_GetTotalDamageNumberAttackers(gsiPlayer) -- for team players
 		local numHeroesAttackingFriendly = 0
 		local m = 1
 		while(currNode) do
-			m=m+1 if m > 1000 then ERROR_print("[LHP] Q") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiPlayer.lastSeen.location.x, gsiPlayer.lastSeen.location.y, false) return end
+			m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] Q") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiPlayer.lastSeen.location.x, gsiPlayer.lastSeen.location.y, false) return end
 			local thisUnit = currNode.fromUnit
 			if not Unit_IsNullOrDead(thisUnit) and thisUnit:IsHero() then
 				players_found[GSI_GetPlayerFromPlayerID(thisUnit:GetPlayerID()).nOnTeam] = true
@@ -906,7 +916,7 @@ function Analytics_RoshanOrHeroAttacksInTimeline(gsiUnit, offset)
 		local afterTime = offset and GameTime() + offset or 0
 		local m = 1
 		while(currNode) do
-			m=m+1 if m > 1000 then ERROR_print("[LHP] R") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) return end
+			m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] R") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) return end
 			if currNode.timeLanding >= afterTime then
 				local thisUnit = currNode.fromUnit
 				if not thisUnit:IsNull()
@@ -938,7 +948,7 @@ function Analytics_HeroAttacksInTimeline(gsiUnit)
 	local currNode = damageList.oldestNode
 	local m = m + 1
 	while(currNode) do
-		m=m+1 if m > 1000 then ERROR_print("[LHP] S") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) return end
+		m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] S") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) return end
 		local thisUnit = currNode.fromUnit
 		if not Unit_IsNullOrDead(thisUnit) and thisUnit:IsHero() and thisUnit.GetPlayerID then
 			thisUnit = GSI_GetPlayerFromPlayerID(thisUnit:GetPlayerID())
@@ -965,7 +975,7 @@ function Analytics_GetFutureDamageFromUnitType(hUnit, unitType)
 		local currTime = GameTime()
 		local m = 1
 		while(currNode) do
-			m=m+1 if m > 1000 then ERROR_print("[LHP] T") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(hUnit:GetLocation().x, hUnit:GetLocation().y, false) return end
+			m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] T") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(hUnit:GetLocation().x, hUnit:GetLocation().y, false) return end
 			if currNode.timeLanding > currTime and Unit_GetUnitType(currNode.fromUnit) == unitType then
 				totalDamage = totalDamage + currNode.damage
 			end
@@ -984,7 +994,7 @@ function Analytics_GetMostDamagingUnitTypeToUnit(gsiUnit, limitPast)
 		local damageTotal = {}
 		local m = 1
 		while (currNode) do -- Create the damage totals for types
-			m=m+1 if m > 1000 then ERROR_print("[LHP] U") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) return end
+			m=m+1 if m > 1000 then ERROR_print(true, not DEBUG, "[LHP] U") DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(gsiUnit.lastSeen.location.x, gsiUnit.lastSeen.location.y, false) return end
 			local unitType = Unit_GetUnitType(currNode.fromUnit)
 			if currNode.timeLanding > limitPast then
 				damageTotal[unitType] = (damageTotal[unitType] and damageTotal[unitType] or 0) + currNode.damage

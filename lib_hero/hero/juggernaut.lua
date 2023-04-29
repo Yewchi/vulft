@@ -1,12 +1,12 @@
 local hero_data = {
 	"juggernaut",
-	{1, 3, 1, 2, 1, 4, 1, 2, 3, 5, 2, 4, 3, 2, 8, 3, 4, 10, 11},
+	{1, 2, 1, 3, 1, 4, 1, 2, 2, 5, 2, 4, 3, 3, 8, 3, 10, 4, 12},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_branches","item_magic_stick","item_branches","item_boots","item_magic_wand","item_phase_boots","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_mjollnir","item_yasha","item_manta","item_aghanims_shard","item_skadi","item_basher","item_gem","item_sphere","item_abyssal_blade","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
+		"item_blood_grenade","item_branches","item_branches","item_quelling_blade","item_tango","item_circlet","item_boots","item_blades_of_attack","item_chainmail","item_wind_lace","item_phase_boots","item_magic_wand","item_wraith_band","item_javelin","item_maelstrom","item_blade_of_alacrity","item_yasha","item_manta","item_aghanims_shard","item_belt_of_strength","item_basher","item_quarterstaff","item_eagle","item_talisman_of_evasion","item_butterfly","item_ultimate_orb","item_point_booster","item_skadi","item_abyssal_blade","item_mjollnir","item_ultimate_scepter_2",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Blade Fury","Healing Ward","Blade Dance","Omnislash","+5 All Stats","+100.0 Blade Fury Radius","-20.0s Healing Ward Cooldown","+1s Blade Fury Duration","+40% Blade Dance Lifesteal","+150 Blade Fury DPS","+1s Omnislash Duration","+2 Healing Ward Hits to Kill",
+		"Blade Fury","Healing Ward","Blade Dance","Omnislash","+5 All Stats","+100.0 Blade Fury Radius","-20.0s Healing Ward Cooldown","+1s Blade Fury Duration","+50% Blade Dance Lifesteal","+150 Blade Fury DPS","+1s Omnislash Duration","+2 Healing Ward Hits to Kill",
 	}
 }
 --@EndAutomatedHeroData
@@ -61,6 +61,8 @@ local increase_safety_handle = IncreaseSafety_GetTaskHandle()
 local avoid_and_hide_handle = AvoidHide_GetTaskHandle()
 local zone_defend = ZoneDefend_GetTaskHandle()
 
+local OMNISLASH_JUMP_DIST = 425
+
 local ceil = math.ceil
 local floor = math.floor
 local abs = math.abs
@@ -104,7 +106,7 @@ d = {
 						return false
 					end
 					local playerLoc = gsiPlayer.lastSeen.location
-					local fhtLoc = objective.lastSeen.location
+					local fhtLoc = objective.lastSeen.previousLocation -- slightly more realistic.. needs about 8 frames really
 					local bladeFuryRadius = bladeFury:GetSpecialValueFloat("blade_fury_radius")
 					bladeFuryRadius = bladeFuryRadius and bladeFuryRadius > 0 and bladeFuryRadius
 							or 250
@@ -149,7 +151,8 @@ d = {
 					local omni = hUnit:GetAbilityInSlot(5)
 					if not bladeFury or bladeFury:GetName() ~= "juggernaut_blade_fury"
 							or hUnit:HasModifier("modifier_juggernaut_blade_fury")
-							or hUnit:HasModifier("modifier_juggernaut_omnislash") then
+							or hUnit:HasModifier("modifier_juggernaut_omnislash")
+							or hUnit:IsSilenced() then
 						-- above check immune-hits dodgeables if in BF.
 						return nil;
 					end
@@ -158,10 +161,11 @@ d = {
 						USE_ABILITY(gsiPlayer, bladeFury, nil, 400, nil)
 						return false;
 					end
-					if CAN_BE_CAST(gsiPlayer, omni) then
+					local knownE = gsiPlayer.time.data.knownEngageables
+					if knownE and CAN_BE_CAST(gsiPlayer, omni) then
 						local incoming, ability = AbilityLogic_AnyProjectiles(gsiPlayer, true)
-						if gsiPlayer.lastSeenHealth
-								< max(200+50*#nearbyEnemies^1.25, ability:GetSpecialValueInt("damage")) then
+						if incoming and gsiPlayer.lastSeenHealth
+								< max(200+50*(#knownE)^1.25, ability:GetSpecialValueInt("damage")) then
 							local nearestEnemy, nearestDist = Vector_GetNearestToUnitForUnits(
 									gsiPlayer, nearbyEnemies
 								)
@@ -275,17 +279,15 @@ d = {
 					USE_ABILITY(gsiPlayer, bladeFury, nil, 400)
 					return;
 				end
-			end
-			if currActivityType >= ACTIVITY_TYPE.FEAR then
-				if #allE > 0 and CAN_BE_CAST(gsiPlayer, bladeFury) then
-					if hUnit:IsRooted() or (gsiPlayer.currentMovementSpeed+1
+				if #allE > 0 and (currActivityType >= ACTIVITY_TYPE.FEAR and futureDamage > 0
+							or currTask == fight_harass_handle
+						) and ( hUnit:IsRooted()
+							or gsiPlayer.currentMovementSpeed+1
 									< hUnit:GetBaseMovementSpeed()
-								and futureDamage > 0
-							) then
-						
-						USE_ABILITY(gsiPlayer, bladeFury, nil, 400)
-						return;
-					end
+						) then
+					
+					USE_ABILITY(gsiPlayer, bladeFury, nil, 400)
+					return;
 				end
 			end
 			if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
@@ -313,19 +315,23 @@ d = {
 		else
 			lowest = gsiPlayer; lowestHppAllied = playerHpp
 		end
+		local fightIsOn, alliesHeat, enemiesHeat
+				= FightClimate_FightIsOn(gsiPlayer, nearbyAllies, allE, 2400)
 		if CAN_BE_CAST(gsiPlayer, healingWard)
-				and (#nearbyAllies > 2 or #nearbyEnemies == 0
-					or FightClimate_GetEnemiesTotalHeat(nearbyEnemies, true) > 0.99)
-				and HIGH_USE(gsiPlayer, healingWard, highUse*1.33, 
-					(1.5*lowestHppAllied-max(0, danger)) / (1 + #nearbyEnemies + #outerEnemies))
-				and ( (currTask == zone_defend_handle
-					and max(fhtReal and POINT_DISTANCE_2D(playerLoc, fhtLoc) or 0,
-						gsiPlayer.recentMoveTo 
-							and POINT_DISTANCE_2D(playerLoc, gsiPlayer.recentMoveTo) or 0
-						) < 1500
-					) or (playerHpp - futureDamage*3 / gsiPlayer.maxHealth)
-						< 0.35 + max(0, min(0.5, danger*0.167))
-				) then
+				and ((fightIsOn and lowestHppAllied < 0.45 + 0.085*#allE
+						and gsiPlayer.lastSeenMana > highUse*1.33
+					) or (#nearbyAllies > 2 or #nearbyEnemies == 0
+						or enemiesHeat > 0.99)
+					and HIGH_USE(gsiPlayer, healingWard, highUse*1.33, 
+						(1.5*lowestHppAllied-max(0, danger)) / (1 + #nearbyEnemies + #outerEnemies))
+					and ( (currTask == zone_defend_handle
+						and max(fhtReal and POINT_DISTANCE_2D(playerLoc, fhtLoc) or 0,
+							gsiPlayer.recentMoveTo 
+								and POINT_DISTANCE_2D(playerLoc, gsiPlayer.recentMoveTo) or 0
+							) < 1500
+						) or (playerHpp - futureDamage*3 / gsiPlayer.maxHealth)
+							< 0.35 + max(0, min(0.5, danger*0.167))
+				)) then
 			USE_ABILITY(gsiPlayer, healingWard,
 					Vector_FacingAtLength(gsiPlayer, 100), 400, nil
 				)
@@ -333,8 +339,12 @@ d = {
 		end
 		-- TODO TEMP
 		-- Omnislash
-		local omnislashTotalDmg = 150 + omnislash:GetLevel()*150
-		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local omnislashTotalDmg = fhtReal and Unit_GetArmorPhysicalFactor(fht)
+				* (4.5*hUnit:GetAttackDamage() + 135) / (1 / hUnit:GetAttackSpeed())
+		local danger = fhtReal and Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local fightIntent
+
+		if DEBUG and fht then INFO_print("[hero_jug] vacuum omnislash to %s: %s", fht.shortName, omnislashTotalDmg) end
 		
 		if (omnislashCanCast or swiftslashCanCast) and fhtReal then -- TEMP
 			if futureDamage * 3 > gsiPlayer.lastSeenHealth then
@@ -352,22 +362,34 @@ d = {
 			local playerPower = Analytics_GetPowerLevel(gsiPlayer)
 			local fhtPower = Analytics_GetPowerLevel(fht)
 			local powerDiff = (fhtPower - playerPower) / playerPower
-			if distToFht < omnislash:GetCastRange()*1.15
+			local crowdedLoc, crowdedRating = CROWDED_RATING(fhtLoc, SET_HERO_ENEMY,
+					nearbyEnemies, OMNISLASH_JUMP_DIST*0.67
+				)
+			if distToFht < omnislash:GetCastRange()*1.65 
+						+ 0.4*Vector_UnitFacingUnit(fht, gsiPlayer)
 					and (gsiPlayer.lastSeenHealth
-						< fht.lastSeenHealth * (0.75 + #nearbyEnemies*0.5)
-					or #nearbyEnemies + danger > 3) then
+							< fht.lastSeenHealth * (0.75 + #nearbyEnemies*0.5)
+						or #nearbyEnemies + danger > 3
+						or crowdedRating > 1.85
+							and crowdedRating - (2 - fhtPercHp*2) < 2
+						or fightIsOn
+					) then
 				local hasWaveClearItem = Item_HasWaveClearOn(gsiPlayer, true)
 				local creeps, distCreeps
 				if not hasWaveClearItem then
 					creeps, distCreeps = Set_GetNearestEnemyCreepSetToLocation(
-							gsiPlayer.lastSeen.location
+							fht.lastSeen.location
 						)
 				end
-				if (not creeps or distCreeps
-								> 200 + 300 * fht.lastSeenHealth / omnislashTotalDmg
-							or omnislashTotalDmg - (not creeps and 0 or #creeps*100)
-								> fht.lastSeenHealth*0.83
-						) and omnislashTotalDmg > fht.lastSeenHealth*0.83 then
+				local creepsAdjustDmg = creeps and creeps[1]
+						and omnislashTotalDmg * max(hasWaveClearItem and 0.45 or 0.15,
+								min(1, (distCreeps/300)/((#creeps)^0.5))
+							)
+						or omnislashTotalDmg
+				INFO_print("[hero_jug] creep-adjusted omnislash to %s: %d. hasWaveClearItem: %s",
+						fht.shortName, creepsAdjustDmg, hasWaveClearItem
+					)
+				if (creepsAdjustDmg) > fht.lastSeenHealth then
 					if omnislashCanCast then
 						USE_ABILITY(gsiPlayer, omnislash, fht, 400, nil)
 					else

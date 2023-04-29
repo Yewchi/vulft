@@ -1,10 +1,10 @@
 local hero_data = {
 	"mirana",
-	{1, 3, 2, 1, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 7, 3, 4, 9, 11},
+	{2, 3, 1, 1, 1, 4, 1, 2, 2, 5, 2, 4, 3, 3, 7, 3, 4, 9},
 	{
-		"item_magic_stick","item_branches","item_ward_observer","item_branches","item_tango","item_tango","item_faerie_fire","item_boots","item_arcane_boots","item_wind_lace","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_cloak","item_hood_of_defiance","item_headdress","item_pipe","item_ancient_janggo","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_boots_of_bearing","item_ring_of_health","item_pers","item_pers","item_lotus_orb",
+		"item_ward_observer","item_branches","item_tango","item_slippers","item_branches","item_circlet","item_wraith_band","item_boots","item_magic_wand","item_arcane_boots","item_mekansm","item_buckler","item_guardian_greaves","item_cloak","item_headdress","item_ring_of_health","item_staff_of_wizardry","item_pipe","item_ogre_axe","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_ultimate_orb","item_sphere","item_gem","item_ultimate_orb","item_sheepstick","item_aghanims_shard",
 	},
-	{ {3,3,3,2,1,}, {4,4,4,4,5,}, 0.1 },
+	{ {3,3,3,3,5,}, {4,4,4,4,3,}, 0.1 },
 	{
 		"Starstorm","Sacred Arrow","Leap","Moonlight Shadow","-2.0s Sacred Arrow cooldown","+125 Leap Distance","Moonlight Shadow gives +20.0% Evasion","+80 Leap Attack Speed","-20s Moonlight Shadow Cooldown","+35 Damage","+2 Multishot Sacred Arrows","+200 Starstorm Damage",
 	}

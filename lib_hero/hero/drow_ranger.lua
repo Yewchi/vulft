@@ -1,12 +1,12 @@
 local hero_data = {
 	"drow_ranger",
-	{1, 3, 1, 2, 3, 4, 3, 3, 1, 1, 6, 4, 2, 2, 8, 2, 4, 9, 11},
+	{1, 3, 1, 2, 3, 5, 3, 3, 1, 1, 7, 5, 2, 2, 9, 2, 5},
 	{
-		"item_quelling_blade","item_circlet","item_tango","item_branches","item_sobi_mask","item_magic_stick","item_wraith_band","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_belt_of_strength","item_blade_of_alacrity","item_staff_of_wizardry","item_dragon_lance","item_force_staff","item_hurricane_pike","item_blade_of_alacrity","item_yasha","item_aghanims_shard","item_manta","item_lifesteal","item_claymore","item_satanic","item_quarterstaff","item_butterfly","item_silver_edge","item_black_king_bar",
+		"item_circlet","item_slippers","item_circlet","item_slippers","item_magic_stick","item_branches","item_branches","item_wraith_band","item_wraith_band","item_boots_of_elves","item_boots","item_magic_wand","item_gloves","item_power_treads","item_blade_of_alacrity","item_dragon_lance","item_force_staff","item_hurricane_pike","item_blitz_knuckles","item_invis_sword","item_silver_edge","item_eagle","item_quarterstaff","item_butterfly","item_skadi","item_blink","item_swift_blink","item_aghanims_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Frost Arrows","Gust","Multishot","Marksmanship","+15% Gust Self Movement Speed","+15.0 Frost Arrow Damage","Gust Reveals Invisible Units","-8.0s Multishot Cooldown","+25% Multishot Damage","-4.0s Gust Cooldown","+12% Marksmanship Chance","+3.0 Multishot Waves",
+		"Frost Arrows","Gust","Multishot","Glacier","Marksmanship","+15% Gust Self Movement Speed","+15 Frost Arrow Damage","Gust Reveals Invisible Units","-8.0s Multishot Cooldown","+25% Multishot Damage","-4.0s Gust Cooldown","+12% Marksmanship Chance","+3.0 Multishot Waves",
 	}
 }
 --@EndAutomatedHeroData

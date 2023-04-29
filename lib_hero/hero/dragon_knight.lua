@@ -1,12 +1,12 @@
 local hero_data = {
 	"dragon_knight",
-	{2, 3, 3, 1, 1, 4, 1, 2, 3, 3, 2, 4, 1, 2, 8, 5, 4, 9, 12},
+	{2, 3, 3, 1, 3, 4, 1, 1, 1, 5, 3, 4, 2, 2, 8, 2, 4, 9, 11},
 	{
-		"item_tango","item_ward_observer","item_quelling_blade","item_circlet","item_gauntlets","item_branches","item_bracer","item_bracer","item_gloves","item_belt_of_strength","item_magic_wand","item_power_treads","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_orchid","item_bloodthorn","item_reaver","item_overwhelming_blink","item_ultimate_scepter_2","item_octarine_core",
+		"item_tango","item_branches","item_quelling_blade","item_gauntlets","item_faerie_fire","item_gauntlets","item_gloves","item_belt_of_strength","item_power_treads","item_magic_wand","item_soul_ring","item_gloves","item_blink","item_hand_of_midas","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_manta","item_buckler","item_assault","item_helm_of_iron_will","item_nullifier","item_reaver",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
-		"Breathe Fire","Dragon Tail","Dragon Blood","Elder Dragon Form","+15 Damage","-30% Breathe Fire Damage Reduction","+0.5s Dragon Tail Stun","+400 Health","+175 Elder Dragon Form Attack Range","+75% Breathe Fire Damage/Cast Range in Dragon Form","+12 Dragon Blood HP Regen/Armor","+400 AoE Dragon Tail During Elder Dragon Form",
+		"Breathe Fire","Dragon Tail","Dragon Blood","Elder Dragon Form","+15 Damage","-30% Breathe Fire Damage Reduction","+0.4s Dragon Tail Stun","+400 Health","+150 Elder Dragon Form Attack Range","+75% Breathe Fire Damage/Cast Range in Dragon Form","+12 Dragon Blood HP Regen/Armor","+400 AoE Dragon Tail During Elder Dragon Form",
 	}
 }
 --@EndAutomatedHeroData

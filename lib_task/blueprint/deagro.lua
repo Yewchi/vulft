@@ -35,7 +35,7 @@ local task_handle = Task_CreateNewTask()
 
 local approx_building_attack_time = 0.8
 local deagro_throttle = Time_CreateThrottle(approx_building_attack_time)
-function Deagro_UpdatePriority(nOnTeam) -- 2/15/21 called from last_hit_projection when a tower is found and first recorded attacking friendly player
+function Deagro_UpdatePriority(nOnTeam) -- 15/02/22 called from last_hit_projection when a tower is found and first recorded attacking friendly player
 	--print("scoring deagro trigger", nOnTeam)
 	Task_SetTaskPriority(task_handle, nOnTeam, TASK_PRIORITY_TOP)
 end

@@ -1,10 +1,10 @@
 local hero_data = {
 	"hoodwink",
-	{1, 2, 2, 3, 2, 4, 2, 1, 1, 6, 1, 4, 3, 3, 8, 3, 4, 9, 11},
+	{2, 1, 3, 2, 2, 4, 2, 1, 1, 6, 1, 4, 3, 3, 8, 3, 4, 9, 12},
 	{
-		"item_ward_observer","item_enchanted_mango","item_tango","item_branches","item_branches","item_branches","item_ward_sentry","item_bottle","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_boots","item_magic_wand","item_javelin","item_mithril_hammer","item_maelstrom","item_staff_of_wizardry","item_crown","item_crown","item_rod_of_atos","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_lesser_crit","item_skadi","item_greater_crit","item_desolator","item_black_king_bar",
+		"item_circlet","item_circlet","item_branches","item_branches","item_tango","item_faerie_fire","item_wraith_band","item_wraith_band","item_boots","item_power_treads","item_lesser_crit","item_magic_wand","item_force_staff","item_greater_crit","item_dragon_lance","item_hurricane_pike","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_demon_edge","item_rapier","item_satanic","item_rapier",
 	},
-	{ {2,2,1,3,3,}, {4,4,4,2,5,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,4,1,4,}, 0.1 },
 	{
 		"Acorn Shot","Bushwhack","Scurry","Sharpshooter","+40% Scurry Evasion When Active","-3.0s Bushwhack Cooldown","+60.0 Bushwhack Damage","+2 Acorn Shot Bounces","25.0% Sharpshooter Faster Projectile / Charge Time","-4 Armor Corruption","2 Acorn Shot Charges","+135 Bushwhack Radius",
 	}

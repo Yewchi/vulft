@@ -1,12 +1,12 @@
 local hero_data = {
 	"dawnbreaker",
-	{2, 1, 2, 1, 2, 4, 2, 3, 3, 3, 3, 4, 1, 1, 7, 5, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 1, 1, 4, 3, 1, 8, 5, 4, 10, 11},
 	{
-		"item_tango","item_enchanted_mango","item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_bracer","item_soul_ring","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_ogre_axe","item_robe","item_echo_sabre","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_mithril_hammer","item_basher","item_vanguard","item_abyssal_blade","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
+		"item_gauntlets","item_circlet","item_branches","item_enchanted_mango","item_tango","item_quelling_blade","item_boots","item_bracer","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_robe","item_quarterstaff","item_oblivion_staff","item_ogre_axe","item_echo_sabre","item_aghanims_shard","item_blight_stone","item_diadem","item_harpoon","item_mithril_hammer","item_desolator","item_blink","item_ogre_axe","item_black_king_bar","item_helm_of_iron_will","item_nullifier",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,1,5,}, {3,3,3,1,4,}, 0.1 },
 	{
-		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+12% Celestial Hammer Slow","+50% Luminosity Critical Strike Damage","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","2 Starbreaker Charges","+1100 Celestial Hammer Cast Range",
+		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+14% Celestial Hammer Slow","+50% Luminosity Critical Strike Damage","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","-6s Starbreaker Cooldown","+80%% Celestial Hammer Cast Range/Speed",
 	}
 }
 --@EndAutomatedHeroData
@@ -233,9 +233,13 @@ end
 				and HIGH_USE(gsiPlayer, solarGuardian, highUse - solarGuardian:GetManaCost(),
 						1-playerHealthPercent
 					) then
-			USE_ABILITY(gsiPlayer, solarGuardian, alliedInDangerInAirQuotes.lastSeen.location, 400, nil,
-					false, false, nil, gsiPlayer.hUnit.Action_UseAbilityOnLocation)
-			return;
+			local crowdedLoc, crowdedRating = CROWDED_RATING(alliedInDangerInAirQuotes.lastSeen.location, SET_HERO_ENEMY, nil, 800)
+			if crowdedRating > 0.5 then
+				crowdedLoc = Vector_PointBetweenPoints(crowdedLoc, alliedInDangerInAirQuotes.lastSeen.location)
+				USE_ABILITY(gsiPlayer, solarGuardian, crowdedLoc, 400, nil,
+						false, false, nil, gsiPlayer.hUnit.Action_UseAbilityOnLocation)
+				return;
+			end
 		end
 	end,
 }

@@ -1,8 +1,8 @@
 local hero_data = {
 	"troll_warlord",
-	{2, 1, 3, 2, 2, 3, 2, 4, 3, 1, 1, 4, 1, 3, 7, 6, 4, 10, 12},
+	{2, 1, 3, 3, 1, 4, 3, 1, 1, 6, 2, 4, 3, 2, 7, 2, 4, 10, 12},
 	{
-		"item_slippers","item_circlet","item_branches","item_branches","item_tango","item_quelling_blade","item_wraith_band","item_boots_of_elves","item_boots","item_power_treads","item_ring_of_health","item_pers","item_broadsword","item_bfury","item_wind_lace","item_magic_wand","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_basher","item_blink","item_abyssal_blade","item_lifesteal","item_monkey_king_bar","item_aghanims_shard","item_quarterstaff","item_butterfly","item_swift_blink","item_rapier","item_lifesteal","item_claymore","item_satanic","item_lesser_crit","item_demon_edge","item_greater_crit",
+		"item_quelling_blade","item_tango","item_slippers","item_circlet","item_branches","item_branches","item_wraith_band","item_cornucopia","item_boots","item_magic_wand","item_broadsword","item_bfury","item_phase_boots","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_basher","item_lifesteal","item_claymore","item_satanic","item_helm_of_iron_will","item_nullifier","item_abyssal_blade","item_aghanims_shard","item_blink","item_swift_blink",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

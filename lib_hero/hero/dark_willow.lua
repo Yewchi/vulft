@@ -1,12 +1,12 @@
 local hero_data = {
 	"dark_willow",
-	{1, 2, 2, 1, 2, 5, 2, 1, 1, 3, 7, 5, 3, 3, 9, 3, 5, 6, 11, 13},
+	{1, 2, 1, 2, 1, 5, 2, 3, 1, 3, 2, 5, 3, 3, 8, 4, 5, 4, 13, 4, 6, 9, 11},
 	{
-		"item_mantle","item_faerie_fire","item_tango","item_circlet","item_ward_observer","item_branches","item_branches","item_null_talisman","item_bottle","item_magic_wand","item_boots","item_crown","item_ring_of_basilius","item_veil_of_discord","item_blink","item_aghanims_shard","item_arcane_boots","item_mystic_staff","item_aeon_disk","item_void_stone","item_aether_lens","item_platemail","item_mystic_staff","item_shivas_guard","item_kaya","item_ethereal_blade","item_octarine_core","item_moon_shard","item_lesser_crit","item_demon_edge","item_greater_crit","item_ultimate_orb","item_ultimate_orb","item_skadi",
+		"item_tango","item_blood_grenade","item_flask","item_ward_sentry","item_tango","item_faerie_fire","item_branches","item_branches","item_boots","item_wind_lace","item_tranquil_boots","item_wind_lace","item_void_stone","item_staff_of_wizardry","item_cyclone","item_blink","item_aghanims_shard","item_gem","item_vitality_booster","item_aeon_disk","item_gem","item_gem","item_gem","item_pers","item_vitality_booster","item_energy_booster","item_soul_booster","item_octarine_core","item_gem",
 	},
-	{ {3,3,3,2,5,}, {4,4,4,4,2,}, 0.1 },
+	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
 	{
-		"Bramble Maze","Shadow Realm","Cursed Crown","Bedlam","Terrorize","+0.5s Cursed Crown Stun Duration","-2.0s Shadow Realm Cooldown","+30 Bedlam Damage","+160 Cursed Crown AoE","+2s Shadow Realm Duration","-7.0s Bramble Maze CD","+100 Attack Speed","Bedlam Pierces Magic Immunity",
+		"Bramble Maze","Shadow Realm","Cursed Crown","Bedlam","Terrorize","+0.4s Cursed Crown Stun Duration","-2.0s Shadow Realm Cooldown","+30 Bedlam Damage","+160 Cursed Crown AoE","+2s Shadow Realm Duration","-7.0s Bramble Maze CD","+100 Attack Speed","+2 Bedlam Attack Targets",
 	}
 }
 --@EndAutomatedHeroData

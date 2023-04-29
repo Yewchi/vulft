@@ -105,6 +105,7 @@ local function get_lexp_standing_loc(gsiPlayer, farmLaneObj, timeTillStartAttack
 	local tmp = gsiPlayer.attackRange
 	-- TODO BUG SAFE, LOGICALLY RELEVANT MOVEMENT
 	gsiPlayer.attackRange = LEECH_EXP_RANGE -- Spoof our attack range
+	local crashedLane = farmLaneObj and farmLaneObj.lastSeen
 	local moveTo = farmLaneObj and (farmLaneObj.center or farmLaneObj.lastSeen.location)
 			or Set_GetPredictedLaneFrontLocation(Farm_GetMostSuitedLane(gsiPlayer))
 	local careFactor = 70 / math.max(0.1, Unit_GetHealthPercent(gsiPlayer)^2)
@@ -112,9 +113,16 @@ local function get_lexp_standing_loc(gsiPlayer, farmLaneObj, timeTillStartAttack
 			gsiPlayer, moveTo, SET_HERO_ENEMY, -- Needs check if heroes attacking
 			careFactor, min(2.5, math.max(0, timeTillStartAttack)),
 			timeTillStartAttack < 0.33, -- forceAttackRange
-			nil, true -- aheadness, dryRun
+			not crashedLane and 0.0, true, crashedLane and 1 or 0 -- aheadness, dryRun
 		)
 	gsiPlayer.attackRange = tmp
+	local underTower = Set_GetTowerOverLocation(moveTo, ENEMY_TEAM)
+	if underTower then
+		moveTo = Positioning_AdjustToAvoidLocationFlipAggressive(
+				moveTo, gsiPlayer.lastSeen.location,
+				underTower.lastSeen.location, underTower.attackRange + 140
+			)
+	end
 	return moveTo
 		-- TODO BUG SAFE, LOGICALLY RELEVANT MOVEMENT
 end
@@ -157,7 +165,7 @@ blueprint = {
 						and (farmLaneObjective.lastSeenHealth / farmLaneObjective.maxHealth)^2
 						or 0.33
 					)
-		--[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then print("leech exp returns", gsiPlayer.shortName, (0.3+anyIntendHarmFactor),(theorizedDangerScore*15), max(0, farmLaneScoreFactor)) end
+		
 		local creep, tta, score = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
 		local standingLoc = get_lexp_standing_loc(gsiPlayer, farmLaneObjective, tta)
 		if standingLoc then

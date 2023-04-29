@@ -1,12 +1,12 @@
 local hero_data = {
 	"tidehunter",
-	{3, 1, 3, 2, 3, 5, 3, 2, 2, 6, 2, 5, 1, 1, 8, 1, 5, 11, 9, 13},
+	{3, 2, 3, 2, 3, 5, 3, 6, 2, 2, 1, 5, 1, 1, 1, 8, 5, 10, 11},
 	{
-		"item_branches","item_branches","item_quelling_blade","item_enchanted_mango","item_tango","item_ring_of_health","item_crown","item_boots","item_meteor_hammer","item_magic_wand","item_arcane_boots","item_chainmail","item_headdress","item_mekansm","item_buckler","item_guardian_greaves","item_blink","item_aghanims_shard","item_point_booster","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_pers","item_pers","item_refresher",
+		"item_tango","item_ring_of_regen","item_ring_of_regen","item_enchanted_mango","item_faerie_fire","item_crown","item_ring_of_health","item_pers","item_crown","item_meteor_hammer","item_boots","item_mekansm","item_energy_booster","item_arcane_boots","item_mekansm","item_buckler","item_guardian_greaves","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_cloak","item_ultimate_scepter","item_headdress","item_pipe","item_sange","item_talisman_of_evasion","item_heavens_halberd",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Gush","Kraken Shell","Anchor Smash","Tendrils of the Deep","Ravage","+50 Anchor Smash Damage","+10.0% Gush Slow","+120 Gush Damage","-25% Anchor Smash Damage Reduction","Anchor Smash affects buildings","+40 Kraken Shell Damage Block","+1s Ravage Stun","50% chance of Anchor Smash on attack",
+		"Gush","Kraken Shell","Anchor Smash","Tendrils of the Deep","Ravage","+50 Anchor Smash Damage","+10.0% Gush Slow","+120 Gush Damage","-25% Anchor Smash Damage Reduction","Anchor Smash affects buildings","+40 Kraken Shell Damage Block","+0.8s Ravage Stun Duration","50% chance of Anchor Smash on attack",
 	}
 }
 --@EndAutomatedHeroData

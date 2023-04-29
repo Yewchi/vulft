@@ -1,12 +1,12 @@
 local hero_data = {
 	"ember_spirit",
-	{3, 2, 3, 1, 2, 4, 2, 1, 1, 3, 1, 2, 5, 3, 7, 4, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 3, 1, 1, 4, 3, 3, 7, 5, 4, 10, 11},
 	{
-		"item_quelling_blade","item_faerie_fire","item_tango","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_orb_of_corrosion","item_magic_wand","item_javelin","item_maelstrom","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_gem","item_black_king_bar","item_kaya","item_gem","item_sange","item_kaya_and_sange","item_shivas_guard","item_gungir",
+		"item_faerie_fire","item_ward_observer","item_branches","item_quelling_blade","item_tango","item_boots","item_bottle","item_wind_lace","item_phase_boots","item_blight_stone","item_orb_of_corrosion","item_magic_wand","item_mithril_hammer","item_maelstrom","item_gloves","item_hand_of_midas","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_rod_of_atos","item_gungir","item_platemail","item_mystic_staff","item_shivas_guard","item_relic","item_nullifier",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,4,}, 0.1 },
 	{
-		"Searing Chains","Sleight of Fist","Flame Guard","Fire Remnant","+12 Damage","+200 Flame Guard Absorption","+50 Flame Guard DPS","+1.0s Searing Chains Duration","+1 Searing Chains Target","+55 Sleight of Fist Hero Damage","2 Sleight of Fist Charges","-12s Remnant Charge Restore Time",
+		"Searing Chains","Sleight of Fist","Flame Guard","Fire Remnant","+12 Damage","+200 Flame Guard Barrier Amount","+50 Flame Guard DPS","+1.0s Searing Chains Duration","+1 Searing Chains Target","+55 Sleight of Fist Hero Damage","2 Sleight of Fist Charges","-12s Remnant Charge Restore Time",
 	}
 }
 --@EndAutomatedHeroData

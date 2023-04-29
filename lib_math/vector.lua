@@ -42,12 +42,16 @@ local rad = math.rad
 local max = math.max
 local min = math.min
 local abs = math.abs
-local sqrt = math.sqrt
 local MATH_PI = math.pi
 local MATH_2PI = 2*MATH_PI
 local RADIAN90 = MATH_PI/2
 local RADIAN270 = MATH_PI*3/2
+local Vector = Vector
 
+local analytical_unit_vecs = {} -- for approx rads shifts
+for i=1,60 do -- 1.5 degrees space, or about 270 unit variance at 10,000 dist.
+
+end
 function Vector_PointToPointLine(p1, p2)
 	return Vector((p2.x - p1.x), (p2.y - p1.y), (p2.z - p1.z))
 end
@@ -74,7 +78,7 @@ local Vector_PointBetweenPoints = Vector_PointBetweenPoints
 
 -- I think this should be renamed "Vector_Orthogonal" -- 27/03/23 -- no refactored because it should allow modifying the orthogonal-z sign
 function Vector_CartesianNormal(v)
-	return Vector_CrossProduct(v, ORTHOGONAL_Z)
+	return Vector(v.y, -v.x, 0)
 end
 local Vector_CartesianNormal = Vector_CartesianNormal
 
@@ -101,7 +105,7 @@ end
 local Vector_ScalarMultiply = Vector_ScalarMultiply
 
 function Vector_LengthOfVector(v)
-	return sqrt(v.x^2 + v.y^2 + v.z^2)
+	return (v.x^2 + v.y^2 + v.z^2)^0.5
 end
 Vector_Length = Vector_LengthOfVector
 local Vector_LengthOfVector = Vector_LengthOfVector
@@ -113,12 +117,12 @@ local Vector_InverseVector = Vector_InverseVector
 Vector_Inverse = Vector_InverseVector
 
 function Vector_PointDistance2D(p1, p2)
-	return sqrt((p2.x - p1.x)^2 + (p2.y - p1.y)^2)
+	return ((p2.x - p1.x)^2 + (p2.y - p1.y)^2)^0.5
 end
 local Vector_PointDistance2D = Vector_PointDistance2D
 
 function Vector_PointDistance(p1, p2)
-	return sqrt((p2.x - p1.x)^2 + (p2.y - p1.y)^2 + (p2.z - p1.z)^2)
+	return ((p2.x - p1.x)^2 + (p2.y - p1.y)^2 + (p2.z - p1.z)^2)^0.5
 end
 local Vector_PointDistance = Vector_PointDistance
 
@@ -137,7 +141,7 @@ end
 
 local suppress_zero = 5
 function Vector_ToDirectionalUnitVector(v)
-	local lengthOfVector = Vector_LengthOfVector(v)
+	local lengthOfVector = (v.x^2 + v.y^2 + v.z^2)^0.5
 	if lengthOfVector <= 0.00001 then
 		if suppress_zero > 0 or DEBUG then
 			
@@ -172,14 +176,21 @@ function Vector_ToDirectionalUnitVector2D(v)
 end
 
 function Vector_UnitDirectionalPointToPoint(v1, v2)
-	return Vector_ToDirectionalUnitVector(Vector_PointToPointLine(v1, v2))
+	local v1v2 = Vector(v2.x-v1.x, v2.y-v1.y, v2.z-v1.z)
+	local len = (v1v2.x^2 + v1v2.y^2 + v1v2.z^2)^0.5
+	v1v2.x = v1v2.x/len
+	v1v2.y = v1v2.y/len
+	v1v2.z = v1v2.z/len
+	return v1v2
 end
 local Vector_UnitDirectionalPointToPoint = Vector_UnitDirectionalPointToPoint
 
 function Vector_UnitDirectionalPointToPoint2D(v1, v2)
-	return Vector_ToDirectionalUnitVector2D(
-			Vector(v2.x-v1.x, v2.y-v1.y, 0)
-		)
+	local v1v2 = Vector(v2.x-v1.x, v2.y-v1.y, 0)
+	local len = (v1v2.x^2 + v1v2.y^2)^0.5
+	v1v2.x = v1v2.x/len
+	v1v2.y = v1v2.y/len
+	return v1v2
 end
 local Vector_UnitDirectionalPointToPoint2D = Vector_UnitDirectionalPointToPoint2D
 
@@ -210,25 +221,29 @@ function Vector_PointToPointLimitedMin2D(p1, p2, limit)
 end
 
 function Vector_ToLength(v, length)
-	local vLen = sqrt(v.x^2 + v.y^2 + v.z^2)
+	local vLen = (v.x^2 + v.y^2 + v.z^2)^0.5
 	local factor = length/vLen
 	return Vector(v.x*factor, v.y*factor, v.z*factor)
 end
 
 function Vector_ToLength2D(v, length, keepZ)
-	local vLen = sqrt(v.x^2 + v.y^2)
+	local vLen = (v.x^2 + v.y^2)^0.5
 	local factor = length/vLen
 	return Vector(v.x*factor, v.y*factor, keepZ and v.z or 0)
 end
 
-function Vector_ProgressBetweenPoints(p1, p2, progress)
-	return Vector_Addition(
-			Vector(p1.x, p1.y, p1.z),
-			Vector_ScalarMultiply(
-				Vector_PointToPointLine(p1, p2),
-				progress
-			)
-		)
+function Vector_PointToPointAtDistance(p1, p2, dist)
+	return Vector( p1.x + (p2.x-p1.x)*dist,
+			p1.y + (p2.y-p1.y)*dist, 
+			p1.z + (p2.z-p1.z)*dist )
+end
+
+function Vector_ProgressBetweenPoints2D(p1, p2, progress)
+	local shift = Vector(p2.x-p1.x, p2.y-p1.y)
+	local len = (shift.x^2 + shift.y^2)^0.5
+	shift.x = shift.x*progress + p1.x
+	shift.y = shift.y*progress + p1.y
+	return shift
 end
 
 function Vector_UnitDirectionalFacingDirection(degrees) -- TODO REFACTOR DEGREES NAME OR STANDARDIZE RADS IN
@@ -252,8 +267,8 @@ function Vector_UnitFacingUnit(u1, u2)
 	local u1Facing = u1.GetFacing and u1:GetFacing() or u1.hUnit:GetFacing()
 	local u1Loc = u1.GetLocation and u1:GetLocation() or u1.lastSeen.location
 	local u2Loc = u2.GetLocation and u2:GetLocation() or u2.lastSeen.location
-	local directionVector = Vector_PointToPointLine(u1Loc, u2Loc)
-	local directlyFacing = acos(directionVector.x / Vector_LengthOfVector(directionVector))
+	local directionVector = Vector(u2Loc.x - u1Loc.x, u2Loc.y - u1Loc.y, 0)
+	local directlyFacing = acos(directionVector.x / ((directionVector.x^2 + directionVector.y^2)^0.5))
 	directlyFacing = directionVector.y < 0 and MATH_2PI-directlyFacing or directlyFacing
 	local unitFacing = rad(u1Facing)
 	local radToTurn = unitFacing - directlyFacing
@@ -274,8 +289,8 @@ end
 function Vector_UnitFacingLoc(unit, loc)
 	local unitFacing = unit.GetFacing and unit:GetFacing() or unit.hUnit:GetFacing()
 	local unitLoc = unit.GetLocation and unit:GetLocation() or unit.lastSeen.location
-	local directionVector = Vector_PointToPointLine(unitLoc, loc)
-	local directlyFacing = acos(directionVector.x / Vector_LengthOfVector(directionVector))
+	local directionVector = Vector(loc.x-unitLoc.x, loc.y-unitLoc.y)
+	local directlyFacing = acos(directionVector.x / ((directionVector.x^2 + directionVector.y^2)^0.5))
 	directlyFacing = directionVector.y < 0 and MATH_2PI-directlyFacing or directlyFacing
 	local unitFacing = rad(unitFacing)
 	local radToTurn = unitFacing - directlyFacing
@@ -300,7 +315,7 @@ end
 
 function Vector_PointToPointRads(p1, p2)
 	local directionVector = Vector_PointToPointLine(p1, p2)
-	local radsAngle = acos(directionVector.x / sqrt(directionVector.x^2 + directionVector.y^2))
+	local radsAngle = acos(directionVector.x / (directionVector.x^2 + directionVector.y^2)^0.5)
 	radsAngle = directionVector.y < 0 and MATH_2PI - radsAngle or radsAngle
 	return radsAngle
 end
@@ -313,6 +328,17 @@ function Vector_BRads2D(a, b, c)
 	local bcSq = (c.x-b.x)^2 + (c.y-b.y)^2
 	local caSq = (a.x-c.x)^2 + (a.y-c.y)^2
 	return acos((abSq + bcSq - caSq)/(2*(abSq*bcSq)^0.5))
+end
+
+-------- Vector_BRadsProgressToC()
+function Vector_BRadsProgressToC(A, B, C, p, limitRange)
+	local ABv = Vector(B.x-A.x, B.y-A.y)
+	local lenAB = (ABv.x^2 + ABv.y^2)^0.5
+	local ABRads = acos(ABv.x / lenAB)
+	local ACx = C.x - A.x
+	local ACy = C.y - A.y
+	local lenAC = (ACx^2 + ACy^2)^0.5
+	local ACRads = (ACx / lenAC)
 end
 
 function Vector_PointWithinTriangle(p, q1, q2, q3)
@@ -329,7 +355,7 @@ end
 local Vector_PointWithinTriangle = Vector_PointWithinTriangle
 
 function Vector_SideOfPlane(p, q1, q2) -- i.e. Always use counter-clock-wise encapsulation if comparing to 1
-	return Vector_CrossProduct2D(Vector_PointToPointLine(q1, q2), Vector_PointToPointLine(q2, p)) > 0 and 1 or -1
+	return (q2.x-q1.x)*(p.y-q2.y) - (q2.y-q1.y)*(p.x-q2.x) > 0 and 1 or -1
 end
 local Vector_SideOfPlane = Vector_SideOfPlane
 
@@ -375,7 +401,7 @@ local Vector_PointWithinStripDirectional = Vector_PointWithinStripDirectional
 
 -------- Vector_PointWithinCone()
 function Vector_PointWithinCone(p, base, height, projectingRads, halfRadiansSpread)
-	local distanceFromBase = sqrt((p.x - base.x)^2 + (p.y - base.y)^2 + (p.z - base.z)^2)
+	local distanceFromBase = ((p.x - base.x)^2 + (p.y - base.y)^2 + (p.z - base.z)^2)^0.5
 	local baseP = Vector(p.x - base.x, p.y - base.y, 0)
 	local radsDiff = abs(acos(baseP.x / distanceFromBase) - projectingRads)
 	radsDiff = radsDiff > MATH_PI and MATH_2PI - radsDiff or radsDiff
@@ -413,22 +439,22 @@ local Vector_DirectionalUnitMovingForward = Vector_DirectionalUnitMovingForward
 
 function Vector_DistancePointToLine2D(P, lp1, lp2)
 	local lp1Lp2 = Vector(lp2.x-lp1.x, lp2.y-lp1.y, 0)
-	local lengthLp1Lp2 = sqrt(lp1Lp2.x^2 + lp1Lp2.y^2)
+	local lengthLp1Lp2 = (lp1Lp2.x^2 + lp1Lp2.y^2)^0.5
 	local lp1P = Vector(P.x-lp1.x, P.y-lp1.y, 0)
-	local lengthLp1P = sqrt(lp1P.x^2 + lp1P.y^2)
+	local lengthLp1P = (lp1P.x^2 + lp1P.y^2)^0.5
 	local angle = acos(
 			(lp1Lp2.x*lp1P.x + lp1Lp2.y*lp1P.y) -- lp1lp2.lp1P
 				/ (lengthLp1Lp2 * lengthLp1P) -- / (|lp1lp2|*|lp1P|)
 		)
 	return lengthLp1P * sin(angle)
 end
-local Vector_DistancePointToLine = Vector_DistancePointToLine
+local Vector_DistancePointToLine2D = Vector_DistancePointToLine2D
 
 function Vector_DistancePointToLine(P, lp1, lp2)
 	local lp1Lp2 = Vector(lp2.x-lp1.x, lp2.y-lp1.y, lp2.z-lp1.z)
-	local lengthLp1Lp2 = sqrt(lp1Lp2.x^2 + lp1Lp2.y^2 + lp1Lp2.z^2)
+	local lengthLp1Lp2 = (lp1Lp2.x^2 + lp1Lp2.y^2 + lp1Lp2.z^2)^0.5
 	local lp1P = Vector(P.x-lp1.x, P.y-lp1.y, P.z-lp1.z)
-	local lengthLp1P = sqrt(lp1P.x^2 + lp1P.y^2 + lp1P.z^2)
+	local lengthLp1P = (lp1P.x^2 + lp1P.y^2 + lp1P.z^2)^0.5
 	local angle = acos(
 			(lp1Lp2.x*lp1P.x + lp1Lp2.y*lp1P.y + lp1Lp2.z*lp1P.z)
 				/ (lengthLp1Lp2 * lenthLp1P)
@@ -436,6 +462,23 @@ function Vector_DistancePointToLine(P, lp1, lp2)
 	return lengthLp1P * sin(angle)
 end
 local Vector_DistancePointToLine = Vector_DistancePointToLine
+
+function Vector_DistUnitToUnit(unit1, unit2)
+	unit1 = unit1.hUnit and unit1.lastSeen.location
+			or unit1:GetLocation()
+	unit2 = unit2.hUnit and unit2.lastSeen.location
+			or unit2:GetLocation()
+	return ((unit1.x-unit2.x)^2 + (unit1.y-unit2.y)^2 + (unit1.z-unit2.z)^2)^0.5
+end
+
+function Vector_DistUnitToUnit2D(unit1, unit2)
+	unit1 = unit1.hUnit and unit1.lastSeen.location
+			or unit1:GetLocation()
+	unit2 = unit2.hUnit and unit2.lastSeen.location
+			or unit2:GetLocation()
+	print(unit1.x, unit1.y, unit2.x, unit2.y)
+	return ((unit1.x-unit2.x)^2 + (unit1.y-unit2.y)^2)^0.5
+end
 
 function Vector_GetNearestToUnitForUnits(gsiUnit, gsiUnitsTbl)
 	local closestDist = 0xFFFF
@@ -504,7 +547,7 @@ function Vector_BoundedToWorld(v)
 end
 
 local function get_bezier_xy1(self, progress)
-	-- Waiting for feeling future-lazy
+	-- Waiting for an application
 end
 
 local function get_bezier_xy2(self, progress)
@@ -535,7 +578,7 @@ end
 local function get_bezier_forwards(self, progress, andUpdate)
 	local valSave = self.val
 	local progressSave = self.progress
-	local forwardsVal = self:compute(progress)
+	local forwardsVal = self:compute(progressSave+progress)
 	local forwardsProgress = self.progress
 	if not andUpdate then
 		self.val = val
@@ -547,11 +590,11 @@ end
 function Vector_CreateBezierFunction(p0, p1, p2, p3, p4)
 	local newBezier = {}
 	if not p0 or not p1 then
-		ERROR_print(string.format("[vector] attempt to create a bezier without a required arg. %s", 
-					Util_ParamString(p0, p1, p2, p3, p4)
-				)
+		ERROR_print(true, DEBUG,
+				"[vector] attempt to create a bezier without a required arg. %s", 
+				Util_ParamString(p0, p1, p2, p3, p4)
 			)
-		print(debug.traceback())
+		return nil;
 	end
 	newBezier.computeForwards = get_bezier_forwards
 	newBezier.p0 = p0

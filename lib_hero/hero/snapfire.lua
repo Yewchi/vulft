@@ -1,10 +1,10 @@
 local hero_data = {
 	"snapfire",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 8, 3, 4, 9, 11},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_tango","item_circlet","item_gauntlets","item_branches","item_branches","item_faerie_fire","item_enchanted_mango","item_faerie_fire","item_bracer","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_magic_wand","item_buckler","item_guardian_greaves","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_broadsword","item_blades_of_attack","item_lesser_crit","item_demon_edge","item_greater_crit","item_lesser_crit","item_demon_edge","item_greater_crit",
+		"item_enchanted_mango","item_magic_stick","item_tango","item_circlet","item_wraith_band","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_cloak","item_headdress","item_pipe","item_aghanims_shard","item_void_stone","item_ultimate_orb","item_sheepstick","item_blink","item_vitality_booster","item_energy_booster","item_gem","item_gem","item_reaver","item_aeon_disk","item_overwhelming_blink","item_gem","item_gem","item_cornucopia","item_cornucopia","item_refresher",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,4,2,}, 0.1 },
+	{ {3,3,3,2,1,}, {3,3,5,2,4,}, 0.1 },
 	{
 		"Scatterblast","Firesnap Cookie","Lil' Shredder","Mortimer Kisses","+70 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","Lil' Shredder Uses Your Attack Damage","+60 Mortimer Kisses Impact Damage","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
 	}

@@ -1,4 +1,125 @@
-v0.7b-230414 (10th April meta) - Updated for 7.33
+v0.8 // 2023-04-27 (25th April meta) -- Dota 2 7.33
+> ADDED Capturing Outposts
+	-| Will try to clutch the capture if it gets dangerous
+	-| Abandons capture if it becomes too dangerous and the cast time is high, probably.
+
+> ADDED Power treads switching
+	-| Heroes will now try to switch into intelligence for their spell casting.
+	-| Switch back to primary after a short moment.
+	-| Str for fear
+	-| Unviseral use agi for fighting
+	-| Switch to agi for bottle use
+	-| May switch to agi for consumable use
+
+> Warding
+	-| Fixed the bug where heroes would stand idle at any point of the map for long periods of time when trying to ward.
+	-| Fixed data degradation of automaticly generated ward location. -- Warding will be much more sturdy for any map changes.
+
+> General movement
+	-| Fixed many bugs with basic movement functions
+	-| Much more is planned for improving movement.
+
+> Fight analytics
+	-| Bots will detect if a hero is directly moving towards them to attack, with a few very rare false positives.
+	-| Used in analytics for determining who on the team is drawing enemy's threat.
+
+> Farming jungle during team pushes
+	-| Fixed a bug that prevented bots from farming jungle when a nearby allied player is pushing the wave
+	-| Previously, all heroes allocated to the lane would try to push the wave. (cores demagnatize from other cores unless the PushHarder metric is high)
+	-| Greedy and glass cannons are preferred for pushing the wave.
+	-| Hero selection for pushing creep waves while assisted is temporary, it will include a score increase for heroes that have high gank resistance sometime in the future.
+	-| Heroes with high physical offensive and defensive powers are preferred to assist the player by standing nearby and farming the jungle.
+	-| The selected, unrevealed or known-up pack to farm will advance along with the creep wave front.
+	-| If the number of players alive on the allied team is twice that or more of the enemy team, then this behaviour is disengaged, and they will push faster, so long as the PushHarder metric passes a certain limit. PushHarder is determined per-hero, but is strongly based on the state of the game. [url=https://github.com/Yewchi/vulft/wiki/Metrics]graph for more info[/url]
+	-| I will probably make it so that the best physical power player still tries to get some jungle farm along with the push during PushHarder, as some heroes have push ability logic anyways, and more gold and xp gained during the time.
+	-| Players are included in the calcuation, but cannot influence the designated pusher decision; if an allied player is jungling nearby after the early game, and it is not near a bounty, for now, it might be because they think you pushing is a good idea.
+
+> Buying regen
+	-| Fixed an issue introduced with the latest regen stock count fixes
+	-| Bots would not buy any regen in their original build (most regen).
+	-| Actually tested the fix, and confirmed it does work.
+
+> Windrunner
+	-| Now stands more aggressively and away from heroes that are not her target during focus fire
+	-| Stands forward the more confident she is in the fight.
+	-| No longer affected by orb walking code, just stands to secure the kill where it is safest.
+
+> Muerta
+	-| Fixed a bug preventing muerta using pierce when she is taking a lot of physical damage
+	-| Gains a slight fight incentive even when she enters ultimate in fear, which may cause her to turn the fight.
+
+> Juggernaut
+	-| Increased odds of using healing ward.
+	-| Increased odds of using omnislash aggressively
+	-| -- Is based on values like nearby creeps and their closeness, if an attack damage wave clear item is held, if both teams are engaged in the fight, target's health.
+	-| Testing shows this is fairly good while improvement is possible, but other heroes will be implemented instead.
+
+> Arc Warden
+	-| Fixed Arc not using escape curves for spark wraith fog of war.
+
+> AoE ability location data logic
+	-| Fixed many bugs for targeting heroes in an AoE strip.
+	-| Fixed a bug that caused windrunner to shoot in an undefined direction if the target was not moving. i.e. the shot was not improvable based on wind's guess shot location.
+	-| Grimstroke now also uses this advanced location data scoring function for adjusting Stroke of Fate now, and will be more accurate. Needs improving to wait for comparitively good shots on many heroes, as windrunner already uses.
+
+> Aggression threshold near towers
+	-| Fixed a bug with tower attack ranges for positioning considerations.
+	-| Heroes will chase to the correct distance when checking their power threshold to dive a tower.
+	-| E.g. previously, a low level hero who would not try to dive a tower would back out of fight_harass way too early because they thought they would be standing under tower while attacking a hero under tower.
+
+> Item use improved
+	-| Fixed a bunch of issues with item use caused by thinking bots were not channeling an item that they had just started a cast of
+	-| Meteor hammer much more reliable
+
+> Search Fog
+	-| Enemy missing events nearby to the allies around them are raised to score search_fog immediately to create the escape path.
+	-| More efficient chasing.
+
+> Lots of other things, including some new bugs, and over aggression in lane.
+
+~~~~
+
+v0.7dd-230421 (10th April meta) - Updated for 7.33
+> Fixed another missed check for tango item build clogging due to new stock count
+
+~~~~
+
+v0.7d-230421 (10th April meta) - Updated for 7.33
+> Corrected item_clarity and item_tango purchasing behaviour for stock counts in 7.33
+-| Bots were infinitely trying to purchase tangos and clarities, failing to purchase, moving it up the item build list and then adding it again.
+
+> Reduced the range of ward spot finding
+-| The reduced range of ward finding on the larger map is still greater than it was on the previous map.
+-| Reduces the amount of spurious wards found. Usually they aren't used anyways as the spurious locations are mostly around the Dire and Radiant fountains, where the front-line of each teams towers keep the ward location reserved as too dangerous for consideration (at least for now).
+-| Still broken, they will place a few wards then my analytical height loc data will degrade due to a bug in the ward-correction algorithm bot's use.
+-| Minor performance increase, especially during the start of the match.
+
+~~~~
+
+v0.7cc-230421 (10th April meta) - Updated for 7.33
+> Fixed localization initialize error
+-| Fixed a bug prevented chat commands to prompt for setting human's role with pings
+
+> DEVELOPER:
+-| Added a dev script to fully-automate packing for releases of VULFT into other languages.
+
+~~~~
+
+v0.7c-230420 (10th April meta) - Updated for 7.33
+> Fixed Zues bot not able to initialize.
+
+> Juggernaut Blade Fury
+-| Jug will stand to maximize AoE damage
+-| He will also use attacks while in bladefury if he is ahead of an enemy to their fountain, or if the enemy is facing Jug, or stunned, rooted, etc, for attack procs.
+
+~~~~
+
+v0.7b-230420 (10th April meta) - Updated for 7.33
+> Hotfix runes init on Dire.
+
+~~~~
+
+v0.7a-230414 (10th April meta) - Updated for 7.33
 > ADDED HERO Juggernaut
 
 > Set your role at any time with '!pos [1 to 5]'

@@ -1,12 +1,12 @@
 local hero_data = {
 	"sniper",
-	{1, 2, 1, 3, 2, 2, 3, 1, 1, 2, 3, 3, 6, 4, 7, 4, 4, 9, 11},
+	{2, 3, 2, 3, 2, 3, 1, 1, 3, 6, 2, 4, 1, 1, 7, 4, 4, 9},
 	{
-		"item_tango","item_circlet","item_slippers","item_slippers","item_faerie_fire","item_branches","item_branches","item_gloves","item_boots_of_elves","item_wraith_band","item_power_treads","item_javelin","item_maelstrom","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mjollnir","item_aghanims_shard","item_quarterstaff","item_eagle","item_butterfly","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_lesser_crit","item_greater_crit",
+		"item_slippers","item_slippers","item_tango","item_branches","item_circlet","item_wraith_band","item_wraith_band","item_wraith_band","item_boots","item_boots_of_elves","item_power_treads","item_mithril_hammer","item_javelin","item_maelstrom","item_blade_of_alacrity","item_dragon_lance","item_mask_of_madness","item_hurricane_pike","item_aghanims_shard","item_butterfly","item_claymore","item_satanic","item_lesser_crit","item_greater_crit","item_mjollnir","item_moon_shard",
 	},
-	{ {1,1,1,2,3,}, {1,1,1,2,3,}, 0.1 },
+	{ {2,2,2,3,1,}, {2,2,2,4,1,}, 0.1 },
 	{
-		"Shrapnel","Headshot","Take Aim","Assassinate","+1.0s Take Aim Duration","+30 Headshot Damage","+30 Attack Speed","+-14% Shrapnel Slow","+28 Knockback Distance Headshot","+24 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
+		"Shrapnel","Headshot","Take Aim","Assassinate","+1.0s Take Aim Duration","+30 Headshot Damage","+30 Attack Speed","+-15% Shrapnel Movement Slow","+25 Headshot Knockback Distance","+25 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
 	}
 }
 --@EndAutomatedHeroData
@@ -48,7 +48,9 @@ local fight_harass_handle = FightHarass_GetTaskHandle()
 
 local t_player_abilities = {}
 
-local SHRAPNEL_LANDS_DELAY = 0.3 + 1.2
+local max = math.max
+
+local SHRAPNEL_LANDS_DELAY = 0.3 + 1.2 + 0.5
 local SHRAPNEL_DURATION = 10
 local SHRAPNEL_RADIUS = 450
 local SHRAPNEL_CHARGE_TALENT_INDEX = 13
@@ -78,7 +80,7 @@ local function try_cast_extrapolated_shrapnel(gsiPlayer, shrapnel, shrapnelsActi
 	if not targetUnit.hUnit or targetUnit.hUnit:IsNull() or not targetUnit.hUnit:IsAlive() then
 		return false
 	end
-	local extrapolatedLoc = targetUnit.hUnit:GetExtrapolatedLocation(SHRAPNEL_LANDS_DELAY)
+	local extrapolatedLoc = targetUnit.hUnit:GetExtrapolatedLocation(SHRAPNEL_LANDS_DELAY)*max(0.33, targetUnit.hUnit:GetMovementDirectionStability())
 --	print("TRY SHRAP")
 --	print(VEC_POINT_DISTANCE(
 --				gsiPlayer.lastSeen.location,

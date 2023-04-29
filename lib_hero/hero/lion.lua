@@ -1,10 +1,10 @@
 local hero_data = {
 	"lion",
-	{1, 3, 3, 1, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 8, 2, 4, 10},
+	{1, 3, 1, 2, 1, 4, 1, 3, 2, 2, 2, 4, 3, 5, 8, 3, 4, 9, 12},
 	{
-		"item_ward_observer","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_flask","item_wind_lace","item_branches","item_boots","item_tranquil_boots","item_fluffy_hat","item_magic_wand","item_aghanims_shard","item_blink","item_staff_of_wizardry","item_force_staff","item_gem","item_aeon_disk","item_point_booster","item_ultimate_scepter","item_gem",
+		"item_tango","item_ward_observer","item_branches","item_branches","item_branches","item_blight_stone","item_branches","item_boots","item_wind_lace","item_tranquil_boots","item_magic_wand","item_blink","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_aghanims_shard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_boots_of_bearing","item_aether_lens","item_yasha",
 	},
-	{ {1,1,1,3,5,}, {5,5,5,4,4,}, 0.1 },
+	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
 	{
 		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-3s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
 	}

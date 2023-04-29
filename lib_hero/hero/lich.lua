@@ -1,12 +1,12 @@
 local hero_data = {
 	"lich",
-	{1, 2, 1, 3, 2, 4, 1, 2, 3, 5, 3, 4, 3, 1, 7, 2, 4, 10, 11},
+	{1, 2, 1, 3, 1, 4, 1, 2, 3, 6, 3, 4, 3, 2, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_ward_sentry","item_enchanted_mango","item_enchanted_mango","item_ward_observer","item_magic_wand","item_boots","item_ring_of_basilius","item_crown","item_veil_of_discord","item_tranquil_boots","item_aghanims_shard","item_void_stone","item_energy_booster","item_aether_lens","item_blink","item_gem","item_mystic_staff","item_ultimate_orb","item_sheepstick",
+		"item_tango","item_blood_grenade","item_enchanted_mango","item_magic_stick","item_smoke_of_deceit","item_ward_observer","item_wind_lace","item_boots","item_fluffy_hat","item_tranquil_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_energy_booster","item_guardian_greaves","item_cloak","item_headdress","item_ring_of_health","item_pipe","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity",
 	},
-	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Frost Blast","Frost Shield","Sinister Gaze","Chain Frost","+10% Frost Shield Damage Reduction","+150 Frost Blast Radius and Damage","+0.5s Sinister Gaze Duration","-3s Frost Blast Cooldown","+100 Chain Frost Damage","+4s Frost Shield Duration","Frost Shield Provides +50 HP Regen","Chain Frost Unlimited Bounces",
+		"Frost Blast","Frost Shield","Sinister Gaze","Chain Frost","+10% Frost Shield Damage Reduction","+150 Frost Blast Radius and Damage","+0.4s Sinister Gaze Duration","-3s Frost Blast Cooldown","+100 Chain Frost Damage","+4s Frost Shield Duration","Frost Shield Provides +50 HP Regen","Chain Frost Unlimited Bounces",
 	}
 }
 --@EndAutomatedHeroData

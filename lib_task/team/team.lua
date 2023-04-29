@@ -27,14 +27,6 @@
 TEAM_CAPTAIN_UNIT = TEAM_CAPTAIN_UNIT or GetBot()
 TEAM_CAPTAIN_UNIT.Chat = Captain_Chat
 
-require(GetScriptDirectory().."/lib_hero/vibe")
-require(GetScriptDirectory().."/lib_analytics/xeta")
-require(GetScriptDirectory().."/lib_task/task")
-require(GetScriptDirectory().."/lib_hero/hero")
-require(GetScriptDirectory().."/lib_task/team/wanted_poster")
-require(GetScriptDirectory().."/lib_task/blueprint/blueprint_main")
-require(GetScriptDirectory().."/lib_hero/ability_think_main")
-
 local max = math.max
 local min = math.min
 local abs = math.abs
@@ -49,8 +41,6 @@ local buyback_directive
 local t_present_or_committed = {} for i=1,3 do t_present_or_committed[i] = {} end -- state if pnot is at strategic lane
 
 local t_prev_strategic_lane = {}
-
-local Task_GetCurrentTaskHandle = Task_GetCurrentTaskHandle
 
 local zone_defend_handle
 local fight_harass_handle
@@ -287,7 +277,7 @@ function Team_InformDeadTryBuyback(gsiPlayer)
 					gsiPlayer.hUnit:ActionImmediate_Buyback() 
 				end
 				if not defensible.tier or not Item_TownPortalScrollCooldown(gsiPlayer) then
-					ERROR_print(string.format("Found nils in TryBuyback (%s %s)", defensible.tier, Item_TownPortalScrollCooldown(gsiPlayer)))
+					ERROR_print(false, not DEBUG, "Found nils in TryBuyback (%s %s)", defensible.tier, Item_TownPortalScrollCooldown(gsiPlayer))
 					return
 				end
 				if defensible.lastSeenHealth > 200
@@ -451,4 +441,11 @@ function Team_FortUnderAttack(gsiUnit)
 		Task_IncentiviseTask(team_players[i], UseAbility_GetTaskHandle(), score, decrement)
 	end
 end
---[[ MicroThink() implemented in bot_generic as Think() = MicroThink() ]]--
+
+require(GetScriptDirectory().."/lib_hero/vibe")
+require(GetScriptDirectory().."/lib_analytics/xeta")
+require(GetScriptDirectory().."/lib_task/task")
+require(GetScriptDirectory().."/lib_hero/hero")
+require(GetScriptDirectory().."/lib_task/team/wanted_poster")
+require(GetScriptDirectory().."/lib_task/blueprint/blueprint_main")
+require(GetScriptDirectory().."/lib_hero/ability_think_main")

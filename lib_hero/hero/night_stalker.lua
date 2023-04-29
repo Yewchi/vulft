@@ -2,7 +2,7 @@ local hero_data = {
 	"night_stalker",
 	{1, 3, 1, 3, 1, 4, 1, 2, 3, 6, 3, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_gauntlets","item_quelling_blade","item_branches","item_magic_stick","item_tango","item_enchanted_mango","item_boots","item_bracer","item_chainmail","item_phase_boots","item_wind_lace","item_magic_wand","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_aghanims_shard","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_soul_booster","item_energy_booster","item_void_stone","item_octarine_core","item_sheepstick","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar","item_ultimate_scepter_2","item_overwhelming_blink",
+		"item_quelling_blade","item_tango","item_branches","item_branches","item_branches","item_bracer","item_bracer","item_boots","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_quarterstaff","item_oblivion_staff","item_aghanims_shard","item_ogre_axe","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_sange","item_heavens_halberd","item_buckler","item_hyperstone","item_assault","item_diadem","item_diadem","item_harpoon",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

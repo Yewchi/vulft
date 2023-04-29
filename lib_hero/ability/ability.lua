@@ -179,7 +179,7 @@ function Ability_HandleAbilityUpgrades(gsiPlayer) -- TODO Locks ability points i
 	end
 end
 
-function Ability_PassPlayerAbilityData(gsiPlayer, skillBuild, abilityNameIndices, abilities)
+function Ability_InitializePlayer(gsiPlayer, skillBuild, abilityNameIndices, abilities)
 	-- store data
 	--print("PRELOAD", Util_PrintableTable(skillBuild), Util_PrintableTable(abilityNameIndices), Util_PrintableTable(abilities))
 	local pnot = gsiPlayer.nOnTeam

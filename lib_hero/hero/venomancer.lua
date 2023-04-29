@@ -1,12 +1,12 @@
 local hero_data = {
 	"venomancer",
-	{1, 2, 2, 3, 3, 3, 3, 4, 2, 2, 1, 4, 1, 1, 7, 5, 4, 9},
+	{1, 2, 1, 2, 3, 5, 3, 2, 2, 1, 1, 5, 3, 3, 6, 9, 5, 7, 13, 11},
 	{
-		"item_circlet","item_tango","item_branches","item_magic_stick","item_branches","item_ward_sentry","item_boots","item_wind_lace","item_tranquil_boots","item_belt_of_strength","item_magic_wand","item_wind_lace","item_fluffy_hat","item_ancient_janggo","item_staff_of_wizardry","item_force_staff","item_cloak","item_hood_of_defiance","item_headdress","item_boots_of_bearing","item_pipe","item_point_booster","item_ogre_axe",
+		"item_branches","item_branches","item_ring_of_regen","item_circlet","item_tango","item_branches","item_urn_of_shadows","item_boots","item_magic_wand","item_tranquil_boots","item_vitality_booster","item_spirit_vessel","item_belt_of_strength","item_wind_lace","item_ancient_janggo","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_boots_of_bearing","item_point_booster","item_ultimate_scepter","item_void_stone","item_pers","item_lotus_orb","item_dragon_lance","item_hurricane_pike","item_mystic_staff","item_sheepstick",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,3,3,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Venomous Gale","Poison Sting","Plague Ward","Poison Nova","-5s Venomous Gale CD","+20% Poison Sting Health Regen Reduction","-1.0s Plague Ward Cooldown","-8% Poison Sting Slow","+5.0s Poison Nova Duration","Gale Creates Plague Wards","Poison Nova reduces +100 Attack Speed","2.5x Plague Ward HP/Damage",
+		"Venomous Gale","Poison Sting","Plague Ward","Poison Nova","Noxious Plague","-5s Venomous Gale CD","+20% Poison Sting Health Regen Reduction","-1.0s Plague Ward Cooldown","-8% Poison Sting Slow","1.5% Noxious Plague Max HP Damage","Gale Creates Plague Wards","Noxious Plague Aura reduces +200 Attack Speed","2.5x Plague Ward HP/Damage",
 	}
 }
 --@EndAutomatedHeroData

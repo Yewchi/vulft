@@ -1,12 +1,12 @@
 local hero_data = {
 	"riki",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 8, 5, 4, 10, 11},
+	{2, 3, 2, 1, 2, 4, 2, 1, 3, 3, 5, 4, 1, 1, 7, 3, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_gauntlets","item_branches","item_branches","item_circlet","item_slippers","item_magic_wand","item_wraith_band","item_boots","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_blade_of_alacrity","item_yasha","item_manta","item_relic","item_nullifier","item_aghanims_shard","item_point_booster","item_ultimate_scepter","item_basher","item_abyssal_blade","item_ultimate_scepter_2","item_blink","item_swift_blink","item_greater_crit","item_rapier",
+		"item_tango","item_quelling_blade","item_branches","item_branches","item_circlet","item_slippers","item_wraith_band","item_magic_wand","item_boots","item_boots_of_elves","item_gloves","item_power_treads","item_blade_of_alacrity","item_diffusal_blade_2","item_blade_of_alacrity","item_yasha","item_manta","item_lesser_crit","item_greater_crit","item_gem","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard",
 	},
-	{ {1,1,1,2,3,}, {1,1,1,2,3,}, 0.1 },
+	{ {1,1,1,2,2,}, {1,1,1,2,2,}, 0.1 },
 	{
-		"Smoke Screen","Blink Strike","Tricks of the Trade","Cloak and Dagger","+60 Smoke Screen Radius","+0.4s Blink Strike Slow","8% Cloak and Dagger Movement Speed","-4s Smoke Screen Cooldown","+0.5 Backstab Multiplier","-4s Blink Strike Replenish Time","-4 Tricks of the Trade Cooldown","Tricks of the Trade Applies a Basic Dispel",
+		"Smoke Screen","Blink Strike","Tricks of the Trade","Cloak and Dagger","+60 Smoke Screen Radius","+8% Cloak and Dagger Movement Speed","+50% Tricks of the Trade Agility Increase","-4s Smoke Screen Cooldown","+0.5 Backstab Multiplier","-4s Blink Strike Replenish Time","-4 Tricks of the Trade Cooldown","Tricks of the Trade Applies a Basic Dispel",
 	}
 }
 --@EndAutomatedHeroData

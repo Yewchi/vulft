@@ -1,8 +1,8 @@
 local hero_data = {
 	"phantom_lancer",
-	{1, 3, 2, 3, 3, 4, 3, 2, 2, 6, 2, 4, 1, 1, 7, 1, 4, 9, 11},
+	{1, 3, 3, 2, 3, 4, 3, 2, 2, 6, 2, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_branches","item_magic_stick","item_enchanted_mango","item_branches","item_quelling_blade","item_tango","item_slippers","item_circlet","item_circlet","item_branches","item_branches","item_branches","item_quelling_blade","item_wraith_band","item_boots_of_elves","item_gloves","item_boots","item_power_treads","item_blade_of_alacrity","item_diffusal_blade_2","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_reaver","item_heart","item_blitz_knuckles","item_claymore","item_orchid","item_mage_slayer","item_bloodthorn",
+		"item_magic_stick","item_tango","item_quelling_blade","item_circlet","item_branches","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_blade_of_alacrity","item_yasha","item_cloak","item_ultimate_orb","item_manta","item_blade_of_alacrity","item_staff_of_wizardry","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_reaver","item_heart","item_mage_slayer","item_blitz_knuckles","item_staff_of_wizardry","item_orchid","item_bloodthorn","item_demon_edge","item_disperser","item_aghanims_shard","item_ultimate_scepter_2","item_basher","item_abyssal_blade","item_revenants_brooch",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

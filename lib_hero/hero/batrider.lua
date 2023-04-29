@@ -1,10 +1,10 @@
 local hero_data = {
 	"batrider",
-	{1, 3, 1, 2, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 7, 5, 4, 10, 12},
+	{1, 1, 2, 3, 1, 4, 1, 3, 3, 3, 2, 2, 2, 4, 7, 5, 4, 10, 12},
 	{
-		"item_enchanted_mango","item_tango","item_faerie_fire","item_ward_observer","item_bottle","item_boots","item_wind_lace","item_blitz_knuckles","item_robe","item_chainmail","item_witch_blade","item_aghanims_shard","item_platemail","item_void_stone","item_ring_of_health","item_lotus_orb","item_blink","item_octarine_core","item_gem","item_arcane_blink","item_ultimate_scepter","item_gem","item_ultimate_scepter_2",
+		"item_blood_grenade","item_tango","item_branches","item_faerie_fire","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_magic_wand","item_chainmail","item_robe","item_witch_blade","item_blink","item_aghanims_shard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_blade_of_alacrity","item_dragon_lance","item_hurricane_pike","item_energy_booster","item_aether_lens","item_cornucopia","item_refresher",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
 		"Sticky Napalm","Flamebreak","Firefly","Flaming Lasso","+50 Sticky Napalm Radius","+50 Flamebreak Knockback Distance","+20 Movement Speed","-10s Flaming Lasso Cooldown","+4.5s Firefly Duration","+2 Flamebreak Charges","+10 Sticky Napalm Damage","Flamebreak applies +2 Sticky Napalm Stacks",
 	}

@@ -1,12 +1,12 @@
 local hero_data = {
 	"spirit_breaker",
-	{3, 1, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 7, 2, 4, 10, 11},
+	{3, 1, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 5, 4, 10, 11},
 	{
-		"item_quelling_blade","item_branches","item_faerie_fire","item_tango","item_branches","item_ward_observer","item_ring_of_health","item_crown","item_meteor_hammer","item_boots","item_wind_lace","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_blitz_knuckles","item_shadow_amulet","item_broadsword","item_invis_sword","item_ogre_axe","item_black_king_bar","item_kaya","item_yasha","item_yasha_and_kaya","item_staff_of_wizardry","item_cyclone","item_mystic_staff","item_wind_waker","item_ultimate_scepter","item_aghanims_shard","item_aghanims_shard","item_gem","item_ultimate_scepter_2","item_octarine_core",
+		"item_tango","item_blood_grenade","item_quelling_blade","item_orb_of_venom","item_branches","item_branches","item_magic_stick","item_magic_wand","item_boots","item_chainmail","item_phase_boots","item_wind_lace","item_belt_of_strength","item_robe","item_ancient_janggo","item_blitz_knuckles","item_invis_sword","item_ogre_axe","item_black_king_bar","item_gem","item_ultimate_scepter","item_gem","item_yasha_and_kaya","item_ultimate_scepter_2","item_gem","item_silver_edge","item_cyclone",
 	},
-	{ {5,5,2,3,2,}, {4,4,4,2,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,4,4,}, 0.1 },
 	{
-		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
+		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+13% Greater Bash Chance","+175 Charge of Darkness Bonus Speed","+25% Greater Bash Damage","Bulldoze +500 All Damage Barrier",
 	}
 }
 --@EndAutomatedHeroData

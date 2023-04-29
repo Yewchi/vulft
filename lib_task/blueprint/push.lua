@@ -28,7 +28,7 @@ local TEST = TEST
 
 local task_handle = Task_CreateNewTask()
 
-local PUSH_THROTTLE = 0.179 -- rotates
+local PUSH_THROTTLE = 0.23807 -- rotates
 
 local TIME_TOWER_STILL_UNAGROABLE = 0.82 - 0.03
 local LEVEL_AND_SAFETY_ALLOW_PUSH_TOWERS = 4 + (-(-2)) -- level + (-danger)
@@ -364,13 +364,17 @@ blueprint = {
 					end
 				end
 
+				
+				
+
+
 				return arbitraryUnit,
 						min(gsiPlayer.level*3,
 								max(-10, (GSI_GetAliveAdvantageFactor()*50))-40*(theoreticalDanger)
 							)
 						- Xeta_CostOfTravelToLocation(gsiPlayer, enemy.center)
 						+ underAttack + finishAttack + attackStraysScore
-						- #knownEngage * 40 + #theorizedEngage * 10
+						- #knownEngage * 40 - #theorizedEngage * 10
 						- potentialDpsToMeIsBad - farmTaskScoreGetLastHit
 						+ 30*max(0, (1.25 - pushHarderFactor))
 						+ dontPushWithPusherFactor

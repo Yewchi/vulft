@@ -1,12 +1,12 @@
 local hero_data = {
 	"death_prophet",
-	{1, 3, 3, 1, 3, 4, 3, 1, 1, 2, 6, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 3, 3, 1, 3, 4, 3, 2, 1, 1, 6, 4, 2, 2, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_magic_stick","item_circlet","item_circlet","item_branches","item_branches","item_tango","item_branches","item_cloak","item_hood_of_defiance","item_boots","item_wind_lace","item_magic_wand","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_wraith_band","item_platemail","item_pers","item_reaver","item_vitality_booster","item_heart","item_ring_of_health","item_void_stone","item_lotus_orb","item_vladmir",
+		"item_circlet","item_tango","item_branches","item_slippers","item_enchanted_mango","item_blood_grenade","item_wraith_band","item_boots","item_wind_lace","item_arcane_boots","item_headdress","item_magic_wand","item_mekansm","item_buckler","item_guardian_greaves","item_ogre_axe","item_sange","item_heavens_halberd","item_platemail","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_shivas_guard","item_blink","item_gem",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+300 Health","-2.0s Crypt Swarm Cooldown","20.0% Spirit Siphon Move Speed Slow","+30 Spirit Siphon Damage/Heal","-20s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
+		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+300 Health","-2.0s Crypt Swarm Cooldown","25.0% Spirit Siphon Move Speed Slow","+30 Spirit Siphon Damage/Heal","-22s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
 	}
 }
 --@EndAutomatedHeroData
@@ -136,7 +136,7 @@ d = {
 		if gsiPlayer.hUnit:HasModifier("modifier_death_prophet_spirit_siphon") then
 			Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 16, 4)
 			if attackRange == gsiPlayer.attackRange then
-				pUnit_SetFalsifyAttackRange(gsiPlayer, min(attackRange, SIPHON_BREAK_RANGE * 0.75))
+				pUnit_SetFalsifyAttackRange(gsiPlayer, min(attackRange, SIPHON_BREAK_RANGE * 0.6))
 			end
 		elseif attackRange ~= gsiPlayer.attackRange then
 			pUnit_SetFalsifyAttackRange(gsiPlayer, attackRange)

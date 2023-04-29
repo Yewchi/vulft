@@ -1,12 +1,12 @@
 local hero_data = {
 	"puck",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 8, 3, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 3, 3, 5, 8, 4, 4, 9, 11},
 	{
-		"item_tango","item_branches","item_branches","item_branches","item_ward_observer","item_faerie_fire","item_bottle","item_boots","item_blitz_knuckles","item_robe","item_chainmail","item_witch_blade","item_blink","item_robe","item_magic_wand","item_staff_of_wizardry","item_belt_of_strength","item_kaya","item_kaya_and_sange","item_aether_lens","item_octarine_core","item_overwhelming_blink","item_mystic_staff","item_ultimate_orb","item_sheepstick",
+		"item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_branches","item_ward_observer","item_bottle","item_robe","item_chainmail","item_witch_blade","item_boots","item_robe","item_gloves","item_power_treads","item_blink","item_robe","item_staff_of_wizardry","item_kaya","item_kaya_and_sange","item_ultimate_orb","item_cornucopia","item_sphere","item_energy_booster","item_octarine_core","item_overwhelming_blink","item_revenants_brooch","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Illusory Orb","Waning Rift","Phase Shift","Dream Coil","+50 Illusory Orb Damage","+0.75s Waning Rift Silence Duration","-10s Dream Coil Cooldown","+75 Waning Rift Damage","-4s Waning Rift Cooldown","+150 Initial/Break Dream Coil Damage","Dream Coil Pierces Magic Immunity","Dream Coil Rapid Fire",
+		"Illusory Orb","Waning Rift","Phase Shift","Dream Coil","+50 Illusory Orb Damage","+0.75s Waning Rift Silence Duration","-10s Dream Coil Cooldown","+75 Waning Rift Damage","-4s Waning Rift Cooldown","+150 Initial/Break Dream Coil Damage","Dream Coil Pierces Debuff Immunity","+250 Waning Rift Radius/Max Distance",
 	}
 }
 --@EndAutomatedHeroData

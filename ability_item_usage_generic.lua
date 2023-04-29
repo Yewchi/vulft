@@ -219,9 +219,8 @@ local function generic_microthink() -- See Think() counterparts (grander scale t
 			job_domain:DoAllJobs()
 		else
 			job_domain = nil
-			ERROR_print(string.format("[ability_item_usage_generic]: Manually destroying"..
-					" %s's flippable hook to default behavior.",
-					GetBot():GetUnitName() )
+			ERROR_print(false, false, "[ability_item_usage_generic]: Manually destroying %s's flippable hook to default behavior.",
+					GetBot():GetUnitName() 
 				)
 			ItemUsageThink = function() end
 			CourierUsageThink = function() end

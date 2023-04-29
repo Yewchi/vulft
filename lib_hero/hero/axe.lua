@@ -1,8 +1,8 @@
 local hero_data = {
 	"axe",
-	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 8, 2, 4, 9, 11},
+	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 8, 6, 4, 9, 11},
 	{
-		"item_tango","item_faerie_fire","item_magic_stick","item_branches","item_quelling_blade","item_branches","item_ring_of_protection","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_chainmail","item_magic_wand","item_blades_of_attack","item_phase_boots","item_blink","item_blade_mail","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_cloak","item_hood_of_defiance","item_pipe",
+		"item_quelling_blade","item_tango","item_branches","item_ring_of_protection","item_ring_of_protection","item_ring_of_health","item_vanguard","item_boots","item_magic_wand","item_blink","item_broadsword","item_blade_mail","item_aghanims_shard","item_gem","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_platemail","item_gem","item_shivas_guard","item_gem","item_kaya_and_sange","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_overwhelming_blink","item_cornucopia","item_cornucopia","item_refresher",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

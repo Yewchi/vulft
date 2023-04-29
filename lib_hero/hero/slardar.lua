@@ -1,12 +1,12 @@
 local hero_data = {
 	"slardar",
-	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 7, 2, 4, 9, 12},
+	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 8, 2, 4, 9, 12},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_belt_of_strength","item_gloves","item_power_treads","item_magic_wand","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_hyperstone","item_buckler","item_assault","item_demon_edge","item_javelin","item_monkey_king_bar","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_gem",
+		"item_tango","item_quelling_blade","item_branches","item_branches","item_gauntlets","item_faerie_fire","item_boots","item_gloves","item_belt_of_strength","item_lifesteal","item_mask_of_madness","item_belt_of_strength","item_power_treads","item_ogre_axe","item_echo_sabre","item_diadem","item_harpoon","item_harpoon","item_blink","item_mithril_hammer","item_aghanims_shard","item_black_king_bar","item_relic","item_nullifier",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,3,1,}, 0.1 },
 	{
-		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+0.2s Slithereen Crush Stun Duration","+325 Health","+50 Bash of the Deep Damage","+150.0 Slithereen Crush Damage","-4 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
+		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+0.2s Slithereen Crush Stun Duration","+325 Health","+50 Bash of the Deep Damage","+150.0 Slithereen Crush Damage","-3 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
 	}
 }
 --@EndAutomatedHeroData

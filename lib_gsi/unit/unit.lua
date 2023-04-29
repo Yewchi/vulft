@@ -98,7 +98,7 @@ function Unit_GetTimeTilNextAttackStart(gsiUnit)
 	if not gsiUnit.hUnit:CanBeSeen() then
 		return 0
 	end
-	return max(gsiUnit.hUnit:GetSecondsPerAttack()*(1-gsiUnit.hUnit:GetAttackPoint())
+	return max(gsiUnit.hUnit:GetSecondsPerAttack()*(1-gsiUnit.attackPointPercent)
 			+ gsiUnit.hUnit:GetLastAttackTime() - GameTime(), 0)
 end
 local time_til_attack_start = Unit_GetTimeTilNextAttackStart

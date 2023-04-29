@@ -2,11 +2,11 @@ local hero_data = {
 	"sand_king",
 	{3, 1, 2, 2, 2, 4, 2, 1, 1, 1, 6, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_tango","item_gauntlets","item_circlet","item_branches","item_branches","item_bracer","item_crown","item_magic_wand","item_veil_of_discord","item_boots","item_tranquil_boots","item_blink","item_staff_of_wizardry","item_kaya","item_aghanims_shard","item_ghost","item_ethereal_blade","item_staff_of_wizardry","item_wind_lace","item_cyclone","item_aether_lens","item_octarine_core",
+		"item_quelling_blade","item_branches","item_branches","item_circlet","item_tango","item_enchanted_mango","item_branches","item_tango","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_blink","item_magic_wand","item_staff_of_wizardry","item_wind_lace","item_cyclone","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aeon_disk","item_void_stone","item_soul_booster","item_octarine_core",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.5s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Base Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
+		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","20 Sand Storm Damage Per Second","+0.4s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Base Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
 	}
 }
 --@EndAutomatedHeroData

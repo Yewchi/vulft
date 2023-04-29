@@ -270,6 +270,113 @@ local make_target_building_far_safe = function(gsiPlayer, target)
 	return target
 end
 
+-- TODO move all the action stuff into this file.
+function AbilityLogic_UseLantern(gsiPlayer, lantern)
+	local useLantern = gsiPlayer.hUnit:GetAbilityByName("ability_lamp_use")
+	--local useLantern = gsiPlayer.hUnit:GetAbilityByName("ability_pluck_famango")
+	print(useLantern)
+	if useLantern then
+		print('using lantern', useLantern:GetCastRange())
+		if Vector_DistUnitToUnit(gsiPlayer, lantern)
+				> useLantern:GetCastRange()*0.8 then
+			gsiPlayer.hUnit:Action_MoveDirectly(lantern.lastSeen.location)
+			return true
+		end
+		-- 'attempting' 201 0 3 64
+		print('attemping', useLantern:GetBehavior(), useLantern:GetTargetType(), useLantern:GetTargetTeam(), useLantern:GetTargetFlags())
+		print(gsiPlayer.shortName, lantern.hUnit)
+		local hUnit = gsiPlayer.hUnit
+		if RandomInt(1, 5) == 5 then 
+			-- RESULT: IDLES -- hUnit confirmed, and tried straight from GetUnitList,
+			-- -| they will move to the unit, get in range, and never trigger a cast.
+			-- -| Players cast ability_lamp_use, the location associated with
+			-- -| the cast is <0,0,0>. Famangoes and Twin Gates will show the cast at
+			-- -| the location of the building/caster didn't check.
+			-- - Tried stealing the player's ability handle as well, also failed.
+			gsiPlayer.hUnit:Action_UseAbilityOnEntity(useLantern, lantern.hUnit)--nothing
+			--gsiPlayer.hUnit:Action_UseAbility(useLantern, lantern.hUnit)--nothing
+			--gsiPlayer.hUnit:Action_UseShrine(lantern.hUnit)--nothing
+		end
+		return true
+	end
+	return false
+end
+
+function AbilityLogic_UseOutpost(gsiPlayer, outpost)
+	if outpost then
+		if outpost.hUnit:HasModifier("modifier_invulnerable") then
+			return false, false
+		end
+		if Vector_DistUnitToUnit(gsiPlayer, outpost) > 400 then
+			gsiPlayer.hUnit:Action_MoveDirectly(outpost.lastSeen.location)
+			return true, false
+		end
+		local abilityCapture = gsiPlayer.hUnit:GetAbilityByName("ability_capture")
+		local activeAbility = gsiPlayer.hUnit:GetCurrentActiveAbility()
+		-- WORKS
+		if gsiPlayer.hUnit:GetCurrentActiveAbility() ~= abilityCapture then
+			gsiPlayer.hUnit:Action_UseAbilityOnEntity(abilityCapture, outpost.hUnit)
+			return true, false
+		else
+			return true, true
+		end
+	end
+	return false, false
+end
+
+function AbilityLogic_UseFamangoTree(gsiPlayer, mangoTree, distLimit)
+--	local humans = GSI_GetTeamHumans(TEAM)
+
+	if mangoTree then
+		local distToUnit = Vector_DistUnitToUnit(gsiPlayer, mangoTree)
+		if distLimit and distToUnit > distLimit then
+			return false, false, distToUnit
+		end
+		if distToUnit > 500 then
+			gsiPlayer.hUnit:Action_MoveDirectly(mangoTree.lastSeen.location)
+			return true, false, distToUnit
+		end
+		local pluck = gsiPlayer.hUnit:GetAbilityByName("ability_pluck_famango")
+--		pluck = humans[1] and humans[1].hUnit:GetAbilityByName("ability_pluck_famango")
+		if pluck then
+			INFO_print("[ability_generics] %s plucking %s at %s", gsiPlayer.shortName,
+					mangoTree.name, mangoTree.lastSeen.location
+				) -- prints
+			-- RESULT: IDLES
+			if RandomInt(1, 7) == 7 then
+				gsiPlayer.hUnit:Action_UseAbilityOnEntity(abilityCapture, mangoTree)
+			end
+			return true, gsiPlayer.hUnit:GetCurrentActiveAbility() == abilityCapture,
+					distToUnit
+		end
+	end
+	return false, false, distToUnit
+end
+
+function AbilityLogic_UseTwinGate(gsiPlayer, twinGate, distLimit)
+	if twinGate then
+		local distToUnit = Vector_DistUnitToUnit(gsiPlayer, twinGate)
+		if distLimit and distToUnit > distLimit then
+			return false, false, distToUnit
+		end
+		if distToUnit > 350 then
+			gsiPlayer.hUnit:Action_MoveDirectly(twinGate.lastSeen.location)
+			return true, false, distToUnit
+		end
+		local gateWarp = gsiPlayer.hUnit:GetAbilityByName("twin_gate_portal_warp")
+		if gateWarp then
+			INFO_print("[ability_generics] %s warping from %s at %s",
+					gsiPlayer.shortName, twinGate.name, twinGate.lastSeen.location
+				)
+			-- RESULT: IDLES
+			gsiPlayer.hUnit:Action_UseAbilityOnEntity(gateWarp, twinGate)
+			return true, gsiPlayer.hUnit:GetCurrentActiveAbility() == gateWarp,
+					distToUnit
+		end
+	end
+	return false, false, distToUnit
+end
+
 function AbilityLogic_GetBlinkLocation(gsiPlayer, hAbility, castRange, activityType,
 		activityHandle, fightHarassTarget, dangerLimit, nearbyAllies, nearbyEnemies)
 	-- Assumes a blink at FHT is desirable if aggressive AcTy. i.e. they are not dead / dotted up

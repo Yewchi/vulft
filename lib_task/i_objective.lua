@@ -39,6 +39,7 @@ function iObjective_NewImaginarySafeUnit(loc, radius, expires, name)
 	dUnit.IsNull = return_false
 	dUnit.IsAlive = return_true
 	dUnit.name = name or "dummy"
+	dUnit.shortName = name
 	dUnit.expires = expires
 	dUnit.lastSeen = {["location"] = loc}
 	dUnit.radius = radius

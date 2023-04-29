@@ -1,12 +1,12 @@
 local hero_data = {
 	"skeleton_king",
-	{1, 2, 2, 3, 2, 4, 2, 5, 3, 3, 3, 4, 1, 1, 7, 1, 4, 9, 11},
+	{1, 2, 3, 2, 2, 3, 3, 3, 4, 2, 1, 4, 1, 1, 7, 5, 4, 9, 11},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_branches","item_magic_stick","item_enchanted_mango","item_helm_of_iron_will","item_blades_of_attack","item_magic_wand","item_gloves","item_armlet","item_boots","item_chainmail","item_blight_stone","item_phase_boots","item_mithril_hammer","item_desolator","item_blitz_knuckles","item_shadow_amulet","item_invis_sword","item_broadsword","item_silver_edge","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_hyperstone","item_buckler","item_platemail","item_assault","item_aghanims_shard","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
+		"item_tango","item_quelling_blade","item_magic_stick","item_branches","item_branches","item_branches","item_helm_of_iron_will","item_boots","item_phase_boots","item_gloves","item_magic_wand","item_relic","item_nullifier","item_talisman_of_evasion","item_radiance","item_armlet","item_blink","item_sange","item_blade_of_alacrity","item_boots_of_elves","item_sange_and_yasha","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_reaver","item_overwhelming_blink","item_bloodthorn","item_moon_shard","item_vanguard","item_abyssal_blade","item_refresher",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Wraithfire Blast","Vampiric Spirit","Mortal Strike","Reincarnation","+8% Vampiric Spirit Lifesteal","-25%% Summon Skeleton Duration/-25%% Cooldown","+0.7s Wraithfire Blast Stun Duration","+26 Skeletons Attack Damage","+25% Cleave","+6 Minimum Skeletons Spawned","-2.0s Mortal Strike Cooldown","Reincarnation Casts Wraithfire Blast",
+		"Wraithfire Blast","Vampiric Spirit","Mortal Strike","Reincarnation","+4% Vampiric Spirit Lifesteal","-25%% Summon Skeleton Duration/-25%% Cooldown","+0.5s Wraithfire Blast Stun Duration","+26 Skeletons Attack Damage","+25% Cleave","+6 Minimum Skeletons Spawned","-2.0s Mortal Strike Cooldown","Reincarnation Casts Wraithfire Blast",
 	}
 }
 --@EndAutomatedHeroData

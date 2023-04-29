@@ -68,9 +68,9 @@ FIGHT_INTENT_I__AT_PLAYER = 1
 FIGHT_INTENT_I__LAST_UPDATE = 2
 FIGHT_INTENT_I__HEAT = 3
 
+local floor = math.floor
 local max = math.max
 local min = math.min
-local sqrt = math.sqrt
 local sin = math.sin
 local cos = math.cos
 local B_AND = bit.band
@@ -79,10 +79,11 @@ local EMPTY_TABLE = EMPTY_TABLE
 local avoid_hide_handle
 local increase_safety_handle
 
-local intent_throttle = Time_CreateThrottle(0.2) -- 3-state behavior over time system .'. intents updated every 0.6s
+local INTENT_UPDATE_THROTTLE = 0.2
+local intent_throttle = Time_CreateThrottle(INTENT_UPDATE_THROTTLE) -- 3-state behavior over time system .'. intents updated every 0.6s
 local t_intent = {}
 local t_intent_prev_location = {}
-local t_intent_recent_aggression = {} -- Indexed by attcking player pnot, value is the target player's table ref 
+local t_intent_recent_aggression = {} -- Indexed by attcking gsiPlayer tblref, 
 --local t_intent_recently_targeted_by = {} -- Indexed by target player pnot, each are LuaRef arr[5]. Using arr[++i] = nil; arr[++i] = nil table resizing
 --t_intent_recently_targeted_by[TEAM] = {}
 --t_intent_recently_targeted_by[ENEMY_TEAM] = {} -- This is not two-team table creationelegant but it works, and isn't a big deal
@@ -214,30 +215,200 @@ function FightClimate_RegisterReponseTypes(abilities, ...)
 	end
 end
 
+
+-- Preferred use is on FHT due to target cache timedata TODO probably bad, probably update job
+-------- FightClimate_IsTryingToEscapeFromPlayer()
 function FightClimate_IsTryingToEscapeFromPlayer(gsiTarget, gsiAggressor)
-	if gsiAggressor.team == gsiTarget.team then return false, -0 end
+	local escapeTbl = gsiAggressor.time.data.escapeTbl
+	if escapeTbl and escapeTbl[5] == gsiTarget then
+		return escapeTbl[1], escapeTbl[2], escapeTbl[3], escapeTbl[4]
+		 -- .'. slow when checking allies are escaping
+	end
+
+	local distUnits = Vector_DistUnitToUnit(gsiTarget, gsiAggressor)
+	if distUnits > 2400 then return false, -0 end
+
 	local aggressorIsTeam = gsiAggressor.team == TEAM
+	local alliedAggressor = aggressorIsTeam and SET_HERO_ALLIED
+			or SET_HERO_ENEMY
+	local nearbyOpposing = Set_GetTeamHeroesInLocRad(
+			gsiAggressor.team, gsiAggressor.lastSeen.location, 1800
+		)
+	local centeredOpposing = Set_GetCrowdedRatingToSetTypeAtLocation(
+			gsiAggressor.lastSeen.location, alliedAggressor, nearbyOpposing,
+			1800
+		)
 	local danger = Analytics_GetTheoreticalDangerAmount(
 			aggressorIsTeam and gsiAggressor or gsiTarget
-		)
+		) -- send in allied unit of either
 	if not aggressorIsTeam then
 		local currTask = Task_GetCurrentTaskHandle(gsiTarget)
 		if currTask == avoid_hide_handle or currTask == increase_safety_handle then
+			
 			return true, max(0, 1 - danger)
 		end
 	end
-	local nearbyTargetTower = Set_GetNearestTeamTowerToLocation(gsiTarget.team, gsiTarget.lastSeen.location)
+	local nearbyTargetTower = Set_GetNearestTeamTowerToPlayer(gsiTarget.team, aggressorIsTeam and gsiAggressor or gsiTarget) -- inaccurate
+	local facingEscape = max(Vector_UnitFacingUnit(gsiTarget, nearbyTargetTower),
+			Vector_UnitFacingLoc(gsiTarget, aggressorIsTeam and ENEMY_FOUNTAIN or TEAM_FOUNTAIN)
+		)
+	facingEscape = min(facingEscape, -Vector_UnitFacingLoc(gsiTarget, centeredOpposing))
+	local _, opposingDps = GSI_GetTotalDpsOfUnits(nearbyOpposing)
+	local targetTwoSecondHealth = gsiTarget.lastSeenHealth
+			- opposingDps*(2+facingEscape*2) * Unit_GetArmorPhysicalFactor(gsiTarget)
+	if aggressorIsTeam then
+		gsiAggressor.time.data.escapeTbl = {targetTwoSecondHealth < 0,
+				targetTwoSecondHealth, nearbyOpposing, centeredOpposing
+			}
+	end
 	
+	return targetTwoSecondHealth < 0, targetTwoSecondHealth, nearbyOpposing, centeredOpposing
 end
+
+function FightClimate_NoSlowIsLostKillSimple(gsiPlayer, gsiTarget, slowPerc, abilityDmg)
+	local distUnits = Vector_DistUnitToUnit(gsiPlayer, gsiTarget)
+	if distUnits > max(1100, gsiPlayer.attackRange+40) then
+		
+		return false, distUnits
+	end
+	-- Assume feared, assume fighting
+	local nearestTower, nearestDist = Set_GetNearestTeamTowerToPlayer(
+			gsiTarget.team, gsiPlayer.team == TEAM and gsiPlayer or gsiTarget) -- inaccurate
+	local physicalTaken = Unit_GetArmorPhysicalFactor(gsiTarget)
+	local dmg = gsiPlayer.hUnit:GetAttackDamage() * physicalTaken
+	if not nearestTower then
+		
+		return false, distUnits -- TODO fountain
+	end
+	local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 2400)
+	local heat = FightClimate_GetEnemiesTotalHeat(nearbyEnemies, true)
+	-- TODO very incomplete and inaccurate
+	local distFactor = max(0, (nearestDist-gsiPlayer.attackRange)/500)
+	DebugDrawText(1300, 250+gsiPlayer.nOnTeam*8, string.format("noslow %d < %d < %d", dmg*(1.5 + distFactor), gsiTarget.lastSeenHealth, dmg*6.5), 255, TEAM_IS_RADIANT and 255 or 0, 128)
+	if gsiTarget.lastSeenHealth > dmg*(1.5 + distFactor) and gsiTarget.lastSeenHealth < dmg*6.5 then
+		
+		return true, distUnits
+	end
+	return false, distUnits
+end
+
+function FightClimate_NoSlowIsLostKill(gsiPlayer, gsiTarget, slowPerc, abilityDmg)
+	-- TODO ask registered damage module for curr slow %
+
+	-- Assume currently chasing
+	-- Assume no debuff immunity
+	if gsiPlayer.team == ENEMY_TEAM and gsiPlayer.typeIsNone then
+		local danger, known, theory = Analytics_GetTheoreticalDanagerAmount(gsiPlayer)
+		-- shouldn't be asking for team target, return 'w/e' val
+		return gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0 + 0.15*#known + 0.033*#theory
+	end
+	local nearestTower, nearestDist = Set_GetNearestTeamTowerToPlayer( gsiTarget.team, gsiPlayer) -- inaccurate
+	if not nearestTower then
+		return gsiTarget.lastSeenHealth < 1200 -- TODO fountain fight
+	end
+	local playerDist = Vector_DistUnitToUnit(gsiPlayer, nearbyTower) - nearbyTower.attackRange + 100
+	local distPlayers = Vector_DistUnitToUnit(gsiPlayer, gsiTarget)
+	local physicalTaken = Unit_GetArmorPhysicalFactor(gsiTarget)
+	local dmg = gsiPlayer.hUnit:GetAttackDamage() * physicalTaken
+	local remainingHealth = gsiTarget.lastSeenHealth + 5*gsiTarget.hUnit:GetHealthRegen()
+	local movingAttackingSpeed = gsiPlayer.currentMovementSpeed
+			* max(0.15, (0.9-gsiPlayer.attackPointPercent))
+	local fightIntent
+	local nearbyAllies
+	local slowDmg = abilityDmg or 0
+	local targetMvspeed = gsiTarget.currentMovementSpeed
+	local attackRange = gsiPlayer.attackRange
+	-- simulate no slow
+	local timeRemaining = min(nearestDist,
+			(nearestDist + gsiPlayer.attackRange - max(0, distPlayers-attackRange))
+		) / targetMvspeed
+	local simDist = disPlayers
+	-- get the target in attack range
+	while(timeRemaining > 0) do
+		if simDist < attackRange then
+			break;
+		end
+	end
+	-- attack the target in sec/attack steps
+	
+
+	--[[
+	if movingAttackSpeed > gsiTarget.currentMovementSpeed and 
+			(dmg / gsiPlayer.hUnit:GetSecondsPerAttack())
+				* (nearestDist / gsiTarget.currentMovementSpeed)
+				> remainingHealth then
+		-- very inaccurate
+		return false
+	else
+		-- TODO increase accuracy, just having a shot at it
+		-- Unabstracted for my bleeding eyes
+		local freeDmgDist = max(0, 200 - nearestDist - playerDist -- (bounding + buffer)* 2 heroes * [2,in-out]
+				+ max(0, gsiPlayer.attackRange - distPlayers - 75) -- buffer 75
+			)
+		if freeDmgDist > 0 then
+			local distPerAttackSeconds = freeDmgDist / gsiPlayer.hUnit:GetSecondsPerAttack()
+			local freeAttackPotential = 1 + floor(max(6, -- potential as distance needs to be factored out
+					distPerAttackSeconds
+				))
+--[[DEV]	if VERBOSE or DEBUG and DEBUG_IsBotTheIntern() then
+--[[DEV]		VEBUG_print("[fight_climate] NoSlowIsLostKill(%s), free attack potential: %s, distLost/attack: %s",
+--[[DEV]				Util_ParamString(STR(gsiPlayer), STR(gsiTarget), slowPerc, abilityDmg),
+--[[DEV]				freeAttackPotential, gsiTarget.currentMovementSpeed - movingAttackSpeed
+--[[DEV]			)
+--[[DEV]	end
+			local noSlowDmg = freeAttackPotential * dmg
+					/ (gsiTarget.currentMovementSpeed - movingAttackSpeed) -- ^^ factored out ^^
+			remainingHealth = remainingHealth - noSlowDmg
+			if remainingHealth < 0 then
+				return false
+			end
+			slowDmg = noSlowDmg * slowPerc -- SeemsGood
+			nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 1400, false)
+			local intended, intentsTbl, numIntend = FightClimate_AnyIntentToHarm(
+					gsiTarget, nearbyAllies)
+			if intended then
+				for i=1,#intentsTbl do
+					local thisAllied = nearbyAllies[i]
+					dmg = gsiPlayer.hUnit:GetAttackDamage() * physicalTaken
+					playerDist = Vector_DistUnitToUnit(thisAllied, nearbyTower)
+					distPlayers = Vector_DistUnitToUnit(thisAllied, gsiTarget)
+					freeDmgDist = max(0, 200 - nearestDist - playerDist
+							+ max(0, gsiPlayer.attackRange - distPlayers - 75)
+						) -- bug: heroes that would get in range from the slow are not considered
+					if freeDmgDist > 0 then
+						distPerAttackSeconds = freeDmgDist / gsiPlayer.hUnit:GetSecondsPerAttack()
+						freeAttackPotential = 1 + floor(max(4,
+								distPerAttackSeconds
+							))
+			--[[DEV]	if VERBOSE or DEBUG and DEBUG_IsBotTheIntern() then
+			--[[DEV]		VEBUG_print("[fight_climate] NoSlowIsLostKill(...), %s free attacks: %s",
+			--[[DEV]				STR(thisAllied), freeAttacks
+			--[[DEV]			)
+			--[[DEV]	end
+						local noSlowDmg = freeAttckPotential *
+									/ (gsiTarget.currentMovementSpeed - movingAttackSpeed))
+						remainingHealth = remainingHealth - freeAttacks * dmg
+								/ gsiTarget.currentMovementSpeed
+						if remainingHealth < 0 then return false; end
+					end
+				end
+			end
+		end
+	end
+	local 
+	if not nearbyAllies or  --]]
+end -- END --- FightClimate_NoSlowIsLostKill()
 
 function Analytics_RegisterAnalyticsJobDomainToFightClimate(gsiDomain)
 	avoid_hide_handle = AvoidHide_GetTaskHandle()
 	increase_safety_handle = IncreaseSafety_GetTaskHandle()
 end
 
-function FightClimate_ImmediatelyExposedToAttack(gsiTargetted, enemyHeroesToTargeted, timeCheck, minRange)
+function FightClimate_ImmediatelyExposedToAttack(gsiTargetted, enemyHeroesToTargeted, timeCheck,
+			minRange, useLocation
+		)
 	local exposedCount = 0
-	local playerLoc = gsiTargetted.lastSeen.location
+	local playerLoc = useLocation or gsiTargetted.lastSeen.location
 
 	enemyHeroesToTargetted = enemyHeroesToTargetted
 			or Set_GetTeamHeroesInLocRad(gsiTargetted.team == TEAM and ENEMY_TEAM or TEAM,
@@ -322,7 +493,7 @@ function FightClimate_RegisterRecentHeroAggression(gsiPlayer, gsiTarget, isAbili
 			playersIntent[3] = 1
 		else
 			t_intent_recent_aggression[gsiPlayer] = 
-					create_or_recycle_pair(gsiTarget, GameTime() + AGGRESSIVE_BEHAVIOR_EXPIRY)
+					create_or_recycle_pair(gsiTarget, GameTime())
 		end
 	else
 		-- Process friendly ability casts
@@ -440,8 +611,32 @@ function FightClimate_GetIntent(gsiPlayer)
 				local thisIntent = t_intent_recent_aggression[thisEnemy]
 				t_intent[thisEnemy] = thisIntent and thisIntent[3] > 0.5 and thisIntent[1] or false
 				if not thisEnemy.typeIsNone then
-					-- Location stuff TODO
+					-- Use 1/500 angle facing as indicator. Not a complete soultion but reasonably certain.
+					-- TODO Do not use anything about player mannerisms or behaviour that might be
+					-- -| misconstrued. i.e. nothing any one bot script or player would do. Only use
+					-- -| the truth of the matter, 'how much is-approaching', 'using phase boots for what'
+					-- -| 'hero is diving a tower', 'hero looks safe and is ignoring last hits'
+					local triggerRange = 350 + thisEnemy.attackRange*1.35
+					for ia=1,numAllies do
+						local thisAlly = allies[i]
+						if IsHeroAlive(thisAlly.playerID)
+								and Vector_UnitFacingUnit(thisEnemy, thisAlly) > 0.998 then -- 1/500 forwards
+							local distUnits = Vector_DistUnitToUnit(thisEnemy, thisAlly)
+							if distUnits < triggerRange then
+								if not thisIntent then
+									t_intent_recent_aggression[thisEnemy]
+											= create_or_recycle_pair(thisAlly, currTime)
+								else
+									thisIntent[1] = thisAlly
+									thisIntent[2] = currTime
+									thisIntent[3] = 1
+								end
+								t_intent[thisEnemy] = thisAlly
+							end
+						end
+					end
 				end
+				::NEXT_INTENT_3_ENEMY::
 			end
 		end
 	end
@@ -457,9 +652,9 @@ function FightClimate_GreatestEnemiesThreatToPlayer(gsiPlayer, enemyTbl)
 	for i=1,#enemyTbl do
 		local thisEnemy = enemyTbl[i]
 		local thisIntent = t_intent_recent_aggression[thisEnemy]
-		local thisEnemyLoc = thisEnemy.lastSeen.location
 		if thisIntent and thisIntent[1] == gsiPlayer and thisIntent[3] then
-			local distToEnemy = sqrt((playerLoc.x-thisEnemyLoc.x)^2 + (playerLoc.y-thisEnemyLoc.y)^2)
+			local thisEnemyLoc = thisEnemy.lastSeen.location
+			local distToEnemy = ((playerLoc.x-thisEnemyLoc.x)^2 + (playerLoc.y-thisEnemyLoc.y)^2)^0.5
 			local extendedAttackRange = max(900, gsiPlayer.attackRange*1.5)
 			local thisEnemyPower = Analytics_GetPowerLevel(thisEnemy)
 			local thisThreatScore =  max(0.15, thisIntent[3] -- (intended target intensity
@@ -467,7 +662,7 @@ function FightClimate_GreatestEnemiesThreatToPlayer(gsiPlayer, enemyTbl)
 									/ extendedAttackRange
 								) -- + within attack rangeness)
 						)
-				) * sqrt(thisEnemyPower) -- * sqrt(power)
+				) * (thisEnemyPower)^0.5 -- * sqrt(power)
 			if thisThreatScore > greatestThreatScore then
 				greatestThreat = thisEnemy
 				greatestThreatScore = thisThreatScore
@@ -483,7 +678,7 @@ local valid_garbage = {} -- see "set correct #intentsTbl" below
 -- gsiPlayer == the player to return if any harm was intended to (e.g. if they are on the same team, it will never be true unless we are denying QoP Q), playerTbl == a tbl of any of the players in the game, to check their intent
 -- returned table is TODO currently just a list of each hero intended to be harmed for each intent.
 function FightClimate_AnyIntentToHarm(gsiPlayer, playerTbl, intentsTbl)
-	--local intentsTbl = intentsTbl
+	-- playerTbl is enemies to gsiPlayer
 	local numPlayers = #playerTbl
 	local harmIntended = 0
 	intentsTbl = intentsTbl and intentsTbl or valid_garbage
@@ -594,6 +789,27 @@ function FightClimate_GetEnemiesTotalHeat(enemyTbl, giveNulls)
 	return heat*countEnemies, heat
 end
 
+function FightClimate_FightIsOn(gsiPlayer, alliesTbl, enemiesTbl, range)
+	local mvSpeed = gsiPlayer.currentMovementSpeed
+	alliesTbl = alliesTbl or Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, range or 7*mvSpeed, true)
+	enemiesTbl = enemiesTbl or Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, range or 7*mvSpeed, 0.5)
+	local alliesHeat = 0
+	local enemiesHeat = 0
+	for i=1,#alliesTbl do
+		local thisIntent = t_intent_recent_aggression[alliesTbl[i]]
+		if thisIntent and thisIntent[2] < GameTime() then
+			alliesHeat = alliesHeat + thisIntent[3]
+		end
+	end
+	for i=1,#enemiesTbl do
+		local thisIntent = t_intent_recent_aggression[enemiesTbl[i]]
+		if thisIntent and thisIntent[2] < GameTime() then
+			enemiesHeat = enemiesHeat + thisIntent[3]
+		end
+	end
+	return enemiesHeat > 0.5 and alliesHeat > 0.5, alliesHeat, enemiesHeat
+end
+
 -- returns if any player is attacking another players in the area
 function FightClimate_AnyCombatNearPlayer(gsiPlayer, radius)
 	local nearbyEnemies =
@@ -601,13 +817,13 @@ function FightClimate_AnyCombatNearPlayer(gsiPlayer, radius)
 	local nearbyAllies =
 			Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, radius, AGGRESSIVE_BEHAVIOR_EXPIRY)
 	for i=1,#nearbyEnemies do
-		local thisIntent = t_recent_intent_aggression[nearbyEnemies[i]]
+		local thisIntent = t_intent_recent_aggression[nearbyEnemies[i]]
 		if thisIntent and thisIntent[2] < GameTime() then
 			return true
 		end
 	end
 	for i=1,#nearbyAllies do
-		local thisIntent = t_recent_intent_aggression[nearbyAllies[i]]
+		local thisIntent = t_intent_recent_aggression[nearbyAllies[i]]
 		if thisIntent and thisIntent[2] < GameTime() then
 			return true
 		end

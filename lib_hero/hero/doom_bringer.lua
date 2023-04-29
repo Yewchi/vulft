@@ -1,12 +1,12 @@
 local hero_data = {
 	"doom_bringer",
-	{2, 1, 2, 3, 2, 4, 2, 1, 1, 6, 1, 3, 3, 3, 7, 4, 4, 10, 11},
+	{2, 1, 2, 1, 2, 4, 2, 1, 1, 6, 3, 3, 3, 3, 7, 4, 4, 11, 10},
 	{
-		"item_tango","item_magic_stick","item_quelling_blade","item_branches","item_branches","item_flask","item_boots","item_chainmail","item_magic_wand","item_blades_of_attack","item_phase_boots","item_ring_of_health","item_crown","item_void_stone","item_meteor_hammer","item_gloves","item_hand_of_midas","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_aether_lens","item_aghanims_shard","item_energy_booster","item_vitality_booster","item_octarine_core","item_gem","item_pers","item_pers","item_gem","item_refresher","item_ultimate_scepter_2",
+		"item_branches","item_slippers","item_quelling_blade","item_enchanted_mango","item_circlet","item_boots","item_energy_booster","item_arcane_boots","item_magic_wand","item_gloves","item_hand_of_midas","item_ogre_axe","item_wraith_band","item_mithril_hammer","item_black_king_bar","item_blink","item_aghanims_shard","item_shivas_guard","item_aghanims_shard","item_gem","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_refresher","item_overwhelming_blink",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Devour","Scorched Earth","Infernal Blade","Doom","Devour grants +15% Magic Resistance","+20 Scorched Earth Damage","+10% Scorched Earth Movement Speed","Devour Can Target Ancients","-12.0s Scorched Earth Cooldown","-35s Doom Cooldown","+2.1% Infernal Blade Damage","Doom applies Break",
+		"Devour","Scorched Earth","Infernal Blade","Doom","Devour grants +15% Magic Resistance","+15 Scorched Earth Damage","+10% Scorched Earth Movement Speed","Devour Can Target Ancients","-12.0s Scorched Earth Cooldown","-35s Doom Cooldown","+2.1% Infernal Blade Damage","Doom applies Break",
 	}
 }
 --@EndAutomatedHeroData

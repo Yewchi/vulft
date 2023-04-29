@@ -1,4 +1,4 @@
-VULFT - Full Takeover Bot Script. Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 10/04/23. Requires manual install into vscripts/bots folder (all recently released bots have this issue). VUL-FT has no affiliation with DotaBuff.<br/>
+VULFT - Full Takeover Bot Script. Requires manual install into vscripts/bots folder (all recently released bots have this issue). Highly dynamic fight behaviour. DotaBuff roles and item builds updated on: 25/04/23. VUL-FT has no affiliation with DotaBuff.<br/>
 <br/>
 [Translations of This Page in Other Languages](https://steamcommunity.com/groups/VULFT/announcements/detail/6966546241858334331)<br/>
 <br/>
@@ -58,7 +58,8 @@ Basic jungling in downtime.<br/>
 They may jungle self-deny in the early game if they get caught by the enemy.<br/>
 Dynamic retreat, to friendly towers (unless the tower gets overrun), or to friendly allies in the direction of the allied fountain.<br/>
 Bounty rune task allocation based on proximity, safety, fog, greed rating<br/>
-Tower defense allocation based on required threat. (No 5-man deathballs because you looked rudely at a tower).<br/>
+Tower defense allocation based on required threat.<br/>
+Choose your position whenever by saying in chat "!pos [1-5]"
 Lower CPU usage than other popular bots.<br/>
 Bugs!<br/>
 <br/>
@@ -71,13 +72,11 @@ In addition. I promise this project's code is 100% functional offline and will s
 [VUL-FT source code](https://github.com/Yewchi/vulft) -- Public github
 
 ## == Not yet implemented ==
-The player can only choose their lane and role in the first 30 seconds of a match.<br/>
 Macro fight behaviour, initiator choice, grander strats like cutting losses, trading towers. They will assess the current aggressive plays being made and see if they think it's worth it for themselves, if an enemy is occupied attacking someone else. Enemy fight intent is tracked and loses magnitude based on facing direction, this allows allies to recognize trading without being attacked.<br/>
 Player-to-bot ping communication.<br/>
 Enemy vision assessments.<br/>
 Dewarding.<br/>
 Sentry and dust for enemy stealth.<br/>
-Outposts.<br/>
 Illusions are controlled by default behaviour. (But arc warden double is full-takeover).<br/>
 Enemy fountain threat.<br/>
 Avoid zones.<br/>
@@ -90,9 +89,11 @@ Denying towers.<br/>
 
 ## == Known issues ==
 Picking may over-select for core roles.<br/>
-Middle lane may have a difficult time outplaying the opposing mid -- much better in safe or offlane where they can trade.<br/>
 Some tasks are not well informed by threat analytics code, not all tasks use intelligent movement functions to adjust vectors around dangerous areas.<br/>
 Junk is not correctly sold (DotaBuff meta parser is not complete, and there may be additional junk buys incorrectly parsed into the build, item builds are calculated for their combines, however, the junk is incorrectly evaluated and the wrong item may be sold when 9-slotted).<br/>
+Bots do not leave lanes which are dangerous if farming them. They only retreat. The untested data is there for changing lanes but mid-game rotating is not coded, it only happens naturally as they move / getting runes / defending towers / sometimes by jungling. The score of the creep wave draws them in too strongly. <br/>
+Overly aggressive, especially in the early game.<br/>
+Bots might not be able to commit to a highground push, due to certain variables in the state of the creep wave, they might wander off out of push range instead.<br/>
 <br/>
 Many other things.<br/>
 <br/>
@@ -105,8 +106,8 @@ These three rune issues are all technically true, but there is a workaround in p
 
 ## == Project State ==
 Alpha version. Please give feedback.<br/>
-Is the project currently stable: Experimental, updated for 7.33 21/04/23 (April 21)<br/>
-Last DotaBuff meta update: 10/04/23<br/>
+Is the project currently stable: Stable, updated for 7.33 29/04/23 (April 29)<br/>
+Last DotaBuff meta update: 25/04/23<br/>
 <br/>
 
 ## == Support ==

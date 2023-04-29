@@ -41,8 +41,25 @@ SET_HERO_ENEMY =				UNIT_LIST_ENEMY_HEROES
 SET_CREEP_ENEMY = 				UNIT_LIST_ENEMY_CREEPS
 SET_CREEP_ENEMY_CONTROLLED = 	0xFF02
 SET_WARD_ENEMY =				UNIT_LIST_ENEMY_WARDS
-SET_CREEP_NEUTRAL =				UNIT_LIST_NEUTRAL_CREEPS
 SET_BUILDING_ENEMY =			UNIT_LIST_ENEMY_BUILDINGS
+SET_CREEP_NEUTRAL =				UNIT_LIST_NEUTRAL_CREEPS
+SET_BUILDING_NEUTRAL =			0xFF03
+-- ~
+local SET_ALL = SET_ALL
+local SET_ALL_ALLIED = SET_ALL_ALLIED
+local SET_HERO_ALLIED = SET_HERO_ALLIED
+local SET_CREEP_ALLIED = SET_CREEP_ALLIED
+local SET_CREEP_ALLIED_CONTROLLED = SET_CREEP_ALLIED_CONTROLLED
+local SET_WARD_ALLIED = SET_WARD_ALLIED
+local SET_BUILDING_ALLIED = SET_BUILDING_ALLIED
+local SET_ALL_ENEMY = SET_ALL_ENEMY
+local SET_HERO_ENEMY = SET_HERO_ENEMY
+local SET_CREEP_ENEMY = SET_CREEP_ENEMY
+local SET_CREEP_ENEMY_CONTROLLED = SET_CREEP_ENEMY_CONTROLLED
+local SET_WARD_ENEMY = SET_WARD_ENEMY
+local SET_BUILDING_ENEMY = SET_BUILDING_ENEMY
+local SET_CREEP_NEUTRAL = SET_CREEP_NEUTRAL
+local SET_BUILDING_NEUTRAL = SET_BUILDING_NEUTRAL
 
 SET_HERO = 				UNIT_TYPE_HERO
 
@@ -83,6 +100,7 @@ if DEBUG then
 	end
 end
 local THROTTLE_UPDATE_LANE_FRONTS = DEBUG and not USER_HAS_NO_EPILEPSY_RISK_DEBUG_THROTTLES and 0.0 or 0.37 -- slow throttle (greater than 0.0) has epileptic risk
+local THROTTLE_UPDATE_NEUTRALS = 0.67
 
 local SET_SCREEN_TRACKING = true and VERBOSE
 
@@ -269,6 +287,22 @@ local function update_lane_fronts()
 	end
 end
 
+local function update_neutral_set()
+	print("DONT USE THIS")
+	local neuts = GetUnitList(SET_CREEP_NEUTRAL)
+	local neutsSet = t_sets[neuts] or {}
+	for i=1,#neuts do
+		print("NEUTS", neuts[i]:GetUnitName())
+		if neuts[i]:IsBuilding() then
+			table.insert(neutsSet, bUnit_NewSafeUnit(neuts[i]))
+		end
+	end
+	local team = GSI_GetTeamBuildings(TEAM)
+	for k,v in pairs(team) do
+		print(k, v, v.name)
+	end
+end
+
 local function update_creep_set_type(creepSetType)
 	local sameReactPlayerCreepSetType
 	if creepSetType == SET_CREEP_ALLIED then
@@ -340,6 +374,8 @@ local function update_enemy_buildings()
 end
 
 local function update_all_sets__job(workingSet)
+
+
 	if workingSet.throttleEnemy:allowed() then
 		if workingSet.throttleAllied:allowed() then
 			update_creep_set_type(SET_CREEP_ALLIED)
@@ -348,6 +384,9 @@ local function update_all_sets__job(workingSet)
 		if workingSet.throttleUpdateLaneFronts:allowed() then
 			update_lane_fronts()
 		end
+--	no	if workingSet.throttleUpdateNeutrals:allowed() then
+--			update_neutral_set()
+--		end
 	end
 end
 
@@ -374,24 +413,36 @@ function Set_Initialize()
 	-- building.lua NB Enemy building data is utilizing allied tier::data for valid minute -1:30 data.
 	local tBuildingListAllied = bUnit_ConvertListToSafeUnits(GetUnitList(SET_BUILDING_ALLIED))
 	t_sets[SET_BUILDING_ALLIED] = {units={}, towers={}}
+	t_sets[SET_BUILDING_ENEMY] = {units={}, towers={}}
+	t_sets[SET_BUILDING_NEUTRAL] = {units={}, outposts={}, mangoTrees={}, twinGates={},
+			lanterns={}, boss={} }
 	for i=1,#tBuildingListAllied,1 do
 		local gsiThisBuilding = tBuildingListAllied[i]
-		table.insert(t_sets[SET_BUILDING_ALLIED].units, gsiThisBuilding)
-		if string.find(gsiThisBuilding.name, "tower") then
-			table.insert(t_sets[SET_BUILDING_ALLIED].towers, gsiThisBuilding)
-			table.insert(all_towers, gsiThisBuilding)
-			Map_ReportTowerLocation(gsiThisBuilding.name, gsiThisBuilding.lastSeen.location)
+		if gsiThisBuilding.isOutpost then
+			table.insert(t_sets[SET_BUILDING_NEUTRAL].units, gsiThisBuilding)
+			table.insert(t_sets[SET_BUILDING_NEUTRAL].outposts, gsiThisBuilding)
+		else
+			table.insert(t_sets[SET_BUILDING_ALLIED].units, gsiThisBuilding)
+			if string.find(gsiThisBuilding.name, "tower") then
+				table.insert(t_sets[SET_BUILDING_ALLIED].towers, gsiThisBuilding)
+				table.insert(all_towers, gsiThisBuilding)
+				Map_ReportTowerLocation(gsiThisBuilding.name, gsiThisBuilding.lastSeen.location)
+			end
 		end
 	end
 	local tBuildingListEnemy = bUnit_ConvertListToSafeUnits(GetUnitList(SET_BUILDING_ENEMY))
-	t_sets[SET_BUILDING_ENEMY] = {units={}, towers={}}
 	for i=1,#tBuildingListEnemy,1 do
 		local gsiThisBuilding = tBuildingListEnemy[i]
-		table.insert(t_sets[SET_BUILDING_ENEMY].units, gsiThisBuilding)
-		if string.find(gsiThisBuilding.name, "tower") then
-			table.insert(t_sets[SET_BUILDING_ENEMY].towers, gsiThisBuilding)
-			table.insert(all_towers, gsiThisBuilding)
-			Map_ReportTowerLocation(gsiThisBuilding.name, gsiThisBuilding.lastSeen.location)
+		if gsiThisBuilding.isOutpost then
+			table.insert(t_sets[SET_BUILDING_NEUTRAL].units, gsiThisBuilding)
+			table.insert(t_sets[SET_BUILDING_NEUTRAL].outposts, gsiThisBuilding)
+		else
+			table.insert(t_sets[SET_BUILDING_ENEMY].units, gsiThisBuilding)
+			if string.find(gsiThisBuilding.name, "tower") then
+				table.insert(t_sets[SET_BUILDING_ENEMY].towers, gsiThisBuilding)
+				table.insert(all_towers, gsiThisBuilding)
+				Map_ReportTowerLocation(gsiThisBuilding.name, gsiThisBuilding.lastSeen.location)
+			end
 		end
 	end
 	job_domain:RegisterJob(
@@ -430,6 +481,33 @@ function Set_Initialize()
 	-- TowersNearAllies platter
 	updated_towers_player = GSI_GetBot()
 	updated_towers_frame_time = 0
+
+	local neuts = GetUnitList(SET_CREEP_NEUTRAL)
+	local neutSet = t_sets[SET_BUILDING_NEUTRAL]
+	for i=1,#neuts do
+		
+		if neuts[i]:IsBuilding() then
+			local neutSafe = bUnit_NewSafeUnit(neuts[i])
+			table.insert(neutSet.units, neutSafe)
+			if string.find(neutSafe.name, "lantern") then
+				
+				table.insert(neutSet.lanterns, neutSafe)
+			elseif string.find(neutSafe.name, "twin_gate") then
+				
+				table.insert(neutSet.twinGates, neutSafe)
+			elseif string.find(neutSafe.name, "mango_tree") then
+				
+				table.insert(neutSet.mangoTrees, neutSafe)
+			else
+				INFO_print("[set] unknown neutral building type found: %s", neutSafe.name)
+			end
+		end
+	end
+
+
+
+
+
 	
 	Set_Initialize = nil
 end
@@ -476,7 +554,11 @@ end
 
 function Set_NumericalIndexUnion(s1, s2) -- Destructive to s1 SetUnion
 	for k,v in pairs(EMPTY_TABLE) do
-		if PRINT_EMPTY_TBL_ERR then ERROR_print("[set] EMPTY TABLE HAS BEEN MODIFIED", type(k), type(v), tostring(k), Util_Printable(v)) end
+		if PRINT_EMPTY_TBL_ERR then
+			ERROR_print(true, not DEBUG, "[set] EMPTY TABLE HAS BEEN MODIFIED %s %s %s %s",
+					type(k), type(v), tostring(k), STR(v)
+				)
+		end
 		if s1 == EMPTY_TABLE then
 			s1 = {}
 			EMPTY_TABLE = {}
@@ -515,13 +597,38 @@ function Set_Score(setUnits, ...)
 	
 end
 
-
 function Set_GetSetUnitNearestToLocation(loc, set)
 	local units = set.units or set
 	local nearestUnit
 	local nearestDist = 0xFFFF
 	for i=1,#units do
-		local dist = Math_PointToPointDistance2D(loc, units[i].lastSeen.location)
+		local unitLoc = units[i].lastSeen.location
+		local dist = ((loc.x-unitLoc.x)^2 + (loc.y-unitLoc.y)^2)^0.5
+		if dist < nearestDist then
+			nearestUnit = units[i]
+			nearestDist = dist
+		end
+	end
+	return nearestUnit, nearestDist
+end
+
+function Set_GetSetTypeUnitNearestToLocation(loc, setType, subType)
+	local units = t_sets[setType]
+	if subType then
+		units = units[subType]
+		if not units or type(subType) ~= "string" then
+			ERROR_print(true, not DEBUG, "[set] Set_GetSetTypeUnitNearestToLocation%s: no such setType",
+					Util_ParamString(loc, setType, subType)
+				)
+			return nil, 14142
+		end
+	end
+
+	local nearestUnit
+	local nearestDist = 0xFFFF
+	for i=1,#units do
+		local unitLoc = units[i].lastSeen.location
+		local dist = ((loc.x-unitLoc.x)^2 + (loc.y-unitLoc.y)^2)^0.5
 		if dist < nearestDist then
 			nearestUnit = units[i]
 			nearestDist = dist
@@ -561,7 +668,7 @@ function Set_GetCrowdedRatingToSetTypeAtLocation(location, setType, checkSet, ma
 			if thisBot ~= list[i] then
 				local thisLocationOfCrowding = list[i].lastSeen and list[i].lastSeen.location
 						or list[i]:GetLocation() 
-				local dist = Math_PointToPointDistance2D(location, thisLocationOfCrowding)
+				local dist = ((location.x-thisLocationOfCrowding.x)^2 + (location.y-thisLocationOfCrowding.y)^2)^0.5
 				if dist < maxRange then
 					totalCrowdingUnits = totalCrowdingUnits + 1
 					crowdingRating = crowdingRating + (maxRange - dist) / maxRange
@@ -666,7 +773,7 @@ function Set_GetUnitsInRadiusCircle(location, radius, s1, s2, bailIfCreep) -- e.
 		for i=1,#s1Units do
 			local unitLoc = s1Units[i].lastSeen.location
 			--print("Checking unit with distance", Math_PointToPointDistance2D(location, unitLoc))
-			if Math_PointToPointDistance2D(location, unitLoc) < radius then
+			if ((location.x-unitLoc.x)^2 + (location.y-unitLoc.y)^2)^0.5 < radius then
 				table.insert(units, s1Units[i])
 				-- DebugDrawCircle(unitLoc, 60, 0, 0, 255)
 				if bailIfCreep and s1Units[i].type == UNIT_TYPE_CREEP then
@@ -679,7 +786,7 @@ function Set_GetUnitsInRadiusCircle(location, radius, s1, s2, bailIfCreep) -- e.
 		local s2Units = s2.units
 		for i=1,#s2Units do
 			local unitLoc = units[i].lastSeen.location
-			if Math_PointToPointDistance2D(location, unitLoc) < radius then
+			if ((location.x-unitLoc.x)^2 + (location.y-unitLoc.y)^2)^0.5 < radius then
 				table.insert(units, s1Units[i])
 				-- DebugDrawCircle(unitLoc, 60, 0, 0, 255)
 			end
@@ -715,102 +822,6 @@ local function get_nearest_tower_to_loc(set, loc, notShrine)
 		end
 	end
 	return closestTower, closestDistance
-end
-
-function Set_GetSaferLaneObject(setOrUnit, minimumDistance)
-	local location = setOrUnit.center or location.lastSeen.location
-	local minimumDistance = minimumDistance or 500
-	local creepSets = t_sets[SET_CREEP_ALLIED]
-	local topRightness = location.x + location.y
-	local closestDist = 0xFFFF
-	local closestObject
-	for i=1,#creepSets do
-		local thisCreepSet = creepSets[i]
-		local thisCreepSetLoc = thisCreepSet.center
-		local thisDist = Vector_PointDistance2D(location, thisCreepSetLoc)
-		if thisDist > minimumDistance
-				and thisDist < closestDist
-				and (TEAM_IS_RADIANT and thisCreepSetLoc.x + thisCreepSetLoc.y < topRightness
-						or thisCreepSetLoc.x + thisCreepSetLoc.y > topRightness
-				) then
-			closestDist = thisDist
-			closestObject = thisCreepSet
-		end
-	end
-	local towerUnits = t_sets[SET_BUILDING_ALLIED].towers
-	for i=1,#towerUnits do
-		local thisTower = towerUnits[i]
-		local thisTowerLoc = thisTower.lastSeen.location
-		local thisDist = Vector_PointDistance2D(location, thisTowerLoc)
-		if thisDist > minimumDistance
-				and thisDist < closestDist
-				and (TEAM_IS_RADIANT and thisTowerLoc.x + thisTowerLoc.y < topRightness
-						or thisTowerLoc.x + thisTowerLoc.y > topRightness
-				) then
-			closestDist = thisDist
-			closestObject = thisTower
-		end
-	end
-	if closestObject then
-		return closestObject, closestDist
-	end
-	local fountain = GSI_GetTeamFountainUnit(TEAM)
-	return fountain, Vector_PointDistance2D(location, fountain)
-end
-
--- k-d tree, or something more simplistic?. tower-quadrant cache.
-function Set_GetNearestTeamBuildingToLoc(team, loc, notShrine)
-	return get_nearest_tower_to_loc(t_sets[team == TEAM and SET_BUILDING_ALLIED or SET_BUILDING_ENEMY].units, loc, notShrine)
-end
-
-function Set_InformBuildingFell(gsiBuilding)
-	local setSearched = gsiBuilding.team == TEAM
-			and t_sets[SET_BUILDING_ALLIED].towers or t_sets[SET_BUILDING_ENEMY].towers
-	
-	for iKey,tableRef in pairs(setSearched) do
-		if gsiBuilding == tableRef then
-			
-			table.remove(setSearched, iKey)
-			break;
-		end
-	end
-	local setSearched = gsiBuilding.team == TEAM
-			and t_sets[SET_BUILDING_ALLIED].units or t_sets[SET_BUILDING_ENEMY].units
-	for iKey,tableRef in pairs(setSearched) do
-		if gsiBuilding == tableRef then
-			
-			table.remove(setSearched, iKey)
-			break;
-		end
-	end
-end
-
-function Set_GetNearestTeamTowerToPlayer(team, gsiPlayer)
-	local timeData = gsiPlayer.time.data
-	if team == TEAM then
-		if timeData.nearTeamTower and not bUnit_IsNullOrDead(timeData.nearTeamTower) then
-			--print("Tower at location is not dead nor null", timeData.nearTeamTower.lastSeen.location, timeData.nearTeamTower.hUnit:GetHealth())
-			return timeData.nearTeamTower, timeData.nearTeamTowerDistance
-		end
-		timeData.nearTeamTower, timeData.nearTeamTowerDistance =
-				get_nearest_tower_to_loc(t_sets[SET_BUILDING_ALLIED].towers, gsiPlayer.lastSeen.location)
-		return timeData.nearTeamTower, timeData.nearTeamTowerDistance
-	else
-		if timeData.nearEnemyTower and not bUnit_IsNullOrDead(timeData.nearEnemyTower) then
-			return timeData.nearEnemyTower, timeData.nearEnemyTowerDistance
-		end
-		timeData.nearEnemyTower, timeData.nearEnemyTowerDistance =
-				get_nearest_tower_to_loc(t_sets[SET_BUILDING_ENEMY].towers, gsiPlayer.lastSeen.location)
-		return timeData.nearEnemyTower, timeData.nearEnemyTowerDistance
-	end
-end
-
-function Set_GetEnemyTowerPlayerIsUnder(gsiPlayer)
-	local nearestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
-	if nearestTower and Math_PointToPointDistance2D(nearestTower.lastSeen.location, gsiPlayer.lastSeen.location) < nearestTower.attackRange then
-		return nearestTower
-	end
-	return false
 end
 
 local loc_cache_tower_atk = {}
@@ -880,9 +891,10 @@ function Set_GetTowerOverLocation(loc, requireTeam)
 		local overLocTeamTower = get_nearest_tower_to_loc(t_sets[SET_BUILDING_ENEMY].towers, loc)
 		local tLoc = overLocTower and overLocTower.lastSeen.location
 		local dist = overLocTower
-				and Vector_PointDistance2D(tLoc, loc)
+				and ((tLoc.x-loc.x)^2 + (tLoc.y-loc.y)^2)^0.5
 		local distTeam = overLocTeamTower
-				and Vector_PointDistance2D(overLocTeamTower.lastSeen.location, loc)
+				and ((overLocTeamTower.lastSeen.location.x-loc.y)^2
+					+ (overLocTeamTower.lastSeen.location.y-loc.y)^2)^0.5
 		if (overLocTower and overLocTeamTower and distTeam < dist)
 				or (not overLocTower and overLocTeamTower) then
 			tLoc = overLocTeamTower.lastSeen.location
@@ -891,7 +903,7 @@ function Set_GetTowerOverLocation(loc, requireTeam)
 		end
 		
 		loc_cache[x][y] = overLocTower
-				and Vector_PointDistance2D(loc, tLoc)
+				and ((loc.x-tLoc.x)^2 + (loc.y-tLoc.y)^2)^0.5
 					< overLocTower.attackRange
 				and overLocTower
 				or false
@@ -902,10 +914,10 @@ function Set_GetTowerOverLocation(loc, requireTeam)
 	if overLocTower and (not requireTeam or overLocTower.team == requireTeam) then
 		local tLoc = overLocTower.lastSeen.location
 		
-		return overLocTower, ((tLoc.x - loc.x)^2 + (tLoc.y - loc.y)^2)^0.5
+		return overLocTower, ((tLoc.x - loc.x)^2 + (tLoc.y - loc.y)^2)^0.5, overLocTower
 	end
 end
-	
+local get_tower_over_location = Set_GetTowerOverLocation
 
 local t_sets_platter = {{}, {}}
 local function update_towers_near_allied_heroes() -- sub func to Set_GetTowersNearAlliedHeroes() below
@@ -916,9 +928,11 @@ local function update_towers_near_allied_heroes() -- sub func to Set_GetTowersNe
 	if tBuildingListAllied then
 		for i=1,#tBuildingListAllied,1 do
 			local gsiThisTower = tBuildingListAllied[i]
+			local towerLoc = gsiThisTower.lastSeen.location
 			-- if not bUnit_IsNullOrDead(gsiThisTower) then  -- TODO Raises questions about hUnit scope if buildings are not to be updated each frame. 
 			for n=1,TEAM_NUMBER_OF_PLAYERS,1 do
-				if Math_PointToPointDistance2D(gsiThisTower.lastSeen.location, tGsiPlayers[n].lastSeen.location) 
+				local playerLoc = tGsiPlayers[n].lastSeen.location
+				if ((towerLoc.x-playerLoc.x)^2 + (towerLoc.y-playerLoc.y)^2)^0.5
 						< DEFAULT_NEARBY_LIMIT_DISTANCE then
 					table.insert(t_sets_platter[1].units, gsiThisTower)
 					break
@@ -933,9 +947,11 @@ local function update_towers_near_allied_heroes() -- sub func to Set_GetTowersNe
 	if tBuildingListEnemy then
 		for i=#tBuildingListEnemy,1,-1 do
 			local gsiThisTower = tBuildingListEnemy[i]
+			local towerLoc = gsiThisTower.lastSeen.location
 			-- if not bUnit_IsNullOrDead(gsiThisTower) then --
 			for n=1,TEAM_NUMBER_OF_PLAYERS,1 do
-				if Math_PointToPointDistance2D(gsiThisTower.lastSeen.location, tGsiPlayers[n].lastSeen.location) 
+				local playerLoc = tGsiPlayers[n].lastSeen.location
+				if ((towerLoc.x-playerLoc.x)^2 + (towerLoc.y-playerLoc.y)^2)^0.5
 						< DEFAULT_NEARBY_LIMIT_DISTANCE then
 					table.insert(t_sets_platter[2].units, gsiThisTower)
 					break
@@ -959,6 +975,115 @@ function Set_GetTowersNearAlliedHeroes()
 	return EMPTY_TABLE
 end
 
+function Set_GetSaferLaneObject(setOrUnit, minimumDistance)
+	local location = setOrUnit.center or location.lastSeen.location
+	local minimumDistance = minimumDistance or 500
+	local creepSets = t_sets[SET_CREEP_ALLIED]
+	local topRightness = location.x + location.y
+	local closestDist = 0xFFFF
+	local closestObject
+	for i=1,#creepSets do
+		local thisCreepSet = creepSets[i]
+		local thisCreepSetLoc = thisCreepSet.center
+		local thisDist = ((location.x-thisCreepSetLoc.x)^2 + (location.y-thisCreepSetLoc.y)^2)^0.5
+		if thisDist > minimumDistance
+				and thisDist < closestDist
+				and (TEAM_IS_RADIANT and thisCreepSetLoc.x + thisCreepSetLoc.y < topRightness
+						or thisCreepSetLoc.x + thisCreepSetLoc.y > topRightness
+				) then
+			closestDist = thisDist
+			closestObject = thisCreepSet
+		end
+	end
+	local towerUnits = t_sets[SET_BUILDING_ALLIED].towers
+	for i=1,#towerUnits do
+		local thisTower = towerUnits[i]
+		local thisTowerLoc = thisTower.lastSeen.location
+		local thisDist = ((location.x-thisTowerLoc.x)^2 + (location.y-thisTowerLoc.y)^2)^0.5
+		if thisDist > minimumDistance
+				and thisDist < closestDist
+				and (TEAM_IS_RADIANT and thisTowerLoc.x + thisTowerLoc.y < topRightness
+						or thisTowerLoc.x + thisTowerLoc.y > topRightness
+				) then
+			closestDist = thisDist
+			closestObject = thisTower
+		end
+	end
+	if closestObject then
+		return closestObject, closestDist
+	end
+	local fountain = GSI_GetTeamFountainUnit(TEAM)
+	return fountain, ((location.x-fountain.x)^2 + (location.y-fountain.y))^0.5
+end
+
+-- k-d tree, or something more simplistic?. tower-quadrant cache.
+function Set_GetNearestTeamBuildingToLoc(team, loc, notShrine)
+	return get_nearest_tower_to_loc(t_sets[team == TEAM and SET_BUILDING_ALLIED or SET_BUILDING_ENEMY].units, loc, notShrine)
+end
+
+function Set_InformBuildingFell(gsiBuilding)
+	local setSearched = gsiBuilding.team == TEAM
+			and t_sets[SET_BUILDING_ALLIED].towers or t_sets[SET_BUILDING_ENEMY].towers
+	
+	for iKey,tableRef in pairs(setSearched) do
+		if gsiBuilding == tableRef then
+			
+			table.remove(setSearched, iKey)
+			break;
+		end
+	end
+	local setSearched = gsiBuilding.team == TEAM
+			and t_sets[SET_BUILDING_ALLIED].units or t_sets[SET_BUILDING_ENEMY].units
+	for iKey,tableRef in pairs(setSearched) do
+		if gsiBuilding == tableRef then
+			
+			table.remove(setSearched, iKey)
+			break;
+		end
+	end
+end
+
+local r = false
+function Set_GetNearestTeamTowerToPlayer(team, gsiPlayer)
+	if not r then
+		r = RealTime()
+		local towers = t_sets_platter[1].units
+		local loc = gsiPlayer.lastSeen.location
+		for i=1,100000 do
+			local a = team == gsiPlayer.team and 1 or 2
+			get_nearest_tower_to_loc(towers, loc)
+		end
+		print("BENCH TOWER NEAREST", RealTime() - r)
+	end
+	local timeData = gsiPlayer.time.data
+	if team == TEAM then
+		if timeData.nearTeamTower and not bUnit_IsNullOrDead(timeData.nearTeamTower) then
+			--print("Tower at location is not dead nor null", timeData.nearTeamTower.lastSeen.location, timeData.nearTeamTower.hUnit:GetHealth())
+			return timeData.nearTeamTower, timeData.nearTeamTowerDistance
+		end
+		timeData.nearTeamTower, timeData.nearTeamTowerDistance =
+				get_nearest_tower_to_loc(t_sets[SET_BUILDING_ALLIED].towers, gsiPlayer.lastSeen.location)
+		return timeData.nearTeamTower, timeData.nearTeamTowerDistance
+	else
+		if timeData.nearEnemyTower and not bUnit_IsNullOrDead(timeData.nearEnemyTower) then
+			return timeData.nearEnemyTower, timeData.nearEnemyTowerDistance
+		end
+		timeData.nearEnemyTower, timeData.nearEnemyTowerDistance =
+				get_nearest_tower_to_loc(t_sets[SET_BUILDING_ENEMY].towers, gsiPlayer.lastSeen.location)
+		return timeData.nearEnemyTower, timeData.nearEnemyTowerDistance
+	end
+end
+
+function Set_GetEnemyTowerPlayerIsUnder(gsiPlayer)
+	local nearestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
+	local towerLoc = nearestTower.lastSeen.location
+	local playerLoc = gsiPlayer.lastSeen.location
+	if nearestTower and ((towerLoc.x-playerLoc.x)^2 + (towerLoc.y-playerLoc.y)^2)^0.5 < nearestTower.attackRange then
+		return nearestTower
+	end
+	return false
+end
+
 local re_gehsnah
 function Set_GetEnemyHeroSetsNearAlliedHeroes(range) -- TEMPORARY PATCHWORK FUNC
 	local tTeamPlayers = GSI_GetTeamPlayers(TEAM)
@@ -968,9 +1093,11 @@ function Set_GetEnemyHeroSetsNearAlliedHeroes(range) -- TEMPORARY PATCHWORK FUNC
 	if tEnemyHeroes then
 		for iEnemy=1,#tEnemyHeroes,1 do
 			local gsiThisHero = tEnemyHeroes[iEnemy]
+			local heroLoc = gsiThisHero.lastSeen.location
 			if not gsiThisHero.typeIsNone then
 				for n=1,TEAM_NUMBER_OF_PLAYERS,1 do
-					if Math_PointToPointDistance2D(gsiThisHero.lastSeen.location, tTeamPlayers[n].lastSeen.location) 
+					local alliedLoc = tTeamPlayers[n].lastSeen.location
+					if ((heroLoc.x-alliedLoc.x)^2 + (heroLoc.y-alliedLoc.y)^2)^0.5 
 							< range then
 						table.insert(tSet[1].units, gsiThisHero)
 						break
@@ -998,7 +1125,8 @@ function Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, radius, forAnalyticsTime)
 			if ( not gsiThisHero.typeIsNone and not pUnit_IsNullOrDead(gsiThisHero) )
 					or (forAnalyticsTime and gsiThisHero.lastSeen.timeStamp + forAnalyticsTime > GameTime()
 						and not IsLocationVisible(gsiThisHero.lastSeen.location)) then
-				local dist = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, gsiThisHero.lastSeen.location)
+				local enemyLoc = gsiThisHero.lastSeen.location
+				local dist = ((playerLocation.x-enemyLoc.x)^2 + (playerLocation.y-enemyLoc.y)^2)^0.5
 				if radius > dist then
 					table.insert(tInRadius, gsiThisHero)
 				end
@@ -1024,7 +1152,8 @@ function Set_GetEnemyHeroesInPlayerRadiusAndOuter(location, radius, outer, forAn
 					or (forAnalyticsTime and IsHeroAlive(gsiThisHero.playerID)
 						and gsiThisHero.lastSeen.timeStamp + forAnalyticsTime > GameTime()
 					) then
-				local dist = Math_PointToPointDistance2D(location, gsiThisHero.lastSeen.location)
+				local enemyLoc = gsiThisHero.lastSeen.location
+				local dist = ((location.x-enemyLoc.x)^2 + (location.y-enemyLoc.y)^2)^0.5
 				if radius > dist then
 					table.insert(tInRadius, gsiThisHero)
 				elseif outer > dist then
@@ -1062,8 +1191,8 @@ function Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, radius, includeSelf)
 	for n=1,#tAlliedHeroes,1 do
 		local gsiThisHero = tAlliedHeroes[n]
 		if gsiThisHero ~= gsiPlayer and not pUnit_IsNullOrDead(gsiThisHero) then
-			if radius > Math_PointToPointDistance2D(playerLocation,
-					gsiThisHero.lastSeen.location) then
+			local alliedLoc = gsiThisHero.lastSeen.location
+			if radius > ((playerLocation.x-alliedLoc.x)^2 + (playerLocation.y-alliedLoc.y)^2)^0.5 then
 				table.insert(tInRadius, gsiThisHero)
 			end
 		end
@@ -1082,7 +1211,8 @@ function Set_GetTeamHeroesInLocRad(team, loc, rad)
 	for n=1,#tHeroes,1 do
 		local gsiThisHero = tHeroes[n]
 		if not pUnit_IsNullOrDead(gsiThisHero) then
-			if rad > Math_PointToPointDistance2D(loc, gsiThisHero.lastSeen.location) then
+			local heroLoc = gsiThisHero.lastSeen.location
+			if rad > ((loc.x-heroLoc.x)^2 + (loc.y-heroLoc.y)^2)^0.5 then
 				table.insert(tInRadius, gsiThisHero)
 			end
 		end
@@ -1103,7 +1233,8 @@ function Set_GetEnemyHeroesInLocRad(location, radius, forAnalyticsTime)
 				or (forAnalyticsTime and thisEnemy.lastSeen.timeStamp + forAnalyticsTime
 					> GameTime()
 				) then
-			if rad > Math_PointToPointDistance2D(loc, thisEnemy.lastSeen.location) then
+			local enemyLoc = thisEnemy.lastSeen.location
+			if rad > ((loc.x-enemyLoc.x)^2 + (loc.y-enemyLoc.y)^2)^0.5 then
 				table.insert(tInRadius, thisEnemy)
 			end
 		end
@@ -1122,8 +1253,8 @@ function Set_GetAlliedHeroesInLocRadius(gsiPlayer, loc, radius, includeSelf)
 		local gsiThisHero = tAlliedHeroes[n]
 		if (includeSelf or gsiThisHero ~= gsiPlayer)
 				and not pUnit_IsNullOrDead(gsiThisHero) then
-			if radius > Math_PointToPointDistance2D(loc,
-					gsiThisHero.lastSeen.location) then
+			local alliedLoc = gsiThisHero.lastSeen.location
+			if radius > ((loc.x-alliedLoc.x)^2 + (loc.y-alliedLoc.y)^2)^0.5 then
 				table.insert(tInRadius, gsiThisHero)
 			end
 		end
@@ -1143,7 +1274,8 @@ function Set_GetNearestAlliedHeroToLocation(location)
 		for i=1,#alliedHeroesList,1 do
 			local thisHero = alliedHeroesList[i]
 			if not pUnit_IsNullOrDead(thisHero) then
-				local dist = Math_PointToPointDistance2D(location, thisHero.lastSeen.location)
+				local alliedLoc = thisHero.lastSeen.location
+				local dist = ((location.x-alliedLoc.x)^2 + (location.y-alliedLoc.y)^2)^0.5
 				if dist < nearestDistance then
 					nearestDistance = dist
 					nearestHero = thisHero
@@ -1165,7 +1297,8 @@ function Set_GetNearestEnemyHeroToLocation(location, forAnalyticsTime)
 					or (forAnalyticsTime and thisEnemy.lastSeen.timeStamp + forAnalyticsTime
 						> GameTime()
 					)then
-				local dist = Math_PointToPointDistance2D(location, thisEnemy.lastSeen.location)
+				local enemyLoc = thisEnemy.lastSeen.location
+				local dist = ((location.x-enemyLoc.x)^2 + (location.y-enemyLoc.y)^2)^0.5
 				if dist < nearestDistance then
 					nearestDistance = dist
 					nearestHero = thisEnemy
@@ -1194,7 +1327,8 @@ function Set_GetFurthestEnemyHeroToLocation(location, forAnalyticsTime, heroTbl)
 			local thisEnemy = enemyHeroesList[i]
 			if not pUnit_IsNullOrDead(thisEnemy)
 					or (forAnalyticsTime and thisEnemy.lastSeen.timeStamp + forAnalyticsTime > GameTime())then
-				local dist = Math_PointToPointDistance2D(location, thisEnemy.lastSeen.location)
+				local enemyLoc = thisEnemy.lastSeen.location
+				local dist = ((location.x-enemyLoc.x)^2 + (location.y-enemyLoc.y)^2)^0.5
 				if dist > furthestDistance then
 					furthestDistance = dist
 					furthestHero = thisEnemy
@@ -1211,8 +1345,10 @@ function Set_GetCreepSetsNearAlliedHeroes() -- nb. This is naturally cleaned by 
 	local tSets = recycle_empty or {}
 	local tCreepSetsAllied = t_sets[SET_CREEP_ALLIED]
 	for s=1,#tCreepSetsAllied,1 do
+		local creepSetCenter = tCreepSetsAllied[s].center
 		for n=1,TEAM_NUMBER_OF_PLAYERS,1 do
-			if Math_PointToPointDistance2D(tCreepSetsAllied[s].center, tGsiPlayers[n].lastSeen.location) 
+			local playerLoc = tGsiPlayers[n].lastSeen.location
+			if ((creepSetCenter.x-playerLoc.x)^2 + (creepSetCenter.y-playerLoc.y)^2)^0.5 
 					< ALLOWABLE_CREEP_SET_DIAMETER then
 				table.insert(tSets, tCreepSetsAllied[s])
 				break
@@ -1221,8 +1357,10 @@ function Set_GetCreepSetsNearAlliedHeroes() -- nb. This is naturally cleaned by 
 	end
 	local tCreepSetsEnemy = t_sets[SET_CREEP_ENEMY]
 	for s=1,#tCreepSetsEnemy,1 do
+		local creepSetCenter = tCreepSetsEnemy[s].center
 		for n=1,TEAM_NUMBER_OF_PLAYERS,1 do
-			if Math_PointToPointDistance2D(tCreepSetsEnemy[s].center, tGsiPlayers[n].lastSeen.location) 
+			local playerLoc = tGsiPlayers[n].lastSeen.location
+			if ((creepSetCenter.x-playerLoc.x)^2 + (creepSetCenter.y-playerLoc.y)^2)^0.5 
 					< ALLOWABLE_CREEP_SET_DIAMETER then
 				table.insert(tSets, tCreepSetsEnemy[s])
 				break
@@ -1255,14 +1393,17 @@ function Set_GetNearestAlliedCreepSetInLane(gsiPlayer, lane)
 	local tCreepSetsAllied = t_sets[SET_CREEP_ALLIED]
 	local closestSet = nil
 	local closestSetDistance = HIGH_32_BIT
-	local thisPlayerLocation = gsiPlayer.lastSeen.location
+	local playerLoc = gsiPlayer.lastSeen.location
 	
 	for s=1,#tCreepSetsAllied,1 do
 		local thisCreepSet = tCreepSetsAllied[s]
-		local thisDistance = Math_PointToPointDistance2D(thisCreepSet.center, thisPlayerLocation)
-		if thisCreepSet.lane == lane and thisDistance < closestSetDistance then
-			closestSetDistance = thisDistance
-			closestSet = thisCreepSet
+		local creepSetCenter = thisCreepSet.center
+		if thisCreepSet.lane == lane then
+			local thisDistance = ((creepSetCenter.x-playerLoc.x)^2 + (creepSetCenter.y-playerLoc.y)^2)^0.5
+			if thisDistance < closestSetDistance then
+				closestSetDistance = thisDistance
+				closestSet = thisCreepSet
+			end
 		end
 	end
 	
@@ -1275,7 +1416,8 @@ function Set_GetNearestAlliedCreepSetToLocation(location)
 	local closestSetDistance = HIGH_32_BIT
 	for s=1,#tCreepSetsAllied,1 do
 		local thisCreepSet = tCreepSetsAllied[s]
-		local thisDistance = Math_PointToPointDistance2D(thisCreepSet.center, location)
+		local creepSetCenter = thisCreepSet.center
+		local thisDistance = ((creepSetCenter.x-location.x)^2 + (creepSetCenter.y-location.y)^2)^0.5
 		if thisDistance < closestSetDistance then
 			closestSetDistance = thisDistance
 			closestSet = thisCreepSet
@@ -1291,10 +1433,13 @@ function Set_GetNearestEnemyCreepSetAtLaneLoc(location, lane)
 	
 	for s=1,#tCreepSetsEnemy,1 do
 		local thisCreepSet = tCreepSetsEnemy[s]
-		local thisDistance = Math_PointToPointDistance2D(thisCreepSet.center, location)
-		if thisCreepSet.lane == lane and thisDistance < closestSetDistance then
-			closestSetDistance = thisDistance
-			closestSet = thisCreepSet
+		local creepSetCenter = thisCreepSet.center
+		if thisCreepSet.lane == lane then
+			local thisDistance = ((creepSetCenter.x-location.x)^2 + (creepSetCenter.y-location.y)^2)^0.5
+			if thisDistance < closestSetDistance then
+				closestSetDistance = thisDistance
+				closestSet = thisCreepSet
+			end
 		end
 	end
 	
@@ -1307,7 +1452,8 @@ function Set_GetNearestEnemyCreepSetToLocation(location)
 	local closestSetDistance = HIGH_32_BIT
 	for s=1,#tCreepSetsEnemy,1 do
 		local thisCreepSet = tCreepSetsEnemy[s]
-		local thisDistance = Math_PointToPointDistance2D(thisCreepSet.center, location)
+		local creepSetCenter = thisCreepSet.center
+		local thisDistance = ((creepSetCenter.x-location.x)^2 + (creepSetCenter.y-location.y)^2)^0.5
 		if thisDistance < closestSetDistance then
 			closestSetDistance = thisDistance
 			closestSet = thisCreepSet
@@ -1366,11 +1512,12 @@ function Set_GetEnemyCreepSetLaneFront(lane)
 	if tCreepSetsEnemy then
 		for s=1,#tCreepSetsEnemy,1 do
 			local thisCreepSet = tCreepSetsEnemy[s]
-			local dist = Math_PointToPointDistance2D(thisCreepSet.center, team_lane_creep_spawner[ENEMY_TEAM][thisCreepSet.lane]) -- [[MAJOR BUG FIX v0.7]]
-			if thisCreepSet.lane == lane and
-					dist > greatestDistance then
-				greatestDistance = dist
-				enemyFront = thisCreepSet
+			if thisCreepSet.lane == lane then
+				local dist = Math_PointToPointDistance2D(thisCreepSet.center, team_lane_creep_spawner[ENEMY_TEAM][thisCreepSet.lane]) -- [[MAJOR BUG FIX v0.7]]
+				if dist > greatestDistance then
+					greatestDistance = dist
+					enemyFront = thisCreepSet
+				end
 			end
 		end
 	end
@@ -1383,8 +1530,10 @@ function Set_GetAlliedCreepSetsNearAlliedHeroes()
 	local tCreepSetsAllied = t_sets[SET_CREEP_ALLIED]
 	local tSets = re_gacsnah or {}
 	for s=1,#tCreepSetsAllied,1 do
+		local creepSetCenter = tCreepSetsAllied[s].center
 		for n=1,TEAM_NUMBER_OF_PLAYERS,1 do
-			if Math_PointToPointDistance2D(tCreepSetsAllied[s].center, tGsiPlayers[n].lastSeen.location) 
+			local playerLoc = tGsiPlayers[n].lastSeen.location
+			if ((creepSetCenter.x-playerLoc.x)^2 + (creepSetCenter.y-playerLoc.y)^2)^0.5 
 					< ALLOWABLE_CREEP_SET_DIAMETER then
 				table.insert(tSets, tCreepSetsAllied[s])
 				break
@@ -1449,6 +1598,25 @@ function Set_GetLowestCreepHealthInSet(set)
 	return -1
 end
 
+function Set_GetNearestTeamOutpostInLocRad(team, loc, radius)
+	local units = t_sets[SET_BUILDING_NEUTRAL].outposts
+	radius = radius or 14142
+	local closestOutpost
+	local closestDist = 0xFFFFFF
+	for i=1,#units do
+		local thisOutpost = units[i]
+		thisOutpost.team = thisOutpost.hUnit:GetTeam()
+		if thisOutpost.team == team then
+			local dist = ((loc.x-thisOutpost.lastSeen.location.x)^2 + (loc.y-thisOutpost.lastSeen.location.y)^2)^0.5
+			if dist <= radius and dist < closestDist then
+				closestDist = dist
+				closestOutpost = thisOutpost
+			end
+		end
+	end
+	return closestOutpost, closestDist
+end
+
 function Set_SetIsDotaType(setType)
 	return setType < SET_HERO
 end
@@ -1463,7 +1631,10 @@ function GSI_CreateUpdateUnitSets()
 						DEBUG and not USER_HAS_NO_EPILEPSY_RISK_DEBUG_THROTTLES and
 						THROTTLE_SET_ALL_UPDATE or THROTTLE_SET_ALL_UPDATE/3
 					),
-				["throttleUpdateLaneFronts"] = Time_CreateThrottle(THROTTLE_UPDATE_LANE_FRONTS)
+				["throttleUpdateLaneFronts"] = Time_CreateThrottle(THROTTLE_UPDATE_LANE_FRONTS),
+				-- TODO Really like a fightclimate typed throttle that increases delta when fighting
+				-- -| so that I can imply that fightclimate will become more robust and gamified.
+				["throttleUpdateNeutrals"] = Time_CreateThrottle(THROTTLE_UPDATE_NEUTRALS),
 			},
 			"JOB_UPDATE_UNIT_SETS"
 		)

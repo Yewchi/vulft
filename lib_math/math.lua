@@ -26,7 +26,6 @@
 
 -- Basic mathematical functions and trigonometry. 
 
-local sqrt = math.sqrt
 local floor = math.floor
 MATH_PI = math.pi
 MATH_2PI = 2*MATH_PI
@@ -57,24 +56,24 @@ function Math_DivisorSafe5Dec(val)
 end
 
 function Math_DistanceOfLine2D(v1)
-	return sqrt(v1.x^2 + v1.y^2)
+	return (v1.x^2 + v1.y^2)^0.5
 end
 
 function Math_DistanceOfLine(v1)
-	return sqrt(v1.x^2 + v1.y^2 + v1.z^2)
+	return (v1.x^2 + v1.y^2 + v1.z^2)^0.5
 end
 
 function Math_PointToPointDistance2D(p1, p2)
-	return sqrt((p2.x - p1.x)^2 + (p2.y - p1.y)^2)
+	return ((p2.x - p1.x)^2 + (p2.y - p1.y)^2)^0.5
 end
 
 function Math_PointCoordinatesDistance2D(x1, y1, x2, y2)
-	return sqrt((x2 - x1)^2 + (y2 - y1)^2)
+	return ((x2 - x1)^2 + (y2 - y1)^2)^0.5
 end
 
 -- TODO Depreciate
 function Math_PointToPointDistance(p1, p2)
-	return sqrt((p2.x - p1.x)^2 + (p2.y - p1.y)^2 + (p2.z - p1.z)^2)
+	return ((p2.x - p1.x)^2 + (p2.y - p1.y)^2 + (p2.z - p1.z)^2)^0.5
 end
 
 local lastWarn = 0
@@ -117,7 +116,7 @@ function Math_CreateQuadraticFunction(specialModificationFunction, modifyFirst, 
 		local exponent = args[i]
 		local cofactor = args[i+1]
 		if not cofactor then
-			ERROR_print("[math] Attempt to create a quadratic without a cofactor at even index %s.", i)
+			--FIX THISERROR_print("[math] Attempt to create a quadratic without a cofactor at even index %s.", i)
 			print(debug.traceback())
 		end
 		newQuadratic[1][(i+1) / 2] = exponent

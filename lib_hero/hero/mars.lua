@@ -1,12 +1,12 @@
 local hero_data = {
 	"mars",
-	{2, 1, 1, 2, 1, 4, 1, 2, 2, 3, 3, 4, 3, 3, 8, 5, 4, 10, 12},
+	{2, 1, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_branches","item_tango","item_enchanted_mango","item_enchanted_mango","item_ring_of_health","item_pers","item_crown","item_meteor_hammer","item_boots","item_arcane_boots","item_magic_wand","item_blink","item_aether_lens","item_point_booster","item_octarine_core","item_aghanims_shard","item_ogre_axe","item_black_king_bar",
+		"item_gauntlets","item_quelling_blade","item_gauntlets","item_tango","item_branches","item_branches","item_bracer","item_soul_ring","item_boots","item_phase_boots","item_blight_stone","item_magic_wand","item_mithril_hammer","item_desolator","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_aghanims_shard","item_blink","item_hyperstone","item_platemail","item_buckler","item_assault","item_pers","item_point_booster","item_vitality_booster","item_octarine_core","item_cornucopia","item_refresher","item_reaver","item_overwhelming_blink",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
-		"Spear of Mars","God's Rebuke","Bulwark","Arena Of Blood","+100 God's Rebuke Distance","+30% Bulwark Active Redirect Chance","-4s God's Rebuke Cooldown","+100.0 Spear Of Mars Damage","+6%/+6% Bulwark Front/Side damage reduction","+0.8s Spear of Mars Stun","God's Rebuke +65% Crit","Arena Of Blood Grants Team +180 HP Regen",
+		"Spear of Mars","God's Rebuke","Bulwark","Arena Of Blood","+100 God's Rebuke Distance","+30% Bulwark Active Redirect Chance","-4s God's Rebuke Cooldown","+100.0 Spear Of Mars Damage","+6%/+6% Bulwark Front/Side damage reduction","+0.6s Spear of Mars Stun","God's Rebuke +65% Crit","Arena Of Blood Grants Team +180 HP Regen",
 	}
 }
 --@EndAutomatedHeroData

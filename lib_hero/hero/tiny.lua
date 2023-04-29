@@ -1,10 +1,10 @@
 local hero_data = {
 	"tiny",
-	{3, 1, 1, 2, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 8, 3, 4, 9, 12},
+	{3, 1, 2, 1, 1, 4, 1, 2, 2, 2, 6, 4, 3, 12, 8, 3, 4, 10},
 	{
-		"item_gauntlets","item_gauntlets","item_tango","item_quelling_blade","item_enchanted_mango","item_branches","item_boots","item_gloves","item_soul_ring","item_power_treads","item_quarterstaff","item_robe","item_echo_sabre","item_magic_wand","item_blink","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_blitz_knuckles","item_shadow_amulet","item_invis_sword","item_lesser_crit","item_silver_edge","item_hyperstone","item_platemail","item_assault","item_eagle","item_swift_blink","item_reaver","item_satanic","item_moon_shard",
+		"item_ward_observer","item_branches","item_faerie_fire","item_quelling_blade","item_tango","item_bottle","item_boots","item_chainmail","item_blades_of_attack","item_wind_lace","item_phase_boots","item_blink","item_oblivion_staff","item_echo_sabre","item_blades_of_attack","item_lesser_crit","item_point_booster","item_ultimate_scepter","item_echo_sabre","item_aghanims_shard","item_greater_crit","item_hyperstone","item_assault","item_swift_blink","item_ultimate_scepter_2","item_blitz_knuckles",
 	},
-	{ {2,2,2,1,1,}, {2,2,2,1,5,}, 0.1 },
+	{ {3,3,2,5,2,}, {4,4,4,2,2,}, 0.1 },
 	{
 		"Avalanche","Toss","Tree Grab","Grow","+20 Movement Speed","+10 Strength","+10% Status Resistance","+80 Avalanche Damage","+40% Grow Bonus Damage With Tree","Toss Requires No Target","-8s Avalanche Cooldown","2 Toss Charges",
 	}

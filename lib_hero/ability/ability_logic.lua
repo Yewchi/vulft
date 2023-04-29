@@ -1096,7 +1096,8 @@ local t_neutrals_ability_funcs = {
 							local magicRes = AbilityLogic_CastOnTargetWillSucceed(gsiUnit, thisEnemy, ability)
 							local nearFuture = Analytics_GetNearFutureHealth(thisEnemy, 1)
 							if nearFuture > 0
-									and nearFuture < ability:GetSpecialValueFloat("damage")*magicRes then
+									and nearFuture+thisEnemy.hUnit:GetHealthRegen()*1.5 < ability:GetSpecialValueFloat("damage")*magicRes then
+								print("golmdtra kill :|")
 								return thisEnemy
 							end
 						end
@@ -1117,6 +1118,7 @@ local t_neutrals_ability_funcs = {
 				end
 				if bestTarget and Vector_PointDistance2D(bestTarget.lastSeen.location, casterLoc)
 							< castRange*0.95 then
+					print("get golm'd :|")
 					return bestTarget
 				end
 			end,
@@ -1471,7 +1473,13 @@ function AbilityLogic_WillChainCastHit(gsiCasting, gsiTarget, castRange, chainin
 
 	local killMe = 1
 	while(1) do -- O(n^2)
-		if killMe > 100 then ERROR_print("[ability_logic]: UNEXPECTED INFINITE LOOP", totalJumps, Util_PrintableTable(chainingUnitTbl)) break; end
+		if killMe > 100 then
+			ERROR_print(true, not DEBUG,
+					"[ability_logic]: AbilityLogic_WillChainCastHit UNEXPECTED INFINITE LOOP",
+					totalJumps, Util_PrintableTable(chainingUnitTbl)
+				)
+			return false
+		end
 		fromLoc, fromUnit, numUnits = chain_unfairly_to_target(fromLoc, toLoc, chainingUnitTbl, acceptableChainDist,
 				lowestDistanceFrom, lowestDistanceTo, numUnits
 			)

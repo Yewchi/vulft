@@ -1,12 +1,12 @@
 local hero_data = {
 	"clinkz",
-	{2, 3, 2, 1, 1, 4, 1, 1, 3, 3, 3, 4, 5, 2, 7, 2, 4, 10, 11},
+	{2, 3, 2, 3, 2, 6, 2, 1, 1, 1, 1, 6, 7, 3, 9, 3, 6, 12, 13},
 	{
-		"item_magic_wand","item_branches","item_branches","item_branches","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_boots","item_javelin","item_maelstrom","item_crown","item_crown","item_staff_of_wizardry","item_gungir","item_blade_of_alacrity","item_belt_of_strength","item_blades_of_attack","item_dragon_lance","item_lesser_crit","item_greater_crit","item_ultimate_scepter","item_relic","item_rapier","item_staff_of_wizardry","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike",
+		"item_tango","item_circlet","item_slippers","item_branches","item_faerie_fire","item_ward_observer","item_branches","item_bottle","item_wraith_band","item_boots","item_fluffy_hat","item_blades_of_attack","item_magic_wand","item_falcon_blade","item_cornucopia","item_orchid","item_dragon_lance","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_force_staff","item_hurricane_pike","item_black_king_bar","item_sheepstick",
 	},
 	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
 	{
-		"Burning Barrage","Searing Arrows","Skeleton Walk","Death Pact","+20 Searing Arrows Damage","-3.0s Skeleton Walk Cooldown","+20% Death Pact Health","Death Pact Steal creep abilities","+125 Attack Range","+3.0 Burning Barrage arrows","+25% Burning Barrage Damage","Searing Arrows Multishot",
+		"Strafe","Tar Bomb","Death Pact","Burning Army","Burning Barrage","Skeleton Walk","+20 Tar Bomb Bonus Attack Damage","-3s Skeleton Walk Cooldown","+75 Attack Range","+1 Death Pact Charge","+200 Death Pact Health","+40 Strafe Attack Speed","-7s Strafe Cooldown","Tar Bomb Multishot",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,12 +1,12 @@
 local hero_data = {
 	"muerta",
-	{1, 2, 1, 3, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 7, 2, 4, 9, 12},
+	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 8, 2, 4, 10, 12},
 	{
-		"item_branches","item_branches","item_tango","item_enchanted_mango","item_circlet","item_mantle","item_fluffy_hat","item_null_talisman","item_blades_of_attack","item_magic_wand","item_fluffy_hat","item_boots","item_falcon_blade","item_robe","item_power_treads","item_javelin","item_maelstrom","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_hyperstone","item_mjollnir","item_lesser_crit","item_greater_crit","item_dragon_lance","item_hurricane_pike","item_blink","item_swift_blink","item_refresher","item_sheepstick","item_moon_shard","item_rapier","item_rapier",
+		"item_quelling_blade","item_circlet","item_slippers","item_branches","item_tango","item_branches","item_wraith_band","item_power_treads","item_robe","item_falcon_blade","item_javelin","item_maelstrom","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_blitz_knuckles","item_shadow_amulet","item_silver_edge","item_staff_of_wizardry","item_crown","item_crown","item_crown","item_gungir","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_force_staff","item_hurricane_pike","item_blink","item_swift_blink","item_moon_shard","item_boots",
 	},
-	{ {1,1,2,2,2,}, {1,1,3,4,4,}, 0.1 },
+	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
 	{
-		"Dead Shot","The Calling","Gunslinger","Pierce the Veil","+100 Dead Shot damage","+8 Strength","+250 Dead Shot Cast Range","+25 Damage","2 Dead Shot Charges","The Calling summons +2 additional revenants","+20% Gunslinger chance","+25% Magic Resistance",
+		"Dead Shot","The Calling","Gunslinger","Pierce the Veil","+80 Dead Shot Damage","+8 Strength","+250 Dead Shot Cast Range","+35 Damage","2 Dead Shot Charges","+20% Gunslinger chance","The Calling summons +2 additional revenants","+25% Magic Resistance",
 	}
 }
 --@EndAutomatedHeroData
@@ -506,7 +506,7 @@ d = {
 		if CAN_BE_CAST(gsiPlayer, pierce)
 				and (nearbyEnemies[1] or 
 					damageInTimeline > gsiPlayer.lastSeenHealth * 0.15)
-				and gsiPlayer.lastSeenHealth < 0.8 then
+				and playerHpp < 0.8 then
 			
 			if damageInTimeline > gsiPlayer.lastSeenHealth * 0.05
 					and HIGH_USE(gsiPlayer, pierce, highUse - pierce:GetManaCost(),

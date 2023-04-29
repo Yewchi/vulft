@@ -1,8 +1,8 @@
 local hero_data = {
 	"queenofpain",
-	{3, 1, 1, 2, 3, 4, 3, 3, 2, 6, 2, 4, 2, 1, 8, 1, 4, 9, 11},
+	{3, 1, 1, 2, 3, 4, 3, 3, 1, 1, 2, 4, 2, 2, 8, 5, 4, 9, 11},
 	{
-		"item_tango","item_ward_observer","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_null_talisman","item_gloves","item_boots","item_robe","item_power_treads","item_magic_wand","item_staff_of_wizardry","item_robe","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_sphere","item_mystic_staff","item_sheepstick","item_pers","item_refresher","item_shivas_guard",
+		"item_tango","item_faerie_fire","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_magic_wand","item_gloves","item_robe","item_robe","item_power_treads","item_blitz_knuckles","item_chainmail","item_witch_blade","item_staff_of_wizardry","item_blade_of_alacrity","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_sange","item_kaya_and_sange","item_pers","item_octarine_core","item_black_king_bar","item_cornucopia","item_ultimate_scepter_2","item_sphere","item_refresher",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

@@ -1,8 +1,8 @@
 local hero_data = {
 	"beastmaster",
-	{1, 4, 1, 2, 1, 6, 1, 2, 2, 2, 4, 6, 4, 4, 9, 8, 6, 12, 13},
+	{1, 2, 1, 2, 1, 6, 1, 2, 2, 4, 4, 6, 4, 4, 9, 8, 6, 12, 13},
 	{
-		"item_enchanted_mango","item_branches","item_faerie_fire","item_branches","item_magic_stick","item_quelling_blade","item_boots","item_arcane_boots","item_magic_wand","item_wind_lace","item_belt_of_strength","item_ancient_janggo","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_wind_lace","item_tranquil_boots","item_boots_of_bearing","item_aether_lens","item_kaya","item_ghost","item_ethereal_blade","item_blink",
+		"item_quelling_blade","item_magic_stick","item_enchanted_mango","item_sobi_mask","item_branches","item_helm_of_iron_will","item_diadem","item_boots","item_helm_of_the_dominator","item_buckler","item_ring_of_basilius","item_blades_of_attack","item_lifesteal","item_vladmir","item_helm_of_the_overlord","item_ogre_axe","item_staff_of_wizardry","item_ogre_axe","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_mithril_hammer","item_black_king_bar","item_kaya","item_ogre_axe","item_belt_of_strength","item_sange","item_kaya_and_sange","item_blink",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

@@ -73,8 +73,8 @@ function Hero_InitializeBehavior(shortNameOrDefault, gsiPlayer)
 	end
 	if thisPlayerHeroBehaviorIndex then
 		local thisPlayerBehavior = t_hero_behavior[thisPlayerHeroBehaviorIndex]
-		Item_PassPlayerItemBuild(gsiPlayer, t_hero_behavior[thisPlayerHeroBehaviorIndex][HERO_BEHAVIOUR_I__ITEM_BUILD])
-		Ability_PassPlayerAbilityData(	
+		Item_InitializePlayer(gsiPlayer, t_hero_behavior[thisPlayerHeroBehaviorIndex][HERO_BEHAVIOUR_I__ITEM_BUILD])
+		Ability_InitializePlayer(	
 				gsiPlayer, 
 				thisPlayerBehavior[HERO_BEHAVIOUR_I__SKILL_BUILD],
 				thisPlayerBehavior[HERO_BEHAVIOUR_I__ABILITY_NAME_INDICES],

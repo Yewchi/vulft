@@ -1,12 +1,12 @@
 local hero_data = {
 	"rattletrap",
-	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 8, 2, 4, 10, 12},
+	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 8, 2, 4, 10},
 	{
-		"item_tango","item_gauntlets","item_quelling_blade","item_gauntlets","item_enchanted_mango","item_branches","item_ring_of_health","item_vanguard","item_boots","item_wind_lace","item_arcane_boots","item_magic_wand","item_headdress","item_chainmail","item_mekansm","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_buckler","item_guardian_greaves","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_platemail",
+		"item_tango","item_magic_stick","item_branches","item_faerie_fire","item_enchanted_mango","item_branches","item_ward_observer","item_boots","item_magic_wand","item_wind_lace","item_wind_lace","item_tranquil_boots","item_cloak","item_glimmer_cape","item_ancient_janggo","item_boots_of_bearing","item_wind_lace","item_medallion_of_courage","item_solar_crest","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
-	{ {3,3,3,5,1,}, {5,3,3,4,4,}, 0.1 },
+	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
 	{
-		"Battery Assault","Power Cogs","Rocket Flare","Hookshot","-2s Rocket Flare Cooldown","-2s Power Cogs Cooldown","+2 Power Cogs Hit To Kill","+24 Battery Assault Damage","Rocket Flare True Sight","Power Cogs Leash Units Inside","Spell Immunity Inside Power Cogs","-0.25s Battery Assault Interval",
+		"Battery Assault","Power Cogs","Rocket Flare","Hookshot","-2s Rocket Flare Cooldown","-2s Power Cogs Cooldown","+2 Power Cogs Hit To Kill","+24 Battery Assault Damage","Rocket Flare True Sight","+75 Rocket Flare Damage","Debuff Immunity Inside Power Cogs","-0.25s Battery Assault Interval",
 	}
 }
 --@EndAutomatedHeroData

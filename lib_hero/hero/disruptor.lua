@@ -1,12 +1,12 @@
 local hero_data = {
 	"disruptor",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 5, 4, 1, 1, 8, 1, 4, 9, 12},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 5, 4, 1, 1, 8, 1, 4, 9, 11},
 	{
-		"item_ward_observer","item_ward_observer","item_tango","item_magic_stick","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_boots","item_magic_wand","item_arcane_boots","item_fluffy_hat","item_cloak","item_gem","item_staff_of_wizardry","item_force_staff","item_cloak","item_gem","item_shadow_amulet","item_glimmer_cape","item_point_booster","item_gem",
+		"item_tango","item_blood_grenade","item_smoke_of_deceit","item_enchanted_mango","item_branches","item_branches","item_branches","item_ward_observer","item_wind_lace","item_boots","item_wind_lace","item_tranquil_boots","item_magic_wand","item_robe","item_belt_of_strength","item_ancient_janggo","item_boots_of_bearing","item_wind_lace","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem",
 	},
-	{ {1,1,1,3,5,}, {5,5,5,4,4,}, 0.1 },
+	{ {5,1,1,1,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Thunder Strike","Glimpse","Kinetic Field","Static Storm","-3s Kinetic Field Cooldown","+30 Thunder Strike Damage","250 Glimpse Max Damage","+2.0s Static Storm Duration","+2s Kinetic Field Duration","+3 Thunder Strike Hits","-12s Glimpse Cooldown","+200 Static Storm Radius",
+		"Thunder Strike","Glimpse","Kinetic Field","Static Storm","-3s Kinetic Field Cooldown","+100 Thunder Strike Radius","250 Glimpse Max Damage","+1.5s Static Storm Duration","+2s Kinetic Field Duration",".4s Thunder Strike Slow Duration","-12s Glimpse Cooldown","+200 Static Storm Radius",
 	}
 }
 --@EndAutomatedHeroData

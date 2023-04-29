@@ -185,9 +185,9 @@ require(GetScriptDirectory().."/lib_task/blueprint/zone_defend")
 require(GetScriptDirectory().."/lib_task/blueprint/rune")
 require(GetScriptDirectory().."/lib_task/blueprint/dawdle")
 require(GetScriptDirectory().."/lib_task/blueprint/use_item")
-require(GetScriptDirectory().."/lib_task/blueprint/search_fog")
 require(GetScriptDirectory().."/lib_task/blueprint/pick_up_item")
 require(GetScriptDirectory().."/lib_task/blueprint/die_to_neutrals")
+require(GetScriptDirectory().."/lib_task/blueprint/search_fog")
 require(GetScriptDirectory().."/lib_task/blueprint/mortal_unit")
 
 --task_init_funcs = { -- bad, should self-register TODO

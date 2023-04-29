@@ -45,7 +45,7 @@ local min = math.min
 local max = math.max
 local sqrt = math.sqrt
 
-local INCREASE_SAFETY_PRIORITY_UPDATE_THROTTLE = 0.229 -- Rotates
+local INCREASE_SAFETY_PRIORITY_UPDATE_THROTTLE = 0.30457 -- Rotates
 
 local mobility_in_use = {}
 local defensives_in_use = {}
@@ -53,6 +53,8 @@ local defensives_in_use = {}
 local team_fountain
 
 local TEAM_FOUNTAIN_LOC = Map_GetTeamFountainLocation()
+
+local t_team_players
 
 local next_player = 1
 local function estimated_time_til_completed(gsiPlayer, objective)
@@ -70,11 +72,16 @@ local function task_init_func(taskJobDomain)
 	avoid_hide_handle = AvoidHide_GetTaskHandle()
 	consumable_handle = Consumable_GetTaskHandle()
 
+	t_team_players = GSI_GetTeamPlayers(TEAM)
+
 	taskJobDomain:RegisterJob(
 			function(workingSet)
 				if workingSet.throttle:allowed() then
-					Task_SetTaskPriority(task_handle, next_player, TASK_PRIORITY_TOP)
-					next_player = Task_RotatePlayerOnTeam(next_player)
+					local thisPlayer = t_team_players[next_player]
+					if thisPlayer.lastSeenHealth / thisPlayer.maxHealth < 0.67 then
+						Task_SetTaskPriority(task_handle, next_player, TASK_PRIORITY_TOP)
+						next_player = Task_RotatePlayerOnTeam(next_player)
+					end
 				end
 			end,
 			{["throttle"] = Time_CreateThrottle(INCREASE_SAFETY_PRIORITY_UPDATE_THROTTLE)},

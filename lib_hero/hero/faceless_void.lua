@@ -1,8 +1,8 @@
 local hero_data = {
 	"faceless_void",
-	{1, 2, 3, 1, 3, 4, 3, 1, 1, 3, 2, 4, 2, 2, 7, 6, 9, 4, 11},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 7, 6, 4, 9, 11},
 	{
-		"item_tango","item_branches","item_branches","item_quelling_blade","item_slippers","item_circlet","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_lifesteal","item_mask_of_madness","item_blade_of_alacrity","item_magic_wand","item_yasha","item_manta","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_aghanims_shard","item_butterfly","item_moon_shard",
+		"item_tango","item_magic_stick","item_branches","item_quelling_blade","item_branches","item_branches","item_boots_of_elves","item_magic_wand","item_gloves","item_power_treads","item_lifesteal","item_quarterstaff","item_mask_of_madness","item_javelin","item_maelstrom","item_hyperstone","item_mjollnir","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ultimate_orb","item_manta","item_talisman_of_evasion","item_quarterstaff","item_eagle","item_butterfly","item_aghanims_shard","item_mask_of_madness","item_ultimate_scepter","item_ultimate_scepter_2","item_refresher",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

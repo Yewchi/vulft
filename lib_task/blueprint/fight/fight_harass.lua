@@ -24,7 +24,24 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
+-- fight_harass constants
 local XETA_SCORE_DO_NOT_RUN = XETA_SCORE_DO_NOT_RUN
+local VALUE_OF_ONE_HEALTH = VALUE_OF_ONE_HEALTH
+local CREEP_AGRO_RANGE = CREEP_AGRO_RANGE
+local UNIT_TYPE_CREEP = UNIT_TYPE_CREEP
+local UNIT_TYPE_BUILDING = UNIT_TYPE_BUILDING
+local UNIT_TYPE_HERO = UNIT_TYPE_HERO
+local DEBUG = DEBUG
+local VERBOSE = VERBOSE
+local TEST = TEST
+-- /consts
+
+-- ()
+local max = math.max
+local min = math.min
+local abs = math.abs
+local Positioning_WillAttackCmdExposeToLocRad = Positioning_WillAttackCmdExposeToLocRad
+local Task_GetTaskScore = Task_GetTaskScore
 local Math_PointToPointDistance2D = Math_PointToPointDistance2D
 local Set_GetEnemyHeroesInPlayerRadius = Set_GetEnemyHeroesInPlayerRadius
 local pUnit_GetAdjustedAttackTime = pUnit_GetAdjustedAttackTime
@@ -33,13 +50,19 @@ local Lhp_GetActualFromUnitToUnitAttackOnce = Lhp_GetActualFromUnitToUnitAttackO
 local FarmJungle_GetJungleCampClearViability = FarmJugnle_GetJungleCampClearViability
 local Analytics_GetTotalDamageInTimeline = Analytics_GetTotalDamageInTimeline
 local Analytics_GetMostDamagingUnitTypeToUnit = Analytics_GetMostDamagingUnitTypeToUnit
-local VALUE_OF_ONE_HEALTH = VALUE_OF_ONE_HEALTH
-local CREEP_AGRO_RANGE = CREEP_AGRO_RANGE
+local FarmLane_UtilizingLaneSafety = FarmLane_UtilizingLaneSafety
+local Task_CreateUpdatePriorityDeagroJob = Task_CreateUpdatePriorityDeagroJob
+local Set_GetCenterOfSetUnits = Set_GetCenterOfSetUnits
+local Set_GetAlliedHeroesInLocRadius = Set_GetAlliedHeroesInLocRadius
+local Set_GetNearestTeamTowerToPlayer = Set_GetNearestTeamTowerToPlayer
+local FightClimate_AnyIntentToHarm = FightClimate_AnyIntentToHarm
+local FightClimate_CreepPressureFast = FightClimate_CreepPressureFast
+local FarmLane_AnyCreepLastHitTracked = FarmLane_AnyCreepLastHitTracked
+local FarmLane_InformFightingNoFarming = FarmLane_InformFightingNoFarming
 local Positioning_WillAttackCmdExposeToLocRad = Positioning_WillAttackCmdExposeToLocRad
-local Task_GetTaskScore = Task_GetTaskScore
-local max = math.max
-local min = math.min
-local abs = math.abs
+local Xeta_CostOfWaitingSeconds = Xeta_CostOfWaitingSeconds
+local Vector_PointDistance = Vector_PointDistance
+-- /()
 
 local TEST = TEST and true
 
@@ -78,6 +101,11 @@ end
 
 function FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
 	return t_health_diff_outnumbered_factor[gsiPlayer.nOnTeam] or 0
+end
+
+function FightHarass_GetTarget(gsiPlayer)
+	local fht = Task_GetTaskObjective(gsiPlayer, task_handle)
+	return fht, fht and not pUnit_IsNullOrDead(fht)
 end
 
 local next_player = 1
@@ -155,9 +183,20 @@ blueprint = {
 		local attackTarget = hPlayer:GetAttackTarget() 
 
 		
+		
+		
 
+		local timeData = gsiPlayer.time.data
+		-- Check if we are taking damage, and from what
+		local highRecentTakenType, highRecentTaken = timeData.highRecentTakenType
+		if not highRecenTakenType then
+			highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer, 2)
+			timeData.highRecentTakenType = highRecentTakenType
+			timeData.highRecentTaken = highRecentTaken
+		else
+			highRecentTaken = timeData.highRecentTaken
+		end
 		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
-		local highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer, 2)
 		local attackDamage = hPlayer:GetAttackDamage()
 		if highRecentTakenType == UNIT_TYPE_CREEP
 				and highRecentTaken*max(1, (1+danger)) > attackDamage then
@@ -168,6 +207,7 @@ blueprint = {
 			end
 		end
 		if LanePressure_CanAgroCreeps(gsiPlayer) and creepPressure + danger > 0.2 then
+		
 
 
 
@@ -188,17 +228,22 @@ blueprint = {
 
 				Positioning_MoveDirectly(gsiPlayer, moveSafe)
 
+		
 				return xetaScore;
 			end
 		end
+		
 		if GSI_UnitCanStartAttack(gsiPlayer) --[[or (attackTarget and attackTarget:IsHero())]] then
+		
 			local hEnemy = objective.hUnit
-			if not LanePressure_AgroCreepsNow(gsiPlayer, objective, true) then
-				gsiPlayer.hUnit:Action_AttackUnit(hEnemy, true)
+			if LanePressure_AgroCreepsNow(gsiPlayer, objective) then
+		
 				return xetaScore
 			end
 			local inAttackRange = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, objective.lastSeen.location) < gsiPlayer.attackRange + 80
+		
 			if inAttackRange or hPlayer:GetAttackTarget() then
+		
 				gsiPlayer.hUnit:Action_AttackUnit(hEnemy, true)
 			else
 				if DEBUG and gsiPlayer.shortName == "arc_warden" then DebugDrawText(200, 200, ":3", 255, 255, 255) end
@@ -219,6 +264,7 @@ blueprint = {
 			--print(objective.name, gsiPlayer.shortName, "is dead")
 			return XETA_SCORE_DO_NOT_RUN
 		else
+		
 			
 			Positioning_ZSAttackRangeUnitHugAllied(
 					gsiPlayer, objective.lastSeen.location, SET_BUILDING_ENEMY,
@@ -244,15 +290,23 @@ blueprint = {
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
 
-		local playerIsRooted = hUnitPlayer:IsRooted()
+		local timeData = gsiPlayer.time.data
 		-- Check if we are taking damage, and from what
-		local highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer, 2)
+		local highRecentTakenType, highRecentTaken = timeData.highRecentTakenType
+		if not highRecenTakenType then
+			highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer, 2)
+			timeData.highRecentTakenType = highRecentTakenType
+			timeData.highRecentTaken = highRecentTaken
+		else
+			highRecentTaken = timeData.highRecentTaken
+		end
+		local playerIsRooted = hUnitPlayer:IsRooted()
 		if not playerIsRooted then
 			if highRecentTaken > 
-							math.max(
-									hUnitPlayer:GetAttackDamage()*2.5,
-									prevObjective and Analytics_GetTotalDamageInTimeline(prevObjective.hUnit, 2) or 0
-								)
+						max(
+								hUnitPlayer:GetAttackDamage()*2.5,
+								prevObjective and Analytics_GetTotalDamageInTimeline(prevObjective.hUnit, 2) or 0
+							)
 					and FarmLane_UtilizingLaneSafety(gsiPlayer) then
 				
 				return prevObjective, XETA_SCORE_DO_NOT_RUN
@@ -278,7 +332,11 @@ blueprint = {
 		local playerLoc = gsiPlayer.lastSeen.location
 		local attackRange = gsiPlayer.attackRange
 		local harassRange, nearbyEnemies = get_harassable_enemies(gsiPlayer)
-		local centerOfEnemies = Set_GetCenterOfSetUnits(nearbyEnemies) or playerLoc
+		local centerOfEnemies = timeData.centerOfEnemies
+		if not centerOfEnemies then
+			centerOfEnemies = Set_GetCenterOfSetUnits(nearbyEnemies) or playerLoc
+			timeData.centerOfEnemies = centerOfEnemies
+		end
 		local nearbyAllies = Set_GetAlliedHeroesInLocRadius(gsiPlayer, centerOfEnemies, 1700, false)
 		local numNearbyEnemies = #nearbyEnemies
 		local numNearbyAllies = #nearbyAllies
@@ -288,7 +346,7 @@ blueprint = {
 		local mostHarassableEnemyValue = XETA_SCORE_DO_NOT_RUN
 		local nearestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer) or GSI_GetTeamFountainUnit(ENEMY_TEAM)
 		local tLoc = nearestTower and nearestTower.lastSeen.location
-		local tRange = nearestTower and nearestTower.attackRange + 150
+		local tRange = nearestTower and nearestTower.attackRange + 70
 		local enemy_intents = enemy_intents
 		local friendly_intents = friendly_intents
 		-- update intents (in-func)
@@ -299,30 +357,39 @@ blueprint = {
 		--[[DEBUG]]if getsCrapJob then DebugDrawText(1600, 680, string.format("friendly_intents:%s %s", tostring(friendly_intents[1]), tostring(friendly_intents[2])), 255, 255, 255) DebugDrawText(1600, 690, string.format("enemy_intents:%s %s", tostring(enemy_intents[1]), tostring(enemy_intents[2])), 255, 255, 255) end
 		local netPowerStruggle = 0 -- Used to inform the final score. If their Godlike Mid is in lane with MeatSim, we should know that attacking MeatSim might be a very bad idea.
 
-		local farmLaneScore = max(0, Task_GetTaskScore(gsiPlayer, farm_lane_task_handle))
+		local farmLaneScore = min(max(0, Task_GetTaskScore(gsiPlayer, farm_lane_task_handle)),
+				(not prevObjective and 67 or 67*(prevObjective.lastSeenHealth / prevObjective.maxHealth))
+			)
 		
 		-- create data for targetting based on positioning
 		local creepPressure = FightClimate_CreepPressureFast(gsiPlayer) -- used in score divisor
 
 		local totalDistanceOfEnemiesToMe = 0
+		local farmLaneCreep, farmLaneTta, farmLaneScore
+				= FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+		local creepIsPlausible = farmLaneCreep
+				and not farmLaneCreep.center
+				and gsiPlayer.attackPointPercent * gsiPlayer.hUnit:GetSecondsPerAttack()
+						+ (Vector_PointDistance2D(farmLaneCreep.lastSeen.location, playerLoc)
+							- gsiPlayer.attackRange - 40
+						) / gsiPlayer.currentMovementSpeed
+					< max(1, farmLaneTta)
 		local distanceScores = {}
+		local distances = {}
 		local challenge = 0
 		for i=1,numNearbyEnemies do
-			distanceScores[i] = Math_PointToPointDistance2D(
-					playerLoc,
-					nearbyEnemies[i].lastSeen.location
-				)	
-			totalDistanceOfEnemiesToMe = totalDistanceOfEnemiesToMe + distanceScores[i]
+			local enemyLoc = nearbyEnemies[i].lastSeen.location
+			distances[i] = ((playerLoc.x-enemyLoc.x)^2 + (playerLoc.y-enemyLoc.y)^2)^0.5
+			totalDistanceOfEnemiesToMe = totalDistanceOfEnemiesToMe + distances[i]
 			if enemy_intents[i] then
 				challenge = challenge + 1
 			end
 		end
-		local _, farmLaneTta, farmLaneScore = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
-		local farmLaneAttackNowDecrement = gsiPlayer.difficulty >= 4
+		local farmLaneAttackNowDecrement = gsiPlayer.difficulty >= 3
 				and farmLaneTta > (gsiPlayer.hUnit:GetSecondsPerAttack() + 0.75)
 				and 0 or farmLaneScore / (challenge + 0.2 + 0.3*gsiPlayer.level)
 		local missingManaCare = 0
-		if challenge > 1 then
+		if challenge > 1 and creepIsPlausible then
 			FarmLane_InformFightingNoFarming(gsiPlayer)
 			farmLaneAttackNowDecrement = farmLaneAttackNowDecrement + 15 
 		else
@@ -330,8 +397,8 @@ blueprint = {
 		end
 		local avgDistance = nearbyEnemies[1] and totalDistanceOfEnemiesToMe / numNearbyEnemies or 0
 		for i=1,numNearbyEnemies do
-			distanceScores[i] = distanceScores[i] < attackRange+75 and 0
-					or min(0, avgDistance - distanceScores[i])*numNearbyEnemies/30
+			distanceScores[i] = distances[i] < attackRange+75 and 0
+					or min(0, avgDistance - distances[i])*numNearbyEnemies/30
 		end
 		
 		if DEBUG then
@@ -406,8 +473,8 @@ blueprint = {
 			
 			thisHarassableRating = thisHarassableRating
 					- (nearestTower and
-							(Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, thisEnemy, tLoc, tRange+100)
-								and (500-thisHarassableRating)*nearestTower.hUnit:GetAttackDamage()*3/gsiPlayer.lastSeenHealth or 0
+							(Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, thisEnemy, tLoc, tRange)
+								and (500-thisHarassableRating)*nearestTower.attackDamage*3/gsiPlayer.lastSeenHealth or 0
 							)
 						or 0
 					)

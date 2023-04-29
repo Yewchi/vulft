@@ -1,12 +1,12 @@
 local hero_data = {
 	"marci",
-	{1, 3, 3, 2, 3, 4, 3, 2, 2, 2, 5, 4, 1, 1, 7, 1, 4, 10, 11},
+	{1, 2, 3, 3, 3, 4, 3, 2, 2, 5, 2, 4, 1, 1, 7, 1, 4, 10, 12},
 	{
-		"item_orb_of_venom","item_branches","item_quelling_blade","item_branches","item_tango","item_blight_stone","item_orb_of_corrosion","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_gloves","item_blades_of_attack","item_magic_wand","item_armlet","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_broadsword","item_blades_of_attack","item_lesser_crit","item_blink","item_mithril_hammer","item_belt_of_strength","item_basher","item_greater_crit",
+		"item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_branches","item_tango","item_soul_ring","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_belt_of_strength","item_magic_wand","item_mithril_hammer","item_basher","item_mithril_hammer","item_black_king_bar","item_blink","item_ring_of_health","item_abyssal_blade","item_demon_edge","item_javelin","item_monkey_king_bar","item_reaver","item_overwhelming_blink",
 	},
-	{ {1,1,1,2,3,}, {1,1,1,2,3,}, 0.1 },
+	{ {3,3,3,1,2,}, {3,3,3,1,2,}, 0.1 },
 	{
-		"Dispose","Rebound","Sidekick","Unleash","+125 Rebound Cast/Jump Range","+60 Dispose Damage","+15% Sidekick Lifesteal","-3s Rebound Cooldown","+0.7s Rebound Stun Duration","+15% Unleash Movement Speed","1.5s Unleash Pulse Silence","1.5s Sidekick Spell Immunity",
+		"Dispose","Rebound","Sidekick","Unleash","+100 Rebound Cast/Jump Range","+70 Dispose Damage","+15% Sidekick Lifesteal","-3s Rebound Cooldown","+0.5s Rebound Stun Duration","+15% Unleash Movement Speed","+350 Dispose Throw Distance","1.5s Sidekick Debuff Immunity",
 	}
 }
 --@EndAutomatedHeroData

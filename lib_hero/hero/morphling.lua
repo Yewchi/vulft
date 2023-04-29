@@ -1,12 +1,12 @@
 local hero_data = {
 	"morphling",
-	{3, 2, 3, 1, 1, 1, 1, 2, 2, 6, 2, 4, 3, 3, 7, 4, 4, 9, 11},
+	{3, 2, 2, 1, 2, 1, 1, 1, 2, 6, 4, 3, 3, 3, 8, 4, 4, 9, 11},
 	{
-		"item_circlet","item_magic_stick","item_tango","item_branches","item_branches","item_branches","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_falcon_blade","item_blade_of_alacrity","item_magic_wand","item_belt_of_strength","item_dragon_lance","item_yasha","item_manta","item_platemail","item_assault","item_ring_of_health","item_platemail","item_lotus_orb","item_ultimate_scepter","item_reaver","item_lifesteal","item_satanic","item_black_king_bar","item_ultimate_scepter_2","item_aghanims_shard","item_pers","item_pers","item_refresher","item_moon_shard","item_moon_shard",
+		"item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_branches","item_quelling_blade","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_lifesteal","item_falcon_blade","item_yasha","item_aghanims_shard","item_manta","item_skadi","item_gem","item_lesser_crit","item_silver_edge","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_black_king_bar","item_claymore","item_ultimate_scepter_2","item_satanic",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Waveform","Adaptive Strike (Agility)","Attribute Shift (Agility Gain)","Morph","+15% Magic Resistance","+250 Waveform Range","+16s Morph Duration","+15 Agility","Waveform Attacks Targets","+1s Adaptive Strike Stun Duration","-40%% Waveform Cooldown","+35 Strength",
+		"Waveform","Adaptive Strike (Agility)","Attribute Shift (Agility Gain)","Morph","+15% Magic Resistance","+250 Waveform Range","+16s Morph Duration","+15 Agility","Waveform Attacks Targets","+0.8s Adaptive Strike Stun Duration","-40%% Waveform Cooldown","+35 Strength",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,12 +1,12 @@
 local hero_data = {
 	"luna",
-	{1, 3, 3, 2, 2, 2, 3, 2, 3, 1, 4, 1, 1, 4, 7, 5, 4, 9, 12},
+	{3, 1, 3, 5, 3, 2, 3, 2, 2, 2, 4, 4, 1, 1, 8, 1, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_circlet","item_branches","item_slippers","item_wraith_band","item_boots_of_elves","item_magic_wand","item_power_treads","item_lifesteal","item_mask_of_madness","item_blade_of_alacrity","item_dragon_lance","item_mithril_hammer","item_fluffy_hat","item_black_king_bar","item_hurricane_pike","item_broadsword","item_lesser_crit","item_ultimate_orb","item_ultimate_orb","item_skadi","item_greater_crit","item_reaver","item_satanic","item_energy_booster","item_void_stone","item_aether_lens","item_aghanims_shard","item_boots",
+		"item_slippers","item_circlet","item_quelling_blade","item_tango","item_branches","item_branches","item_wraith_band","item_boots","item_lifesteal","item_gloves","item_magic_wand","item_boots_of_elves","item_power_treads","item_mask_of_madness","item_yasha","item_sphere","item_manta","item_broadsword","item_blades_of_attack","item_lesser_crit","item_silver_edge","item_black_king_bar","item_eagle","item_talisman_of_evasion","item_butterfly","item_satanic","item_moon_shard","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Lucent Beam","Moon Glaives","Lunar Blessing","Eclipse","-8% Moon Glaives Damage Reduction","+0.4s Lucent Beam Ministun","-2.0s Lucent Beam Cooldown","-25.0s Eclipse Cooldown","+500 Moon Glaives fired on Lucent Beam","+100 Lucent Beam Damage","+35 Lunar Blessing Damage","+0.25s Eclipse Lucent Ministun",
+		"Lucent Beam","Moon Glaives","Lunar Blessing","Eclipse","-8% Moon Glaives Damage Reduction","+0.3s Lucent Beam Ministun","-2.0s Lucent Beam Cooldown","-25.0s Eclipse Cooldown","+500 Moon Glaives fired on Lucent Beam","+100 Lucent Beam Damage","+20 Lunar Blessing Damage","+0.25s Eclipse Lucent Ministun",
 	}
 }
 --@EndAutomatedHeroData

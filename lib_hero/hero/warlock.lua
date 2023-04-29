@@ -1,12 +1,12 @@
 local hero_data = {
 	"warlock",
-	{2, 1, 2, 3, 3, 4, 3, 3, 2, 2, 1, 4, 1, 1, 7, 5, 4, 9, 12},
+	{2, 3, 3, 2, 3, 4, 3, 2, 1, 6, 1, 4, 1, 1, 7, 2, 4, 10, 11},
 	{
-		"item_tango","item_magic_stick","item_enchanted_mango","item_faerie_fire","item_ward_observer","item_ring_of_basilius","item_magic_wand","item_boots","item_aghanims_shard","item_headdress","item_arcane_boots","item_fluffy_hat","item_holy_locket","item_headdress","item_chainmail","item_buckler","item_mekansm","item_guardian_greaves","item_buckler","item_vladmir","item_wraith_pact",
+		"item_clarity","item_branches","item_enchanted_mango","item_ward_sentry","item_tango","item_branches","item_faerie_fire","item_magic_wand","item_ring_of_basilius","item_boots","item_arcane_boots","item_void_stone","item_aether_lens","item_wind_lace","item_cloak","item_tranquil_boots","item_glimmer_cape","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_aghanims_shard","item_gem","item_boots_of_bearing",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Fatal Bonds","Shadow Word","Upheaval","Chaotic Offering","+4% Fatal Bonds Damage","+75 Upheaval Radius","+12 Upheaval Attack Speed per second on Allies","-4s Shadow Word Cooldown","Summons a Golem on death","+25 Shadow Word Damage/Heal","+20 Chaotic Offering Golems Armor","80% Magic Resistance for Chaotic Offering Golems",
+		"Fatal Bonds","Shadow Word","Upheaval","Chaotic Offering","+4% Fatal Bonds Damage","+75 Upheaval Radius","+12 Upheaval Attack Speed per second on Allies","+18 Shadow Word Heal/Damage","Summons a Golem on death","450 Shadow Word AoE","+20 Chaotic Offering Golems Armor","80% Magic Resistance for Chaotic Offering Golems",
 	}
 }
 --@EndAutomatedHeroData

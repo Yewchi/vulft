@@ -1,12 +1,12 @@
 local hero_data = {
 	"zuus",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 3, 8, 4, 9, 11},
+	{1, 3, 1, 2, 1, 5, 1, 2, 2, 7, 2, 5, 3, 3, 6, 3, 5, 10, 12, 13},
 	{
-		"item_branches","item_branches","item_branches","item_faerie_fire","item_tango","item_bottle","item_boots","item_energy_booster","item_arcane_boots","item_void_stone","item_aether_lens","item_robe","item_kaya","item_aghanims_shard","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_ultimate_orb","item_ring_of_health","item_sphere","item_vitality_booster","item_energy_booster","item_soul_booster","item_kaya_and_sange","item_octarine_core","item_refresher","item_ultimate_scepter_2","item_arcane_blink","item_force_staff","item_silver_edge","item_falcon_blade",
+		"item_tango","item_branches","item_branches","item_faerie_fire","item_branches","item_ward_observer","item_bottle","item_boots","item_arcane_boots","item_magic_wand","item_robe","item_staff_of_wizardry","item_kaya","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_point_booster","item_vitality_booster","item_bloodstone","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_blink","item_voodoo_mask","item_diadem","item_dagon_5","item_dagon_2","item_dagon_3","item_dagon_4","item_dagon_5","item_ultimate_scepter_2","item_gem","item_cornucopia","item_cornucopia","item_refresher","item_mystic_staff","item_arcane_blink","item_octarine_core",
 	},
-	{ {2,2,2,2,1,}, {2,2,2,2,5,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Arc Lightning","Lightning Bolt","Heavenly Jump","Thundergod's Wrath","-4s Heavenly Jump Cooldown","+250 Health","+30 Movement Speed after Heavenly Jump","+1 Heavenly Jump Target","+100 Thundergod's Wrath Damage","+0.4s Lightning Bolt Ministun","325 AOE Lightning Bolt","+100 Arc Lightning Damage",
+		"Arc Lightning","Lightning Bolt","Heavenly Jump","Lightning Hands","Thundergod's Wrath","-4s Heavenly Jump Cooldown","+250 Health","+30 Movement Speed after Heavenly Jump","+1 Heavenly Jump Target","+4% Arc Lightning Current Health As Damage","+0.3s Lightning Bolt Ministun","325 AOE Lightning Bolt","+150 Thundergod's Wrath Damage",
 	}
 }
 --@EndAutomatedHeroData

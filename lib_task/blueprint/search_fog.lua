@@ -34,6 +34,7 @@ local next_player = 1
 
 local TIME_SINCE_SEEN_LIMIT_SEARCH = 8
 
+local t_team_players
 local t_enemy_players
 
 local ENEMY_FOUNTAIN = ENEMY_FOUNTAIN
@@ -51,10 +52,10 @@ end
 local function task_init_func(taskJobDomain)
 	Blueprint_RegisterTaskName(task_handle, "search_fog")
 	if VERBOSE then VEBUG_print(string.format("search_fog: Initialized with handle #%d.", task_handle)) end
-	task_handle = Task_CreateNewTask()
 
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
 
+	t_team_players = GSI_GetTeamPlayers(TEAM)
 	t_enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
 
 	local next_player = 1
@@ -95,20 +96,21 @@ function SearchFog_GetNearbyBezier(location, radius)
 	return bezier_platter
 end
 
-function SearchFog_GetRevealLocNearby(location, radius)
+function SearchFog_GetRevealLocNearby(gsiPlayer, radius, location)
 	local beziers = t_player_bezier_escape
-	local exitIndex = RandomInt(1,TEAM_NUMBER_OF_PLAYERS)
-	local i = (exitIndex % TEAM_NUMBER_OF_PLAYERS) + 1
+	location = location or gsiPlayer.lastSeen.location
+	local i = gsiPlayer.nOnTeam
+	local exitIndex = (i + TEAM_NUMBER_OF_PLAYERS - 2) % TEAM_NUMBER_OF_PLAYERS + 1
 	while(i ~= exitIndex) do
 		local bez = beziers[i]
 		if bez and bez.val then
 			if bez.expires < GameTime() then
 				beziers[i] = nil
 			elseif Vector_PointDistance(location, bez.val or bez.p0) < radius then
-				return bez.val
+				return bez.val, bez
 			end
 		end
-		i = (i % TEAM_NUMBER_OF_PLAYERS) + 1
+		i = i % TEAM_NUMBER_OF_PLAYERS + 1
 	end
 end
 
@@ -116,6 +118,19 @@ function SearchFog_GetEscapeGuess(gsiPlayer)
 	return t_player_bezier_escape[gsiPlayer.nOnTeam]
 end
 SearchFog_GetPlayerBezier = SearchFog_GetEscapeGuess
+
+function SearchFog_InformFreshNull(gsiEnemy)
+	local teamPlayers = t_team_players
+	local enemyLoc = gsiEnemy.lastSeen.location
+	for i=1,#teamPlayers do
+		if teamPlayers[i].hUnit:IsAlive() then
+			local playerLoc = teamPlayers[i].lastSeen.location
+			if ((playerLoc.x-enemyLoc.x)^2 + (playerLoc.y-enemyLoc.y)^2)^0.5 < 2400 then
+				Task_SetTaskPriority(task_handle, i, TASK_PRIORITY_TOP)
+			end
+		end
+	end
+end
 
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
@@ -159,15 +174,16 @@ blueprint = {
 						Vector_ScalarMultiply2D(Vector_UnitDirectionalPointToPoint(
 								lastSeenLoc, ENEMY_FOUNTAIN -- using lastSeenLoc here ends up closer to the ^|channel|^ towards fountain of the forwardsFacing location, it is in interception.
 							),
-							objective.currentMovementSpeed*TIME_SINCE_SEEN_LIMIT_SEARCH*1.33
+							objective.currentMovementSpeed*TIME_SINCE_SEEN_LIMIT_SEARCH*1.15
 						)
 					)
 				)
 			checkBezier.expires = currTime + TIME_SINCE_SEEN_LIMIT_SEARCH
+			checkBezier.forPlayer = objective
 			t_player_bezier_escape[gsiPlayer.nOnTeam] = checkBezier
 		end
 
-		Positioning_ZSMoveCasual(gsiPlayer, checkBezier:compute(timeSinceSeen / TIME_SINCE_SEEN_LIMIT_SEARCH), 650, 1100, 0.05)
+		Positioning_ZSMoveCasual(gsiPlayer, checkBezier:compute((timeSinceSeen+0.5) / TIME_SINCE_SEEN_LIMIT_SEARCH), 650, 1100, 0.05)
 		gsiPlayer.recentMoveTo = objective.location
 
 		
@@ -201,6 +217,7 @@ blueprint = {
 
 
 
+			local enemyFountain = ENEMY_FOUNTAIN
 			if IsHeroAlive(thisEnemy.playerID)
 					and lastSeenTime < timeStampConsiderUnknown and GameTime() - lastSeenTime < TIME_SINCE_SEEN_LIMIT_SEARCH
 					and Vector_PointDistance2D(gsiPlayer.lastSeen.location, thisEnemy.lastSeen.location)
@@ -219,8 +236,9 @@ blueprint = {
 									(GameTime() - thisEnemy.lastSeen.timeStamp)*thisEnemy.currentMovementSpeed*1.25
 								)
 						)
-					local playerCanWithstandOrNoTower = not nearestTower
-							or playerEhp / nearestTower.attackDamage > 4 * (thisHpp + #t_enemy_players)
+					local playerCanWithstandOrNoTower = (not nearestTower
+							or playerEhp / nearestTower.attackDamage > 4 * (thisHpp + #t_enemy_players))
+							and ((checkLocation.x-enemyFountain.x)^2 + (checkLocation.y-enemyFountain.y)^2)^0.5 < 1100
 					if playerCanWithstandOrNoTower
 							or ( Vector_PointDistance(checkLocation, nearestTower.lastSeen.location)
 											> nearestTower.attackRange + 200

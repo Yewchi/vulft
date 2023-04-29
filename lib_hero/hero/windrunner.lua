@@ -1,12 +1,12 @@
 local hero_data = {
 	"windrunner",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 11},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 12},
 	{
-		"item_branches","item_branches","item_tango","item_branches","item_faerie_fire","item_branches","item_ward_observer","item_bottle","item_gloves","item_power_treads","item_magic_wand","item_javelin","item_mithril_hammer","item_maelstrom","item_gloves","item_mithril_hammer","item_black_king_bar","item_blink","item_lesser_crit","item_headdress","item_greater_crit","item_gungir","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_ultimate_scepter_2",
+		"item_branches","item_tango","item_faerie_fire","item_quelling_blade","item_ward_observer","item_bottle","item_magic_wand","item_javelin","item_boots","item_power_treads","item_mithril_hammer","item_maelstrom","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_mithril_hammer","item_belt_of_strength","item_basher","item_blink","item_staff_of_wizardry","item_cyclone","item_demon_edge","item_lesser_crit","item_greater_crit","item_vanguard","item_abyssal_blade","item_aghanims_shard",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,3,4,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Shackleshot","Powershot","Windrun","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.8s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
+		"Shackleshot","Powershot","Windrun","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.65s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
 	}
 }
 --@EndAutomatedHeroData
@@ -103,6 +103,39 @@ d = {
 		Xeta_RegisterAbscondScore("windrunnerShackleShotMultiple", 0, 2, 5, 0.167)
 		Xeta_RegisterAbscondScore("windrunnerPowerShotCrowded", 0, 2, 5, 0.167)
 		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
+		SpecialBehavior_RegisterBehavior("fightHarassRunOverride",
+				function(gsiPlayer, objective, score)
+					local hUnit = gsiPlayer.hUnit
+					if not hUnit:HasModifier("modifier_windrunner_focusfire")
+							or objective.hUnit:IsNull() then
+						return false;
+					end
+					local playerLoc = gsiPlayer.lastSeen.location
+					local fhtLoc = objective.lastSeen.location
+					local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+					if GameTime() - gsiPlayer.hUnit:GetLastAttackTime()
+								< gsiPlayer.hUnit:GetSecondsPerAttack()+0.1
+							or gsiPlayer.hUnit:GetAttackTarget() then
+						Positioning_ZSAttackRangeUnitHugAllied(
+								gsiPlayer, objective.lastSeen.location, SET_HERO_ENEMY,
+								min(gsiPlayer.attackRange*0.85, 250 + gsiPlayer.attackRange * (danger+1)),
+								0, true, 0.4 + max(0, (-danger-1))
+							)
+					else
+						gsiPlayer.hUnit:Action_AttackUnit(objective.hUnit, false)
+					end
+					return true;
+				end
+			)
+
+		gsiPlayer.modPowerLevel = function(gsiPlayer, powerLevel)
+			if gsiPlayer.hUnit:HasModifier("modifier_windrunner_focusfire") then
+				local enemiesToWind = Set_GetTeamHeroesInLocRad(gsiPlayer.team == TEAM
+						and ENEMY_TEAM or TEAM, gsiPlayer.lastSeen.location, 1250
+					)
+				return powerLevel*(1 + 0.67^(1+#enemiesToWind))
+			end
+		end
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])

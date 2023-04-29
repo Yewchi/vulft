@@ -1,8 +1,8 @@
 local hero_data = {
 	"dark_seer",
-	{2, 3, 1, 2, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 12},
+	{2, 1, 2, 3, 2, 4, 2, 3, 1, 1, 1, 4, 3, 3, 7, 5, 4, 9, 12},
 	{
-		"item_quelling_blade","item_mantle","item_branches","item_circlet","item_enchanted_mango","item_null_talisman","item_boots","item_arcane_boots","item_magic_wand","item_chainmail","item_headdress","item_mekansm","item_cloak","item_guardian_greaves","item_hood_of_defiance","item_pipe","item_blink","item_gem","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_pers","item_gem","item_sphere","item_black_king_bar",
+		"item_tango","item_quelling_blade","item_enchanted_mango","item_clarity","item_mantle","item_branches","item_mantle","item_ring_of_health","item_vitality_booster","item_vanguard","item_null_talisman","item_null_talisman","item_magic_wand","item_boots","item_arcane_boots","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_cornucopia","item_cornucopia","item_vanguard","item_refresher","item_vanguard","item_octarine_core","item_aghanims_shard","item_energy_booster","item_vitality_booster","item_aeon_disk","item_gem","item_ultimate_scepter_2",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{

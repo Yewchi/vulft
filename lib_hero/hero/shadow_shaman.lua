@@ -1,12 +1,12 @@
 local hero_data = {
 	"shadow_shaman",
-	{1, 3, 1, 2, 1, 4, 3, 1, 3, 3, 2, 4, 2, 2, 8, 5, 4, 10, 12},
+	{1, 3, 1, 2, 2, 4, 1, 2, 3, 3, 6, 4, 3, 2, 7, 1, 4, 10},
 	{
-		"item_tango","item_magic_stick","item_flask","item_faerie_fire","item_boots","item_arcane_boots","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_aether_lens","item_point_booster","item_vitality_booster","item_octarine_core","item_blink","item_glimmer_cape","item_pers",
+		"item_blood_grenade","item_flask","item_tango","item_magic_stick","item_clarity","item_clarity","item_enchanted_mango","item_tango","item_clarity","item_ward_sentry","item_boots","item_magic_wand","item_arcane_boots","item_void_stone","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_cornucopia","item_cornucopia","item_refresher","item_blink","item_gem",
 	},
-	{ {3,3,3,1,1,}, {4,4,3,5,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Ether Shock","Hex","Shackles","Mass Serpent Ward","+155 Shackles Total Damage","-3.0s Hex Cooldown","+140 Serpent Wards Attack Range","+1.0s Shackles Duration","Hex Breaks","+1 Serpent Wards Max HP","+380 Ether Shock Damage","+25 Wards Attack Damage",
+		"Ether Shock","Hex","Shackles","Mass Serpent Ward","+170 Shackles Total Damage","-2.0s Hex Cooldown","+140 Serpent Wards Attack Range","+1.0s Shackles Duration","Hex Breaks","+1 Serpent Wards Max HP","+400 Ether Shock Damage","+25 Wards Attack Damage",
 	}
 }
 --@EndAutomatedHeroData

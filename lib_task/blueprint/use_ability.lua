@@ -27,7 +27,7 @@
 -- Other tasks trigger the scoring, and essentially the highest scoring task request incentivises this task for it's purposes.
 -- Abilities already in-cast are also incentivised. Probably needs some "this is taking way too long"
 
-local PRIORITY_UPDATE_USE_ABILITY_THROTTLE = 0.071 -- Rotates. 
+local PRIORITY_UPDATE_USE_ABILITY_THROTTLE = 0.142 -- Rotates. 
 
 local QUEUED_ABILITY_I__ABILITY_OR_FUNC = 1
 local QUEUED_ABILITY_I__TARGET = 2
@@ -46,6 +46,8 @@ local queue_node_recyclable = {}
 local t_abilities_queued = {} -- player number on team -> list head
 
 local task_handle = Task_CreateNewTask()
+
+local use_item_handle
 
 local blueprint
 
@@ -247,23 +249,30 @@ function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, t
 
 	
 	
-	if isAbility and not forceAbilityFunc then
-		actionFunc = AbilityLogic_GetBestFitCastFunc(gsiPlayer, abilityOrFunc, target)
-		if actionFunc == gsiPlayer.hUnit.Action_UseAbilityOnLocation
-				and target and not target.x
-				and (target.lastSeen or target.GetLocation) then
-			target = target.hUnit and target.lastSeen.location or target:GetLocation()
+	if isAbility then
+		elapseExpiry = elapseExpiry or abilityOrFunc:GetCastPoint() + abilityOrFunc:GetChannelTime() + 1
+		if not forceAbilityFunc then
+			actionFunc = AbilityLogic_GetBestFitCastFunc(gsiPlayer, abilityOrFunc, target)
+			if actionFunc == gsiPlayer.hUnit.Action_UseAbilityOnLocation
+					and target and not target.x
+					and (target.lastSeen or target.GetLocation) then
+				target = target.hUnit and target.lastSeen.location or target:GetLocation()
+			end
 		end
-	end
-	if actionFunc and isAbility and abilityOrFunc:GetCooldownTimeRemaining() ~= 0 then
-		if squelch_not_off_cd > 0 then
-			squelch_not_off_cd = squelch_not_off_cd - 1
-			WARN_print("[use_ability] Attempt to register an ability which is on cooldown. %s(%s): t=%.2f.%s",
-					gsiPlayer.shortName, abilityOrFunc:GetName(),
-					abilityOrFunc:GetCooldownTimeRemaining(),
-					squelch_not_off_cd > 0 and "" or " - SQUELCHED"
-				)
-			print(debug.traceback())
+		if actionFunc and abilityOrFunc:GetCooldownTimeRemaining() ~= 0 then
+			if squelch_not_off_cd > 0 then
+				squelch_not_off_cd = squelch_not_off_cd - 1
+				WARN_print("[use_ability] Attempt to register an ability which is on cooldown. %s(%s): t=%.2f.%s",
+						gsiPlayer.shortName, abilityOrFunc:GetName(),
+						abilityOrFunc:GetCooldownTimeRemaining(),
+						squelch_not_off_cd > 0 and "" or " - SQUELCHED"
+					)
+				print(debug.traceback())
+			end
+		elseif gsiPlayer.usableItemCache.powerTreads
+				and abilityOrFunc:GetManaCost() > 0 then
+			UseItem_PowerTreadsStatLock(gsiPlayer, ATTRIBUTE_INTELLECT, elapseExpiry+0.1, scoreToBreak*1.33)
+			Task_SetTaskPriority(use_item_handle, gsiPlayer.nOnTeam, TASK_PRIORITY_TOP)
 		end
 	end
 
@@ -278,7 +287,7 @@ function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, t
 		local stepNode = t_abilities_queued[nOnTeam]
 		if stepNode then -- usually stepNode == nil -> assign new ability
 			local i = 1
-			while(stepNode and stepNode[QUEUED_ABILITY_I__NEXT_NODE]) do  i = i + 1 if i > 98 then Util_TablePrint({stepNode[1]:GetName(), stepNode}) if i>100 then DEBUG_KILLSWITCH = true ERROR_print("use_ability: UseAbility_RegisterAbilityUseAndLockToScore KILLSWITCH") return  end end
+			while(stepNode and stepNode[QUEUED_ABILITY_I__NEXT_NODE]) do  i = i + 1 if i > 98 then Util_TablePrint({stepNode[1]:GetName(), stepNode}) if i>100 then DEBUG_KILLSWITCH = true ERROR_print(true, not DEBUG, "use_ability: UseAbility_RegisterAbilityUseAndLockToScore KILLSWITCH") return  end end
 				stepNode = stepNode[QUEUED_ABILITY_I__NEXT_NODE]
 			end
 			local newNode = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry)
@@ -317,6 +326,8 @@ local next_player = 1
 local function task_init_func(taskJobDomain)
 	Blueprint_RegisterTaskName(task_handle, "use_ability")
 	if VERBOSE then VEBUG_print(string.format("use_ability: Initialized with handle #%d.", task_handle)) end
+
+	use_item_handle = UseItem_GetTaskHandle()
 
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
 

@@ -1,10 +1,10 @@
 local hero_data = {
 	"kunkka",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 5, 8, 1, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 8, 5, 4, 9, 11},
 	{
-		"item_quelling_blade","item_gauntlets","item_tango","item_ward_observer","item_branches","item_faerie_fire","item_bracer","item_bracer","item_boots","item_chainmail","item_phase_boots","item_magic_wand","item_belt_of_strength","item_sange","item_heavens_halberd","item_relic","item_radiance","item_black_king_bar","item_aghanims_shard","item_blink","item_point_booster","item_ultimate_scepter","item_sheepstick","item_hyperstone","item_assault","item_ultimate_scepter_2","item_pers","item_refresher",
+		"item_ward_observer","item_quelling_blade","item_faerie_fire","item_branches","item_branches","item_tango","item_gauntlets","item_magic_wand","item_bracer","item_boots","item_blades_of_attack","item_phase_boots","item_relic","item_radiance","item_ogre_axe","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_cornucopia","item_cornucopia","item_refresher","item_sheepstick","item_ultimate_scepter_2","item_orchid","item_cloak","item_quarterstaff","item_bloodthorn","item_overwhelming_blink",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
 		"Torrent","Tidebringer","X Marks the Spot","Ghostship","Tidebringer applies +1% slow for +1s","+25% X Marks the Spot Move Speed","+30%% Torrent Knock Up/Stun Duration","+45 Damage","+80 Torrent AoE","+70% Tidebringer Cleave","Ghostship Fleet","-2s Tidebringer Cooldown",
 	}

@@ -1,12 +1,12 @@
 local hero_data = {
 	"bounty_hunter",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 6, 3, 4, 3, 3, 8, 3, 4, 9, 11},
+	{3, 2, 2, 1, 2, 4, 2, 1, 1, 3, 1, 4, 3, 3, 7, 5, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_pers","item_crown","item_meteor_hammer","item_boots","item_wind_lace","item_magic_wand","item_phase_boots","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_void_stone","item_energy_booster","item_aether_lens","item_octarine_core","item_ultimate_orb","item_mystic_staff","item_sheepstick","item_ultimate_scepter_2","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_wind_waker",
+		"item_quelling_blade","item_tango","item_branches","item_branches","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_magic_wand","item_chainmail","item_phase_boots","item_orb_of_corrosion","item_wind_lace","item_relic","item_radiance","item_cloak","item_ogre_axe","item_ring_of_health","item_eternal_shroud","item_yasha","item_sange_and_yasha","item_heart","item_aghanims_shard","item_ultimate_orb","item_cornucopia","item_sphere","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_moon_shard","item_sheepstick",
 	},
-	{ {3,3,3,3,4,}, {5,3,4,3,4,}, 0.1 },
+	{ {3,3,3,2,5,}, {4,4,4,3,2,}, 0.1 },
 	{
-		"Shuriken Toss","Jinada","Shadow Walk","Track","+10/+10% Shadow Walk Attack/Move Slow","+40 Jinada Damage","+2s Silence on Hit With Shadow Walk","Half Track Bonus Speed to Allies","Track Grants 600 Ground Vision","+50 Jinada Gold Steal","2 Shuriken Toss Charges","+250 Track Gold",
+		"Shuriken Toss","Jinada","Shadow Walk","Track","+0.65s Shuriken Toss Slow","+40 Jinada Damage","+25% Damage Taken in Shadow Walk","Half Track Bonus Speed to Allies","Track Grants Shared Vision","+50 Jinada Gold Steal","2 Shuriken Toss Charges","+250 Track Gold",
 	}
 }
 --@EndAutomatedHeroData

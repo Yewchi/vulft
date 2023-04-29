@@ -115,7 +115,7 @@ local function update_scoreboard_and_killstreaks__job(workingSet)
 			else
 				process_any_kills_for_winning(anyDireKills, anyRadiantKills)
 			end
-			INFO_print("[scoreboard] %s team heat: %s", TEAM_IS_RADIANT and "Radiant" or "Dire", swingGameFactor)
+			INFO_print("[scoreboard] %s team heat: %s", TEAM_IS_RADIANT and "Radiant" or "Dire", swing_game_factor)
 		end
 	end
 end

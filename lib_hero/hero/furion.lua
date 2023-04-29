@@ -2,7 +2,7 @@ local hero_data = {
 	"furion",
 	{3, 2, 3, 1, 3, 5, 3, 2, 2, 2, 13, 5, 1, 1, 8, 1, 5, 10, 12},
 	{
-		"item_magic_stick","item_tango","item_circlet","item_branches","item_branches","item_branches","item_magic_wand","item_boots","item_gloves","item_robe","item_power_treads","item_buckler","item_ring_of_basilius","item_vladmir","item_wraith_pact","item_staff_of_wizardry","item_crown","item_crown","item_rod_of_atos","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_claymore","item_orchid","item_platemail","item_buckler","item_assault","item_mage_slayer","item_bloodthorn","item_gungir",
+		"item_magic_stick","item_tango","item_circlet","item_branches","item_branches","item_branches","item_magic_wand","item_boots","item_gloves","item_robe","item_power_treads","item_buckler","item_ring_of_basilius","item_vladmir","item_staff_of_wizardry","item_crown","item_crown","item_rod_of_atos","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_claymore","item_orchid","item_platemail","item_buckler","item_assault","item_mage_slayer","item_bloodthorn","item_gungir","item_helm_of_the_overlord"
 	},
 	{ {1,1,1,3,5,}, {1,1,1,3,4,}, 0.1 },
 	{

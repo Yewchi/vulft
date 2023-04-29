@@ -1,12 +1,12 @@
 local hero_data = {
 	"broodmother",
-	{2, 3, 1, 2, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 1, 1, 2, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 3, 4, 9, 11},
 	{
-		"item_tango","item_branches","item_circlet","item_quelling_blade","item_branches","item_slippers","item_wraith_band","item_boots","item_magic_wand","item_arcane_boots","item_crown","item_meteor_hammer","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_blitz_knuckles","item_orchid","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_black_king_bar",
+		"item_quelling_blade","item_tango","item_gauntlets","item_faerie_fire","item_gauntlets","item_branches","item_ward_observer","item_cornucopia","item_soul_ring","item_blitz_knuckles","item_orchid","item_boots","item_gloves","item_orb_of_corrosion","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_buckler","item_hyperstone","item_assault","item_void_stone","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_desolator",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
 	{
-		"Insatiable Hunger","Spin Web","Silken Bola","Spawn Spiderlings","+80 Spawn Spiderlings Damage","+3 Spin Web Simultaneous Webs","-10s Spin Web Recharge Time","+130 Spiderlings Health","+400 AoE Silken Bola","+25 Agility","+0.3s BAT during Insatiable Hunger","+35% Silken Bola Slow/Miss Chance",
+		"Insatiable Hunger","Spin Web","Silken Bola","Spawn Spiderlings","+80 Spawn Spiderlings Damage","+3 Spin Web Simultaneous Webs","-7s Spin Web Restore Time","+130 Spiderlings Health","+400 AoE Silken Bola","+35 Attack Speed","+0.3s BAT during Insatiable Hunger","+35% Silken Bola Slow/Miss Chance",
 	}
 }
 --@EndAutomatedHeroData

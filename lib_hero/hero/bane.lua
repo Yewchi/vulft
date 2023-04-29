@@ -1,12 +1,12 @@
 local hero_data = {
 	"bane",
-	{3, 2, 2, 3, 2, 4, 2, 3, 3, 1, 1, 4, 1, 1, 7, 5, 4, 9, 12},
+	{2, 3, 2, 1, 2, 4, 3, 3, 3, 2, 1, 4, 1, 1, 7, 6, 4, 10},
 	{
-		"item_tango","item_tango","item_ward_sentry","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_branches","item_branches","item_wind_lace","item_magic_wand","item_boots","item_arcane_boots","item_aether_lens","item_tranquil_boots","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_glimmer_cape",
+		"item_blood_grenade","item_blood_grenade","item_tango","item_enchanted_mango","item_ward_observer","item_branches","item_branches","item_ward_observer","item_boots","item_arcane_boots","item_magic_wand","item_cloak","item_shadow_amulet","item_glimmer_cape","item_gem","item_void_stone","item_aether_lens","item_gem","item_point_booster","item_ultimate_scepter",
 	},
-	{ {1,1,1,3,2,}, {5,5,5,4,2,}, 0.1 },
+	{ {1,1,3,2,3,}, {4,4,4,5,5,}, 0.1 },
 	{
-		"Enfeeble","Brain Sap","Nightmare","Fiend's Grip","Nightmare Damage Heals Bane","+20% Enfeeble Cast Range Reduction","-3s Brain Sap Cooldown","+5% Fiend's Grip Max Mana Drain","-3s Nightmare Cooldown","+30 Movement Speed","+200 Brain Sap Damage/Heal","+5s Fiend's Grip Duration",
+		"Enfeeble","Brain Sap","Nightmare","Fiend's Grip","-2s Brain Sap Cooldown","+20% Enfeeble Cast Range Reduction","+13 Enfeeble Damage Per Second","+5% Fiend's Grip Max Mana Drain","-3s Nightmare Cooldown","+30 Movement Speed","+200 Brain Sap Damage/Heal","+3s Fiend's Grip Duration",
 	}
 }
 --@EndAutomatedHeroData

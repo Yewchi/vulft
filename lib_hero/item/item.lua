@@ -205,6 +205,7 @@ USABLE_ITEMS_FOR_INDEXING = {
 	["item_black_king_bar"] = "bkb",
 	["item_blade_mail"] = "bladeMail",
 	["item_blink"] = "blink",
+	["item_blood_grenade"] = "bloodGrenade",
 	["item_bloodstone"] = "bloodstone",
 	["item_bloodthorn"] = "bloodthorn",
 	["item_bottle"] = "bottle",
@@ -219,6 +220,9 @@ USABLE_ITEMS_FOR_INDEXING = {
 	["item_dagon_4"] = "dagon",
 	["item_dagon_5"] = "dagon",
 	["item_diffusal_blade"] = "diffusalBlade",
+	["item_diffusal_blade_2"] = "diffusalBlade",
+	["item_diffusal_blade_2L"] = "diffusalBlade",
+	["item_disperser"] = "diffusalBlade",
 	["item_dust"] = "dust",
 	["item_eternal_shroud"] = "hood",
 	["item_ethereal_blade"] = "etherealBlade",
@@ -227,6 +231,7 @@ USABLE_ITEMS_FOR_INDEXING = {
 	["item_glimmer_cape"] = "glimmerCape",
 	["item_gungir"] = "gungir",
 	["item_hand_of_midas"] = "midas",
+	["item_harpoon"] = "harpoon",
 	["item_heavens_halberd"] = "heavensHalberd",
 	["item_helm_of_the_dominator"] = "hotd",
 	["item_helm_of_the_overlord"] = "hoto",
@@ -244,6 +249,7 @@ USABLE_ITEMS_FOR_INDEXING = {
 	["item_nullifier"] = "nullifier",
 	["item_orchid"] = "orchid",
 	["item_overwhelming_blink"] = "blink",
+	["item_pavise"] = "pavise",
 	["item_phase_boots"] = "phaseBoots",
 	["item_pipe"] = "pipe",
 	["item_power_treads"] = "powerTreads",
@@ -300,6 +306,7 @@ ITEM_WAVE_CLEAR_ATTACK = {
 	["item_gungir"] = true,
 	["item_maelstrom"] = true,
 	["item_mjollnir"] = true,
+	["item_bfury"] = true
 }
 
 ITEMS_JUNGLE = {
@@ -412,6 +419,12 @@ ITEMS_JUNGLE = {
 	["item_witless_shako"] = 1,
 	["item_ring_of_aquila"] = 2,
 	["item_lance_of_pursuit"] = 1,
+}
+
+ITEM_POWER_TREADS_STATE_STAT = {
+	[0] = ATTRIBUTE_STRENGTH,
+	[1] = ATTRIBUTE_INTELLECT,
+	[2] = ATTRIBUTE_AGILITY
 }
 
 require(GetScriptDirectory().."/lib_hero/item/item_logic")

@@ -31,12 +31,15 @@ SCORE_LOCS_INSTANT_SPEED = 0xFFFF
 
 local min = math.min
 local max = math.max
-local sqrt = math.sqrt
 local rad = math.rad
 local sin = math.sin
 local cos = math.cos
 local acos = math.acos
 local abs = math.abs
+
+local DEBUG = DEBUG
+local VERBOSE = VERBOSE
+local TEST = TEST
 
 local UPDATE_PREVIOUS_SEEN_LOC_DELTA = UPDATE_PREVIOUS_SEEN_LOC_DELTA
 
@@ -74,8 +77,9 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 
 	releaseDeltaT = releaseDeltaT or hAbility:GetCastPoint()
 	castRange = castRange or hAbility:GetCastRange()
+	castInfrontDistance = castInfrontDistance or castRange*0.975
 
-	local forwardsVecLen = sqrt(forwardsVec.x^2 + forwardsVec.y^2)
+	local forwardsVecLen = (forwardsVec.x^2 + forwardsVec.y^2)^0.5
 	local topLoc = Vector(base.x+forwardsVec.x, base.y+forwardsVec.y, 0)
 
 	
@@ -92,10 +96,10 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 			local lastSeen = thisUnit.lastSeen
 			local lastSeenLoc = lastSeen.location
 			local lastSeenPrevious = lastSeen.previousLocation
-			local distanceFromBase = sqrt((lastSeenLoc.x - base.x)^2 + (lastSeenLoc.y - base.y))
+			local distanceFromBase = ((lastSeenLoc.x - base.x)^2 + (lastSeenLoc.y - base.y)^2)^0.5
 			local approxExtrapolateT = releaseDeltaT + distanceFromBase/shotSpeed
 			local extrapolatedLoc = not pUnit_IsNullOrDead(thisUnit)
-					and Vector_ProgressBetweenPoints(
+					and Vector_ProgressBetweenPoints2D(
 							lastSeenLoc,
 							thisUnit.hUnit:GetExtrapolatedLocation(approxExtrapolateT),
 							max(0.15, thisUnit.hUnit:GetMovementDirectionStability())
@@ -106,14 +110,14 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 				extrapolatedLoc = Vector_Addition(lastSeenLoc,
 						Vector_ScalarMultiply(
 								Vector(lastSeenPrevious.x - lastSeenLoc.x, lastSeenPrevious.y - lastSeenLoc.y, 0),
-								approxExtrapolateT/(lastSeen.timeStamp - lastSeen.previousTimeStamp)
+								0.925*approxExtrapolateT/(lastSeen.timeStamp - lastSeen.previousTimeStamp)
 							)
 						)
 			end
 			if extrapolatedLoc then
 				-- movement seem valid and useful
 				local baseToExtrapolated = Vector(extrapolatedLoc.x - base.x, extrapolatedLoc.y - base.y, 0)
-				local baseToExtrapolatedLen = sqrt(baseToExtrapolated.x^2 + baseToExtrapolated.y^2)
+				local baseToExtrapolatedLen = (baseToExtrapolated.x^2 + baseToExtrapolated.y^2)^0.5
 				local distFromCenter = baseToExtrapolatedLen * sin(
 						acos((forwardsVec.x*baseToExtrapolated.x + forwardsVec.y*baseToExtrapolated.y)
 							/ (forwardsVecLen * baseToExtrapolatedLen)
@@ -126,7 +130,8 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 					local powerSc = powerFactor * Analytics_GetPowerLevel(thisUnit)
 					local dmgSc = damageFactor * dmgPercent
 
-					totalScore = totalScore + intendedSc + lowHealthSc + powerSc + dmgSc
+					totalScore = totalScore + (intendedSc + lowHealthSc + powerSc + dmgSc)
+							* distFromCenter/halfDiameter
 	
 	
 	
@@ -152,8 +157,10 @@ function ScoreLocs_StripHeroes(gsiPlayer, unitsTbl, hAbility,
 	-- Use shift left because baked normal to the forwardsvec uses an orthogonal +ve z coordinate
 	local shiftLeft = (greatestDistCcw - greatestDistCw)
 	-- topLoc + ortogonal*shiftLeft
-	local hitsBetter = Vector(topLoc.x + forwardsVec.y*shiftLeft/forwardsVecLen,
-			topLoc.y - forwardsVec.x*shiftLeft/forwardsVecLen, 0)
+	local hitsBetter = shiftLeft > 20
+			and Vector(topLoc.x + forwardsVec.y*shiftLeft/forwardsVecLen,
+				topLoc.y - forwardsVec.x*shiftLeft/forwardsVecLen, 0)
+			or topLoc
 	
 	if castInfrontDistance then
 		hitsBetter = Vector_Addition(base, Vector_ScalarMultiply(
@@ -203,9 +210,13 @@ function ScoreLocs_ConeHeroes(gsiPlayer, unitsTbl, hAbility, height,
 		local thisPowerFactor
 		local dmgFactor
 		if type(hitScores[i]) ~= "table" then
-			ERROR_print(string.format("[score_location_data] Err - ScoreConeHeroes() found a nil table at i=%d from table garbage of size %d, checking %d units, indexIntendedTarget %d", i, #hitScores, countUnits, indexIntendedTarget or -0))
+			ERROR_print(true, not DEBUG,
+					"[score_location_data] Err - ScoreConeHeroes() found a nil table at i=%d from table garbage of size %d, checking %d units, indexIntendedTarget %d",
+					i, #hitScores, countUnits, indexIntendedTarget or -0
+				)
 			Util_TablePrint({["hitScores"]=hitScores})
 			Util_TablePrint({["unitsTbl"]=unitsTbl})
+			return 0, nil, nil, 0
 		end
 		
 		if thisUnit and not pUnit_IsNullOrDead(thisUnit) then
@@ -282,6 +293,8 @@ function ScoreLocs_ConeHeroes(gsiPlayer, unitsTbl, hAbility, height,
 	local bestHitLoc
 	local bestHitCount = 0
 
+	local countUnits = #unitsTbl -- THIS IS A HORRIBLE HOTFIX TODO
+
 	-- Find best cast
 	-- O(n) due to intendedTarget requirement
 	for i=1,countUnits do
@@ -312,15 +325,15 @@ function ScoreLocs_ConeHeroes(gsiPlayer, unitsTbl, hAbility, height,
 				if hits then
 					hitCount = hitCount + 1
 					if not hitScores[indexIntendedTarget] then
-						ERROR_print(string.format(
-									"[score_location_data] Found nil hitScores entry for intended '%s', index %d, countUnits %d.",
-									intendedTarget and intendedTarget.shortName or intendedTarget.name or "none",
-									indexIntendedTarget or -0,
-									countUnits
-								)
+						ERROR_print(true, not DEBUG,
+								"[score_location_data] Found nil hitScores entry for intended '%s', index %d, countUnits %d.",
+								intendedTarget and intendedTarget.shortName or intendedTarget.name or "none",
+								indexIntendedTarget or -0,
+								countUnits
 							)
 						Util_TablePrint(unitsTbl, 2)
 						Util_TablePrint(hitScores, 2)
+						return 0, nil, nil, 0
 					end
 					thisScore = thisScore + hitScores[indexIntendedTarget][2]
 					thisScore = thisScore + (1 - abs(2.3*dist-centerConeDist) / centerConeDist) + (1 - radsDiff / halfRadiansSpread)
@@ -411,10 +424,10 @@ function ScoreLocs_ConeSeenUnitsHitsTarget(gsiPlayer, unitsTbl, hAbility, target
 	local checkUnitInfront = true -- cancelled if all the units are too far away.
 	local checkTargetInfront
 	local targetHitsLoc, targetHitsDeltaT, targetExtrapolatedTime, targetRadsProjecting
-	if sqrt((playerLoc.x - targetLoc.x)^2
+	if ((playerLoc.x - targetLoc.x)^2
 				+ (playerLoc.y - targetLoc.y)^2
 				+ (playerLoc.z - targetLoc.z)^2
-			) < castRange then
+			)^0.5 < castRange then
 		checkTargetInfront = true
 		targetHitsLoc, targetHitsDeltaT = Projectile_ExtrapolateProjectileToSeenUnit(
 				playerLoc, target, releaseDeltaT, shotSpeed
@@ -436,8 +449,8 @@ function ScoreLocs_ConeSeenUnitsHitsTarget(gsiPlayer, unitsTbl, hAbility, target
 			if checkUnitInfront then
 				
 				local distToUnit
-						= sqrt((playerLoc.x - unitLoc.x)^2 + (playerLoc.y - unitLoc.y)^2
-								+ (playerLoc.z - unitLoc.z)^2)
+						= ((playerLoc.x - unitLoc.x)^2 + (playerLoc.y - unitLoc.y)^2
+								+ (playerLoc.z - unitLoc.z)^2)^0.5
 				if distToUnit < castRange then
 					
 					local hitsLoc, hitsDeltaT = Projectile_ExtrapolateProjectileToSeenUnit(playerLoc, thisUnit,

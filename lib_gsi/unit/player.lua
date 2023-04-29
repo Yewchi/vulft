@@ -9,7 +9,7 @@ PNOT_TIMED_DATA = {}
 local PLACEHOLDER_MOVEMENT_SPEED = 300 -- For unknown enemy units at start of match
 local PLACEHOLDER_ATTACK_POINT = 0.5
 
-THROTTLE_PLAYERS_LAST_SEEN_UPDATE = 0.05
+THROTTLE_PLAYERS_LAST_SEEN_UPDATE = 0.066667
 local THROTTLE_PLAYERS_LAST_SEEN_UPDATE = THROTTLE_PLAYERS_LAST_SEEN_UPDATE
 local THROTTLE_PLAYERS_DATA_UPDATE = 0.3049
 --
@@ -33,6 +33,10 @@ local VERBOSE = VERBOSE
 local TEAM = TEAM
 local ENEMY_TEAM = ENEMY_TEAM
 local BOTH_TEAMS = BOTH_TEAMS
+
+local VERBOSE = VERBOSE or DEBUG_TARGET and string.find(DEBUG_TARGET, "player")
+local DEBUG = VERBOSE or DEBUG
+local TEST = TEST
 
 local cos = math.cos
 local sin = math.sin
@@ -61,16 +65,12 @@ local function handle_player_spell_or_item_cast(castInfo, abc)
 	if VERBOSE then
 		local unit = castInfo.unit
 		if unit then
-			if unit and not unit:IsNull() then
-				print(unit:GetUnitName())
-				print(unit)
-				print(unit:GetHealth())
-			else
+			if unit:IsNull() then
 				if not seenThatBefore then DEBUG_KILLSWITCH = true end
 				VEBUG_print("[player] ability has a nulled unit")
 			end
 		end
-		if not thisPlayer.hUnit:IsNull() then
+		if thisPlayer.hUnit and not thisPlayer.hUnit:IsNull() then
 			print(thisPlayer.shortName, thisPlayer.hUnit:GetAnimActivity(), thisPlayer.hUnit:GetCurrentActionType(),
 				thisPlayer.hUnit:GetBoundingRadius())
 		end
@@ -171,7 +171,7 @@ local function update_players_data()
 
 	for i=1,numEnemies do
 		local thisEnemyPlayerHeroUnit = enemyPlayerHeroUnits[i]
-		local thisPlayerID = thisEnemyPlayerHeroUnit:GetPlayerID() -- "ID" may be inconsistent because it's not my cup of joe, i.e. "Id" "visionBlockedByFow" elsewhere.
+		local thisPlayerID = thisEnemyPlayerHeroUnit:GetPlayerID() -- "ID" may be inconsistent i.e. "Id" "visionBlockedByFow" elsewhere. [Internal is commonly used] > [Acronym as CamelCase]
 		local playerNumberOnTeam = GSI_GetPlayerNumberOnTeam(thisPlayerID)
 		local thisPlayer = t_enemy_players[playerNumberOnTeam]
 
@@ -442,6 +442,8 @@ local function update_players_data__job(workingSet)
 	end
 end
 
+local search_fog_handle
+local PLAYERS_ALL = PLAYERS_ALL
 local function update_players_none_type__job(workingSet)
 	local hUnitsTbl
 	local wontForceUpdate = true
@@ -459,7 +461,14 @@ local function update_players_none_type__job(workingSet)
 			end
 		end
 		-- nb. t_enemy_players[i].hUnit is undeclared until update_player_data finds the hUnit, to make IsNull checks possible
-		t_enemy_players[i].typeIsNone = not t_enemy_players[i].hUnit or t_enemy_players[i].hUnit:IsNull()
+		if not gsiEnemy.hUnit or gsiEnemy.hUnit:IsNull() then
+			if not gsiEnemy.typeIsNone and IsHeroAlive(gsiEnemy.playerID) then
+				SearchFog_InformFreshNull(gsiEnemy)
+			end
+			gsiEnemy.typeIsNone = true
+		else
+			gsiEnemy.typeIsNone = false
+		end
 	end
 	local alliedHunits
 	if wontForceUpdate then
@@ -742,11 +751,11 @@ end
 
 local function assert_load_player_hunit(hUnit, TEAM, playerId, nOnTeam)
 	if not hUnit then
-		ERROR_print("[player] player was not a contiguous member of it's team.")
+		ERROR_print(false, not DEBUG, "[player] player was not a contiguous member of it's team.")
 		Util_TablePrint(GetTeamPlayers(TEAM))
-		ERROR_print(string.format("[player] confirm_load_player_hunit(%s, %d, %d, %d)",
-					tostring(hUnit), TEAM, playerId, nOnTeam)
-				)
+		ERROR_print(true, not DEBUG, "[player] confirm_load_player_hunit(%s, %d, %d, %d)",
+				tostring(hUnit), TEAM, playerId, nOnTeam
+			)
 		Util_ThrowError()
 	end
 end

@@ -68,6 +68,10 @@ local max = math.max
 local min = math.min
 local abs = math.abs
 
+local DEBUG = DEBUG
+local VERBOSE = VERBOSE
+local TEST = TEST
+
 local FAR_AWAY_VEC = Vector(0xFFFF, 0xFFFF, 0xFFFF)
 
 local team_players
@@ -418,6 +422,7 @@ function VAN_InformDefensibleFell(gsiBuilding)
 			t_ward_score_cache[count_ward_spots] = 0
 			--((t_ward_is_corrected[count_ward_spots] = nil))
 			t_is_warded[count_ward_spots] = false
+			t_ward_is_corrected[count_ward_spots] = nil
 			t_ward_loc_reserved[i] = t_ward_loc_reserved[count_reserve_ward_spots]
 			t_ward_loc_reserved[count_reserve_ward_spots] = nil
 			count_reserve_ward_spots = count_reserve_ward_spots-1
@@ -426,7 +431,7 @@ function VAN_InformDefensibleFell(gsiBuilding)
 		end
 	end
 	
-	Util_TablePrint(t_ward_loc[1])
+
 
 
 
@@ -485,9 +490,10 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 	if not correctedVec or isCorrected == false then
 		ALERT_print(
 				string.format(
-					"%s wardIndex is out-of-range. Was previously in range: %s",
-					Util_ParamString("VAN_GuideWardAtIndex", gsiPlayer, wardIndex, hItem),
-					Util_Printable(isCorrected ~= nil)
+					"VAN_GuideWardAtIndex%s wardIndex is out-of-range. Was previously in range: %s. Location: %s",
+					Util_ParamString( gsiPlayer, wardIndex, hItem),
+					Util_Printable(isCorrected ~= nil),
+					correctedVec
 				)
 			)
 		
@@ -604,7 +610,9 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 			t_ward_is_corrected[wardIndex] = true
 			INFO_print(
 					string.format(
-						"[vantage] Automatically corrected a presumed warding pillar location on final action %s. %s. %s",
+						"[vantage] Automatically corrected a presumed warding pillar location indexed %s @ %s on final action %s. %s. %s",
+						wardIndex,
+						correctedVec,
 						hUnit:GetCurrentActionType(),
 						hUnit:GetCurrentActiveAbility() and hUnit:GetCurrentActiveAbility():GetName(),
 						tostring(correctedVec)
@@ -615,8 +623,11 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 		
 		INFO_print(
 				string.format(
-					"[vantage] Failed to find a placeable ward location for ward at %s",
-					tostring(t_ward_loc[wardIndex])
+					"[vantage] Failed to find a placeable ward location for ward index %s @ %s, %s %s",
+					wardIndex,
+					tostring(t_ward_loc[wardIndex]),
+					hUnit:GetCurrentActionType(),
+					hUnit:GetCurrentActiveAbility() and hUnit:GetCurrentActiveAbility():GetName() or "<no-active-ability>"
 				)
 			)
 
@@ -628,13 +639,13 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 
 
 		t_ward_correction[wardIndex] = t_ward_correction[count_ward_spots]
-		t_ward_correction[count_ward_spots] = false
+		t_ward_correction[count_ward_spots] = nil
 		t_ward_loc[wardIndex] = t_ward_loc[count_ward_spots]
-		t_ward_loc[count_ward_spots] = false
+		t_ward_loc[count_ward_spots] = nil
 		t_is_warded[wardIndex] = t_is_warded[count_ward_spots]
 		t_is_warded[count_ward_spots] = nil
 		t_ward_is_corrected[wardIndex] = t_ward_is_corrected[count_ward_spots]
-		t_ward_is_corrected[count_ward_spots] = false
+		t_ward_is_corrected[count_ward_spots] = nil -- this line was missing and poisiong the tables with false is_corrected
 		t_ward_score_cache[wardIndex] = t_ward_score_cache[count_ward_spots]
 		t_ward_score_cache[count_ward_spots] = nil
 		count_ward_spots = count_ward_spots-1

@@ -1,12 +1,12 @@
 local hero_data = {
 	"shredder",
-	{1, 3, 3, 2, 2, 4, 2, 2, 1, 1, 1, 4, 5, 3, 7, 3, 4, 9, 12},
+	{1, 3, 3, 2, 5, 4, 2, 2, 2, 1, 1, 4, 1, 3, 7, 3, 4, 9, 11},
 	{
-		"item_circlet","item_gauntlets","item_tango","item_branches","item_quelling_blade","item_enchanted_mango","item_bracer","item_ring_of_health","item_cloak","item_boots","item_arcane_boots","item_soul_ring","item_cloak","item_hood_of_defiance","item_magic_wand","item_robe","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_pers","item_lotus_orb","item_blink","item_lotus_orb","item_lotus_orb","item_lotus_orb","item_lotus_orb","item_lotus_orb","item_lotus_orb","item_sheepstick","item_lotus_orb","item_black_king_bar","item_platemail","item_mystic_staff","item_shivas_guard","item_shivas_guard","item_gem","item_aghanims_shard",
+		"item_gauntlets","item_gauntlets","item_gauntlets","item_quelling_blade","item_branches","item_branches","item_tango","item_ring_of_health","item_boots","item_arcane_boots","item_soul_ring","item_vanguard","item_magic_wand","item_robe","item_kaya","item_belt_of_strength","item_sange","item_kaya_and_sange","item_aghanims_shard","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_platemail","item_helm_of_iron_will","item_crimson_guard","item_shivas_guard","item_mekansm","item_buckler","item_guardian_greaves","item_gem","item_blink","item_octarine_core","item_ultimate_scepter_2",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {2,2,3,3,3,}, {2,2,1,5,3,}, 0.1 },
 	{
-		"Whirling Death","Timber Chain","Reactive Armor","Chakram","+200 Health","+1.5 Mana Regen","+8% Spell Amplification","+6 Reactive Armor Stacks and Duration","+16 Strength","+4% Chakram Slow","+12% Whirling Death Attribute Reduction","+1125 Timber Chain Range",
+		"Whirling Death","Timber Chain","Reactive Armor","Chakram","+200 Health","+1.5 Mana Regen","+8% Spell Amplification","+6 Reactive Armor Stacks and Duration","+20% Magic Resistance","+4% Chakram Slow","Second Chakram","+1125 Timber Chain Range",
 	}
 }
 --@EndAutomatedHeroData

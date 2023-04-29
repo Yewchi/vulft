@@ -11,9 +11,9 @@ local language_name_of_locale_in_locale = {} -- {["zh"] = {["en"] = "yingyu", ..
 -- lua data files was probably a better idea, loading one file + using backup dev langs
 
 local function print_localize_err(str, args)
-	ERROR_print(string.format("[lang] ERROR - Attempt to register localize with a null. %s: %s",
-				str, Util_PrintableTable(args)
-			)
+	ERROR_print(true, not VERBOSE,
+			"[lang] ERROR - Attempt to register localize with a null. %s: %s",
+			str, Util_PrintableTable(args)
 		)
 end
 
@@ -85,9 +85,9 @@ function GetLocalize(str, lang)
 		lang = LOCALE
 	end
 	if type(lang) ~= "string" then
-		ERROR_print(string.format("[lang] Error - Non string locale name given to GetLocalize(%s, %s)",
-					tostring(str), tostring(lang)
-				)
+		ERROR_print(false, not VERBOSE,
+				"[lang] Error - Non string locale name given to GetLocalize(%s, %s)",
+				tostring(str), tostring(lang)
 			)
 		return;
 	end
@@ -97,7 +97,9 @@ function GetLocalize(str, lang)
 			str = tostring(str)
 		end
 	else
-		ERROR_print(string.format("[lang] Error - No str given to GetLocalize(%s, %s)", tostring(str), tostring(lang)))
+		ERROR_print(true, not VERBOSE, "[lang] Error - No str given to GetLocalize(%s, %s)",
+				tostring(str), tostring(lang)
+			)
 		return;
 	end
 	local langTbl = get_locale_tbl(lang)

@@ -1,8 +1,8 @@
 local hero_data = {
 	"obsidian_destroyer",
-	{2, 1, 3, 2, 2, 4, 2, 1, 1, 1, 3, 4, 3, 3, 8, 6, 4, 9, 11},
+	{2, 1, 3, 2, 2, 4, 2, 1, 1, 1, 6, 4, 3, 3, 7, 3, 4, 10, 12},
 	{
-		"item_ward_observer","item_circlet","item_tango","item_branches","item_circlet","item_mantle","item_branches","item_branches","item_faerie_fire","item_gloves","item_boots","item_magic_wand","item_robe","item_power_treads","item_robe","item_blitz_knuckles","item_chainmail","item_witch_blade","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_void_stone","item_ultimate_orb","item_sheepstick","item_sphere","item_gem",
+		"item_tango","item_ward_observer","item_branches","item_branches","item_branches","item_faerie_fire","item_ring_of_health","item_crown","item_meteor_hammer","item_boots","item_robe","item_power_treads","item_gloves","item_hand_of_midas","item_blade_of_alacrity","item_dragon_lance","item_fluffy_hat","item_staff_of_wizardry","item_hurricane_pike","item_blink","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_sheepstick","item_refresher","item_ultimate_scepter_2","item_swift_blink",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

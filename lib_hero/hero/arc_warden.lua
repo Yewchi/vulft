@@ -1,12 +1,12 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 3, 1, 1, 4, 3, 3, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
+	{3, 1, 1, 3, 1, 4, 1, 3, 2, 5, 2, 4, 3, 2, 8, 2, 4, 10, 11},
 	{
-		"item_quelling_blade","item_slippers","item_slippers","item_tango","item_branches","item_branches","item_circlet","item_branches","item_wraith_band","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_boots","item_magic_wand","item_rod_of_atos","item_gungir","item_aether_lens","item_soul_booster","item_octarine_core","item_blink","item_reaver","item_overwhelming_blink","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_ultimate_scepter","item_ultimate_scepter_2","item_dagon_5L","item_aghanims_shard",
+		"item_branches","item_branches","item_branches","item_circlet","item_faerie_fire","item_circlet","item_ward_observer","item_bottle","item_wraith_band","item_gloves","item_wraith_band","item_hand_of_midas","item_boots","item_boots_of_elves","item_power_treads","item_javelin","item_fluffy_hat","item_maelstrom","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_blitz_knuckles","item_invis_sword","item_silver_edge","item_aghanims_shard","item_ogre_axe","item_mjollnir","item_black_king_bar","item_satanic",
 	},
-	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
+	{ {2,2,2,1,1,}, {2,2,2,1,1,}, 0.1 },
 	{
-		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+200 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed","+125 Spark Wraith Damage","+40 Flux Damage","+40% Tempest Double Cooldown Reduction","+12s Tempest Double Duration",
+		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+200 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed/Bonus Magic Damage","+35%% Spark Wraith Damage","-9s Magnetic Field Cooldown","No Damage Penalty Distance For Tempest Double","+12s Tempest Double Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -64,9 +64,6 @@ do
 	end
 end
 
-local saved_abilities_arc
-local saved_abilities_tempest
-
 local function tempest_double_cast(gsiTempest, ability, target)
 	local f = AbilityLogic_DeduceTargetTypeCastFunc(gsiTempest, target)
 	--print(ability, ability:GetName(), gsiTempest.hUnit:GetAbilityByName(ability:GetName()))
@@ -82,21 +79,6 @@ local function tempest_double_think(genericAbilityThink)
 	local tempestDouble = GSI_GetZetTempestGsiUnit()
 	if DEBUG then DEBUG_print(string.format("tempest_double_think: %s", Util_Printable(tempestDouble))) end
 	if tempestDouble == nil or pUnit_IsNullOrDead(tempestDouble) then return end -- Relevent for reloads // persistent job or player.lua data
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	local hUnit = tempestDouble.hUnit
 	local gsiPlayer = GSI_GetPlayerFromPlayerID(tempestDouble.playerID)
 	local pnot = gsiPlayer.nOnTeam
@@ -119,13 +101,13 @@ local function tempest_double_think(genericAbilityThink)
 				or (AbilityLogic_AbilityCanBeCast(tempestDouble, hTpScroll) and Map_BaseLogicalLocationIsTeam(baseOrLaneLocation) and not ZoneDefend_AnyBuildingDefence()) then
 			if not castingTeleport or t_tempest_port_state[pnot] == WAITING_PORT_START then
 				local nearestCreeps = Set_GetNearestEnemyCreepSetToLocation(tempestDouble.lastSeen.location)
-				if not castingTeleport and nearestCreeps and Math_PointToPointDistance2D(tempestDouble.lastSeen.location, nearestCreeps.center) > 2000 and not Farm_AnyOtherCoresInLane(tempestDouble, nearestCreeps) then
+				if not castingTeleport and nearestCreeps and Math_PointToPointDistance2D(tempestDouble.lastSeen.location, nearestCreeps.center) > 2600 and not Farm_AnyOtherCoresInLane(tempestDouble, nearestCreeps) then
 					if t_tempest_port_state[pnot] == NOT_WAITING_PORT_START then
 						t_tempest_port_expiry[pnot] = GameTime() + 7
 					end
 					t_tempest_port_state[pnot] = WAITING_PORT_START
+					hUnit:Action_UseAbilityOnLocation(hTpScroll, nearestCreeps.center)
 				end
-				hUnit:Action_UseAbilityOnLocation(hTpScroll, nearestCreeps.center)
 			end
 			return;
 		end
@@ -255,20 +237,6 @@ d = {
 		if gsiPlayer.isTempest then -- Are we in a deeper stack with a tempest from tempest_double_think()? (the else code-block)
 			USE_ABILITY = tempest_double_cast
 		else
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 			USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 		end
 
@@ -368,21 +336,22 @@ d = {
 					end
 				end
 			end
-			if AbilityLogic_AbilityCanBeCast(gsiPlayer, sparkWraith)
+			local revealAbilityLoc, bez
+					= SearchFog_GetRevealLocNearby(gsiPlayer,
+							sparkWraith:GetCastRange()
+						)
+			
+			if bez and AbilityLogic_AbilityCanBeCast(gsiPlayer, sparkWraith)
 					and AbilityLogic_HighUseAllowOffensive(gsiPlayer, sparkWraith,
-						gsiPlayer.highUseManaSimple, 0.75
+						gsiPlayer.highUseManaSimple,
+						bez.forPlayer.lastSeenHealth / bez.forPlayer.maxHealth
 					) then
-				local revealAbilityLoc, bez
-						= SearchFog_GetRevealLocNearby(gsiPlayer.lastSeen.location,
-								sparkWraith:GetCastRange()
-							)
-				if bez then
-					revealAbilityLoc = bez:computeForwards(0.1)
-					if Vector_PointDistance(revealAbilityLoc, gsiPlayer.lastSeen.location)
-							< sparkWraith:GetCastRange() then
-						USE_ABILITY(gsiPlayer, sparkWraith, revealAbilityLoc, 400)
-						return;
-					end
+				revealAbilityLoc = bez:computeForwards(0.25)
+				
+				if Vector_PointDistance(revealAbilityLoc, gsiPlayer.lastSeen.location)
+						< sparkWraith:GetCastRange() then
+					USE_ABILITY(gsiPlayer, sparkWraith, revealAbilityLoc, 400)
+					return;
 				end
 			end
 			if AbilityLogic_AbilityCanBeCast(gsiPlayer, magneticField) and not gsiPlayer.hUnit:HasModifier("modifier_magnetic_field") 

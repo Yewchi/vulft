@@ -89,16 +89,16 @@ local t_heroes_implemented = {
 		--"npc_dota_hero_luna",
 		"npc_dota_hero_muerta",
 		--"npc_dota_hero_necrolyte",
-		"npc_dota_hero_night_stalker",
+		--"npc_dota_hero_night_stalker",
 		"npc_dota_hero_nyx_assassin",
 		"npc_dota_hero_ogre_magi",
-		"npc_dota_hero_phantom_assassin",
-		"npc_dota_hero_queenofpain",
+		--"npc_dota_hero_phantom_assassin",
+		--"npc_dota_hero_queenofpain",
 		--"npc_dota_hero_rattletrap",
 		"npc_dota_hero_sand_king",
-		"npc_dota_hero_silencer",
+		--"npc_dota_hero_silencer",
 		"npc_dota_hero_skeleton_king",
-		"npc_dota_hero_slardar",
+		--"npc_dota_hero_slardar",
 		"npc_dota_hero_sniper",
 		"npc_dota_hero_sven",
 		--"npc_dota_hero_tidehunter",
@@ -743,6 +743,7 @@ function Think()
 		next_turn_to_pick_time = GameTime() + NEXT_PICK_WAIT + RandomFloat(0, 6)
 		next_pick_pool_addition = GameTime() + NEXT_PICK_POOL_ADDITION_WAIT
 		turn_to_pick = 1
+
 
 
 

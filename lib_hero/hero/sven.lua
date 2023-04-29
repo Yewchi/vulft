@@ -1,12 +1,12 @@
 local hero_data = {
 	"sven",
-	{1, 3, 2, 2, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 11},
+	{1, 3, 1, 2, 2, 4, 2, 2, 3, 6, 3, 4, 3, 1, 7, 1, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_belt_of_strength","item_gloves","item_boots","item_power_treads","item_magic_wand","item_lifesteal","item_mask_of_madness","item_oblivion_staff","item_echo_sabre","item_ogre_axe","item_black_king_bar","item_blink","item_demon_edge","item_monkey_king_bar","item_blitz_knuckles","item_claymore","item_cloak","item_quarterstaff","item_robe","item_void_stone","item_blitz_knuckles","item_claymore","item_bloodthorn","item_satanic","item_swift_blink","item_refresher",
+		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_magic_wand","item_boots","item_gloves","item_power_treads","item_lifesteal","item_mask_of_madness","item_quarterstaff","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_lesser_crit","item_blitz_knuckles","item_shadow_amulet","item_invis_sword","item_lesser_crit","item_silver_edge","item_orchid","item_bloodthorn","item_harpoon","item_reaver","item_overwhelming_blink","item_cornucopia","item_cornucopia","item_refresher","item_cornucopia","item_sphere","item_moon_shard","item_helm_of_iron_will","item_platemail","item_hyperstone","item_assault","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Storm Hammer","Great Cleave","Warcry","God's Strength","+3.0s Warcry Duration","+15 Attack Speed","-15s God's Strength Cooldown","+25% Great Cleave Damage","+8% Warcry Movement Speed","+10 Warcry Armor","+50% God's Strength Damage","+1.25s Storm Hammer Stun Duration",
+		"Storm Hammer","Great Cleave","Warcry","God's Strength","+3.0s Warcry Duration","+15 Attack Speed","-15s God's Strength Cooldown","+25% Great Cleave Damage","+8% Warcry Movement Speed","+10 Warcry Armor","+50% God's Strength Damage","+1.0s Storm Hammer Stun Duration",
 	}
 }
 --@EndAutomatedHeroData

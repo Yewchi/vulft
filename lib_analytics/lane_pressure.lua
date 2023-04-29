@@ -68,7 +68,7 @@ local team_middle_spawn
 
 local t_seen_creep_pressure = {1, 1, 1, 1, 1}
 
-local ALLOW_TIER_ONE_DEF_AVG_TEAM_LEVEL = 7
+local ALLOW_TIER_ONE_DEF_AVG_TEAM_LEVEL = 6
 local tier_one_defend_allowed = false
 
 local START_DEFENCE_THREAT_DIST_MULTIPLIER = 1000
@@ -92,6 +92,15 @@ end
 local creep_agro_reset_time = {}
 local disallow_deagro_time = {}
 
+local t_lane_is_sieged = {}
+
+function LanePressure_InformTeamIsSieged(hUnit)
+	local gsiBuilding = bUnit_ConvertToSafeUnit(hUnit)
+	if gsiBuilding and gsiBuilding.lane then
+		t_lane_is_sieged[gsiBuilding.lane] = true
+	end
+end
+
 function LanePressure_CanDeagroCreeps(gsiPlayer)
 	-- TODO dry run, run action
 	local pnot = gsiPlayer.nOnTeam
@@ -105,12 +114,21 @@ function LanePressure_DeagroCreepsNow(gsiPlayer, target, dryRun)
 	-- TODO dry run, run action
 	local pnot = gsiPlayer.nOnTeam
 	if not target then
-		target = Set_GetNearestAlliedCreepSetToLocation(gsiPlayer.lastSeen.location)
+		--target = Set_GetNearestAlliedCreepSetToLocation(gsiPlayer.lastSeen.location)
+		target = gsiPlayer.hUnit:GetNearbyCreeps(900, false)
+		for i=1,#target do
+			local thisCreep = target[i]
+			if thisCreep:GetHealth() < thisCreep:GetMaxHealth()/2 then
+				target = thisCreep
+				break;
+			end
+		end
 	end
-	if target and not disallow_deagro_time[pnot]
-			or disallow_deagro_time[pnot] <= GameTime() then
+	if target and ( not disallow_deagro_time[pnot]
+				or disallow_deagro_time[pnot] <= GameTime()
+			) then
 		if not dryRun then
-			gsiPlayer.hUnit:Action_AttackUnit(nearbyFriendly[1].hUnit, true)
+			gsiPlayer.hUnit:Action_AttackUnit(target, true)
 			disallow_deagro_time[pnot] = GameTime() + CREEP_DEAGRO_RESET_LIMIT
 		end
 		return true
@@ -130,14 +148,16 @@ function LanePressure_AgroCreepsNow(gsiPlayer, target, dryRun)
 	local pnot = gsiPlayer.nOnTeam
 	if not target then
 		local enemyPlayers = t_enemy_players
-		target = gsiPlayer.hUnit:GetDifficulty() < 4
+		target = gsiPlayer.difficulty <= 3
 				and Set_GetNearestEnemyHeroToLocation(gsiPlayer.lastSeen.location, 0)
 				or Set_GetFurthestEnemyHeroToLocation(gsiPlayer.lastSeen.location, 0)
 	end
-	if target and creep_agro_reset_time[pnot]
-			and creep_agro_reset_time[pnot] <= GameTime() then
+	if target and target.hUnit and not target.typeIsNone
+			and ( not creep_agro_reset_time[pnot]
+				or creep_agro_reset_time[pnot] <= GameTime()
+			) then
 		if not dryRun then
-			gsiPlayer.hUnit:Action_AttackUnit(targetEnemy.hUnit, true)
+			gsiPlayer.hUnit:Action_AttackUnit(target.hUnit, true)
 			creep_agro_reset_time[pnot] = GameTime() + CREEP_AGRO_RESET_LIMIT
 		end
 		return true;
@@ -175,9 +195,9 @@ local creep_pressure = Analytics_CreepPressureFast
 
 function Analytics_GetPushHarderMetricFightIgnorant(gsiPlayer, danger, aliveAdvantage)
 	local timeData = gsiPlayer.time.data
+	local aliveAdvantage = aliveAdvantage or GSI_GetAliveAdvantageFactor()
 	if not timeData.pushHarder then
 		local danger, knownE, theoryE = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
-		local aliveAdvantage = aliveAdvantage or GSI_GetAliveAdvantageFactor()
 
 		local enemyPlayers = GSI_GetTeamPlayers(ENEMY_TEAM)
 
@@ -219,7 +239,7 @@ function Analytics_GetPushHarderMetricFightIgnorant(gsiPlayer, danger, aliveAdva
 
 
 	end
-	return timeData.pushHarder
+	return timeData.pushHarder, aliveAdvantage
 end
 
 function Analytics_ShouldPushHard(gsiPlayer, danger, aliveAdvantage)
@@ -348,6 +368,7 @@ end
 
 local zero_creeps = {}
 zero_creeps.units = EMPTY_TABLE
+local check_creep_tower_pressure_lane = 1
 local function update_creep_tower_pressure__job()
 	-- Enemy team pressure
 	if not tier_one_defend_allowed then
@@ -355,96 +376,102 @@ local function update_creep_tower_pressure__job()
 			tier_one_defend_allowed = true
 		end
 	end
-	for iLane=1,3 do -- TODO INCLUDE BASE PRESSURE -- JUST NEEDS SET REQUEST FOR BASE-WISE SET AND SPECIAL CHECK FOR WHICH BUILDING (MOST?) THREATENED
-		-- TODO IMPROVE
-		-- TODO INCLUDE ENEMY BUILDING PRESSURE FOR SAFE-BUT-DISTANT-PUSHING (OR FURION)
-		-- Using the lowest-tier team defensible...
-		local buildingForNotice = GSI_GetLowestTierDefensible(TEAM, iLane)
-		local enemyCreeps = Set_GetEnemyCreepSetLaneFront(iLane) or zero_creeps
-		local alliedCreeps = Set_GetAlliedCreepSetLaneFront(iLane) or zero_creeps
-		
-		--print("pre fix creep pressure", TEAM, iLane, enemyCreeps==zero_creeps, alliedCreeps==zero_creeps, buildingForNotice.name)
+	laneToCheck = (check_creep_tower_pressure_lane + 1) % 3 + 1
+	check_creep_tower_pressure_lane = laneToCheck
+	-- TODO IMPROVE
+	-- TODO INCLUDE ENEMY BUILDING PRESSURE FOR SAFE-BUT-DISTANT-PUSHING (OR FURION)
+	-- Using the lowest-tier team defensible...
+	
+	local laneIsSieged = t_lane_is_sieged[laneToCheck]
+	t_lane_is_sieged[laneToCheck] = false
 
-		-- ..Check if creeps are in base and if they can determined to be pushing a structure..
-		if not buildingForNotice.isTower or buildingForNotice.tier >=3 then
-			local creepsInBase = Set_GetNearestEnemyCreepSetAtLaneLoc(
-					buildingForNotice.lastSeen.location,
-					TEAM_IS_RADIANT and MAP_LOGICAL_RADIANT_BASE or MAP_LOGICAL_DIRE_BASE
-				)
-			if not creepsInBase
-					or Math_PointToPointDistance2D(
-							creepsInBase.center,
-							buildingForNotice.lastSeen.location)
-						> CONSIDER_CREEPS_ON_BASE_BUILDING then
-				if DEBUG and creepsInBase then DebugDrawLine(creepsInBase.center, buildingForNotice.lastSeen.location, 255, 0, 0) end
-				goto NEXT_LANE;
-			end
-			if creepsInBase then
-				local cacheTower = Set_GetTowerOverLocation(creepsInBase.center)
-				if cacheTower and cacheTower.tier > 3 then
-					buildingForNotice = cacheTower
-				end
-			end
-			enemyCreeps = creepsInBase
-			--DebugDrawLine(creepsInBase.center, buildingForNotice.lastSeen.location, 0, 255, 0)
+	local buildingForNotice = GSI_GetLowestTierDefensible(TEAM, laneToCheck)
+	local enemyCreeps = Set_GetEnemyCreepSetLaneFront(laneToCheck) or zero_creeps
+	local alliedCreeps = Set_GetAlliedCreepSetLaneFront(laneToCheck) or zero_creeps
+	
+	--print("pre fix creep pressure", TEAM, laneToCheck, enemyCreeps==zero_creeps, alliedCreeps==zero_creeps, buildingForNotice.name)
+
+	-- ..Check if creeps are in base and if they can determined to be pushing a structure..
+	if not buildingForNotice.isTower or buildingForNotice.tier >=3 then
+		local creepsInBase = Set_GetNearestEnemyCreepSetAtLaneLoc(
+				buildingForNotice.lastSeen.location,
+				TEAM_IS_RADIANT and MAP_LOGICAL_RADIANT_BASE or MAP_LOGICAL_DIRE_BASE
+			)
+		if not creepsInBase
+				or Math_PointToPointDistance2D(
+						creepsInBase.center,
+						buildingForNotice.lastSeen.location)
+					> CONSIDER_CREEPS_ON_BASE_BUILDING then
+			if DEBUG and creepsInBase then DebugDrawLine(creepsInBase.center, buildingForNotice.lastSeen.location, 255, 0, 0) end
+			return;
 		end
-
-		-- ..Determine pressure on structure of heroes and creeps..
-		local numEnemyCreeps = #(enemyCreeps.units)
-		local numAlliedCreeps = #(alliedCreeps.units)
-		--print(TEAM, iLane, numEnemyCreeps, numAlliedCreeps)
-		local creepPressure = creep_pressure(nil, alliedCreeps.units, enemyCreeps.units) 
-
-		local laneCrash = (enemyCreeps and enemyCreeps.center) or Set_GetPredictedLaneFrontLocation(iLane)
-		--print(laneCrash, enemyCreeps, enemyCreeps and enemyCreeps.center, Map_GetAncientOnRopesFightLocation(baseTeam))
-		if not buildingForNotice then
-			buildingForNotice = GSI_GetTeamAncient(TEAM)
-		end
-		local tierDistance = buildingForNotice.tier or 3
-
-		local prevPressure = t_seen_creep_pressure[iLane]
-		t_seen_creep_pressure[iLane] = math.min(2, math.max(0, prevPressure + (creepPressure > prevPressure and 0.1 or -0.1))) -- .1 / second
-
-		-- ..Check Glyph needed..
-		if GetGlyphCooldown() == 0 then
-			local nearbyEnemyHeroes = Set_GetEnemyHeroesInLocRadOuter(buildingForNotice.lastSeen.location, 700, -1, 0)
-			if DEBUG and enemyCreep and not enemyCreep.center then
-				ERROR_print("lane_pressure.lua found an enemy creep set with units but no center")
-				Util_TablePrint(enemyCreeps)
-			end
-			local hUnit = buildingForNotice.hUnit
-			if (buildingForNotice.isTower or buildingForNotice.isAncient
-					and hUnit and hUnit.IsNull and not hUnit:IsNull() and hUnit:IsAlive()
-					) and (numEnemyCreeps > 0
-							and (numEnemyCreeps + #nearbyEnemyHeroes*2 > USE_GLYPH_ENEMY_PRESENCE_AT_TOWER -- hero's scale to creep is low because hard to push without creeps
-								and Math_PointToPointDistance2D(buildingForNotice.lastSeen.location, enemyCreeps.center) < 500
-							) or (buildingForNotice.tier == 1
-								and buildingForNotice.lastSeenHealth < USE_T1_GLYPH_FOR_HEALTH_AUTO
-							)
-					) then
-				GetBot():ActionImmediate_Glyph()
+		if creepsInBase then
+			local cacheTower = Set_GetTowerOverLocation(creepsInBase.center)
+			if cacheTower and cacheTower.tier > 3 then
+				buildingForNotice = cacheTower
 			end
 		end
+		enemyCreeps = creepsInBase
+		--DebugDrawLine(creepsInBase.center, buildingForNotice.lastSeen.location, 0, 255, 0)
+	end
 
-		--print("blip test:", iLane, laneCrash, creepPressure, buildingForNotice.lastSeen.location)
-		--print(not buildingForNotice.typeIsNone, (tier_one_defend_allowed or buildingForNotice.tier ~= 1 or buildingForNotice.lastSeenHealth < 450), laneCrash, creepPressure >= 1.4, Math_PointToPointDistance2D(buildingForNotice.lastSeen.location, laneCrash))
-		-- ..Check if defense poster is justified..
-		if not buildingForNotice.typeIsNone
-				and (tier_one_defend_allowed or buildingForNotice.tier ~= 1 or buildingForNotice.lastSeenHealth < 450)
-				and laneCrash and creepPressure >= 1.4
-				and Math_PointToPointDistance2D(buildingForNotice.lastSeen.location, laneCrash)
-					< START_DEFENCE_THREAT_DIST_MULTIPLIER*tierDistance then
-			--print('lane: ', iLane, TEAM, baseTeam, laneCrash, buildingForNotice.name, buildingForNotice.lastSeen.location, enemyCreeps)
-			--print(GSI_GetLowestTierTeamLaneTower(TEAM, iLane), Set_GetNearestTeamBuildingToLoc(baseTeam, laneCrash))
-			if buildingForNotice.team == TEAM then
-				ZoneDefend_RegisterBuildingDefenceBlip(buildingForNotice, t_seen_creep_pressure[iLane])
-			else
-				PushLane_RegisterHighPressureOption(buildingForNotice, t_seen_creep_pressure[iLane])
-			end
-		elseif buildingForNotice.wp and creepPressure == 0 then
-			ZoneDefend_RegisterBuildingDefenceSafe(buildingForNotice, t_seen_creep_pressure[iLane])
+	-- ..Determine pressure on structure of heroes and creeps..
+	local numEnemyCreeps = #(enemyCreeps.units)
+	local numAlliedCreeps = #(alliedCreeps.units)
+	--print(TEAM, laneToCheck, numEnemyCreeps, numAlliedCreeps)
+	local creepPressure = creep_pressure(nil, alliedCreeps.units, enemyCreeps.units) 
+
+	local laneCrash = (enemyCreeps and enemyCreeps.center) or Set_GetPredictedLaneFrontLocation(laneToCheck)
+	--print(laneCrash, enemyCreeps, enemyCreeps and enemyCreeps.center, Map_GetAncientOnRopesFightLocation(baseTeam))
+	if not buildingForNotice then
+		buildingForNotice = GSI_GetTeamAncient(TEAM)
+	end
+	local tierDistance = buildingForNotice.tier or 3
+
+	local prevPressure = t_seen_creep_pressure[laneToCheck]
+	t_seen_creep_pressure[laneToCheck] = math.min(2, math.max(0, prevPressure + (creepPressure > prevPressure and 0.05 or -0.05))) -- .1 / second
+
+	local nearbyEnemyHeroes, outerEnemyHeroes = Set_GetEnemyHeroesInLocRadOuter(buildingForNotice.lastSeen.location, 700, 1600, 0)
+	-- ..Check Glyph needed..
+	if GetGlyphCooldown() == 0 then
+		if DEBUG and enemyCreep and not enemyCreep.center then
+			ERROR_print(false, not DEBUG, "lane_pressure.lua found an enemy creep set with units but no center")
+			Util_TablePrint(enemyCreeps)
 		end
-		::NEXT_LANE::
+		local hUnit = buildingForNotice.hUnit
+		if (buildingForNotice.isTower or buildingForNotice.isAncient
+				and hUnit and hUnit.IsNull and not hUnit:IsNull() and hUnit:IsAlive()
+				) and (numEnemyCreeps > 0
+						and (numEnemyCreeps + #nearbyEnemyHeroes*2 > USE_GLYPH_ENEMY_PRESENCE_AT_TOWER -- hero's scale to creep is low because hard to push without creeps
+							and Math_PointToPointDistance2D(buildingForNotice.lastSeen.location, enemyCreeps.center) < 500
+						) or (buildingForNotice.tier == 1
+							and buildingForNotice.lastSeenHealth < USE_T1_GLYPH_FOR_HEALTH_AUTO
+						)
+				) then
+			GetBot():ActionImmediate_Glyph()
+		end
+	end
+
+	--print("blip test:", laneToCheck, laneCrash, creepPressure, buildingForNotice.lastSeen.location)
+	--print(not buildingForNotice.typeIsNone, (tier_one_defend_allowed or buildingForNotice.tier ~= 1 or buildingForNotice.lastSeenHealth < 450), laneCrash, creepPressure >= 1.4, Math_PointToPointDistance2D(buildingForNotice.lastSeen.location, laneCrash))
+	-- ..Check if defense poster is justified..
+	local urgency = creepPressure
+			+ (Analytics_GetFutureDamageInTimeline(buildingForNotice.hUnit)
+				/ buildingForNotice.maxHealth) * 100
+	if not buildingForNotice.typeIsNone
+			and (tier_one_defend_allowed or buildingForNotice.tier ~= 1 or buildingForNotice.lastSeenHealth < 450)
+			and laneCrash and urgency >= 2
+			and Math_PointToPointDistance2D(buildingForNotice.lastSeen.location, laneCrash)
+				< START_DEFENCE_THREAT_DIST_MULTIPLIER*tierDistance then
+		--print('lane: ', laneToCheck, TEAM, baseTeam, laneCrash, buildingForNotice.name, buildingForNotice.lastSeen.location, enemyCreeps)
+		--print(GSI_GetLowestTierTeamLaneTower(TEAM, laneToCheck), Set_GetNearestTeamBuildingToLoc(baseTeam, laneCrash))
+		if buildingForNotice.team == TEAM then
+			ZoneDefend_RegisterBuildingDefenceBlip(buildingForNotice, t_seen_creep_pressure[laneToCheck])
+		else
+			PushLane_RegisterHighPressureOption(buildingForNotice, t_seen_creep_pressure[laneToCheck])
+		end
+	elseif buildingForNotice.wp and creepPressure == 0 then
+		ZoneDefend_RegisterBuildingDefenceSafe(buildingForNotice, t_seen_creep_pressure[laneToCheck])
 	end
 end
 
@@ -461,6 +488,9 @@ function Analytics_CreateUpdateLanePressure()
 	job_domain_analytics:RegisterJob(
 			function(workingSet)
 				if workingSet.throttle:allowed() then
+					
+					
+					
 					update_creep_tower_pressure__job()
 				end
 			end,

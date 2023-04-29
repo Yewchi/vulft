@@ -1,10 +1,10 @@
 local hero_data = {
 	"ancient_apparition",
-	{3, 1, 3, 1, 1, 4, 1, 2, 2, 2, 2, 4, 5, 3, 7, 3, 4, 9},
+	{3, 1, 2, 1, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 8, 3, 4, 9},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_bottle","item_gloves","item_hand_of_midas","item_magic_wand","item_boots","item_belt_of_strength","item_gloves","item_power_treads","item_staff_of_wizardry","item_void_stone","item_cyclone","item_aghanims_shard","item_staff_of_wizardry","item_robe","item_kaya","item_kaya_and_sange","item_pers","item_ultimate_orb","item_sphere","item_mystic_staff",
+		"item_blood_grenade","item_tango","item_tango","item_branches","item_branches","item_branches","item_ward_observer","item_flask","item_ring_of_basilius","item_magic_wand","item_crown","item_veil_of_discord","item_boots","item_shadow_amulet","item_cloak","item_glimmer_cape","item_force_staff","item_tranquil_boots","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_gem","item_boots_of_bearing","item_solar_crest",
 	},
-	{ {1,1,1,1,2,}, {5,5,5,5,2,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+300 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+300 Cold Feet Breaking distance","-5% Ice Vortex Slow/Increased Magic Damage","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
 	}

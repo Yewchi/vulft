@@ -1,12 +1,12 @@
 local hero_data = {
 	"invoker",
-	{3, 1, 3, 1, 3, 1, 3, 1, 1, 2, 3, 2, 3, 2, 2, 2, 2, 2, 3, 9, 6, 7, 1, 1, 12, 1},
+	{3, 1, 3, 1, 3, 1, 3, 1, 2, 3, 3, 2, 3, 2, 2, 2, 2, 2, 1, 9, 5, 1, 1, 7, 12, 1},
 	{
-		"item_circlet","item_circlet","item_branches","item_ward_observer","item_mantle","item_faerie_fire","item_gloves","item_hand_of_midas","item_null_talisman","item_boots","item_ogre_axe","item_mithril_hammer","item_null_talisman","item_black_king_bar","item_blink","item_void_stone","item_mystic_staff","item_void_stone","item_sheepstick","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_aghanims_shard","item_witch_blade","item_revenants_brooch","item_overwhelming_blink","item_ring_of_health","item_refresher",
+		"item_tango","item_faerie_fire","item_branches","item_circlet","item_tango","item_ward_observer","item_faerie_fire","item_slippers","item_magic_stick","item_branches","item_magic_wand","item_null_talisman","item_gloves","item_boots","item_hand_of_midas","item_belt_of_strength","item_robe","item_ancient_janggo","item_blink","item_point_booster","item_ultimate_scepter","item_aghanims_shard","item_mystic_staff","item_sheepstick","item_null_talisman","item_ultimate_orb","item_cornucopia","item_sphere",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Quas","Wex","Exort","Invoke","+20% E.M.P. Mana Burnt","-6s Tornado Cooldown","+50 Forged Spirit Attack Speed","-8s Cold Snap Cooldown","+80%% Chaos Meteor Damage","+30 Alacrity Damage/Speed","Radial Deafening Blast","x3x Quas/Wex/Exort passive effects",
+		"Quas","Wex","Exort","Invoke","+50 Ice Wall DPS","-6s Tornado Cooldown","+50 Forged Spirit Attack Speed","-8s Cold Snap Cooldown","+2 Chaos Meteors","+30 Alacrity Damage/Speed","Radial Deafening Blast","x3x Quas/Wex/Exort passive effects",
 	}
 }
 --@EndAutomatedHeroData

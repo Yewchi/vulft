@@ -1,12 +1,12 @@
 local hero_data = {
 	"abaddon",
-	{3, 2, 3, 2, 3, 4, 2, 1, 2, 6, 1, 4, 3, 1, 7, 1, 4, 10, 12},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_magic_stick","item_tango","item_quelling_blade","item_branches","item_branches","item_branches","item_chainmail","item_boots","item_phase_boots","item_magic_wand","item_relic","item_radiance","item_blade_of_alacrity","item_ultimate_orb","item_blade_of_alacrity","item_yasha","item_manta","item_blink","item_mithril_hammer","item_belt_of_strength","item_basher","item_platemail","item_buckler","item_assault","item_abyssal_blade",
+		"item_quelling_blade","item_tango","item_gauntlets","item_gauntlets","item_branches","item_branches","item_magic_wand","item_ring_of_health","item_crown","item_meteor_hammer","item_boots","item_ancient_janggo","item_tranquil_boots","item_boots_of_bearing","item_blade_of_alacrity","item_platemail","item_hyperstone","item_buckler","item_assault","item_buckler","item_ring_of_basilius","item_blades_of_attack","item_lifesteal","item_point_booster","item_staff_of_wizardry","item_vladmir","item_ogre_axe","item_ultimate_scepter","item_ultimate_orb","item_mystic_staff","item_void_stone","item_sheepstick",
 	},
-	{ {1,1,1,3,3,}, {1,1,1,4,4,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,1,3,3,}, 0.1 },
 	{
-		"Mist Coil","Aphotic Shield","Curse of Avernus","Borrowed Time","+15% Curse of Avernus Movement Slow","+8 Strength","+65 Damage","+50 Mist Coil Heal/Damage","+100 Aphotic Shield Health","-8s Borrowed Time Cooldown","-1 Curse of Avernus Attacks Required","+400 AoE Mist Coil",
+		"Mist Coil","Aphotic Shield","Curse of Avernus","Borrowed Time","+15% Curse of Avernus Movement Slow","+8 Strength","+65 Damage","+50 Mist Coil Heal/Damage","+100 Aphotic Shield Barrier Amount","+400 DPS Borrowed Time Immolation","-1 Curse of Avernus Attacks Required","+400 AoE Mist Coil",
 	}
 }
 --@EndAutomatedHeroData

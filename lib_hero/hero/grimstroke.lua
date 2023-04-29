@@ -1,12 +1,12 @@
 local hero_data = {
 	"grimstroke",
-	{1, 3, 1, 2, 1, 4, 1, 3, 3, 3, 6, 4, 2, 2, 8, 2, 4, 9},
+	{1, 3, 1, 2, 1, 4, 3, 3, 1, 6, 2, 4, 2, 2, 8, 3, 4, 10},
 	{
-		"item_tango","item_enchanted_mango","item_ward_observer","item_branches","item_wind_lace","item_branches","item_ring_of_basilius","item_boots","item_magic_wand","item_arcane_boots","item_aether_lens","item_tranquil_boots","item_gem","item_staff_of_wizardry","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_aghanims_shard","item_gem","item_blink","item_gem",
+		"item_ward_observer","item_tango","item_blood_grenade","item_branches","item_branches","item_circlet","item_branches","item_magic_wand","item_boots","item_energy_booster","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aether_lens","item_gem",
 	},
-	{ {3,3,3,3,3,}, {4,4,4,4,4,}, 0.1 },
+	{ {5,3,1,1,3,}, {5,5,4,4,4,}, 0.1 },
 	{
-		"Stroke of Fate","Phantom's Embrace","Ink Swell","Soulbind","+50 Phantom's Embrace DPS","-5.0s Ink Swell Cooldown","+25.0% Soulbind Spell Damage","+16% Ink Swell Movement Speed","+1000 Stroke of Fate Cast Range","+3 Hits to Kill Phantom","+150 Ink Swell Radius","+50% Stroke of Fate Damage",
+		"Stroke of Fate","Phantom's Embrace","Ink Swell","Soulbind","+65 Phantom's Embrace DPS","-5.0s Ink Swell Cooldown","+25.0% Soulbind Spell Damage","+16% Ink Swell Movement Speed","+1000 Stroke of Fate Cast Range","+3 Hits to Kill Phantom","+150 Ink Swell Radius","+60% Stroke of Fate Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -36,7 +36,7 @@ local ANY_HARM = FightClimate_AnyIntentToHarm
 local CURRENT_ACTIVITY_TYPE = Blueprint_GetCurrentTaskActivityType
 local TASK_OBJECTIVE = Task_GetTaskObjective
 local HEALTH_PERCENT = Unit_GetHealthPercent
-local SET_ENEMY_HERO = SET_ENEMY_HERO
+local SET_HERO_ENEMY = SET_HERO_ENEMY
 local ABILITY_LOCKED = UseAbility_IsPlayerLocked
 local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
 local NEARBY_OUTER = Set_GetEnemyHeroesInPlayerRadiusAndOuter
@@ -49,7 +49,7 @@ local min = math.min
 local push_handle = Push_GetTaskHandle()
 local fight_harass_handle = FightHarass_GetTaskHandle()
 
-local S_O_F_CAST_POINT = 0.8
+local S_O_F_CAST_POINT = 0.6
 local S_O_F_TRAVEL_SPEED = 2400
 local S_C_BIND_RADIUS = 600
 
@@ -79,6 +79,9 @@ d = {
 		local inkSwell = playerAbilities[3]
 		local darkPortrait = playerAbilities[4]
 		local soulChain = playerAbilities[5]
+
+		local darkArtRadius = darkArt:GetAOERadius()
+		darkArtRadius = darkArtRadius or 120
 
 		local highUse = gsiPlayer.highUseManaSimple
 		local currentTask = CURRENT_TASK(gsiPlayer)
@@ -149,10 +152,12 @@ d = {
 						if thisEnemy ~= fht and not pUnit_IsNullOrDead(thisEnemy)
 								and SPELL_SUCCESS(gsiPlayer, thisEnemy, phantom) > 0
 								and VEC_POINT_DISTANCE(playerLoc, thisEnemy.lastSeen.location)
-										< phantomCastRange
-								and HIGH_USE(gsiPlayer, phantom, highUse,
+										< phantomCastRange+40
+								and ( HIGH_USE(gsiPlayer, phantom, highUse,
 										thisEnemy.lastSeenHealth / thisEnemy.maxHealth
-									) then
+									) or gsiPlayer.lastSeenMana > phantom:GetManaCost()
+										and thisEnemy.hUnit:HasModifier("modifier_grimstroke_soul_chain")
+								) then
 							USE_ABILITY(gsiPlayer, phantom, fht, 400, nil)
 							return;
 						end
@@ -162,7 +167,7 @@ d = {
 				local nearestEnemy = Set_GetNearestEnemyHeroToLocation(playerLoc)
 				if nearestEnemy and SPELL_SUCCESS(gsiPlayer, nearestEnemy, phantom) > 0
 						and VEC_POINT_DISTANCE(playerLoc, thisEnemy.lastSeen.location)
-								< phantomCastRange
+								< phantomCastRange + 40
 						and HIGH_USE(gsiPlayer, phantom, highUse, playerHpp) then
 					USE_ABILITY(gsiPlayer, phantom, fht, 400, nil)
 					return;
@@ -189,19 +194,33 @@ d = {
 			-- TODO
 			if fhtReal and HIGH_USE(gsiPlayer, darkArt, highUse, fhtHpp) then
 				local extrapolatedFht = fhtHUnit:GetExtrapolatedLocation(
-						( S_O_F_CAST_POINT + distToFht / S_O_F_TRAVEL_SPEED) * 0.95
+						( S_O_F_CAST_POINT + distToFht / S_O_F_TRAVEL_SPEED)
+							* max(0.125, fhtHUnit:GetMovementDirectionStability())
 					)
-				if VEC_POINT_DISTANCE(playerLoc, extrapolatedFht) < darkArt:GetCastRange() then
-					USE_ABILITY(gsiPlayer, darkArt, fht.lastSeen.location, 400, nil)
-					return;
+				local darkArtRange = darkArt:GetSpecialValueInt("abilitycastrange")
+				darkArtRange = darkArtRange > 1000 and darkArtRange or darkArt:GetCastRange()
+				local score, hitsBetter = ScoreLocs_StripHeroes( gsiPlayer, nearbyEnemies, darkArt,
+						playerLoc, Vector((extrapolatedFht.x-playerLoc.x)*darkArtRange,
+								(extrapolatedFht.y-playerLoc.y)*darkArtRange ), darkArtRadius,
+						fht, 0.45, 0.75, 0.2, 1.0, S_O_F_TRAVEL_SPEED )
+
+				if score > 0 and hitsBetter then
+					DebugDrawLine(playerLoc, hitsBetter, 0, 255, 0)
+					DebugDrawLine(playerLoc, extrapolatedFht, 255, 0, 0)
+					if VEC_POINT_DISTANCE(playerLoc, hitsBetter) < darkArt:GetCastRange() then
+						USE_ABILITY(gsiPlayer, darkArt, hitsBetter, 400, nil)
+						return;
+					end
 				end
 			end
-			if currentTask == push_handle
-					and Analytics_GetTheoreticalDangerAmount(gsiPlayer) < -1.5
-					and HIGH_USE(gsiPlayer, darkArt, highUse, playerHpp) then
-				local nearbyCreepSet = Set_GetNearestEnemyCreepSetToLocation(playerLoc)
+			local danger, known, theory= Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+			if currentTask == push_handle and CAN_BE_CAST(gsiPlayer, darkArt)
+					and danger < -1.5
+					and #known == 0 and #theory == 0
+					and gsiPlayer.lastSeenMana > highUse*max(1.33, (1.5 + danger*1.5)) then
+				local nearbyEnemyCreepSet = Set_GetNearestEnemyCreepSetToLocation(playerLoc)
 				if nearbyEnemyCreepSet and nearbyEnemyCreepSet.units[1] then
-					local crowdedCenter, crowdedRating = CROWDED_RATING(nearbyEnemyCreepSet.center)
+					local crowdedCenter, crowdedRating = CROWDED_RATING(nearbyEnemyCreepSet.center, SET_HERO_ENEMY)
 					if crowdedRating > 2 and VEC_POINT_DSTANCE(playerLoc, crowdedCenter) then
 						USE_ABILITY(gsiPlayer, darkArt, crowdedCenter, 400, nil)
 						return;

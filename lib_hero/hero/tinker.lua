@@ -1,8 +1,8 @@
 local hero_data = {
 	"tinker",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 8, 3, 4, 10, 12},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 3, 3, 4, 3, 3, 7, 6, 4, 10, 12},
 	{
-		"item_circlet","item_circlet","item_circlet","item_branches","item_faerie_fire","item_ward_observer","item_bottle","item_blink","item_soul_ring","item_mystic_staff","item_platemail","item_shivas_guard","item_kaya","item_reaver","item_ogre_axe","item_overwhelming_blink","item_kaya_and_sange","item_energy_booster","item_bloodstone","item_black_king_bar","item_sheepstick",
+		"item_faerie_fire","item_branches","item_ward_observer","item_circlet","item_circlet","item_circlet","item_bottle","item_blink","item_soul_ring","item_mystic_staff","item_shivas_guard","item_ogre_axe","item_black_king_bar","item_staff_of_wizardry","item_kaya","item_kaya_and_sange","item_reaver","item_overwhelming_blink","item_heart","item_voodoo_mask","item_soul_booster","item_bloodstone","item_gem","item_point_booster","item_sheepstick","item_ultimate_orb","item_cornucopia","item_sphere",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

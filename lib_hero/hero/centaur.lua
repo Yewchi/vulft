@@ -1,12 +1,12 @@
 local hero_data = {
 	"centaur",
-	{1, 2, 2, 1, 1, 5, 2, 2, 1, 7, 3, 5, 3, 3, 9, 3, 5, 11, 13, 6},
+	{1, 2, 3, 2, 1, 5, 2, 1, 1, 3, 7, 5, 2, 3, 9, 3, 5, 11, 6, 13},
 	{
-		"item_tango","item_flask","item_branches","item_branches","item_branches","item_branches","item_boots","item_ring_of_health","item_magic_wand","item_vanguard","item_blink","item_relic","item_talisman_of_evasion","item_radiance","item_heart","item_overwhelming_blink","item_gem","item_black_king_bar","item_aghanims_shard","item_wind_lace","item_staff_of_wizardry","item_mystic_staff","item_void_stone","item_mystic_staff","item_wind_waker",
+		"item_tango","item_branches","item_quelling_blade","item_ring_of_protection","item_gauntlets","item_ring_of_health","item_crown","item_vanguard","item_ring_of_health","item_meteor_hammer","item_boots","item_magic_wand","item_wind_lace","item_tranquil_boots","item_blink","item_belt_of_strength","item_wind_lace","item_robe","item_ancient_janggo","item_boots_of_bearing","item_headdress","item_cloak","item_ring_of_health","item_pipe","item_crimson_guard","item_sheepstick","item_shivas_guard",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,4,}, {3,3,3,3,4,}, 0.1 },
 	{
-		"Hoof Stomp","Double Edge","Retaliate","Hitch A Ride","Stampede","+5 Health Regen","+20 Movement Speed","+15 Strength","+40% Double Edge Strength Damage","+45 Retaliate Damage","-25s Stampede Cooldown","Gains Retaliate Aura","+1.0s Hoof Stomp Duration",
+		"Hoof Stomp","Double Edge","Retaliate","Hitch A Ride","Stampede","+5 Health Regen","+20 Movement Speed","+15 Strength","+40% Double Edge Strength Damage","+45 Retaliate Damage","-25s Stampede Cooldown","Gains Retaliate Aura","+0.8s Hoof Stomp Duration",
 	}
 }
 --@EndAutomatedHeroData
