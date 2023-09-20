@@ -1,12 +1,12 @@
 local hero_data = {
 	"beastmaster",
-	{1, 2, 1, 2, 1, 6, 1, 2, 2, 4, 4, 6, 4, 4, 9, 8, 6, 12, 14, 3},
+	{2, 1, 2, 1, 2, 6, 2, 4, 1, 7, 4, 6, 4, 4, 9, 1, 6, 12, 14},
 	{
-		"item_magic_stick","item_quelling_blade","item_sobi_mask","item_enchanted_mango","item_helm_of_iron_will","item_crown","item_helm_of_the_dominator","item_boots","item_ring_of_basilius","item_buckler","item_blades_of_attack","item_lifesteal","item_vladmir","item_helm_of_the_overlord","item_tranquil_boots","item_wind_lace","item_aghanims_shard","item_ogre_axe","item_black_king_bar","item_ultimate_orb","item_mystic_staff","item_sheepstick","item_blink","item_buckler","item_platemail","item_assault","item_ring_of_health","item_pers",
+		"item_circlet","item_circlet","item_tango","item_branches","item_branches","item_branches","item_helm_of_iron_will","item_diadem","item_helm_of_the_dominator","item_buckler","item_ring_of_basilius","item_lifesteal","item_blades_of_attack","item_vladmir","item_helm_of_the_overlord","item_boots","item_cloak","item_headdress","item_magic_wand","item_pipe","item_blink","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_gem","item_shivas_guard",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Wild Axes","Call of the Wild Boar","Call of the Wild Hawk","Inner Beast","Drums of Slom","Primal Roar","+30 Damage","+2.5% Wild Axes Damage Amp Per Stack","+20 Movespeed Aura to Beastmaster and his units","+10 Inner Beast Attack Speed","+35 Boar Attack Damage","+250 Max Health Aura to Beastmaster and his units","-5s Wild Axes Cooldown","-30s Primal Roar Cooldown",
+		"Wild Axes","Call of the Wild Boar","Call of the Wild Hawk","Inner Beast","Drums of Slom","Primal Roar","+30 Damage","+2.5% Wild Axes Damage Amp Per Stack","+{s:bonus_ms} Movespeed Aura to Beastmaster and his units","+10 Inner Beast Attack Speed","+35 Boar Attack Damage","+250 Max Health Aura to Beastmaster and his units","-5s Wild Axes Cooldown","-30s Primal Roar Cooldown",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

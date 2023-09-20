@@ -44,36 +44,46 @@ local ITEM_NAME_SEARCH_START = ITEM_NAME_SEARCH_START
 ITEM_ENSURE_RESULT_READY = true
 ITEM_ENSURE_RESULT_WAIT = 1
 ITEM_ENSURE_RESULT_LOCKED = false
+local ITEM_ENSURE_RESULT_READY = ITEM_ENSURE_RESULT_READY
+local ITEM_ENSURE_RESULT_WAIT = ITEM_ENSURE_RESULT_WAIT
+local ITEM_ENSURE_RESULT_LOCKED = ITEM_ENSURE_RESULT_LOCKED
 
 local ITEM_HAVE_AGHS_SHARD_MYSTERIOUS = ITEM_HAVE_AGHS_SHARD_MYSTERIOUS
 
 ITEM_NOT_FOUND = -1 -- the fail result of FindItemInSlot
+local ITEM_NOT_FOUND = ITEM_NOT_FOUND
 
 ITEM_SWITCH_ITEM_READY_TIME = 7.0
+local ITEM_SWITCH_ITEM_READY_TIME = ITEM_SWITCH_ITEM_READY_TIME
+
+local ITEM_WAVE_CLEAR_NOT_ATTACK = ITEM_WAVE_CLEAR_NOT_ATTACK
+local ITEM_WAVE_CLEAR_ATTACK = ITEM_WAVE_CLEAR_ATTACK
 
 APPROX_MJOL_STATIC_TAKEN_PER_HIT = 0.75*200/5
+local APPROX_MJOL_STATIC_TAKEN_PER_HIT = APPROX_MJOL_STATIC_TAKEN_PER_HIT
 
 local max = math.max
 local min = math.min
-local sqrt = math.sqrt
 
 local ITEM_RES_MAP_COMPONENTS_I__COMBINES_TO = 0
 local item_resolution_map = {} -- end of file init
 
 local EMPTY_TABLE = EMPTY_TABLE
+print("THE EMPTY TABLE IS WHILE LOADING", EMPTY_TABLE, EMPTY_TABLE[1])
 
 ---- item_logic constants --
 local PLACEHOLDER_PURCHASE_SUCCESS = -1 -- Not sure, observed return when courier picking up new item via pUnit:ActionImmediate_PurchaseItem(). 
 
 local CONSUMABLE_ITEM_SEARCH = {
-		"faer", --2, -- item_faerie_fire -- N.B. Requires string.find, shares behaviour # with what looks like a 'basic' item number.
-		"tang", --8, -- item_tango
-		"ward", --8240, -- item_ward_* (dispenser, observer, sentry)
-		"flas", --33556488, -- item_flask, -- item_clarity
-		"clarity",
-		"dust",
-		"ench", --33564676, -- item_enchanted_mango
-		"smok", --33554436, -- item_smoke_of_deceit
+		"faer", --2, -- item_faerie_fire -- N.B. Requires string.find, shares behavior # with what looks like a 'basic' item number.
+		"tem_tang", --8, -- item_tango
+		"tem_ward", --8240, -- item_ward_* (dispenser, observer, sentry)
+		"tem_flas", --33556488, -- item_flask, -- item_clarity
+		"_clarity",
+		"tem_dust",
+		"ant_mang", --33564676, -- item_enchanted_mango
+		"smoke_of", --33554436, -- item_smoke_of_deceit
+		"lood_gre"
 }
 local HEALTH_ON_USE_ITEM_SEARCH = {
 		"faer",
@@ -158,7 +168,8 @@ local t_player_buying_aghs = {} -- Aghs components are removed from next item bu
 local PRIMARY_ATTRIBUTE_TREADS_ITEM = {
 	[0] = "item_belt_of_strength",
 	[1] = "item_boots_of_elves",
-	[2] = "item_robe"
+	[2] = "item_robe",
+	[3] = "item_belt_of_strength"
 }
 
 local function get_item_components(itemName, ownersPrimaryAttribute) -- for #arr
@@ -201,11 +212,18 @@ for pnot=1,TEAM_NUMBER_OF_PLAYERS do
 	t_swap_index_time[pnot] = {}
 end
 function Item_SwapItems(gsiPlayer, slot1, slot2)
+	if slot1 == slot2 then return; end
 	gsiPlayer.hUnit:ActionImmediate_SwapItems(slot1, slot2)
-	local endCooldown = GameTime() + 6.51
 	local playerSwapCooldowns = t_swap_index_time[gsiPlayer.nOnTeam]
-	playerSwapCooldowns[slot1] = endCooldown
-	playerSwapCooldowns[slot2] = endCooldown
+	if slot1 > ITEM_END_INVENTORY_INDEX or slot2 > ITEM_END_INVENTORY_INDEX then
+		local endCooldown = GameTime() + 6.51
+		playerSwapCooldowns[slot1] = endCooldown
+		playerSwapCooldowns[slot2] = endCooldown
+	else
+		local tmp = playerSwapCooldowns[slot1]
+		playerSwapCooldowns[slot1] = playerSwapCooldowns[slot2]
+		playerSwapCooldowns[slot2] = tmp
+	end
 end
 local F_SWAP_ITEMS = Item_SwapItems
 
@@ -220,13 +238,13 @@ function Item_HandleItemShop(gsiPlayer)
 	if not nextPurchase then return end
 	-- cont have purchase
 	
-	--[[DEV]]if DEBUG then INFO_print(string.format("[item_logic] HandleItemShop Junk - %s %s check if able to sell junk fount %d secret %d.", gsiPlayer.shortName, checkSellJunkThrottle:allowed() and "will" or "won't", gsiPlayer.hUnit:DistanceFromFountain(), gsiPlayer.hUnit:DistanceFromSecretShop())) end
+	--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then INFO_print(string.format("[item_logic] HandleItemShop Junk - %s %s check if able to sell junk fount %d secret %d.", gsiPlayer.shortName, checkSellJunkThrottle:allowed() and "will" or "won't", gsiPlayer.hUnit:DistanceFromFountain(), gsiPlayer.hUnit:DistanceFromSecretShop())) end
 	-- Check for uncombinable junk when held item limit
 	if checkSellJunkThrottle:allowed()
 			and (gsiPlayer.hUnit:DistanceFromFountain() == 0
 				or gsiPlayer.hUnit:DistanceFromSecretShop() == 0 )
-			and Item_NumberItemsCarried(gsiPlayer) >= ITEM_INVENTORY_AND_BACKPACK_STORAGE-1 then
-		--Item_SellOrDropJunk(gsiPlayer, nextItemBuildIndex)
+			and Item_NumberItemsCarried(gsiPlayer) == ITEM_INVENTORY_AND_BACKPACK_STORAGE then
+		Item_SellOrDropJunk(gsiPlayer, nextItemBuildIndex)
 	end
 
 	--print("checking secret", gsiPlayer.shortName, IsItemPurchasedFromSecretShop(nextPurchase),
@@ -235,7 +253,7 @@ function Item_HandleItemShop(gsiPlayer)
 	--		(gsiPlayer.hCourier and gsiPlayer.hCourier:DistanceFromSecretShop() > 0),
 	--		GetCourierState(gsiPlayer.hCourier))
 	if IsItemPurchasedFromSecretShop(nextPurchase)
-			and gsiPlayer.hUnit:GetGold()+GSI_GetPlayerGPM(gsiPlayer)/4 > GetItemCost(nextPurchase)
+			and gold + GSI_GetPlayerGPM(gsiPlayer)/4 > GetItemCost(nextPurchase)
 			and gsiPlayer.hUnit:DistanceFromSecretShop() > 0
 			and (gsiPlayer.hCourier and gsiPlayer.hCourier:DistanceFromSecretShop() > 0) then
 		if GetCourierState(gsiPlayer.hCourier) < COURIER_STATE_MOVING
@@ -247,7 +265,7 @@ function Item_HandleItemShop(gsiPlayer)
 		if not IsItemPurchasedFromSecretShop(nextPurchase)
 				or gsiPlayer.hUnit:DistanceFromSecretShop() <= 0 then
 			-- Purchase standard or secret shop item on player
-			--print(gsiPlayer.shortName, "purchasing", nextPurchase, " and transfering")
+			if DEBUG then INFO_print(gsiPlayer.shortName, "purchasing", nextPurchase, " and transfering") end
 			purchaseResult = gsiPlayer.hUnit:ActionImmediate_PurchaseItem(nextPurchase)
 			--print(gsiPlayer.shortName, "purchase result:", purchaseResult)
 		elseif gsiPlayer.hCourier and gsiPlayer.hCourier:DistanceFromSecretShop() <= 0 then
@@ -266,12 +284,15 @@ function Item_HandleItemShop(gsiPlayer)
 			end
 			if USABLE_ITEMS_FOR_INDEXING[nextPurchase] then
 				--print(gsiPlayer.shortName, "adds to purchasedUsables", nextPurchase)
-				table.insert(gsiPlayer.purchasedUsables, nextPurchase)
+				Item_EnsureListedPurchasedUsables(gsiPlayer, nextPurchase)
 			else
 				local combines, combinedResult = Item_CourierDeliveryWillCombineUpgrade(gsiPlayer, nextPurchase)
 				if combines and USABLE_ITEMS_FOR_INDEXING[combinedResult] then
 					--print(gsiPlayer.shortName, "adds to purchasedUsables", combinedResult)
-					table.insert(gsiPlayer.purchasedUsables, combinedResult)
+					Item_EnsureListedPurchasedUsables(gsiPlayer, combinedResult)
+				end
+				if combinedResult == "item_rapier" then
+					gsiPlayer.hasBoughtRapier = true
 				end
 			end
 			-- Get Courier ETA ( can inform supports, don't get bounty in a hard lane until I get my flask )
@@ -289,7 +310,8 @@ function Item_HandleItemShop(gsiPlayer)
 		--	end
 		elseif purchaseResult == PURCHASE_ITEM_INVALID_ITEM_NAME then
 			-- Skip invalid item names
-			--print(string.format("/VUL-FT/ <WARN> hero_behaviour: %s attempted to purchase invalid item name '%s'.", gsiPlayer.shortName, nextPurchase))
+			--[[DEV]]print(string.format("/VUL-FT/ <WARN> hero_behavior: %s attempted to purchase invalid item name '%s'.", gsiPlayer.shortName, nextPurchase))
+			--[[DEV]]if DEBUG then DEBUG_KILLSWITCH = true; ERROR_print(true, false, "Above is kill") end
 			t_item_build_order_next[gsiPlayer.nOnTeam] = t_item_build_order_next[gsiPlayer.nOnTeam] + 1
 		elseif purchaseResult == PURCHASE_ITEM_OUT_OF_STOCK
 				or purchaseResult == PURCHASE_ITEM_DISALLOWED_ITEM then 
@@ -299,6 +321,9 @@ function Item_HandleItemShop(gsiPlayer)
 			while(GameTime() < Item_ItemTimedRequirement(newNext)) do -- search forward for an item that we can buy time-wise
 				rotatedItemNum = rotatedItemNum + 1
 				newNext = itemBuild[nextItemBuildIndex+rotatedItemNum]
+				if nextItemBuildIndex+rotatedItemNum > #itemBuild then
+					break;
+				end
 			end
 			local prevItem = nextPurchase
 			itemBuild[nextItemBuildIndex] = newNext
@@ -369,10 +394,9 @@ end
 function Item_ItemTimedRequirement(item)
 	local itemPurchaseTimeRequirement = ITEM_PURCHASE_TIME_REQUIREMENT[item]
 	if item == "item_tome_of_knowledge" then
+		-- DEPRECIATED > 7.32e
 		return GameTime() < itemPurchaseTimeRequirement and itemPurchaseTimeRequirement
 				or GameTime() % itemPurchaseTimeRequirement < 5 and 0 or HIGH_32_BIT
-		-- Only attempt to buy a tome of knowledge in the first 2 seconds of it being available
-		-- TODO [low] Hack. Could just check purchase success
 	end
 	return ITEM_PURCHASE_TIME_REQUIREMENT[item] or 0
 end
@@ -403,7 +427,7 @@ function Item_DistanceToAliveCourier(gsiPlayer)
 	if hCourier then
 		local courierLoc = hCourier:GetLocation()
 		local playerLoc = gsiPlayer.lastSeen.location
-		return sqrt((courierLoc.x+playerLoc.x)^2 + (courierLoc.y+playerLoc.y^2))
+		return ((courierLoc.x-playerLoc.x)^2 + (courierLoc.y-playerLoc.y^2))^0.5
 	end
 	return 20000
 end
@@ -431,13 +455,21 @@ function Item_GetForceStaffItem(gsiPlayer)
 			or select(2, Item_ItemOwnedAnywhere(gsiPlayer, "item_hurricane_pike"))
 end
 
-function Item_UseBottleIntelligently(gsiPlayer, forceHold)
+function Item_UseBottleIntelligently(gsiPlayer, forceHold, forceUse)
 	local _, bottle = Item_ItemInHeroStorage(gsiPlayer, "item_bottle")
 	if not bottle then return end
 	local couldUse = bottle:GetCurrentCharges() > 0 and bottle:GetCooldownTimeRemaining() == 0
 	if forceHold or couldUse then 
-		Item_LockInventorySwitching(gsiPlayer, 3)
-		if couldUse and Item_EnsureCarriedItemInInventory(gsiPlayer, bottle) == ITEM_ENSURE_RESULT_READY then
+		if gsiPlayer.usableItemCache.powerTreads
+				and gsiPlayer.hUnit:FindItemSlot("item_power_treads")
+						< ITEM_END_INVENTORY_INDEX then
+			UseItem_PowerTreadsStatLock(gsiPlayer, ATTRIBUTE_AGILITY,
+					bottle:GetSpecialValueFloat("restore_time"), 500
+				)
+		end
+		if couldUse and Item_EnsureCarriedItemInInventory(gsiPlayer, bottle)
+					== ITEM_ENSURE_RESULT_READY then
+			Item_LockInventorySwitching(gsiPlayer, 3)
 			if not UseAbility_IsPlayerLocked(gsiPlayer) 
 					and not gsiPlayer.hUnit:HasModifier("modifier_bottle_regeneration") then
 				--print("Smart bottle use", gsiPlayer.shortName)
@@ -515,33 +547,60 @@ end
 
 --[FUNCVAL]]local replenishHealthPlatter = {}
 --[FUNCVAL]]local replenishManaPlatter = {}
-local recycle_table, recycle_table2
+local t_item_platter1, t_item_platter2 = {}, {}
 function Item_GetReplenishers(gsiPlayer, removeBackpackIfLocked) -- TODO Inventory tracking is probably easier and faster
 	local pUnit = gsiPlayer.hUnit
 	local endSearchIndex = removeBackpackIfLocked and not Item_IsInventorySwitchingAllowed(gsiPlayer) and ITEM_END_INVENTORY_INDEX or ITEM_END_BACKPACK_INDEX
-	local iPlatterHealth = 1
-	local iPlatterMana = 1
-	local healthReplenishAvailable = recycle_table or {}
-	local manaReplenishAvailable = recycle_table2 or {}
+	local iPlatterHealth = 0
+	local iPlatterMana = 0
+	local healthReplenishAvailable = t_item_platter1
+	local manaReplenishAvailable = t_item_platter2
+	local preHealthPlatterSize = #healthReplenishAvailable
+	local preManaPlatterSize = #manaReplenishAvailable
+
 	for i=0,endSearchIndex,1 do
 		local thisItem = pUnit:GetItemInSlot(i)
 		if thisItem then
-			if Item_IsManaOnUse(thisItem:GetName()) then
-				manaReplenishAvailable[iPlatterMana] = thisItem
+			local itemName = thisItem:GetName()
+			if Item_IsManaOnUse(itemName) then
 				iPlatterMana = iPlatterMana + 1
-				if string.find(thisItem:GetName(), "magi", ITEM_NAME_SEARCH_START) 
-				or string.find(thisItem:GetName(), "holy_l", ITEM_NAME_SEARCH_START) 
-				or string.find(thisItem:GetName(), "bott", ITEM_NAME_SEARCH_START) 
-				or string.find(thisItem:GetName(), "guar", ITEM_NAME_SEARCH_START) then -- .'. if string.find(manaReplenish[1]:GetName(), "magic_(wand)") then else end hack
-				
-					healthReplenishAvailable[iPlatterHealth] = thisItem
+				manaReplenishAvailable[iPlatterMana] = thisItem -- INSERT
+				if itemName == "item_magic_stick"
+						or itemName == "item_magic_wand" 
+						or itemName == "item_holy_locket" 
+						or itemName == "item_bottle"
+						or itemName == "item_guardian_greaves" then
 					iPlatterHealth = iPlatterHealth + 1
+					healthReplenishAvailable[iPlatterHealth] = thisItem -- HEALTH+MANA INSERT
 				end
-			elseif Item_IsHealthOnUse(thisItem:GetName()) then
-				healthReplenishAvailable[iPlatterHealth] = thisItem
+			elseif Item_IsHealthOnUse(itemName) then
 				iPlatterHealth = iPlatterHealth + 1
+				healthReplenishAvailable[iPlatterHealth] = thisItem -- INSERT
 			end
 		end
+	end
+	for i=iPlatterHealth+1,preHealthPlatterSize do
+		healthReplenishAvailable[i] = nil
+	end
+	for i=iPlatterMana+1,preManaPlatterSize do
+		manaReplenishAvailable[i] = nil
+	end
+	for i=1,#manaReplenishAvailable do
+		if not manaReplenishAvailable[i]
+				or not manaReplenishAvailable[i].GetName then
+			print("WTF? REPLENISH")
+			Util_TablePrint(manaReplenishAvailable, 3)
+		end
+	end
+	for i=1,#healthReplenishAvailable do
+		if not healthReplenishAvailable[i]
+				or not healthReplenishAvailable[i].GetName then
+			print("WTF? REPLENISH H")
+			Util_TablePrint(healthReplenishAvailable, 3)
+		end
+	end
+	if EMPTY_TABLE[1] then
+		print("THE EMPTY TABLE IS REPLENISH", EMPTY_TABLE, EMPTY_TABLE[1], EMPTY_TABLE[1] and Util_TablePrint(EMPTY_TABLE[1] or "fine", 2))
 	end
 	if healthReplenishAvailable[1] then
 		recycle_table = {}
@@ -583,6 +642,7 @@ function Item_GetUsableNonReplenishers(gsiPlayer, removeBackpackIfLocked)
 			end
 		end
 	end
+	print("THE EMPTY TABLE IS REPLENISH", EMPTY_TABLE, EMPTY_TABLE[1])
 	if healthReplenishAvailable[1] then
 		recycle_table = {}
 		if manaReplenishAvailable[1] then
@@ -644,23 +704,25 @@ function Item_IsHoldingAnyDispenser(gsiPlayer)
 	for i=0,ITEM_END_BACKPACK_INDEX do
 		local item = hUnit:GetItemInSlot(i)
 		if item and string.find(item:GetName(), "item_ward_") then
-			return true, i
+			return true, i, item
 		end
 	end
-	return false, -1
+	return false, -1, nil
 end
 
 function Item_OnItemSwapCooldown(gsiPlayer, hItem, itemSlot)
 	local itemSlot = itemSlot or gsiPlayer.hUnit:FindItemSlot(hItem:GetName())
 	local swapTime = t_swap_index_time[gsiPlayer.nOnTeam][itemSlot]
-	if itemSlot > ITEM_END_INVENTORY_INDEX and itemSlot < ITEM_END_BACKPACK_INDEX then
-		ALERT_print(
-				string.format(
-					"[item_logic]: %s Query on item not in the inventory.",
-					Util_ParamString("Item_OnItemSwapCooldown", gsiPlayer, hItem, itemSlot)
+	if itemSlot > ITEM_END_INVENTORY_INDEX --[[and itemSlot < ITEM_END_BACKPACK_INDEX]] then
+		if VERBOSE then 
+			ALERT_print(
+					string.format(
+						"[item_logic]: %s Query on item not in the inventory.",
+						Util_ParamString("Item_OnItemSwapCooldown", gsiPlayer, hItem, itemSlot)
+					)
 				)
-			)
-		return false
+			return true, itemSlot
+		end
 	end
 	swapTime = swapTime and swapTime or 0
 	--print("swap time is", swapTime, GameTime())
@@ -670,10 +732,18 @@ end
 function Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, forceSlot, dryRun) -- N.B. Could be reversed without a following inventory lock
 	local thisItemSlot = gsiPlayer.hUnit:FindItemSlot(hItem:GetName())
 	-- TODO Stash and at fountain, courier in vicinity (does swapping work then) checks?
+	--[[DEV]]print("ITEM ENSURE", hItem:GetName(), hItem:GetCooldownTimeRemaining(), thisItemSlot)
 	if thisItemSlot == ITEM_NOT_FOUND then
 		return ITEM_NOT_FOUND, thisItemSlot
-	elseif thisItemSlot <= ITEM_END_INVENTORY_INDEX or thisItemSlot == forceSlot then
-		return ITEM_ENSURE_RESULT_READY, thisItemSlot
+	elseif thisItemSlot <= ITEM_END_INVENTORY_INDEX and (not forceSlot
+				or thisItemSlot == forceSlot
+			) then
+		local swapCd = t_swap_index_time[gsiPlayer.nOnTeam][thisItemSlot]
+--[[DEV]]print("EnsureCarried in invent swap cd:", swapCd, hItem:GetName(), swapCd and swapCd > GameTime()
+--[[DEV]]		and ITEM_ENSURE_RESULT_WAIT or ITEM_ENSURE_RESULT_READY)
+		return swapCd and swapCd > GameTime()
+				and ITEM_ENSURE_RESULT_WAIT or ITEM_ENSURE_RESULT_READY,
+				thisItemSlot
 	elseif not Item_IsInventorySwitchingAllowed(gsiPlayer) then 
 		return ITEM_ENSURE_RESULT_LOCKED, thisItemSlot
 	end
@@ -683,6 +753,7 @@ function Item_EnsureCarriedItemInInventory(gsiPlayer, hItem, forceSlot, dryRun) 
 			--[[DEBUG]]if VERBOSE then VEBUG_print(string.format("%s switching item slots #%d, #%d for ensure carried operation.", gsiPlayer.shortName, thisItemSlot, switchOutSlot)) end
 			F_SWAP_ITEMS(gsiPlayer, thisItemSlot, switchOutSlot)
 		end
+		--[[DEV]]print("ITEM ENSURE", hItem:GetName(), hItem:GetCooldownTimeRemaining())
 		return ITEM_ENSURE_RESULT_WAIT, switchOutSlot -- .'. check ~= false and we will have the item soon / ready now.
 	end
 end
@@ -829,9 +900,9 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 			if thisItem then
 				local thisItemName = thisItem:GetName()
 				local thisItemCost = GetItemCost(thisItemName)
-				if string.find(thisItemName, "reci", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
+				if string.find(thisItemName, "m_recipe", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
 					--continue
-				elseif string.find(thisItemName, "magic_", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_l", ITEM_NAME_SEARCH_START) then
+				elseif string.find(thisItemName, "tem_magi", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_loc", ITEM_NAME_SEARCH_START) then
 					thisItemCost = thisItemCost + thisItem:GetCurrentCharges() * WAND_CHARGE_VALUE
 					if thisItemCost > highestValueConsumableBackpack then
 						highestValueConsumableBackpack = thisItemCost -- Beat all consumables but rosh.
@@ -844,9 +915,9 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 				elseif Item_IsConsumable(thisItemName) then
 					if thisItemCost == FAERIE_FIRE_MANGO_VALUE then thisItemCost = FAERIE_FIRE_MANGO_CARRIED_VALUE end
 					--print(gsiPlayer.shortName, "checking", thisItemName)
-					if string.find(thisItemName, "ward") then
+					if string.find(thisItemName, "tem_ward") then
 						if foundWardIndex then
-							gsiPlayer.hUnit:ActionImmediate_SwapItems(thisBackpackSlot, foundWardIndex)
+							--gsiPlayer.hUnit:ActionImmediate_SwapItems(thisBackpackSlot, foundWardIndex)
 						else
 							foundWardIndex = thisBackpackSlot
 						end
@@ -856,7 +927,7 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 						highestValueConsumableBackpackSlot = thisBackpackSlot
 					end
 				else
-					if string.find(thisItemName, "boot", ITEM_NAME_SEARCH_START) then
+					if ITEMS_BOOTS[thisItemName] then
 						thisItemCost = thisItemCost + ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
 					end
 					if thisItemCost > highestValueBackpack then
@@ -881,11 +952,11 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 				local thisItemName = thisItem:GetName()
 				local thisItemCost = GetItemCost(thisItemName)
 				--if thisItemName == "item_ward_observer" then print("obs cost", thisItemCost) end
-				if string.find(thisItemName, "reci", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
+				if string.find(thisItemName, "m_recipe", ITEM_NAME_SEARCH_START) then -- Move recipes into backpack
 					lowestValue = -1 
 					lowestValueSlot = thisInventorySlot
 					break
-				elseif string.find(thisItemName, "magic_", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_l", ITEM_NAME_SEARCH_START) then
+				elseif string.find(thisItemName, "tem_magi", ITEM_NAME_SEARCH_START) or string.find(thisItemName, "holy_loc", ITEM_NAME_SEARCH_START) then
 					thisItemCost = thisItemCost + thisItem:GetCurrentCharges() * WAND_CHARGE_VALUE
 					if thisItemCost < lowestValueConsumable then -- Probably cheese in inventory
 						if lowestValueConsumableSlot then
@@ -900,7 +971,7 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 					end
 				elseif Item_IsConsumable(thisItemName) then 
 					if thisItemCost == FAERIE_FIRE_MANGO_VALUE then thisItemCost = FAERIE_FIRE_MANGO_CARRIED_VALUE end
-					if string.find(thisItemName, "ward") then
+					if string.find(thisItemName, "tem_ward") then
 						if foundWardIndex then
 							gsiPlayer.hUnit:ActionImmediate_SwapItems(thisInventorySlot, foundWardIndex)
 						else
@@ -918,8 +989,8 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 						lowestValueConsumableSlot = thisInventorySlot
 					end
 				else
-					if string.find(thisItemName, "boot", ITEM_NAME_SEARCH_START) then
-						thisItemCost = ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
+					if ITEMS_BOOTS[thisItemName] then
+						thisItemCost = thisItemCost + ADDITIONAL_VALUE_OF_BOOT_ITEM -- Take off your boots only if you're 7-slotted high value / 6-slotted+aegis TODO IMPLEMENT AEGIS
 					end
 					if thisItemCost < lowestValue then 
 						lowestValue = thisItemCost
@@ -932,23 +1003,23 @@ function Item_TryOptimalInventoryOrientation(gsiPlayer) -- TODO Primitive
 			::CONT_I_TOIO_INVENTORY::
 		end
 		if ( highestValueBackpackSlot and highestValueBackpack ~= -1 ) or highestValueConsumableBackpackSlot then
-			--print(gsiPlayer.shortName, "sees switchable", highestValueBackpackSlot, highestValueConsumableBackpackSlot)
+			--[[DEV]]print(gsiPlayer.shortName, "sees switchable", highestValueBackpackSlot, highestValueConsumableBackpackSlot,  lowestValueSlot, lowestValueConsumableSlot, freeInventorySlot)
 			if freeInventorySlot then
-				--print(gsiPlayer.shortName, "free slot", highestValueBackpackSlot, highestValueConsumableBackpackSlot)
+				--[[DEV]]print(gsiPlayer.shortName, "free slot", highestValueBackpackSlot, highestValueConsumableBackpackSlot)
 				if highestValueBackpackSlot then -- Switch high value items into empty slot
 					F_SWAP_ITEMS(gsiPlayer, highestValueBackpackSlot, freeInventorySlot)
 				elseif highestValueConsumableBackpackSlot then -- Switch high value consumables into empty slot
 					F_SWAP_ITEMS(gsiPlayer, highestValueConsumableBackpackSlot, freeInventorySlot)
 				end
 			elseif multipleConsumablesInInventory then
-				--print(gsiPlayer.shortName, "multipleConsumables in invent")
+				--[[DEV]]print(gsiPlayer.shortName, "multipleConsumables in invent")
 				if highestValueBackpackSlot then -- switch the lowest value consumable of 2 for highest backpack item
 					F_SWAP_ITEMS(gsiPlayer, highestValueBackpackSlot, lowestValueConsumableSlot)
 				elseif highestValueConsumableBackpack > lowestValueConsumable then -- switch any higher value consumable from backpack into the slot of a lower value consumable
 					F_SWAP_ITEMS(gsiPlayer, highestValueConsumableBackpackSlot, lowestValueConsumableSlot)
 				end
 			elseif highestValueBackpack > lowestValue then -- switch highest value backpack into inventory slot with lower value; allows one consumable
-				--print("highestValueBackpack over lowestValue", GetItemCost(gsiPlayer.hUnit:GetItemInSlot(highestValueBackpackSlot):GetName()), highestValueBackpack, GetItemCost(gsiPlayer.hUnit:GetItemInSlot(lowestValueSlot):GetName()), lowestValue)
+				--[[DEV]]print("highestValueBackpack over lowestValue", GetItemCost(gsiPlayer.hUnit:GetItemInSlot(highestValueBackpackSlot):GetName()), highestValueBackpack, GetItemCost(gsiPlayer.hUnit:GetItemInSlot(lowestValueSlot):GetName()), lowestValue)
 				F_SWAP_ITEMS(gsiPlayer, highestValueBackpackSlot, lowestValueSlot) 
 			elseif highestValueConsumableBackpack > lowestValueConsumable then
 				F_SWAP_ITEMS(gsiPlayer, highestValueConsumableBackpackSlot, lowestValueConsumableSlot)
@@ -967,7 +1038,7 @@ function Item_DetectNextItemBuildIndex(gsiPlayer, itemBuild) -- Used for resolvi
 		if thisItem then
 			if USABLE_ITEMS_FOR_INDEXING[thisItem:GetName()] then
 				--print(gsiPlayer.shortName, "adds to purchasedUsables", thisItem:GetName())
-				table.insert(gsiPlayer.purchasedUsables, thisItem:GetName())
+				Item_EnsureListedPurchasedUsables(gsiPlayer, thisItem:GetName())
 			end
 			for _,itemComponent in ipairs(break_item_until_basic(thisItem, playerPrimaryAttribute)) do
 				table.insert(ownedComponents, itemComponent)
@@ -981,7 +1052,7 @@ function Item_DetectNextItemBuildIndex(gsiPlayer, itemBuild) -- Used for resolvi
 			if thisItem then
 				if USABLE_ITEMS_FOR_INDEXING[thisItem:GetName()] then
 					--print(gsiPlayer.shortName, "adds to purchasedUsables", thisItem:GetName())
-					table.insert(gsiPlayer.purchasedUsables, thisItem:GetName())
+					Item_EnsureListedPurchasedUsables(gsiPlayer, thisItem:GetName())
 				end
 				for _,itemComponent in ipairs(break_item_until_basic(thisItem, playerPrimaryAttribute)) do
 					table.insert(ownedComponents, itemComponent)
@@ -1210,7 +1281,8 @@ end
 local function update_table_of_possible_junk(gsiPlayer, buildOrderIndex)
 	local pnot = gsiPlayer.nOnTeam
 	local updatedIndex = t_player_junk_updated_index[pnot]
-	for i=updatedIndex+1,buildOrderIndex do
+	--[[DEV]]INFO_print("update_table_of_possible_junk %s, %s, %s", gsiPlayer.shortName, updatedIndex, buildOrderIndex)
+	for i=updatedIndex+1,buildOrderIndex-1 do
 		local nowJunkTable = t_player_becomes_junk_index[pnot][i]
 		if nowJunkTable then
 			for iJunk=1,#nowJunkTable do
@@ -1291,7 +1363,7 @@ function Item_SortHeldByValue(gsiPlayer, highToLow)
 			local upperIsHigher =
 					GetItemCost(itemCurr:GetName())
 						+ ( ITEMS_BOOTS[itemCurr:GetName()] and ADDITIONAL_VALUE_OF_BOOT_ITEM or 0)
-					> GetItemCost(itemCurr:GetName()) 
+					> GetItemCost(itemPrev:GetName()) 
 						+ ( ITEMS_BOOTS[itemPrev:GetName()] and ADDITIONAL_VALUE_OF_BOOT_ITEM or 0)
 			if (highToLow and upperIsHigher)
 					or not (highToLow or upperIsHigher) then
@@ -1390,23 +1462,47 @@ function Item_CourierDeliveryWillCombineUpgrade(gsiPlayer, ensureIncluded)
 	return false, nil
 end
 
--- Manual add, usually consumables needed
-function Item_InsertItemToItemBuild(gsiPlayer, itemName)
-	table.insert(t_player_item_build[gsiPlayer.nOnTeam], t_item_build_order_next[gsiPlayer.nOnTeam], itemName)
+local synonym_non_purchased = {
+	["item_ward_observer"] = "item_ward_dispenser",
+	["item_ward_sentry"] = "item_ward_dispenser"
+}
+function Item_EnsureListedPurchasedUsables(gsiPlayer, itemName, noRecurse)
 	if USABLE_ITEMS_FOR_INDEXING[itemName] then
-		INFO_print(gsiPlayer.shortName, "adds to purchasedUsables", itemName)
 		local usables = gsiPlayer.purchasedUsables
 		for i=1,#usables do
 			if usables[i] == itemName then
 				return;
 			end
 		end
+		if not noRecurse then
+			for k,synonym in pairs(synonym_non_purchased) do
+				Item_EnsureListedPurchasedUsables(gsiPlayer, synonym, true)
+			end
+		end
+		INFO_print(gsiPlayer.shortName, "adds to purchasedUsables", itemName)
 		table.insert(usables, itemName)
 	end
 end
 
+-- Manual add, usually consumables needed
+function Item_InsertItemToItemBuild(gsiPlayer, itemName)
+	table.insert(t_player_item_build[gsiPlayer.nOnTeam], t_item_build_order_next[gsiPlayer.nOnTeam], itemName)
+	Item_EnsureListedPurchasedUsables(gsiPlayer, itemName)
+end
+
 function Item_GetNextItemBuildItem(gsiPlayer)
 	return t_player_item_build[gsiPlayer.nOnTeam][t_item_build_order_next[gsiPlayer.nOnTeam]]
+end
+
+function Item_ItemInBuild(gsiPlayer, itemName, inFuture)
+	local itemBuild = t_player_item_build[gsiPlayer.nOnTeam]
+	local startIndex = inFuture and t_item_build_order_next[gsiPlayer.nOnTeam] or 1
+	for i=startIndex,#itemBuild do
+		if itemName == itemBuild[i] then
+			return true
+		end
+	end
+	return false
 end
 
 function Item_ItemInHeroStorage(gsiPlayer, itemName)
@@ -1441,6 +1537,21 @@ function Item_HasInvisItem(gsiPlayer)
 		if hUnit:FindItemSlot(ITEM_INVIS_SEARCH[i]) >= 0 then
 			return true
 		end
+	end
+	return false
+end
+
+function Item_HasWaveClearOn(gsiPlayer, useAttack)
+	local searchTbl = ((useAttack or useAttack == nil) and ITEM_WAVE_CLEAR_ATTACK)
+			or useAttack == false and ITEM_WAVE_CLEAR_NOT_ATTACK
+	local hUnit = gsiPlayer.hUnit
+	for i=1,#searchTbl do
+		if hUnit:FindItemSlot(searchTbl[i]) >= 0 then
+			return true, hItem
+		end
+	end
+	if useAttack == nil then
+		return Item_HasWaveClearOn(gsiPlayer, false)
 	end
 	return false
 end
@@ -1603,9 +1714,9 @@ function Item_RAUCMitigateDelivery(gsiPlayer)
 	return healthGain, healthTime, manaGain, manaTime
 end
 
-function Item_PassPlayerItemBuild(gsiPlayer, itemBuildTable)
-	if gsiPlayer.team == TEAM then -- Leaving this here so Item_Logic has the control over how it's used for enemies
-		print(string.format("/VUL-FT/ hero_behaviour: formulating item build order for %s.", gsiPlayer.shortName))
+function Item_InitializePlayer(gsiPlayer, itemBuildTable)
+	if gsiPlayer.team == TEAM then -- TODO if anything for enemies
+		INFO_print("/VUL-FT/ [item_logic] formulating item build order for %s.", gsiPlayer.shortName)
 		t_player_item_build[gsiPlayer.nOnTeam] = Item_ResolvePartiallyCombinedBuild(gsiPlayer, itemBuildTable)
 		t_item_build_order_next[gsiPlayer.nOnTeam] = Item_DetectNextItemBuildIndex(gsiPlayer, t_player_item_build[gsiPlayer.nOnTeam])
 		--Util_TablePrint(t_player_becomes_junk_index[gsiPlayer.nOnTeam])

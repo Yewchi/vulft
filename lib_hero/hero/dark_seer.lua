@@ -1,8 +1,8 @@
 local hero_data = {
 	"dark_seer",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 1, 1, 4, 7, 5, 4, 9, 12},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 9, 12},
 	{
-		"item_mantle","item_tango","item_enchanted_mango","item_enchanted_mango","item_magic_stick","item_branches","item_branches","item_enchanted_mango","item_ring_of_health","item_vanguard","item_boots","item_arcane_boots","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_magic_wand","item_aghanims_shard","item_sange","item_staff_of_wizardry","item_robe","item_kaya_and_sange","item_blink","item_aeon_disk","item_gem",
+		"item_gauntlets","item_tango","item_gauntlets","item_branches","item_branches","item_quelling_blade","item_magic_wand","item_soul_ring","item_ring_of_health","item_vanguard","item_boots","item_energy_booster","item_arcane_boots","item_headdress","item_mekansm","item_buckler","item_guardian_greaves","item_cloak","item_headdress","item_pipe","item_blink","item_vanguard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
@@ -10,7 +10,7 @@ local hero_data = {
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"dazzle_poison_touch", ABILITY_TYPE.NUKE + ABILITY_TYPE.SLOW + ABILITY_TYPE.ATTACK_MODIFIER},
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

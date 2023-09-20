@@ -1,12 +1,12 @@
 local hero_data = {
 	"sven",
-	{1, 3, 1, 2, 2, 4, 2, 2, 1, 6, 1, 4, 3, 3, 7, 3, 4, 10, 11},
+	{1, 3, 2, 2, 2, 4, 2, 1, 1, 6, 1, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_quelling_blade","item_branches","item_branches","item_tango","item_circlet","item_slippers","item_wraith_band","item_chainmail","item_phase_boots","item_lifesteal","item_mask_of_madness","item_oblivion_staff","item_echo_sabre","item_blink","item_blades_of_attack","item_lesser_crit","item_mithril_hammer","item_black_king_bar","item_invis_sword","item_silver_edge","item_blitz_knuckles","item_void_stone","item_orchid","item_cloak","item_bloodthorn","item_claymore","item_reaver","item_satanic","item_overwhelming_blink","item_point_booster","item_ultimate_scepter_2","item_moon_shard",
+		"item_branches","item_branches","item_quelling_blade","item_tango","item_magic_stick","item_faerie_fire","item_magic_wand","item_belt_of_strength","item_boots","item_power_treads","item_quarterstaff","item_mask_of_madness","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_lesser_crit","item_greater_crit","item_aghanims_shard","item_swift_blink","item_claymore","item_satanic","item_assault","item_hyperstone","item_moon_shard","item_javelin","item_blitz_knuckles","item_javelin","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Storm Hammer","Great Cleave","Warcry","God's Strength","+3.0s Warcry Duration","+15 Attack Speed","-15s God's Strength Cooldown","+25% Great Cleave Damage","+8% Warcry Movement Speed","+10 Warcry Armor","+50% God's Strength Damage","+1.25s Storm Hammer Stun Duration",
+		"Storm Hammer","Great Cleave","Warcry","God's Strength","+3.0s Warcry Duration","+15 Attack Speed","-15s God's Strength Cooldown","+25% Great Cleave Damage","+8% Warcry Movement Speed","+10 Warcry Armor","+50% God's Strength Damage","+1.0s Storm Hammer Stun Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

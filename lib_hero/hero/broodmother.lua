@@ -1,12 +1,12 @@
 local hero_data = {
 	"broodmother",
-	{2, 3, 1, 2, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_blight_stone","item_boots","item_arcane_boots","item_soul_ring","item_headdress","item_mekansm","item_buckler","item_guardian_greaves","item_hood_of_defiance","item_headdress","item_pipe","item_point_booster","item_ultimate_scepter","item_void_stone","item_aether_lens","item_point_booster","item_octarine_core","item_void_stone","item_sheepstick",
+		"item_gauntlets","item_circlet","item_gauntlets","item_branches","item_tango","item_ward_observer","item_bracer","item_boots","item_soul_ring","item_gloves","item_belt_of_strength","item_power_treads","item_cornucopia","item_blitz_knuckles","item_orchid","item_quarterstaff","item_robe","item_ogre_axe","item_boots_of_elves","item_echo_sabre","item_blade_of_alacrity","item_yasha","item_manta","item_aghanims_shard","item_mage_slayer","item_bloodthorn","item_diadem","item_harpoon","item_helm_of_iron_will","item_nullifier","item_ultimate_orb","item_ultimate_orb","item_point_booster","item_skadi",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,4,3,}, 0.1 },
 	{
-		"Insatiable Hunger","Spin Web","Silken Bola","Spawn Spiderlings","+80 Spawn Spiderlings Damage","+3 Spin Web Simultaneous Webs","-10s Spin Web Recharge Time","+130 Spiderlings Health","+400 AoE Silken Bola","+25 Agility","+0.3s BAT during Insatiable Hunger","+35% Silken Bola Slow/Miss Chance",
+		"Insatiable Hunger","Spin Web","Silken Bola","Spawn Spiderlings","+80 Spawn Spiderlings Damage","+3 Spin Web Simultaneous Webs","-7s Spin Web Restore Time","+130 Spiderlings Health","+400 AoE Silken Bola","+35 Attack Speed","+0.3s BAT during Insatiable Hunger","+35% Silken Bola Slow/Miss Chance",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

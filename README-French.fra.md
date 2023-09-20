@@ -1,10 +1,13 @@
-##  Traduction 
-
-La traduction prend beaucoup de temps pour moi, environ 30 minutes. J'ai besoin de revenir à la programmation, donc ce fichier peut être obsolète. Si le processus d'installation manuelle est corrigé et n'est plus nécessaire, je mettrai à jour ce document. Voir la page de l'atelier en anglais pour la date de construction actuelle de DotaBuff et la date de sortie du logiciel.
-
+## VULFT
 
 
 VULFT - Total Override Bot Script. Comportement de combat très dynamique. Les rôles DotaBuff et les séquences de construction d'inventaire sont mis à jour le : 19/03/23. Nécessite une installation manuelle dans le dossier vscripts/bots (identique à Phalanx Bot et à d'autres bots récents, en raison d'un bogue de l'atelier Dota). VUL-FT n'est pas affilié à DotaBuff.
+
+
+
+##  Traduction 
+
+La traduction prend beaucoup de temps pour moi, environ 30 minutes. J'ai besoin de revenir à la programmation, donc ce fichier peut être obsolète. Si le processus d'installation manuelle est corrigé et n'est plus nécessaire, je mettrai à jour ce document. Voir la page de l'atelier en anglais pour la date de construction actuelle de DotaBuff et la date de sortie du logiciel.
 
 
 

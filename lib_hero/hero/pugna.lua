@@ -1,12 +1,12 @@
 local hero_data = {
 	"pugna",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 11},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 8, 3, 4, 10, 11},
 	{
-		"item_branches","item_ward_observer","item_branches","item_faerie_fire","item_branches","item_tango","item_bottle","item_boots","item_energy_booster","item_arcane_boots","item_aether_lens","item_cloak","item_magic_wand","item_crown","item_staff_of_wizardry","item_dagon_5","item_dagon_2L","item_dagon_3L","item_dagon_4L","item_blink","item_sheepstick","item_soul_booster","item_octarine_core","item_aghanims_shard","item_black_king_bar",
+		"item_branches","item_tango","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_bottle","item_boots","item_arcane_boots","item_wind_lace","item_magic_wand","item_void_stone","item_aether_lens","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_point_booster","item_soul_booster","item_void_stone","item_octarine_core","item_blink","item_sphere","item_dagon_2","item_dagon_3","item_dagon_4","item_dagon_5","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
+	{ {3,3,2,2,2,}, {4,4,4,5,2,}, 0.1 },
 	{
-		"Nether Blast","Decrepify","Nether Ward","Life Drain","+20 Movement Speed","+200 Health","-1.0s Nether Blast Cooldown","+3.0 Nether Ward Health","+20% Life Drain Heal","+1.0s Decrepify Duration","+160 Nether Blast Damage","+1.75 Nether Ward Damage Per Mana",
+		"Nether Blast","Decrepify","Nether Ward","Life Drain","+20 Movement Speed","+200 Health","-1.0s Nether Blast Cooldown","+3 Nether Ward Health","+20% Life Drain Heal","+1.0s Decrepify Duration","+160 Nether Blast Damage","+1.75 Nether Ward Damage Per Mana",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -1,12 +1,12 @@
 local hero_data = {
 	"venomancer",
-	{1, 2, 2, 3, 2, 3, 2, 3, 3, 6, 4, 4, 1, 1, 8, 1, 4, 9, 11},
+	{1, 2, 2, 3, 2, 5, 2, 3, 3, 3, 6, 5, 1, 1, 9, 1, 5, 11, 7},
 	{
-		"item_tango","item_slippers","item_branches","item_faerie_fire","item_circlet","item_branches","item_wraith_band","item_magic_wand","item_boots","item_wind_lace","item_tranquil_boots","item_belt_of_strength","item_ancient_janggo","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_aghanims_shard","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_boots_of_bearing","item_ring_of_basilius","item_buckler","item_vladmir","item_wraith_pact","item_void_stone","item_boots_of_bearing",
+		"item_circlet","item_branches","item_tango","item_faerie_fire","item_branches","item_branches","item_faerie_fire","item_tango","item_bracer","item_boots","item_magic_wand","item_arcane_boots","item_headdress","item_wind_lace","item_chainmail","item_mekansm","item_hand_of_midas","item_guardian_greaves","item_cloak","item_ring_of_health","item_headdress","item_pipe","item_point_booster","item_ultimate_scepter","item_staff_of_wizardry","item_cyclone",
 	},
-	{ {3,3,3,3,1,}, {5,3,3,3,3,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,3,}, 0.1 },
 	{
-		"Venomous Gale","Poison Sting","Plague Ward","Poison Nova","-5s Venomous Gale CD","+20% Poison Sting Health Regen Reduction","-1.0s Plague Ward Cooldown","-8% Poison Sting Slow","+5.0s Poison Nova Duration","Gale Creates Plague Wards","Poison Nova reduces +100 Attack Speed","2.5x Plague Ward HP/Damage",
+		"Venomous Gale","Poison Sting","Plague Ward","Poison Nova","Noxious Plague","-5s Venomous Gale CD","+15% Poison Sting Health Regen Reduction","-1.0s Plague Ward Cooldown","-8% Poison Sting Slow","1.5% Noxious Plague Max HP Damage","Gale Creates Plague Wards","Noxious Plague Aura reduces +200 Attack Speed","2.5x Plague Ward HP/Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -1,12 +1,12 @@
 local hero_data = {
 	"brewmaster",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 2, 1, 3, 2, 4, 2, 2, 3, 6, 3, 4, 1, 1, 8, 3, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_gauntlets","item_branches","item_bracer","item_boots","item_arcane_boots","item_ogre_axe","item_magic_wand","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_chainmail","item_hood_of_defiance","item_headdress","item_pipe","item_chainmail","item_mekansm","item_guardian_greaves","item_platemail","item_buckler","item_assault","item_sphere",
+		"item_tango","item_quelling_blade","item_magic_stick","item_gauntlets","item_circlet","item_branches","item_enchanted_mango","item_gauntlets","item_bracer","item_boots","item_urn_of_shadows","item_magic_wand","item_fluffy_hat","item_spirit_vessel","item_gloves","item_hand_of_midas","item_aghanims_shard","item_relic","item_talisman_of_evasion","item_radiance","item_platemail","item_buckler","item_hyperstone","item_assault","item_shivas_guard",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Thunder Clap","Cinder Brew","Drunken Brawler","Primal Split","+15 Damage","+200 Thunder Clap AoE","+30% Cinder Brew Damage/Duration","+1x Brewed Up multiplier for Drunken Brawler","+1200 Brewlings Health","+80 Attack Speed","Brewlings Gain Drunken Brawler Passive","Cinder Brew applies Fear when ignited",
+		"Thunder Clap","Cinder Brew","Drunken Brawler","Primal Split","+10 Brewlings Damage","+200 Thunder Clap AoE","+30% Cinder Brew Damage/Duration","+1x Brewed Up multiplier for Drunken Brawler","+1200 Brewlings Health","+80 Attack Speed","Brewlings Gain Drunken Brawler Passive","Cinder Brew applies Fear when ignited",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

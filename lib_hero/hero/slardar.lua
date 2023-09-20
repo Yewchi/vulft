@@ -1,12 +1,12 @@
 local hero_data = {
 	"slardar",
-	{3, 2, 3, 1, 3, 4, 3, 1, 1, 1, 5, 4, 2, 2, 2, 7, 4, 10, 12},
+	{3, 2, 3, 1, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 8, 5, 4, 9, 12},
 	{
-		"item_branches","item_circlet","item_quelling_blade","item_tango","item_gauntlets","item_branches","item_bracer","item_boots","item_gloves","item_power_treads","item_magic_wand","item_quarterstaff","item_robe","item_echo_sabre","item_blink","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_point_booster","item_gem","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_platemail",
+		"item_circlet","item_circlet","item_gauntlets","item_gauntlets","item_bracer","item_bracer","item_boots","item_power_treads","item_quarterstaff","item_robe","item_echo_sabre","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_hyperstone","item_moon_shard","item_demon_edge","item_javelin","item_monkey_king_bar","item_aghanims_shard",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,4,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+0.2s Slithereen Crush Stun Duration","+325 Health","+50 Bash of the Deep Damage","+150.0 Slithereen Crush Damage","-4 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
+		"Guardian Sprint","Slithereen Crush","Bash of the Deep","Corrosive Haze","-3s Guardian Sprint Cooldown","+0.2s Slithereen Crush Stun Duration","+325 Health","+50 Bash of the Deep Damage","+150 Slithereen Crush Damage","-3 Corrosive Haze Armor","-4.0s Slithereen Crush Cooldown","Corrosive Haze Undispellable",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

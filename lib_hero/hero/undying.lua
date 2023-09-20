@@ -1,12 +1,12 @@
 local hero_data = {
 	"undying",
-	{1, 3, 1, 3, 1, 4, 1, 2, 3, 5, 3, 4, 2, 2, 8, 2, 4, 9},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 5, 4, 2, 2, 7, 2, 4, 9},
 	{
-		"item_enchanted_mango","item_magic_stick","item_enchanted_mango","item_boots","item_arcane_boots","item_headdress","item_wind_lace","item_mekansm","item_buckler","item_magic_wand","item_guardian_greaves","item_platemail","item_gem","item_energy_booster","item_pers","item_lotus_orb","item_buckler","item_gem","item_ring_of_basilius","item_lifesteal","item_gem","item_vladmir",
+		"item_tango","item_blood_grenade","item_enchanted_mango","item_branches","item_branches","item_ward_observer","item_magic_stick","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_magic_wand","item_mekansm","item_platemail","item_void_stone","item_lotus_orb","item_buckler","item_guardian_greaves",
 	},
-	{ {1,1,1,3,5,}, {5,5,5,3,4,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
 	{
-		"Decay","Soul Rip","Tombstone","Flesh Golem","+50 Decay Damage","-15.0s Tombstone Cooldown","+20 Tombstone Zombie Damage","+10 Soul Rip Damage/Heal","Tombstone On Death","-2.0s Decay Cooldown","Gains Reincarnation 300 CD","+6 Tombstone Attacks to Destroy",
+		"Decay","Soul Rip","Tombstone","Flesh Golem","+50 Decay Damage","-15s Tombstone Cooldown","+20 Tombstone Zombie Damage","+10 Soul Rip Damage/Heal","Tombstone On Death","-2.0s Decay Cooldown","+60% Flesh Golem Strength Bonus","+6 Tombstone Attacks to Destroy",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -24,6 +24,8 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
+require(GetScriptDirectory().."/lib_job/modules/lang")
+
 ---- communication indices --
 --
 QUESTION_I__CAPTAINS_MSG = 		1
@@ -57,17 +59,60 @@ COMM.READABLE_ROLE_LANE = TEAM_IS_RADIANT and {"offlane", "middle", "safelane"}
 		or {"safelane", "mid", "offlane"}
 COMM.READABLE_ROLE = {"1", "2", "3", "4", "5"}
 
+-- 
+COMM_CHAT_KILL = "KILL"
 COMM_CHAT_CALLBACK_FUNCS = {}
+COMM_CHAT_CMD_CALLBACK_FUNCS = {}
+-- Comm_RegisterCallbackFunc() RULES:
+-- -| Chat commands are not allowed to be triggers in and of themself if the chat is also to interpret a "!" command.
+-- -| Only one chat function per ![cmdstr].
+-- -| If a command func finds it's cmd string, it should return the string "KILL" to prevent further checks
+-------- Comm_RegisterCallbackFunc()
+function Comm_RegisterCallbackFunc(key, func, isCmd)
+	if isCmd then
+		COMM_CHAT_CMD_CALLBACK_FUNCS[key] = func
+	else
+		COMM_CHAT_CALLBACK_FUNCS[key] = func
+	end
+end
 InstallChatCallback(
 		function(event)
-			for key,func in pairs(COMM_CHAT_CALLBACK_FUNCS) do
-				func(event)
+			if not event.string then return; end
+			local cmd = string.match(event.string, "^%s*!([^%s]*)")
+			local funcsTbl = cmd
+					and COMM_CHAT_CMD_CALLBACK_FUNCS
+					or COMM_CHAT_CALLBACK_FUNCS
+			for key,func in pairs(funcsTbl) do
+				if func(event, cmd) == "KILL" then
+					if DEBUG then DEBUG_print(string.format("Chat func run killed by '%s' with chat: %s", key, Util_PrintableTable(event))) end
+					return;
+				end
 			end
 		end
 	)
-function Comm_RegisterCallbackFunc(key, func)
-	COMM_CHAT_CALLBACK_FUNCS[key] = func
-end
+
+Comm_RegisterCallbackFunc("SET_LANGUAGE",
+		function(event, cmd)
+			if not IsPlayerBot(event.player_id) then
+				local secondArg = string.match(event.string, "^%s*[^%s]+%s*([^%s]*)")
+				local isLangCmd, localeOfCmd = Lang_IsLanguageCmd(cmd)
+				--[[DEV]]INFO_print(string.format("[lang] SET_LANGUAGE ~ isLangCmd: %s. localeOfCmd: %s", isLangCmd, localeOfCmd))
+				if isLangCmd then
+					local localeExists, locale = Lang_CheckLocalizeExists(secondArg, localeOfCmd)
+					if localeExists then
+						LOCALE = locale
+						Captain_AddChatToQueue(string.format("%s: %s, %s.",
+									GetLocalize("lang"), GetLocaleProperName(locale), locale
+								), true, 0.2
+							)
+					end
+					return COMM_CHAT_KILL;
+				end
+			end
+			return; 
+		end,
+		true
+	)
 
 local THIS_BOT
 local job_domain_questions
@@ -75,8 +120,8 @@ local job_domain_queued_questions
 
 local registered_map_draws = {}
 
-local territory_dire = Map_GetLogicalLocation(MAP_ZONE_TERRITORY_DIRE)
-local territory_radiant = Map_GetLogicalLocation(MAP_ZONE_TERRITORY_RADIANT)
+local territory_dire
+local territory_radiant
 
 local alphabet = {
 	["en"] = {
@@ -149,8 +194,13 @@ function Comm_RegisterMapDrawTimed(lang, str, loc, scale, cR, cG, cB, delta, end
 end
 
 function Comm_InterpretHumanLane(nonsense)
+	INFO_print("comm interpret '%s'", nonsense)
+	nonsense = ConvertLocalizedWord(nonsense, nil, DEV_ENVIRONMENT_LOCALE) -- .'. we logically check both the locale text and the dev env locale
+	INFO_print("comm interpret gave '%s'", nonsense)
 	for lane,readable in pairs(COMM.READABLE_LANE) do
+		print(readable)
 		if nonsense:lower():find(readable) then
+			INFO_print("... got it")
 			return lane, readable
 		end
 	end
@@ -158,6 +208,7 @@ function Comm_InterpretHumanLane(nonsense)
 end
 
 function Comm_InterpretHumanRole(nonsense)
+	nonsense = ConvertLocalizedWord(nonsense, nil, DEV_ENVIRONMENT_LOCALE)
 	for role,readable in pairs(COMM.READABLE_ROLE) do
 		if nonsense:lower():find(readable) then
 			return role, readable
@@ -322,6 +373,8 @@ function Communication_InitializeCommunication(thisBot)
 		enemyHumans[i].comms.mostRecentChatText = ""
 		enemyHumans[i].comms.mostRecentPing = teamHumans[i].hUnit:GetMostRecentPing()
 	end
+	territory_dire = Map_GetLogicalLocation(MAP_ZONE_TERRITORY_DIRE)
+	territory_radiant = Map_GetLogicalLocation(MAP_ZONE_TERRITORY_RADIANT)
 end
 
 function Communication_UpdateCommunications() -- Use of this function should be throttled by it's callers

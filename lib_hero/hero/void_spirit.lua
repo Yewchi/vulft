@@ -1,16 +1,16 @@
 local hero_data = {
 	"void_spirit",
-	{3, 1, 3, 2, 2, 4, 2, 2, 3, 3, 1, 4, 1, 1, 8, 6, 4, 9, 12},
+	{3, 1, 3, 1, 3, 4, 3, 2, 1, 1, 2, 4, 2, 2, 8, 5, 9, 4, 11},
 	{
-		"item_ward_observer","item_branches","item_branches","item_tango","item_faerie_fire","item_quelling_blade","item_bottle","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_null_talisman","item_null_talisman","item_kaya","item_ethereal_blade","item_ultimate_orb","item_sphere","item_aether_lens","item_octarine_core","item_ultimate_scepter","item_shivas_guard","item_aghanims_shard","item_sheepstick",
+		"item_ward_observer","item_tango","item_circlet","item_branches","item_branches","item_branches","item_branches","item_bottle","item_magic_wand","item_bracer","item_boots","item_power_treads","item_quarterstaff","item_robe","item_echo_sabre","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_cloak","item_mage_slayer","item_black_king_bar","item_bloodthorn","item_invis_sword","item_lesser_crit","item_silver_edge","item_aghanims_shard",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
 	{
-		"Aether Remnant","Dissimilate","Resonant Pulse","Astral Step","+1.75 Mana Regen","+50 Aether Remnant Damage","Remnant Provides 475 True Sight","Outer Dissimilate Ring","+120 Resonant Pulse Damage","-4s Astral Step Charge Restore Time","Astral Step 160% Crit","Dissimilate Roots for 2.0s",
+		"Aether Remnant","Dissimilate","Resonant Pulse","Astral Step","+1.5 Mana Regen","+50 Aether Remnant Damage","Remnant Provides 475 True Sight","+70 Resonant Pulse Damage","Outer Dissimilate Ring","-4s Astral Step Charge Restore Time","140% Astral Step Crit","Dissimilate Roots for 2.0s",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"void_spirit_aether_remnant", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN + ABILITY_TYPE.POINT_TARGET},
@@ -114,6 +114,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)
 		local locked, _, ability = UseAbility_IsPlayerLocked(gsiPlayer)

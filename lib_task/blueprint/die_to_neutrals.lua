@@ -131,7 +131,7 @@ blueprint = {
 		if not objective then return XETA_SCORE_DO_NOT_RUN end
 		if objective.x then
 			--print("no creeps")
-			gsiPlayer.hUnit:Action_MoveDirectly(objective)
+			Positioning_MoveDirectly(gsiPlayer, objective)
 			return xetaScore;
 		elseif objective[1] then
 			--print("creeps")
@@ -143,7 +143,7 @@ blueprint = {
 						local creepLoc = thisCreep:GetLocation()
 						local moveTo = Vector_Addition(
 								creepLoc,
-								Vector_ScalarMultiply(
+								Vector_ScalarMultiply2D(
 										Vector_UnitDirectionalPointToPoint(
 												creepLoc,
 												TEAM_FOUNTAIN
@@ -151,7 +151,7 @@ blueprint = {
 										150
 									)
 							)
-						gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
+						Positioning_MoveDirectly(gsiPlayer, moveTo)
 						return xetaScore;
 					end
 					gsiPlayer.hUnit:Action_AttackUnit(thisCreep, true)

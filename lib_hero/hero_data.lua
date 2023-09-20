@@ -181,7 +181,7 @@ function HeroData_SetHeroData(heroData, abilities, searchFunc, untested)
 	local thisShortName = heroData[HD_I__SHORT_NAME]
 	hero_data[thisShortName] = heroData
 	hero_search_funcs[thisShortName] = searchFunc
-	Hero_RegisterBehaviour(thisShortName, heroData[HD_I__SKILL_BUILD], heroData[HD_I__ABILITY_NAME_INDICES], heroData[HD_I__ITEM_BUILD], abilities)
+	Hero_RegisterBehavior(thisShortName, heroData[HD_I__SKILL_BUILD], heroData[HD_I__ABILITY_NAME_INDICES], heroData[HD_I__ITEM_BUILD], abilities)
 	t_untested_and_loaded_heroes[thisShortName] = untested
 end
 
@@ -225,8 +225,8 @@ function Hero_CheckGameLosingChannelFactor(gsiPlayer)
 	return 0
 end
 
--- Returns hero data and function to load hero behaviour
-function HeroData_GetHeroRolePreferencesAndBehaviourInit(heroShortName)
+-- Returns hero data and function to load hero behavior
+function HeroData_GetHeroRolePreferencesAndBehaviorInit(heroShortName)
 	if hero_data[heroShortName] == nil then -- load default if the hero is not found
 		if not DEFAULT_HERO_BEHAVIOUR_SHORT_NAME or hero_data[DEFAULT_HERO_BEHAVIOUR_SHORT_NAME] == true then 
 			require(GetScriptDirectory().."/lib_hero/hero/default")
@@ -242,14 +242,14 @@ function HeroData_GetHeroRolePreferencesAndBehaviourInit(heroShortName)
 			INFO_print(string.format("found hero loaded %s", heroShortName))
 			-- return hero lane/role and init func
 			return hero_data[heroShortName][HD_I__LANE_AND_ROLE],
-					function(gsiPlayer) -- i.e. hero_data's result requires defined hero_behaviour init -- something which shall not be changed in an init func above
-						return Hero_InitializeBehaviour(gsiPlayer.shortName, gsiPlayer)
+					function(gsiPlayer) -- i.e. hero_data's result requires defined hero_behavior init -- something which shall not be changed in an init func above
+						return Hero_InitializeBehavior(gsiPlayer.shortName, gsiPlayer)
 					end
 		end
 	end
 	-- return default lane/role and init func
 	return hero_data[DEFAULT_HERO_BEHAVIOUR_SHORT_NAME][HD_I__LANE_AND_ROLE],
 				function(gsiPlayer)
-					return Hero_InitializeBehaviour(DEFAULT_HERO_BEHAVIOUR_SHORT_NAME, gsiPlayer)
+					return Hero_InitializeBehavior(DEFAULT_HERO_BEHAVIOUR_SHORT_NAME, gsiPlayer)
 				end
 end

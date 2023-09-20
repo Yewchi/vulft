@@ -1,12 +1,12 @@
 local hero_data = {
 	"puck",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 3, 3, 3, 8, 4, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 5, 3, 3, 3, 8, 4, 4, 9, 11},
 	{
-		"item_branches","item_faerie_fire","item_ward_observer","item_branches","item_tango","item_branches","item_branches","item_bottle","item_gloves","item_boots","item_robe","item_power_treads","item_magic_wand","item_blitz_knuckles","item_robe","item_witch_blade","item_blink","item_robe","item_kaya","item_ogre_axe","item_kaya_and_sange","item_aether_lens","item_vitality_booster","item_energy_booster","item_octarine_core","item_overwhelming_blink","item_gem","item_ogre_axe","item_revenants_brooch",
+		"item_branches","item_branches","item_ward_observer","item_branches","item_faerie_fire","item_branches","item_tango","item_bottle","item_robe","item_magic_wand","item_gloves","item_boots","item_power_treads","item_robe","item_blitz_knuckles","item_witch_blade","item_blink","item_kaya","item_aghanims_shard","item_kaya_and_sange","item_soul_booster","item_octarine_core","item_dagon_2","item_gem","item_dagon_4","item_dagon_5","item_overwhelming_blink","item_sphere","item_point_booster","item_desolator","item_ultimate_scepter_2",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Illusory Orb","Waning Rift","Phase Shift","Dream Coil","+50 Illusory Orb Damage","+0.75s Waning Rift Silence Duration","-10s Dream Coil Cooldown","+75 Waning Rift Damage","-4s Waning Rift Cooldown","+150 Initial/Break Dream Coil Damage","Dream Coil Pierces Magic Immunity","Dream Coil Rapid Fire",
+		"Illusory Orb","Waning Rift","Phase Shift","Dream Coil","+50 Illusory Orb Damage","+0.75s Waning Rift Silence Duration","-10s Dream Coil Cooldown","+75 Waning Rift Damage","-4s Waning Rift Cooldown","+150 Initial/Break Dream Coil Damage","Dream Coil Pierces Debuff Immunity","+250 Waning Rift Radius/Max Distance",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

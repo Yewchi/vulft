@@ -24,7 +24,7 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
-ACTIVITY_TYPE = { -- Ordered by reaction to additional aggressive behaviour while in the activity type (i.e. the name is not the reaction itself). Examples are listed below
+ACTIVITY_TYPE = { -- Ordered by reaction to additional aggressive behavior while in the activity type (i.e. the name is not the reaction itself). Examples are listed below
 	["DEATH_WISH"] = 1, -- Pango with only swashbuckle up, vs Godlike Lina on 50 hp at T4.
 	["KILL"] = 2, -- Mid-fight, ganking.
 	["CONTROLLED_AGGRESSION"] = 3, -- Harassing during laning stage.
@@ -185,9 +185,10 @@ require(GetScriptDirectory().."/lib_task/blueprint/zone_defend")
 require(GetScriptDirectory().."/lib_task/blueprint/rune")
 require(GetScriptDirectory().."/lib_task/blueprint/dawdle")
 require(GetScriptDirectory().."/lib_task/blueprint/use_item")
-require(GetScriptDirectory().."/lib_task/blueprint/search_fog")
 require(GetScriptDirectory().."/lib_task/blueprint/pick_up_item")
 require(GetScriptDirectory().."/lib_task/blueprint/die_to_neutrals")
+require(GetScriptDirectory().."/lib_task/blueprint/search_fog")
+require(GetScriptDirectory().."/lib_task/blueprint/mortal_unit")
 
 --task_init_funcs = { -- bad, should self-register TODO
 --	Task_CreateUpdatePriorityFarmLaneJob,

@@ -1,12 +1,12 @@
 local hero_data = {
 	"pangolier",
-	{2, 1, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
+	{2, 1, 2, 1, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_boots","item_ward_observer","item_tango","item_quelling_blade","item_branches","item_faerie_fire","item_branches","item_bottle","item_blight_stone","item_orb_of_corrosion","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_magic_wand","item_blink","item_blade_of_alacrity","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_aghanims_shard","item_basher","item_black_king_bar","item_abyssal_blade","item_desolator",
+		"item_branches","item_faerie_fire","item_tango","item_branches","item_branches","item_branches","item_ward_observer","item_bottle","item_blight_stone","item_magic_wand","item_orb_of_corrosion","item_arcane_boots","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_basher","item_vitality_booster","item_void_stone","item_void_stone","item_point_booster","item_octarine_core","item_ultimate_scepter_2","item_sphere",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
-		"Swashbuckle","Shield Crash","Lucky Shot","Rolling Thunder","+3 Lucky Shot Armor Reduction","+400 Swashbuckle Slash Range","+3.0s Shield Crash CD in Ball","+3.0s Rolling Thunder Duration","+30 Swashbuckle Damage","+5% Shield Crash Reduction Per Hero","-3.0s Swashbuckle Cooldown","-20.0s Rolling Thunder Cooldown",
+		"Swashbuckle","Shield Crash","Lucky Shot","Rolling Thunder","+3 Lucky Shot Armor Reduction","+350 Swashbuckle Slash Range","+3.0s Shield Crash CD in Ball","+3.0s Rolling Thunder Duration","+20 Swashbuckle Damage","+100 Shield Crash Barrier Per Hero","-2.5s Swashbuckle Cooldown","-16.0s Rolling Thunder Cooldown",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

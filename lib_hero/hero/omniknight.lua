@@ -1,12 +1,12 @@
 local hero_data = {
 	"omniknight",
-	{2, 3, 1, 1, 2, 4, 2, 1, 1, 5, 2, 4, 3, 3, 8, 3, 4, 9},
+	{3, 1, 3, 1, 1, 3, 1, 2, 3, 6, 4, 4, 2, 2, 8, 2, 4, 10, 11},
 	{
-		"item_ward_sentry","item_tango","item_enchanted_mango","item_branches","item_branches","item_sobi_mask","item_magic_wand","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_ring_of_basilius",
+		"item_gauntlets","item_circlet","item_quelling_blade","item_tango","item_branches","item_branches","item_gauntlets","item_ring_of_health","item_soul_ring","item_boots","item_vanguard","item_magic_wand","item_blades_of_attack","item_phase_boots","item_aghanims_shard","item_helm_of_iron_will","item_crimson_guard","item_ogre_axe","item_robe","item_quarterstaff","item_echo_sabre","item_diadem","item_harpoon","item_ogre_axe","item_belt_of_strength","item_sange","item_heavens_halberd","item_basher",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,3,5,}, 0.1 },
 	{
-		"Purification","Heavenly Grace","Hammer of Purity","Guardian Angel","+4s Heavenly Grace Duration","+50 Base Damage","-2.0s Purification Cooldown","-30.0s Guardian Angel Cooldown","+3 Heavenly Grace Strength/HP Regen per Debuff","-6s Hammer of Purity Cooldown","+160 Purification Damage/Heal","+75% Hammer of Purity Damage",
+		"Purification","Repel","Hammer of Purity","Guardian Angel","-2.0s Purification Cooldown","+50 Base Damage","+3 Repel Strength/HP Regen per Debuff","-30.0s Guardian Angel Cooldown","+2s Repel Duration","-6s Hammer of Purity Cooldown","+160 Purification Damage/Heal","+75% Hammer of Purity Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

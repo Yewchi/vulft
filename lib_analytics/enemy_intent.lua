@@ -53,7 +53,7 @@ function Intent_RegisterObjectiveLocationType(location, typeOfLoc, value, diffic
 	
 end
 
-local function formulate_behaviour_metrics()
+local function formulate_behavior_metrics()
 	for i=1,NUM_ENEMY_PLAYERS do
 		local thisEnemy = t_enemy_players[i]
 		-- Work out who they are attacking
@@ -66,7 +66,7 @@ local function formulate_behaviour_metrics()
 	-- Work out how long it will take for attacked allies to die.
 end
 
--- TODO must efficiently formulate metrics to understand enemy behaviour, so we can easily query what is currently the known-or-likely goal of enemy heroes.
+-- TODO must efficiently formulate metrics to understand enemy behavior, so we can easily query what is currently the known-or-likely goal of enemy heroes.
 function Analytics_RegisterAnalyticsJobDomainToEnemyIntent(job_domain)
 	t_team_players = GSI_GetTeamPlayers(TEAM)
 	t_enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
@@ -76,7 +76,7 @@ function Analytics_RegisterAnalyticsJobDomainToEnemyIntent(job_domain)
 	job_domain:RegisterJob(
 			function(workingSet)
 				if workingSet.throttle:allowed() then
-					formulate_behaviour_metrics()
+					formulate_behavior_metrics()
 				end
 			end,
 			{throttle = Time_CreateThrottle(0.41)},

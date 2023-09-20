@@ -1,12 +1,12 @@
 local hero_data = {
 	"visage",
-	{2, 3, 2, 1, 1, 4, 1, 3, 3, 6, 3, 4, 2, 1, 7, 2, 4, 10, 12},
+	{2, 1, 1, 3, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_blight_stone","item_branches","item_branches","item_enchanted_mango","item_chainmail","item_medallion_of_courage","item_tranquil_boots","item_blight_stone","item_wind_lace","item_blight_stone","item_crown","item_robe","item_belt_of_strength","item_ancient_janggo","item_crown","item_solar_crest","item_aghanims_shard","item_boots_of_bearing","item_aghanims_shard","item_staff_of_wizardry","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_gem","item_ultimate_orb","item_sheepstick",
+		"item_ward_observer","item_circlet","item_gauntlets","item_branches","item_branches","item_magic_stick","item_bracer","item_blight_stone","item_medallion_of_courage","item_wind_lace","item_solar_crest","item_boots","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_hyperstone","item_tranquil_boots","item_platemail","item_buckler","item_assault","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_boots_of_bearing","item_void_stone","item_ultimate_orb","item_sheepstick",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Grave Chill","Soul Assumption","Gravekeeper's Cloak","Summon Familiars","-3.0s Grave Chill Cooldown","+6.0 Visage and Familiars Attack Damage","+1.0 Armor Corruption to Visage and Familiars","Soul Assumption Hits 2 Targets","+20 Soul Assumption Damage Per Charge","+20 Visage and Familiars Movement Speed","Gravekeeper's Cloak  grants +10 Armor","+1 Familiar",
+		"Grave Chill","Soul Assumption","Gravekeeper's Cloak","Summon Familiars","-3s Grave Chill Cooldown","+6.0 Visage and Familiars Attack Damage","+2s Grave Chill Duration","Soul Assumption Hits 2 Targets","+25 Soul Assumption Damage Per Charge","+1.0 Armor Corruption to Visage and Familiars","Gravekeeper's Cloak  grants +10 Armor","+1 Familiar",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

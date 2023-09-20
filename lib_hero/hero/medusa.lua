@@ -1,12 +1,12 @@
 local hero_data = {
 	"medusa",
-	{2, 3, 2, 1, 2, 1, 2, 1, 1, 6, 4, 3, 3, 3, 7, 4, 4, 9, 12},
+	{2, 3, 2, 1, 2, 1, 2, 1, 1, 3, 4, 3, 3, 4, 7, 6, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_circlet","item_slippers","item_slippers","item_branches","item_tango","item_branches","item_branches","item_circlet","item_tango","item_slippers","item_wraith_band","item_boots","item_wraith_band","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_dragon_lance","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_manta","item_hurricane_pike","item_point_booster","item_ultimate_scepter","item_aghanims_shard","item_black_king_bar","item_lesser_crit","item_greater_crit","item_ultimate_scepter_2","item_butterfly",
+		"item_enchanted_mango","item_sobi_mask","item_branches","item_branches","item_magic_stick","item_magic_wand","item_fluffy_hat","item_blades_of_attack","item_falcon_blade","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_yasha","item_manta","item_quarterstaff","item_eagle","item_butterfly","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_hurricane_pike","item_skadi","item_lesser_crit","item_ultimate_scepter_2","item_silver_edge","item_witch_blade","item_revenants_brooch","item_black_king_bar","item_relic","item_rapier","item_moon_shard",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
 	{
-		"Split Shot","Mystic Snake","Mana Shield","Stone Gaze","+15% Mystic Snake Turn and Movement Speed Slow","+0.5 Mana Shield Damage per Mana","+10% Split Shot Damage Penalty","-3s Mystic Snake Cooldown","+2 Mystic Snake Bounces","+2s Stone Gaze Duration","+75 Intelligence","Split Shot Uses Modifiers",
+		"Split Shot","Mystic Snake","Mana Shield","Stone Gaze","+15% Mystic Snake Turn and Movement Speed Slow","+5% Stone Gaze Bonus Physical Damage","+10% Split Shot Damage Penalty","-3s Mystic Snake Cooldown","+2 Mystic Snake Bounces","+1.5s Stone Gaze Duration","+0.9 Mana Shield Damage per Mana","Split Shot Uses Modifiers",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

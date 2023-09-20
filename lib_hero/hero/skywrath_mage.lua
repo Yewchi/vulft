@@ -1,12 +1,12 @@
 local hero_data = {
 	"skywrath_mage",
-	{2, 1, 2, 1, 2, 4, 2, 3, 3, 3, 3, 4, 1, 1, 7, 5, 4, 9, 12},
+	{2, 1, 1, 3, 2, 4, 2, 3, 2, 6, 3, 4, 1, 1, 7, 3, 4, 10, 12},
 	{
-		"item_tango","item_enchanted_mango","item_branches","item_branches","item_mantle","item_circlet","item_ward_sentry","item_ward_observer","item_null_talisman","item_boots","item_aghanims_shard","item_cloak","item_shadow_amulet","item_glimmer_cape","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_vitality_booster","item_energy_booster","item_aeon_disk",
+		"item_tango","item_blood_grenade","item_enchanted_mango","item_enchanted_mango","item_branches","item_ward_sentry","item_ward_sentry","item_tango","item_clarity","item_boots","item_arcane_boots","item_medallion_of_courage","item_wind_lace","item_solar_crest","item_void_stone","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_ultimate_orb",
 	},
-	{ {5,1,3,3,3,}, {4,4,4,4,5,}, 0.1 },
+	{ {5,5,5,3,3,}, {4,4,4,4,4,}, 0.1 },
 	{
-		"Arcane Bolt","Concussive Shot","Ancient Seal","Mystic Flare","+175 Health","+8 Intelligence","-8s Ancient Seal Cooldown","+1 Arcane Bolt Per Cast","Global Concussive Shot","+-12% Ancient Seal Increased Magic Damage","Arcane Bolt Pierces Spell Immunity","+450 Mystic Flare Damage",
+		"Arcane Bolt","Concussive Shot","Ancient Seal","Mystic Flare","+200 Health","+8 Intelligence","-7s Ancient Seal Cooldown","+25% Arcane Bolt Spell Lifesteal","Global Concussive Shot","-10% Ancient Seal Increased Magic Damage","Arcane Bolt Pierces Spell Immunity","+400 Mystic Flare Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

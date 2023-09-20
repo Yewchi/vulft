@@ -1,8 +1,8 @@
 local hero_data = {
 	"bloodseeker",
-	{3, 2, 3, 1, 3, 5, 1, 1, 1, 6, 3, 5, 2, 2, 8, 2, 5, 10, 12, 13},
+	{2, 3, 3, 1, 3, 5, 1, 1, 1, 6, 3, 5, 2, 2, 8, 2, 5, 10, 12},
 	{
-		"item_tango","item_quelling_blade","item_slippers","item_slippers","item_slippers","item_branches","item_branches","item_branches","item_faerie_fire","item_boots","item_gloves","item_boots_of_elves","item_magic_wand","item_power_treads","item_javelin","item_maelstrom","item_blade_of_alacrity","item_boots_of_elves","item_yasha","item_ogre_axe","item_sange_and_yasha","item_mithril_hammer","item_black_king_bar","item_lifesteal","item_mjollnir","item_claymore","item_satanic","item_basher",
+		"item_circlet","item_quelling_blade","item_magic_stick","item_tango","item_branches","item_blades_of_attack","item_boots","item_chainmail","item_phase_boots","item_javelin","item_maelstrom","item_hyperstone","item_mjollnir","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_blade_of_alacrity","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_wraith_band","item_mithril_hammer","item_belt_of_strength","item_basher","item_quarterstaff","item_butterfly","item_ultimate_scepter_2","item_abyssal_blade","item_cornucopia","item_cornucopia","item_refresher",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -10,7 +10,7 @@ local hero_data = {
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"bloodseeker_bloodrage", ABILITY_TYPE.BUFF + ABILITY_TYPE.ATTACK_MODIFIER},
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

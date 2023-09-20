@@ -1,12 +1,12 @@
 local hero_data = {
 	"bane",
-	{2, 3, 2, 3, 2, 4, 3, 2, 3, 1, 1, 4, 1, 1, 7, 6, 4, 9},
+	{2, 3, 2, 3, 2, 4, 2, 3, 3, 1, 1, 4, 1, 1, 7, 5, 4, 9},
 	{
-		"item_tango","item_tango","item_enchanted_mango","item_enchanted_mango","item_ward_sentry","item_ward_sentry","item_branches","item_branches","item_faerie_fire","item_boots","item_void_stone","item_aether_lens","item_wind_lace","item_tranquil_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_glimmer_cape","item_blink",
+		"item_tango","item_blood_grenade","item_faerie_fire","item_circlet","item_branches","item_enchanted_mango","item_ward_sentry","item_bracer","item_boots","item_magic_wand","item_energy_booster","item_medallion_of_courage","item_void_stone","item_arcane_boots","item_platemail","item_ring_of_health","item_lotus_orb","item_crown","item_wind_lace","item_solar_crest","item_energy_booster",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,5,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Enfeeble","Brain Sap","Nightmare","Fiend's Grip","Nightmare Damage Heals Bane","+20% Enfeeble Cast Range Reduction","-3s Brain Sap Cooldown","+5% Fiend's Grip Max Mana Drain","-3s Nightmare Cooldown","+30 Movement Speed","+200 Brain Sap Damage/Heal","+5s Fiend's Grip Duration",
+		"Enfeeble","Brain Sap","Nightmare","Fiend's Grip","-3s Brain Sap Cooldown","+20% Enfeeble Cast Range Reduction","+13 Enfeeble Damage Per Second","+5% Fiend's Grip Max Mana Drain","-3s Nightmare Cooldown","+30 Movement Speed","+250 Brain Sap Damage/Heal","+3s Fiend's Grip Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -70,6 +70,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -212,7 +213,7 @@ d = {
 		end
 		if arbitraryEnemy and CAN_BE_CAST(gsiPlayer, enfeeble) then
 			-- NB!! DESTROYING outerEnemies TABLE
-			Set_NumericalIndexUnion(outerEnemies, nearbyEnemies)
+			Set_NumericalIndexUnion(nil, outerEnemies, nearbyEnemies)
 			local n=1
 			local countEnemies = #outerEnemies
 			-- remove very low health or null enemies

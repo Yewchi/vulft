@@ -27,7 +27,7 @@
 -- Other tasks trigger the scoring, and essentially the highest scoring task request incentivises this task for it's purposes.
 -- Abilities already in-cast are also incentivised. Probably needs some "this is taking way too long"
 
-local PRIORITY_UPDATE_USE_ABILITY_THROTTLE = 0.071 -- Rotates. 
+local PRIORITY_UPDATE_USE_ABILITY_THROTTLE = 0.142 -- Rotates. 
 
 local QUEUED_ABILITY_I__ABILITY_OR_FUNC = 1
 local QUEUED_ABILITY_I__TARGET = 2
@@ -47,6 +47,8 @@ local t_abilities_queued = {} -- player number on team -> list head
 
 local task_handle = Task_CreateNewTask()
 
+local use_item_handle
+
 local blueprint
 
 local number_str = "number"
@@ -54,12 +56,14 @@ local number_str = "number"
 -- RULE OF USE Do not give me a hAbility that is already on the queue. It must be in a combo if there are to be multiple of the same ability used in a sequence.
 
 ---- On chosing a list: array benefit was only for score-based removal
+-------------- free_queue_node()
 local function free_queue_node(node)
 	node[QUEUED_ABILITY_I__PREV_NODE] = false		 -- 5
 	node[QUEUED_ABILITY_I__NEXT_NODE] = false		 -- 6 ... 
 	table.insert(queue_node_recyclable, node)
 end
 
+-------------- alloc_or_recycle_queue_node()
 local function alloc_or_recycle_queue_node(hAbility, target, score, comboIdentifier, actionFunc, elapseExpiry)
 	local new = table.remove(queue_node_recyclable) or {}
 	new[1] = hAbility							 -- 1
@@ -68,11 +72,12 @@ local function alloc_or_recycle_queue_node(hAbility, target, score, comboIdentif
 	new[4] = comboIdentifier or false			 -- ..4 -- recycled node is clean
 	if not comboIdentifier and not actionFunc then print("ACTION FUNC NIL", debug.traceback()) end
 	new[5] = actionFunc
-	new[6] = GameTime() + (elapseExpiry or (hAbility:GetCastPoint() + hAbility:GetChannelTime() + 1)) -- NB. 1 sec limit on combo behaviour -- UseAbility_RefreshQueueTop(gsiPlayer) for long sequences
+	new[6] = GameTime() + (elapseExpiry or (hAbility:GetCastPoint() + hAbility:GetChannelTime() + 1)) -- NB. 1 sec limit on combo behavior -- UseAbility_RefreshQueueTop(gsiPlayer) for long sequences
 	
 	return new
 end
 
+-------------- take_and_sew_queue_node()
 local function take_and_sew_queue_node(pnot, node)
 	local prevNode = node[QUEUED_ABILITY_I__PREV_NODE]
 	local nextNode = node[QUEUED_ABILITY_I__NEXT_NODE]
@@ -90,6 +95,7 @@ local function take_and_sew_queue_node(pnot, node)
 end
 
 local registered_callbacks = {}
+-------- UseAbility_RegisterCallbackFunc()
 function UseAbility_RegisterCallbackFunc(gsiPlayer, ability, funcToCall)
 	local pnot = gsiPlayer.nOnTeam
 	local abilityName = ability:GetName()
@@ -103,6 +109,7 @@ function UseAbility_RegisterCallbackFunc(gsiPlayer, ability, funcToCall)
 	table.insert(thisPlayerCallbacks[abilityName], funcToCall)
 end
 
+-------- UseAbility_IndicateCastCompleted()
 function UseAbility_IndicateCastCompleted(castInfo) -- Installed @ AbilityThink_Initialize()
 	if VERBOSE then print("DOUBLE CALLBACKS?", castInfo.ability:GetName()) end
 	local gsiPlayer = GSI_GetPlayerFromPlayerID(castInfo.player_id) if gsiPlayer.team ~= TEAM then return end 
@@ -141,7 +148,6 @@ function UseAbility_IndicateCastCompleted(castInfo) -- Installed @ AbilityThink_
 	end
 end
 
-
 -------- UseAbility_SetComboScore(...)
 -- - For reprioritizing combos that have been put to sleep by
 -- - - dropping their score to XETA_SCORE_DO_NOT_RUN. Invoker
@@ -162,6 +168,7 @@ function UseAbility_SetComboScore(gsiPlayer, comboIdentifier)
 	end
 end
 
+-------- UseAbility_PopComboQueue()
 function UseAbility_PopComboQueue(gsiPlayer, comboIdentifier)
 	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	local i = 1
@@ -186,6 +193,7 @@ end
 	-- end
 -- end
 
+-------- UseAbility_ClearQueuedComboAbilities()
 function UseAbility_ClearQueuedComboAbilities(gsiPlayer, comboIdentifier)
 	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	local pnot = gsiPlayer.nOnTeam
@@ -201,6 +209,7 @@ function UseAbility_ClearQueuedComboAbilities(gsiPlayer, comboIdentifier)
 	if VERBOSE then VEBUG_print(string.format("use_ability: Cleared %s combo with comboId:'%s'.", gsiPlayer.shortName, comboIdentifier)) end
 end
 
+-------- UseAbility_ClearQueuedAbilities()
 function UseAbility_ClearQueuedAbilities(gsiPlayer, scoreBreaking)
 	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	local pnot = gsiPlayer.nOnTeam
@@ -227,22 +236,58 @@ function UseAbility_ClearQueuedAbilities(gsiPlayer, scoreBreaking)
 	if VERBOSE then VEBUG_print(string.format("use_ability: Cleared %s ability queue. Abilities remaining: %s", gsiPlayer.shortName, tostring(t_abilities_queued[pnot]))) end
 end
 
+local squelch_not_off_cd = 5
+-------- UseAbility_RegisterAbilityUseAndLockToScore()
 function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, target, scoreToBreak, comboIdentifier, doNotCastPointSkip, skipQueue, elapseExpiry, forceAbilityFunc)
+	if gsiPlayer.level-gsiPlayer.vibe.greedRating*10 < 5 then
+		local attackTarget = gsiPlayer.hUnit:GetAttackTarget()
+		if attackTarget and attackTarget:IsCreep() and attackTarget:GetTeam() ~= gsiPlayer.team
+				and gsiPlayer.hUnit:GetAnimCycle() < gsiPlayer.attackPointPercent
+				and attackTarget:GetHealth() < gsiPlayer.hUnit:GetAttackDamage() then
+			if DEBUG then
+				DEBUG_print(string.format("[use_ability] Rejecting register ability of low level and greedy %s attacking %s that would die", gsiPlayer.shortName, not attackTarget:IsNull() and attackTarget:GetUnitName()))
+			end
+			return false
+		end
+	end
 	local nOnTeam = gsiPlayer.nOnTeam
 	scoreToBreak = (scoreToBreak or HIGH_32_BIT) + 250 -- [[HOTFIX]] defense and push tasks are too high
 
-	local isAbility = type(abilityOrFunc) == "table" and true or false
+	local isAbility = type(abilityOrFunc) == "table" and abilityOrFunc.GetCooldownTimeRemaining and true or false
 	local actionFunc = forceAbilityFunc
 
 	--[[DEV]]if VERBOSE then VEBUG_print(string.format("[use_ability] %s registers ability at %s. [%s] Custom func.", gsiPlayer.shortName, Util_Printable(target), forceAbilityFunc and "X" or "_")) end
 	
-	if isAbility and not forceAbilityFunc then
-		actionFunc = AbilityLogic_GetBestFitCastFunc(gsiPlayer, abilityOrFunc, target)
+	if isAbility then
+		elapseExpiry = elapseExpiry or abilityOrFunc:GetCastPoint() + abilityOrFunc:GetChannelTime() + 1
+		if not forceAbilityFunc then
+			actionFunc = AbilityLogic_GetBestFitCastFunc(gsiPlayer, abilityOrFunc, target)
+			if actionFunc == gsiPlayer.hUnit.Action_UseAbilityOnLocation
+					and target and not target.x
+					and (target.lastSeen or target.GetLocation) then
+				target = target.hUnit and target.lastSeen.location or target:GetLocation()
+			end
+		end
+		if actionFunc and abilityOrFunc:GetCooldownTimeRemaining() ~= 0 then
+			if squelch_not_off_cd > 0 then
+				squelch_not_off_cd = squelch_not_off_cd - 1
+				WARN_print("[use_ability] Attempt to register an ability which is on cooldown. %s(%s): t=%.2f.%s",
+						gsiPlayer.shortName, abilityOrFunc:GetName(),
+						abilityOrFunc:GetCooldownTimeRemaining(),
+						squelch_not_off_cd > 0 and "" or " - SQUELCHED"
+					)
+				print(debug.traceback())
+			end
+		elseif gsiPlayer.usableItemCache.powerTreads
+				and abilityOrFunc:GetManaCost() > 0 then
+			UseItem_PowerTreadsStatLock(gsiPlayer, ATTRIBUTE_INTELLECT, elapseExpiry+0.1, scoreToBreak*1.33)
+			Task_SetTaskPriority(use_item_handle, gsiPlayer.nOnTeam, TASK_PRIORITY_TOP)
+		end
 	end
 
 	if TEST then print("use_ability: [RegisterAbilityUseAndLockToScore]", gsiPlayer.shortName, isAbility and abilityOrFunc:GetName() or 'func', target, Util_Printable(target), isAbility, actionFunc, forceAbilityFunc) end
 
-	if skipQueue or (isAbility and not doNotCastPointSkip and abilityOrFunc:GetCastPoint() == 0) then -- e.g. spells with 0.0 cast point can be cast immediately even if other spells are to be cast -- TODO Does it need a facing direction? Probably should have target-in-range check and ability-needs-correct-facing-direction -- doNotCastPointSkip is because we may queue stun -> safety TP type behaviour.
+	if skipQueue or (isAbility and not doNotCastPointSkip and abilityOrFunc:GetCastPoint() == 0) then -- e.g. spells with 0.0 cast point can be cast immediately even if other spells are to be cast -- TODO Does it need a facing direction? Probably should have target-in-range check and ability-needs-correct-facing-direction -- doNotCastPointSkip is because we may queue stun -> safety TP type behavior.
 		local nextNode = t_abilities_queued[nOnTeam]
 		t_abilities_queued[nOnTeam] = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry)
 		t_abilities_queued[nOnTeam][QUEUED_ABILITY_I__NEXT_NODE] = nextNode
@@ -251,7 +296,7 @@ function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, t
 		local stepNode = t_abilities_queued[nOnTeam]
 		if stepNode then -- usually stepNode == nil -> assign new ability
 			local i = 1
-			while(stepNode and stepNode[QUEUED_ABILITY_I__NEXT_NODE]) do  i = i + 1 if i > 98 then Util_TablePrint({stepNode[1]:GetName(), stepNode}) if i>100 then DEBUG_KILLSWITCH = true ERROR_print("use_ability: UseAbility_RegisterAbilityUseAndLockToScore KILLSWITCH") return  end end
+			while(stepNode and stepNode[QUEUED_ABILITY_I__NEXT_NODE]) do  i = i + 1 if i > 98 then Util_TablePrint({stepNode[1]:GetName(), stepNode}) if i>100 then DEBUG_KILLSWITCH = true ERROR_print(true, not DEBUG, "use_ability: UseAbility_RegisterAbilityUseAndLockToScore KILLSWITCH") return  end end
 				stepNode = stepNode[QUEUED_ABILITY_I__NEXT_NODE]
 			end
 			local newNode = alloc_or_recycle_queue_node(abilityOrFunc, target, scoreToBreak, comboIdentifier, actionFunc, elapseExpiry)
@@ -264,6 +309,7 @@ function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, t
 end
 
 -- return: isLocked, isHAbility, abilityOrFunc
+-------- UseAbility_IsPlayerLocked()
 function UseAbility_IsPlayerLocked(gsiPlayer)
 	local nextAbilityNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	if nextAbilityNode then
@@ -275,6 +321,16 @@ function UseAbility_IsPlayerLocked(gsiPlayer)
 	end
 end
 
+-------- UseAbility_GetTarget()
+function UseAbility_GetTarget(gsiPlayer)
+	local nextAbilityNode = t_abilities_queued[gsiPlayer.nOnTeam]
+	if nextAbilityNode then
+		return nextAbilityNode[QUEUED_ABILITY_I__TARGET];
+	end
+	return nil;
+end
+
+-------- UseAbility_RefreshQueueTop()
 function UseAbility_RefreshQueueTop(gsiPlayer) 
 	-- Call this inside of combo functions that may run over 1s long. (Expiry gives castpoint + channel time + 1s). Combo function include it's own fallback cancellation logic if used
 	local topNode = t_abilities_queued[gsiPlayer.nOnTeam]
@@ -283,13 +339,17 @@ function UseAbility_RefreshQueueTop(gsiPlayer)
 	end
 end
 
+-------------- estimated_time_til_completed()
 local function estimated_time_til_completed(gsiPlayer, objective)
 	return 0.3 -- don't care
 end
 local next_player = 1
+-------------- task_init_func()
 local function task_init_func(taskJobDomain)
 	Blueprint_RegisterTaskName(task_handle, "use_ability")
 	if VERBOSE then VEBUG_print(string.format("use_ability: Initialized with handle #%d.", task_handle)) end
+
+	use_item_handle = UseItem_GetTaskHandle()
 
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
 
@@ -403,7 +463,7 @@ blueprint = {
 				end
 			else
 				if target and not target.x then
-					WARN_print(string.format("[use_ability] Undefined behaviour type 1. '%s' casts: '%s' -> '%s'",
+					WARN_print(string.format("[use_ability] Undefined behavior type 1. '%s' casts: '%s' -> '%s'",
 								gsiPlayer.shortName,
 								type(abilityOrFunc) == "table" and abilityOrFunc.GetName and abilityOrFunc:GetName()
 										or Util_Printable(abilityOrFunc),
@@ -415,7 +475,7 @@ blueprint = {
 			end
 		else
 			if type(target) ~= "number" then
-				WARN_print(string.format("[use_ability] Undefined behaviour type 2. '%s' casts: '%s' -> '%s'",
+				WARN_print(string.format("[use_ability] Undefined behavior type 2. '%s' casts: '%s' -> '%s'",
 							gsiPlayer.shortName,
 							type(abilityOrFunc) == "table" and abilityOrFunc.GetName and abilityOrFunc:GetName()
 									or Util_Printable(abilityOrFunc),
@@ -443,6 +503,7 @@ blueprint = {
 	end
 }
 
+-------- UseAbility_GetTaskHandle()
 function UseAbility_GetTaskHandle()
 	return task_handle
 end

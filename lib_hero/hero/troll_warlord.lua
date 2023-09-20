@@ -1,8 +1,8 @@
 local hero_data = {
 	"troll_warlord",
-	{2, 1, 3, 2, 2, 4, 1, 1, 1, 6, 3, 4, 2, 3, 3, 7, 4, 10, 12},
+	{2, 1, 3, 2, 2, 4, 2, 3, 3, 1, 6, 4, 1, 1, 7, 3, 4, 10, 12},
 	{
-		"item_tango","item_quelling_blade","item_slippers","item_branches","item_circlet","item_magic_stick","item_wraith_band","item_ring_of_health","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_pers","item_broadsword","item_bfury","item_mithril_hammer","item_black_king_bar","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_sange","item_sange_and_yasha","item_demon_edge","item_javelin","item_blitz_knuckles","item_belt_of_strength","item_monkey_king_bar","item_basher","item_vanguard","item_abyssal_blade","item_aghanims_shard","item_pers","item_pers","item_refresher",
+		"item_tango","item_quelling_blade","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_blades_of_attack","item_boots","item_phase_boots","item_cornucopia","item_broadsword","item_claymore","item_bfury","item_blade_of_alacrity","item_yasha","item_sange","item_sange_and_yasha","item_mithril_hammer","item_ogre_axe","item_belt_of_strength","item_black_king_bar","item_basher","item_ultimate_orb","item_sphere","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_abyssal_blade","item_blink","item_swift_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_aghanims_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

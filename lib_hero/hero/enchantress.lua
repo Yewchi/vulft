@@ -1,16 +1,16 @@
 local hero_data = {
 	"enchantress",
-	{1, 2, 2, 1, 2, 5, 1, 1, 3, 3, 6, 5, 3, 3, 8, 2, 5, 10, 12},
+	{3, 2, 2, 1, 2, 5, 1, 1, 1, 3, 3, 5, 3, 6, 8, 2, 5, 10, 12},
 	{
-		"item_ward_dispenser","item_tango","item_branches","item_branches","item_branches","item_magic_stick","item_boots","item_belt_of_strength","item_wind_lace","item_robe","item_ancient_janggo","item_magic_wand","item_tranquil_boots","item_blade_of_alacrity","item_dragon_lance","item_blade_of_alacrity","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_boots_of_bearing","item_claymore","item_blitz_knuckles","item_orchid","item_mithril_hammer","item_black_king_bar","item_staff_of_wizardry","item_force_staff","item_hurricane_pike",
+		"item_tango","item_branches","item_faerie_fire","item_mantle","item_circlet","item_branches","item_null_talisman","item_boots","item_magic_wand","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_hurricane_pike","item_aghanims_shard","item_robe","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_staff_of_wizardry","item_cornucopia","item_orchid","item_mage_slayer","item_bloodthorn","item_witch_blade",
 	},
-	{ {1,1,4,3,3,}, {5,5,4,3,4,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
 	{
-		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+10% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","+-65 Untouchable Attack Slow","Enchant Affects Ancients","+6.5% Impetus Damage","+20 Nature's Attendants Heal",
+		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+8% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","+-65 Untouchable Attack Slow","+30%% Enchanted Creep Health/Damage","+6.5% Impetus Damage","+20 Nature's Attendants Heal",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 	[0] = {"enchantress_impetus", ABILITY_TYPE.ATTACK_MODIFIER + ABILITY_TYPE.UNIT_TARGET + ABILITY_TYPE.SINGLE_TARGET + ABILITY_TYPE.NUKE},
@@ -47,7 +47,7 @@ local SPELL_SUCCESS = AbilityLogic_CastOnTargetWillSucceed
 
 local ADDITIONAL_SPROINK_ACQUISITION_RANGE = 181
 
-local ULTRA_ENEMY_FOUNTAIN = Vector(ENEMY_FOUNTAIN.x*4, ENEMY_FOUNTAIN.y*4)
+local ULTRA_ENEMY_FOUNTAIN = Vector(ENEMY_FOUNTAIN.x*4, ENEMY_FOUNTAIN.y*4, 0)
 
 local fight_harass_task_handle = FightHarass_GetTaskHandle()
 
@@ -60,7 +60,7 @@ local abs = math.abs
 local MATH_PI = math.pi
 local MATH_2PI
 
-local ACCEPTABLE_FACING = MATH_PI/12
+local ACCEPTABLE_FACING = MATH_PI/24
 
 local TEST = TEST and true
 
@@ -86,21 +86,17 @@ d = {
 			gsiPlayer.hUnit:Action_UseAbility(sproink)
 			return;
 		end
-		DebugDrawLine(gsiPlayer.lastSeen.location, 
+		--[[DEV]]DebugDrawLine(gsiPlayer.lastSeen.location, Vector_Addition( gsiPlayer.hUnit:GetLocation(), gsiPlayer.sproinkMovementVector ), 100, 255, 50)
+		gsiPlayer.hUnit:Action_MoveDirectly(
 				Vector_Addition(
-						gsiPlayer.lastSeen.location,
-						gsiPlayer.sproinkMovementVector
-					), 100, 255, 50)
-		gsiPlayer.hUnit:Action_MoveToLocation(
-				Vector_Addition(
-						gsiPlayer.lastSeen.location,
+						gsiPlayer.hUnit:GetLocation(),
 						gsiPlayer.sproinkMovementVector
 					)
 			)
 		end,
 	["StartCastSproink"] = function(gsiPlayer, awayFromLoc)
-		local unitDirectional = Vector_UnitDirectionalPointToPoint(gsiPlayer.lastSeen.location, awayFromLoc)
-		gsiPlayer.sproinkMovementVector = Vector_ScalarMultiply2D(unitDirectional, 30)
+		local unitDirectional = Vector_UnitDirectionalPointToPoint(gsiPlayer.hUnit:GetLocation(), awayFromLoc)
+		gsiPlayer.sproinkMovementVector = Vector_ScalarMultiply2D(unitDirectional, 10)
 		gsiPlayer.sproinkDesiredFacing = Vector_GetRadsUnitToLoc(gsiPlayer, awayFromLoc)
 		gsiPlayer.sproinkTryExpiry = GameTime() + 0.75
 		DOMINATE_SetDominateFunc(gsiPlayer, "LibHero_EnchantressCastSproink", d.SproinkDominateFunc, true)
@@ -109,6 +105,7 @@ d = {
 	["UntouchableAtLevel"] = function(lvl) return d.untouchable_at_lvl[min(4, math.floor(lvl/6)+1)] end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["Initialize"] = function(gsiPlayer)
 		AbilityLogic_CreatePlayerAbilitiesIndex(t_player_abilities, gsiPlayer, abilities)
@@ -154,6 +151,8 @@ d = {
 				local currTask = CURRENT_TASK(gsiPlayer)
 				if AbilityLogic_AbilityCanBeCast(gsiPlayer, enchant)
 						and fightHarassTarget.currentMovementSpeed > gsiPlayer.currentMovementSpeed * 0.85
+						and Vector_PointDistance(fightHarassTarget.lastSeen.location, gsiPlayer.lastSeen.location)
+								< enchant:GetCastRange() * 1.05
 						and AbilityLogic_HighUseAllowOffensive(gsiPlayer, enchant, HIGH_USE_ENC_REMAINING_MANA, fightHarassPercentHealth) then
 					UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, enchant, fightHarassTarget, 400, nil)
 					Task_IncentiviseTask(gsiPlayer, fight_harass_task_handle, 15, 3)

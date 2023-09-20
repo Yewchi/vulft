@@ -1,12 +1,12 @@
 local hero_data = {
 	"huskar",
-	{1, 3, 2, 2, 3, 4, 3, 3, 2, 2, 1, 1, 1, 5, 7, 4, 4, 9, 12},
+	{1, 3, 2, 2, 2, 4, 3, 3, 3, 2, 1, 1, 1, 4, 7, 5, 4, 9, 11},
 	{
-		"item_gauntlets","item_tango","item_faerie_fire","item_gauntlets","item_gauntlets","item_boots","item_gloves","item_helm_of_iron_will","item_armlet","item_wind_lace","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ogre_axe","item_belt_of_strength","item_sange","item_heavens_halberd","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_blink","item_aghanims_shard","item_platemail","item_ultimate_scepter_2","item_buckler","item_assault","item_overwhelming_blink",
+		"item_gauntlets","item_branches","item_gauntlets","item_faerie_fire","item_ward_observer","item_gauntlets","item_boots","item_gloves","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_ogre_axe","item_sange","item_heavens_halberd","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_platemail","item_hyperstone","item_buckler","item_assault","item_lifesteal","item_claymore","item_satanic","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,2,1,}, {2,2,2,2,1,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Inner Fire","Burning Spear","Berserker's Blood","Life Break","+0.75s Inner Fire Duration","+2s Life Break Slow Duration","+4 Burning Spears DPS","+15% Lifesteal","+30% Berserker's Blood Regen","-5.0s Life Break Cooldown","+20% Life Break Damage","Burning Spears Pure Damage",
+		"Inner Fire","Burning Spear","Berserker's Blood","Life Break","+0.75s Inner Fire Duration","+2s Life Break Slow Duration","+4 Burning Spears DPS","+15% Lifesteal","+25% Berserker's Blood Regen","-5.0s Life Break Cooldown","+20% Life Break Damage","Burning Spears Pure Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

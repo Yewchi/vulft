@@ -1,6 +1,6 @@
 Developer README.md
 
-Development status: Fortnightly update (as of 01/04/23)
+Development status: Irregular additions and Dota 2 patch updates (as of 19/09/23)
 
 VUL-FT - Very U(gly, Unrolled, Unabstracted, and Fast) Lua Full Takeover for Dota 2
 

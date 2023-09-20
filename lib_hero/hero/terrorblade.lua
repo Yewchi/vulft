@@ -1,12 +1,12 @@
 local hero_data = {
 	"terrorblade",
-	{1, 3, 2, 2, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 1, 4, 10, 12},
+	{1, 3, 2, 3, 2, 2, 4, 2, 3, 6, 3, 4, 1, 1},
 	{
-		"item_tango","item_slippers","item_quelling_blade","item_circlet","item_branches","item_branches","item_wraith_band","item_boots","item_boots_of_elves","item_gloves","item_ring_of_basilius","item_power_treads","item_blade_of_alacrity","item_yasha","item_magic_wand","item_dragon_lance","item_ultimate_orb","item_manta","item_ultimate_orb","item_skadi","item_dragon_lance","item_invis_sword","item_broadsword","item_blades_of_attack","item_lesser_crit","item_silver_edge","item_ultimate_scepter","item_hurricane_pike","item_reaver","item_satanic","item_ultimate_scepter_2","item_black_king_bar","item_blink","item_swift_blink","item_aghanims_shard","item_moon_shard","item_black_king_bar",
+		"item_quelling_blade","item_branches","item_branches","item_magic_stick","item_faerie_fire","item_tango","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_blade_of_alacrity","item_yasha","item_blade_of_alacrity","item_dragon_lance","item_ultimate_orb","item_ultimate_orb","item_skadi","item_lesser_crit","item_greater_crit","item_lifesteal","item_satanic","item_sange","item_sange_and_yasha","item_force_staff","item_hurricane_pike","item_black_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Reflection","Conjure Image","Metamorphosis","Sunder","-3s Reflection Cooldown","+10% Conjure Image Damage","+300 Health","+15% Reflection Slow","+10 All Stats","+10s Conjure Image Duration","-34s Sunder Cooldown","+20s Metamorphosis Duration",
+		"Reflection","Conjure Image","Metamorphosis","Sunder","-3s Reflection Cooldown","+10% Conjure Image Damage","+300 Health","+10% Reflection Slow/Damage","+10 All Stats","+10s Conjure Image Duration","-30s Sunder Cooldown","+20s Metamorphosis Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

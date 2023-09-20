@@ -27,14 +27,6 @@
 TEAM_CAPTAIN_UNIT = TEAM_CAPTAIN_UNIT or GetBot()
 TEAM_CAPTAIN_UNIT.Chat = Captain_Chat
 
-require(GetScriptDirectory().."/lib_hero/vibe")
-require(GetScriptDirectory().."/lib_analytics/xeta")
-require(GetScriptDirectory().."/lib_task/task")
-require(GetScriptDirectory().."/lib_hero/hero")
-require(GetScriptDirectory().."/lib_task/team/wanted_poster")
-require(GetScriptDirectory().."/lib_task/blueprint/blueprint_main")
-require(GetScriptDirectory().."/lib_hero/ability_think_main")
-
 local max = math.max
 local min = math.min
 local abs = math.abs
@@ -49,8 +41,6 @@ local buyback_directive
 local t_present_or_committed = {} for i=1,3 do t_present_or_committed[i] = {} end -- state if pnot is at strategic lane
 
 local t_prev_strategic_lane = {}
-
-local Task_GetCurrentTaskHandle = Task_GetCurrentTaskHandle
 
 local zone_defend_handle
 local fight_harass_handle
@@ -279,7 +269,7 @@ function Team_InformDeadTryBuyback(gsiPlayer)
 			local distOfEnemy = select(2, Set_GetNearestEnemyHeroToLocation(defensible.lastSeen.location, 8))
 			if distOfEnemy < 2400 then
 					-- just as I write this, the fact that the bot will probably tp to any low
-					-- -| danger farmable lane is an indication that that behaviour needs to be
+					-- -| danger farmable lane is an indication that that behavior needs to be
 					-- -| fixed, not this working around it. TODO
 				if defensible.isAncient
 						and gsiPlayer.hUnit:GetRespawnTime() > 4 + distOfEnemy / 400 then
@@ -287,12 +277,12 @@ function Team_InformDeadTryBuyback(gsiPlayer)
 					gsiPlayer.hUnit:ActionImmediate_Buyback() 
 				end
 				if not defensible.tier or not Item_TownPortalScrollCooldown(gsiPlayer) then
-					ERROR_print(string.format("Found nils in TryBuyback (%s %s)", defensible.tier, Item_TownPortalScrollCooldown(gsiPlayer)))
+					ERROR_print(false, not DEBUG, "Found nils in TryBuyback (%s %s)", defensible.tier, Item_TownPortalScrollCooldown(gsiPlayer))
 					return
 				end
 				if defensible.lastSeenHealth > 200
 						and (defensible.tier >= 3 or Item_TownPortalScrollCooldown(gsiPlayer) == 0) then
-					if RandomInt(1, max(16, (6 - defensible.tier)*100 / (gsiPlayer.hUnit:GetGold() - gsiPlayer.hUnit:GetBuybackCost()))) == 1 then
+					if gsiPlayer.hUnit:GetRespawnTime() > (5 - defensible.tier)*10 and RandomInt(1, max(16, (6 - defensible.tier)*100 / (gsiPlayer.hUnit:GetGold() - gsiPlayer.hUnit:GetBuybackCost()))) == 1 then
 						Task_IncentiviseTask(gsiPlayer, fight_harass_handle, 80, 4)
 						gsiPlayer.hUnit:ActionImmediate_Buyback()
 					end
@@ -320,6 +310,17 @@ function Team_GetClearForLaunchHero(gsiPlayer)
 	-- if me check GameTime() > expire clear for launch
 	-- return hero, isMe, launch
 end
+
+function Team_GetLaneOfRoleNumberForTeam(roleNum, team)
+	if roleNum == 1 or roleNum == 5 then 
+		return team == TEAM_RADIANT and MAP_LOGICAL_BOTTOM_LANE or MAP_LOGICAL_TOP_LANE
+	elseif roleNum == 3 or roleNum == 4 then
+		return team == TEAM_RADIANT and MAP_LOGICAL_TOP_LANE or MAP_LOGICAL_BOTTOM_LANE
+	else
+		return MAP_LOGICAL_MIDDLE_LANE
+	end
+end
+
 
 function Team_GetRoleBasedLane(thisPlayer) -- TODO Is there any way to determine the enemy bot names for lane predictions before they show on map? -a Yes, names are queryable.
 	local thisPlayerRole = role_assignments[thisPlayer.nOnTeam]
@@ -391,11 +392,12 @@ end
 
 function Team_FortUnderAttack(gsiUnit)
 	local doCheapAssBuybacks = false
+	--[[DEV]]if DEBUG then DEBUG_print("AHH fort", gsiUnit.name) end
 	if GSI_CountTeamAlive(TEAM) == 0 then
 		doCheapAssBuybacks = true
 	else
 		doCheapAssBuybacks = false
-		local defenders = Set_GetAlliedHeroesInLocRadius(nil, ancient_on_ropes_fight_loc, 4000)
+		local defenders = Set_GetAlliedHeroesInLocRad(nil, ancient_on_ropes_fight_loc, 4000)
 		local attackers = Set_GetEnemyHeroesInLocRadOuter(ancient_on_ropes_fight_loc, 5000, 5000, 10)
 		local defensivePower = Analytics_GetTheoreticalEncounterPower(
 				defenders,
@@ -439,4 +441,11 @@ function Team_FortUnderAttack(gsiUnit)
 		Task_IncentiviseTask(team_players[i], UseAbility_GetTaskHandle(), score, decrement)
 	end
 end
---[[ MicroThink() implemented in bot_generic as Think() = MicroThink() ]]--
+
+require(GetScriptDirectory().."/lib_hero/vibe")
+require(GetScriptDirectory().."/lib_analytics/xeta")
+require(GetScriptDirectory().."/lib_task/task")
+require(GetScriptDirectory().."/lib_hero/hero")
+require(GetScriptDirectory().."/lib_task/team/wanted_poster")
+require(GetScriptDirectory().."/lib_task/blueprint/blueprint_main")
+require(GetScriptDirectory().."/lib_hero/ability_think_main")

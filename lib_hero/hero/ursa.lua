@@ -2,11 +2,11 @@ local hero_data = {
 	"ursa",
 	{3, 1, 3, 2, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 7, 5, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_slippers","item_circlet","item_branches","item_branches","item_magic_stick","item_wraith_band","item_ring_of_health","item_boots","item_void_stone","item_pers","item_claymore","item_broadsword","item_bfury","item_phase_boots","item_wind_lace","item_blink","item_mithril_hammer","item_black_king_bar","item_mithril_hammer","item_basher","item_demon_edge","item_blitz_knuckles","item_monkey_king_bar","item_abyssal_blade","item_aghanims_shard","item_swift_blink","item_octarine_core","item_rapier",
+		"item_magic_stick","item_branches","item_tango","item_branches","item_quelling_blade","item_branches","item_boots","item_blades_of_attack","item_magic_wand","item_chainmail","item_orb_of_venom","item_phase_boots","item_orb_of_corrosion","item_cornucopia","item_broadsword","item_claymore","item_bfury","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_belt_of_strength","item_basher","item_abyssal_blade","item_nullifier","item_aghanims_shard","item_swift_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Earthshock","Overpower","Fury Swipes","Enrage","+20s Fury Swipes Reset Time","+1.75 Mana Regen","Earthshock Applies +2 Fury Swipes","+10% Enrage Status Resistance","-2s Earthshock Cooldown","+12 Fury Swipes Damage","Enrage provides half benefits to allies in a +700 radius","+3 Overpower Attacks",
+		"Earthshock","Overpower","Fury Swipes","Enrage","+20s Fury Swipes Reset Time","+1.75 Mana Regen","Earthshock Applies +2 Fury Swipes","+20% Enrage Status Resistance","+400 Earthshock Radius","+10 Fury Swipes Damage","Earthshock has +2 Charges","+3 Overpower Attacks",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

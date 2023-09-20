@@ -1,4 +1,4 @@
--- Fall-back behaviour for unknown or unimplemented heroes
+-- Fall-back behavior for unknown or unimplemented heroes
 DEFAULT_HERO_BEHAVIOUR_SHORT_NAME = "default"
 
 local hero_data = {

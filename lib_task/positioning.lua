@@ -29,24 +29,47 @@ TEAM_FOUNTAIN_LOC = TEAM==TEAM_RADIANT and Map_GetLogicalLocation(MAP_POINT_RADI
 ---- positioning constants
 GREED_FACTOR_FOR_Z_NORMAL_SWEEP = 4
 
+local UNIT_2D_VEC_COMPONENT = 2^(-0.5)
+
 MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME = 1.5
 SAFE_STANDING_NEAR_ATTACK_VARIANCE_RANGED = (250 + 80) / MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME -- maximum distance away + maximum closeness
-SAFE_STANDING_NEAR_ATTACK_SHIFT_TIME_RANGED = -20 / (250 + 20) * MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME  -- i.e. using this factor, at 0seconds to attack target, we shorten the vector by -80 (a reasonable standing location to cast an attack)
+SAFE_STANDING_NEAR_ATTACK_SHIFT_TIME_RANGED = -80 / (250 + 80) * MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME  -- i.e. using this factor, at 0seconds to attack target, we shorten the vector by -80 (a reasonable standing location to cast an attack)
 SAFE_STANDING_NEAR_ATTACK_VARIANCE_MELEE = (800 + 50) / MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME
 SAFE_STANDING_NEAR_ATTACK_SHIFT_TIME_MELEE = (-50 / (800 + 50)) * MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME -- i.e. because the scale is lower, melee will arrive later to last hit (but, strategically, range units have some aggressive initiative)
 
 local HELPER_VECTOR_45_DEGREE = Vector(601, 601, 0)
---
 
+-- positioning constants
 local TEAM_FOUNTAIN_LOC = TEAM_FOUNTAIN_LOC
+local ENEMY_FOUNTAIN = ENEMY_FOUNTAIN
+local TEAM_FOUNTAIN = TEAM_FOUNTAIN
 local CREEP_AGRO_RANGE = CREEP_AGRO_RANGE
+local DEBUG = DEBUG
+local VERBOSE = VERBOSE
+local TEST = TEST
+local TEAM = TEAM
+local ENEMY_TEAM = ENEMY_TEAM
+local TEAM_IS_RADIANT = TEAM_IS_RADIANT
+local BUILDING_T2_T4_ATTACK_DAMAGE = BUILDING_T2_T4_ATTACK_DAMAGE
+local UNIT_TYPE_NONE = UNIT_TYPE_NONE
+local SET_HERO_ALLIED = SET_HERO_ALLIED
+local SET_HERO_ENEMY = SET_HERO_ENEMY
+--local MINIMUM_ALLOWED_USE_TP_INSTEAD = MINIMUM_ALLOWED_USE_TP_INSTEAD
+local MAP_LOGICAL_MIDDLE_LANE = MAP_LOGICAL_MIDDLE_LANE
+-- /consts
+
+-- ()
 local Vector_Addition = Vector_Addition
 local Vector_ScalarMultiply2D = Vector_ScalarMultiply2D
+local Vector_PointDistance2D = Vector_PointDistance2D
 local Vector_UnitDirectionalPointToPoint = Vector_UnitDirectionalPointToPoint
 local Vector_ToDirectionalUnitVector = Vector_ToDirectionalUnitVector
 local Vector_CrossProduct = Vector_CrossProduct
 local Vector_CrossProduct2D = Vector_CrossProduct2D
 local Vector_PointToPointLine = Vector_PointToPointLine
+local Vector_InverseVector = Vector_InverseVector
+local Vector_ToLength = Vector_ToLength
+local Vector_BoundedToWorld = Vector_BoundedToWorld
 local Math_PointToPointDistance2D = Math_PointToPointDistance2D
 local Set_GetNearestTeamTowerToPlayer = Set_GetNearestTeamTowerToPlayer
 local Set_GetCrowdingRatingToSetTypeAtLocation = Set_GetCrowdingRatingToSetTypeAtLocation
@@ -56,11 +79,26 @@ local abs = math.abs
 local sqrt = math.sqrt
 local acos = math.acos
 local sin = math.sin
+local RandomInt = RandomInt
+local RandomFloat = RandomFloat
+local GameTime = GameTime
+local Map_GetLaneValueOfMapPoint = Map_GetLaneValueOfMapPoint
+local Vector = Vector
+local IsLocationVisible = IsLocationVisible
+local bUnit_IsNullOrDead = bUnit_IsNullOrDead
+local cUnit_NewSafeUnit = cUnit_NewSafeUnit
+local GSI_GetPlayerFromPlayerID = GSI_GetPlayerFromPlayerID
+local Team_GetRoleBasedLane = Team_GetRoleBasedLane
+local Set_GetNearestAlliedCreepSetInLane = Set_GetNearestAlliedCreepSetInLane
+--local Port_CheckPortNeeded = Port_CheckPortNeeded
+-- /()
 
 local LANE_CHECK_DIST_FROM_CENTER = LANE_ELL_BEND_OFFSET*0.8
 
-local p_position_rules = {}
+local MAP_COORD_LOW = -6700
+local MAP_COORD_HIGH = 6700
 
+local p_position_rules = {}
 
 do
 	for i=1,TEAM_NUMBER_OF_PLAYERS,1 do
@@ -93,10 +131,76 @@ function Positioning_ProgressZNormalSweeper__Job(workingSet) -- Updates z-axis v
 	gsiPlayer.zAxisMagnitudeVector.z = math.sin(gsiPlayer.zAxisMagnitudeSweeperRadians)
 end
 
+function Positioning_DeregisterGenericAdjustmentRule(gsiPlayer, handleString)
+	p_position_rules[gsiPlayer.nOnTeam][handleString] = nil
+end
+
+function Positioning_RegisterGenericAdjustmentRule(gsiPlayer, handleString, locationOrEntity, isAvoidance, timeToDrop)
+	p_position_rules[gsiPlayer.nOnTeam][handleString] = {locationOrEntity, isAvoidance, timeToDrop}
+end
+
+-- Sometimes we don't desire a vector to point in an aggressive direction in the lane, like when your creep target runs too far up your lane and flips the to-safe-creep-set vector
+--- The function is not intended to prevent movement in a direction, but retain a logical idea about what a vector in a series of vector operations may mean. This function is very ugly.
+-------- Positioning_FlipAxisTeamIfAggressiveOrientationMovement()
+function Positioning_FlipAxisTeamIfAggressiveOrientationMovement(v, currLoc)
+	if TEAM == TEAM_RADIANT then
+		if Map_GetLaneValueOfMapPoint(currLoc) == MAP_LOGICAL_MIDDLE_LANE then
+			if v.y > 0 and v.x > 0 then
+				return Vector(-v.x, -v.y, v.z)
+			end
+		else
+			if v.y > 0 and (currLoc.x > LANE_CHECK_DIST_FROM_CENTER or currLoc.x < -LANE_CHECK_DIST_FROM_CENTER) then
+				return Vector(v.x, -v.y, v.z)
+			elseif v.x > 0 and (currLoc.y > LANE_CHECK_DIST_FROM_CENTER and currLoc.y < -LANE_CHECK_DIST_FROM_CENTER) then
+				return Vector(-v.x, v.y, v.z)
+			end
+		end
+	else
+		if Map_GetLaneValueOfMapPoint(currLoc) == MAP_LOGICAL_MIDDLE_LANE then
+			if v.y < 0 and v.x < 0 then
+				return Vector(-v.x, -v.y, v.z)
+			end
+		else
+			if v.y < 0 and (currLoc.x > LANE_CHECK_DIST_FROM_CENTER or currLoc.x < -LANE_CHECK_DIST_FROM_CENTER) then
+				return Vector(v.x, -v.y, v.z)
+			elseif v.x < 0 and (currLoc.y > LANE_CHECK_DIST_FROM_CENTER and currLoc.y < -LANE_CHECK_DIST_FROM_CENTER) then
+				return Vector(-v.x, v.y, v.z)
+			end
+		end
+	end
+	return v
+end
+local Positioning_FlipAxisTeamIfAggressiveOrientationMovement = Positioning_FlipAxisTeamIfAggressiveOrientationMovement
+
+-------- Positioning_MoveToLocationSafe()
+function Positioning_MoveToLocationSafe(gsiPlayer, location)
+	-- Temp
+	location = location or Map_GetTeamFountainLocation()
+	Positioning_ZSMoveCasual(gsiPlayer, location, 1)
+end
+local Positioning_MoveToLocationSafe = Positioning_MoveToLocationSafe
+
+-------- Positioning_MoveDirectly()
+function Positioning_MoveDirectly(gsiPlayer, location)
+	--[[DEV]]if DEBUG then DebugDrawText(1220 + (TEAM_IS_RADIANT and 0 or 350), 55 + gsiPlayer.nOnTeam*8, string.format("%s.mv(%5.0f, %5.0f, %5.0f)stb[%1.2f],sp[%3.0f].%d", string.sub(gsiPlayer.shortName, 1,4), location.x, location.y, location.z, gsiPlayer.hUnit:GetMovementDirectionStability(), gsiPlayer.hUnit:GetCurrentMovementSpeed(), gsiPlayer.locationVariation or -0), 155, 255, 35) end
+	gsiPlayer.hUnit:Action_MoveDirectly(location)
+	gsiPlayer.recentMoveTo = location
+end
+local Positioning_MoveDirectly = Positioning_MoveDirectly
+
+-------- Positioning_MoveToLocation()
+function Positioning_MoveToLocation(gsiPlayer, location)
+	--[[DEV]]if DEBUG then DebugDrawText(1220 + (TEAM_IS_RADIANT and 0 or 350), 55 + gsiPlayer.nOnTeam*8, string.format("%s.mv(%5.0f, %5.0f, %5.0f)stb[%1.2f],sp[%3.0f].%d", string.sub(gsiPlayer.shortName, 1,4), location.x, location.y, location.z, gsiPlayer.hUnit:GetMovementDirectionStability(), gsiPlayer.hUnit:GetCurrentMovementSpeed(), gsiPlayer.locationVariation or -0), 155, 255, 35) end
+	gsiPlayer.hUnit:Action_MoveToLocation(location)
+	gsiPlayer.recentMoveTo = location
+end
+local Positioning_MoveToLocation = Positioning_MoveToLocation
+
 -------- Positioning_MoveToSafeAttackRange()
 function Positioning_MoveToSafeAttackRange(gsiPlayer, locationOfUnit)
 	
 end
+local Positioning_MoveToSafeAttackRange = Positioning_MoveToSafeAttackRange
 
 local lower_odd_of_low_rand = 0.0
 local last_lower_odd_random_time = GameTime()
@@ -116,20 +220,7 @@ function Positioning_StutterStepToLocation(gsiPlayer, location)
 			)
 	end
 end
-
-function Positioning_RegisterGenericAdjustmentRule(gsiPlayer, handleString, locationOrEntity, isAvoidance, timeToDrop)
-	p_position_rules[gsiPlayer.nOnTeam][handleString] = {locationOrEntity, isAvoidance, timeToDrop}
-end
-
-function Positioning_DeregisterGenericAdjustmentRule(gsiPlayer, handleString)
-	p_position_rules[gsiPlayer.nOnTeam][handleString] = nil
-end
-
-function Positioning_MoveToLocationSafe(gsiPlayer, location)
-	-- Temp
-	location = location or Map_GetTeamFountainLocation()
-	Positioning_ZSMoveCasual(gsiPlayer, location, 1)
-end
+local Positioning_StutterStepToLocation = Positioning_StutterStepToLocation
 
 -------- Positioning_MovingToLocationAgrosTower()
 function Positioning_MovingToLocationAgrosTower(gsiPlayer, location, tower)
@@ -171,20 +262,23 @@ function Positioning_MovingToLocationAgrosTower(gsiPlayer, location, tower)
 	--[[DEBUG]]if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, tower.lastSeen.location, 255, 0, 0) end
 	return true
 end
+local Positioning_MovingToLocationAgrosTower = Positioning_MovingToLocationAgrosTower
 
 -------- Positioning_AdjustToAvoidCrowdingSetType()
-function Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, location, setType, careFactor)
+function Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, location, setType, careFactor, acquisitionRange)
+	local playerLoc = gsiPlayer.lastSeen.location
 	careFactor = careFactor ~= nil and careFactor or 1.0
 	--print('adjustpos', location, setType, careFactor)
-	local crowdingCenter, crowdingRating = Set_GetCrowdedRatingToSetTypeAtLocation(gsiPlayer.lastSeen.location, setType)
-	if crowdingRating > 0 then
-		local unitDirectionFromCrowdingCenter = Vector_ToDirectionalUnitVector(Vector_PointToPointLine(crowdingCenter, gsiPlayer.lastSeen.location))
-		local adjustedLocation = Vector_Addition(location,
-				Vector_ScalarMultiply2D(
-					unitDirectionFromCrowdingCenter,
-					min(2000, careFactor*crowdingRating)
-				)
-			)
+	local crowdingCenter, crowdingRating = Set_GetCrowdedRatingToSetTypeAtLocation(
+			playerLoc, setType, nil, acquisitionRange)
+	if crowdingRating > 0 and crowdingCenter.x ~= playerLoc.x then
+		local fromAvoidX = playerLoc.x - crowdingCenter.x
+		local fromAvoidY = playerLoc.y - crowdingCenter.y
+		local shiftDist = min(2000, careFactor*crowdingRating)
+				/ (fromAvoidX^2 + fromAvoidY^2)^0.5
+		local adjustedLocation
+				= Vector(location.x + fromAvoidX*shiftDist,
+						location.y + fromAvoidY*shiftDist)
 --[[DEV]]		if DEBUG then 
 --[[DEV]]			-- DebugDrawCircle(crowdingCenter, 80, 180, 20, 255)
 --[[DEV]]			-- DebugDrawLine(location, adjustedLocation, 180, 20, 255)
@@ -196,41 +290,36 @@ function Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, location, setType, 
 		return location
 	end
 end
+local Positioning_AdjustToAvoidCrowdingSetType = Positioning_AdjustToAvoidCrowdingSetType
 
 -- Flips the adjusting added vector if it points aggressively into enemy territory.
 -------- Positioning_AdjustToAvoidLocationFlipAggressive
 function Positioning_AdjustToAvoidLocationFlipAggressive(location, currLocation, avoidLocation, radius)
-	local distBetweenLocations = Math_PointToPointDistance2D(location, avoidLocation)
-	local avoidByDistance = max(0, radius - distBetweenLocations)
-	local locationAvoiding = Vector_Addition(location,
-			Vector_ScalarMultiply2D(
-				Positioning_FlipAxisTeamIfAggressiveOrientationMovement(
-					Vector_ToDirectionalUnitVector(
-						Vector_PointToPointLine(avoidLocation, location)
-					), ZEROED_VECTOR
-				),
-				avoidByDistance + HERO_TARGET_DIAMETER
-			)
-		)
-	--[[DEBUG]]if DEBUG then DebugDrawLine(location, locationAvoiding, 255, 20, 20) end
-	return locationAvoiding
+	local vecFromAvoid = Vector(location.x-avoidLocation.x, location.y-avoidLocation.y)
+	local distBetweenLocations = (vecFromAvoid.x^2 + vecFromAvoid.y^2)^0.5
+	local avoidByDist = max(0, radius - distBetweenLocations) + HERO_TARGET_DIAMETER
+	local vecFromAvoid = Positioning_FlipAxisTeamIfAggressiveOrientationMovement(
+			vecFromAvoid, ZEROED_VECTOR) -- I probably did this because of the treeline at top and bot messing with stuff close to the safelane tower for the safelaners, running horizontally to the spot on the other side of trees rather than to tower.
+	avoidByDist = avoidByDist/distBetweenLocations
+	vecFromAvoid.x = location.x + vecFromAvoid.x*avoidByDist
+	vecFromAvoid.y = location.y + vecFromAvoid.y*avoidByDist
+	--[[DEBUG]]if DEBUG then DebugDrawLine(location, vecFromAvoid, 20, 255, 20) end
+	return vecFromAvoid
 end
+local Positioning_AdjustToAvoidLocationFlipAggressive = Positioning_AdjustToAvoidLocationFlipAggressive
 
 -------- Positioning_AdjustToAvoidLocation()
 function Positioning_AdjustToAvoidLocation(location, currLocation, avoidLocation, radius)
-	local distBetweenLocations = Math_PointToPointDistance2D(location, avoidLocation)
-	local avoidByDistance = max(0, radius*1.15 - distBetweenLocations)
-	local locationAvoiding = Vector_Addition(location,
-			Vector_ScalarMultiply2D(
-				Vector_ToDirectionalUnitVector(
-					Vector_PointToPointLine(avoidLocation, location)
-				),
-				avoidByDistance + HERO_TARGET_DIAMETER
-			)
-		)
-	--[[DEBUG]]if DEBUG then DebugDrawLine(location, locationAvoiding, 255, 20, 20) end
-	return locationAvoiding
+	local vecFromAvoid = Vector(location.x-avoidLocation.x, location.y-avoidLocation.y)
+	local distBetweenLocations = (vecFromAvoid.x^2 + vecFromAvoid.y^2)^0.5
+	local avoidByDist = max(0, radius - distBetweenLocations) + HERO_TARGET_DIAMETER
+	avoidByDist = avoidByDist/distBetweenLocations
+	vecFromAvoid.x = location.x + vecFromAvoid.x*avoidByDist
+	vecFromAvoid.y = location.y + vecFromAvoid.y*avoidByDist
+	--[[DEBUG]]if DEBUG then DebugDrawLine(location, vecFromAvoid, 50, 50, 255) end
+	return vecFromAvoid
 end
+local Positioning_AdjustToAvoidLocation = Positioning_AdjustToAvoidLocation
 
 -- Returns true if already out-of-agro range from location, and then performs no move
 -------- Positioning_FindAndApproachNearestNonAgro()
@@ -246,6 +335,7 @@ function Positioning_FindAndApproachNearestNonAgro(gsiPlayer, locationOfAgro)
 		end
 	end
 end
+local Positioning_FindAndApproachNearestNonAgro = Positioning_FindAndApproachNearestNonAgro
 
 -- If we execute an attack command on a unit, will we be within a location-radius circle
 -- - at any time.
@@ -256,11 +346,11 @@ function Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, gsiUnit, location, r
 	-- TODO improve and reduce
 	local playerLoc = gsiPlayer.lastSeen.location
 	local unitLoc = gsiUnit.lastSeen.location
+	local distanceToAvoided = Math_PointToPointDistance2D(playerLoc, location)
 	local directionalFromUnit = Vector_UnitDirectionalPointToPoint(unitLoc, playerLoc)
 	local directionalFromPlayer = Vector_InverseVector(directionalFromUnit)
 	--local movingTowardsAvoid = ( playerLoc.x < location.x and directionalFromPlayer.x > 0 )
 	--		or ( playerLoc.x > location.x and directionalFromPlayer.x < 0)
-	local distanceToAvoided = Math_PointToPointDistance2D(playerLoc, location)
 
 	if distanceToAvoided < radius then
 		--print(gsiPlayer.shortName, "is inside", location)
@@ -276,68 +366,18 @@ function Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, gsiUnit, location, r
 				)
 		)
 
-	if Vector_PointDistance2D(resultLocation, location) < radius then
-		--print(gsiPlayer.shortName, "will be inside", location)
+	if Vector_PointDistance2D(resultLocation, location) < radius + 40 then -- [[40 BOUNDING BOX BAKE]]
+		--[[DEV]]if VERBOSE and DEBUG_IsBotTheIntern() then print(gsiPlayer.shortName, "will be inside", location) end
 		return true
 	end
 
-	-- N.B. It's assumed going forward that the player is not inside the circle
-	
-	--[[ what the fuck
-	local m = directionalFromPlayer.y / Math_DivisorSafe5Dec(directionalFromPlayer.x)
-	local c = playerLoc.y - m*(playerLoc.x)
-	-- d = |m*circleCenterX + 1*circleCenterY + c| / sqrt(m^2 + 1^2), where 1 represents the coefficient of the y value
-	local d = abs(m*location.x - location.y + c) / sqrt(m^2 + 1)
-
-	--[[VERBOSE]if VERBOSE then print(gsiPlayer.shortName, gsiUnit.shortName, m, "is outside of CmdExpose, checking", d, "<=", radius, m, c) end
-	-- convoluted I'm sure
-	if d <= radius then -- i.e. we intersect the circle
-		local normalToMovement
-				= Vector_CrossProduct2D(directionalFromPlayer, Vector(location.x-playerLoc.x, location.y-playerLoc.y)) >= 0
-					and Vector_CartesianNormal(directionalFromPlayer)
-					or Vector_CartesianNormal(directionalFromUnit) -- if the line is right of the circle center, flip normal
-		-- TODO Where A = the intersection of the normal of the movement-line to the circle, B = a sliding point along the normal,
-		-- - C = the intersection of the movement-line to the circle. What is the general equation of the length of a line
-		-- - B->C. Until then: SeemsGood
-		local testPassedPoint
-				= Vector_Addition(
-						Vector_Addition(location,
-								Vector_ScalarMultiply2D(normalToMovement, d)
-							),
-						Vector_ScalarMultiply2D(directionalFromUnit, radius*sqrt((radius - d)/radius)) -- sqrt SeemsGood
-					)
-		if DEBUG then 
-			local outFromAvoid = Vector_Addition(location, Vector_ScalarMultiply2D(normalToMovement, d))
-			if not TEAM_IS_RADIANT then DebugDrawLine(playerLoc, outFromAvoid, 180, 180, 255) end
-			--DebugDrawCircle(location, radius, 50, 50, 50)
-			DebugDrawCircle(testPassedPoint, 50, 255, 100, 100)
-			if not TEAM_IS_RADIANT then DebugDrawLine(location, outFromAvoid, gsiPlayer.nOnTeam*50, gsiPlayer.nOnTeam*50, 255) end
-			if not TEAM_IS_RADIANT then DebugDrawLine(outFromAvoid, testPassedPoint, gsiPlayer.nOnTeam*50, gsiPlayer.nOnTeam*50, 255) end
-		end
-
-		-- the kicker
-		local sideBefore
-				= Vector_CrossProduct2D(
-						normalToMovement,
-						Vector(playerLoc.x - testPassedPoint.x, playerLoc.y - testPassedPoint.y)
-					)
-		local sideAfter
-				= Vector_CrossProduct2D(
-						normalToMovement,
-						Vector(resultLocation.x - testPassedPoint.x, resultLocation.y - testPassedPoint.y)
-					)
-		if sideBefore > 0 and sideAfter < 0
-				or sideBefore < 0 and sideAfter > 0 then
-			if VERBOSE then print(gsiPlayer.shortName, gsiUnit.shortName, "is a risk") end
-			return true
-		end
-	end --]]
-	local toScared = Vector(location.x - playerLoc.x, location.y - playerLoc.y, 0)
-	local toTarget = Vector(resultLocation.x - playerLoc.x, resultLocation.y - playerLoc.y, 0)
-	local hypotenuseLen = sqrt(toScared.x^2 + toScared.y^2)
-	return hypotenuseLen * sin(acos(toScared.x*toTarget.x + toScared.y*toTarget.y)
-				/ (sqrt(toTarget.x^2+toTarget.y^2)*hypotenuseLen)) < radius
+	local toAvoid = Vector(location.x - playerLoc.x, location.y - playerLoc.y, 0)
+	local toAttacks = Vector(resultLocation.x - playerLoc.x, resultLocation.y - playerLoc.y, 0)
+	local hypotenuseLen = sqrt(toAvoid.x^2 + toAvoid.y^2)
+	return hypotenuseLen * sin(acos(toAvoid.x*toAttacks.x + toAvoid.y*toAttacks.y)
+				/ (sqrt(toAttacks.x^2+toAttacks.y^2)*hypotenuseLen)) < radius
 end
+local Positioning_WillAttackCmdExposeToLocRad = Positioning_WillAttackCmdExposeToLocRad
 
 -- Returns true if unitWins wins a race to finishLoc versus unitLoses. "If I stand here in lane for 4 seconds, do I still win a race to the bounty rune?"
 -------- Positioning_ProjectedRace()
@@ -358,103 +398,81 @@ function Positioning_ProjectedRace(unitWins, unitLoses, finishLoc, timeToProject
 	return wonBy >= 0, wonBy
 end
 
--- Sometimes we don't desire a vector to point in an aggressive direction in the lane, like when your creep target runs too far up your lane and flips the to-safe-creep-set vector
---- The function is not intended to prevent movement in a direction, but retain a logical idea about what a vector in a series of vector operations may mean. This function is very ugly.
--------- Positioning_FlipAxisTeamIfAggressiveOrientationMovement()
-function Positioning_FlipAxisTeamIfAggressiveOrientationMovement(v, currLoc)
-	if TEAM == TEAM_RADIANT then
-		if Map_GetLaneValueOfMapPoint(currLoc) == MAP_LOGICAL_MIDDLE_LANE then
-			if v.y > 0 and v.x > 0 then
-				return Vector(-v.x, -v.y, v.z)
-			end
-		else
-			if v.y > 0 and (currLoc.x > LANE_CHECK_DIST_FROM_CENTER or currLoc.x < -LANE_CHECK_DIST_FROM_CENTER) then
-				return Vector(v.x, -v.y, v.z)
-			elseif v.x > 0 and (currLoc.y > LANE_CHECK_DIST_FROM_CENTER and currLoc.y < -LANE_CHECK_DIST_FROM_CENTER) then
-				return Vector(-v.x, v.y, v.z)
-			end
-		end
-	else
-		if Map_GetLaneValueOfMapPoint(currLoc) == MAP_LOGICAL_MIDDLE_LANE then
-			if v.y < 0 and v.x < 0 then
-				return Vector(-v.x, -v.y, v.z)
-			end
-		else
-			if v.y < 0 and (currLoc.x > LANE_CHECK_DIST_FROM_CENTER or currLoc.x < -LANE_CHECK_DIST_FROM_CENTER) then
-				return Vector(v.x, -v.y, v.z)
-			elseif v.x < 0 and (currLoc.y > LANE_CHECK_DIST_FROM_CENTER and currLoc.y < -LANE_CHECK_DIST_FROM_CENTER) then
-				return Vector(-v.x, v.y, v.z)
-			end
-		end
-	end
-	return v
-end
-
 -- Move to a location casually, as if waiting for something
 -------- Positioning_ZSMoveCasual()
-function Positioning_ZSMoveCasual(gsiPlayer, moveTo, careFactor, maxActionDist, walkStraight, checkPort)
---[[DEV]]if VERBOSE then DebugDrawText(1400+(TEAM_IS_RADIANT and 0 or 50), gsiPlayer.nOnTeam*8, "MC", 180, 180, 180) end
-	local distToDest = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, moveTo)
+function Positioning_ZSMoveCasual(gsiPlayer, moveTo, careFactor, maxActionDist, zFactor, checkPort)
+--[[DEV]]if DEBUG then DebugDrawText(1400+(TEAM_IS_RADIANT and 0 or 50), gsiPlayer.nOnTeam*8, "MC", 180, 180, 180) end
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DEBUG_print("[positioning] %s -> %s, care %.3f, mAD %.3f, zF %.3f, port %s", STR(gsiPlayer), STR(moveTo), careFactor or -0, maxActionDist or -0, zFactor or -0, checPort) print(debug.traceback()) end
+	local playerLoc = gsiPlayer.lastSeen.location
+	local distToDest = ((playerLoc.x-moveTo.x)^2 + (playerLoc.y-moveTo.y)^2)^0.5
 	local lowSweeperZ
 	local circularHelp
-	if not walkStraight then
-		lowSweeperZ = Vector_ScalarMultiply2D(gsiPlayer.zAxisMagnitudeVector, 0.25)
-		circularHelp = Vector_CrossProduct(
-				HELPER_VECTOR_45_DEGREE,
-				lowSweeperZ
-			)
-	end
+	zFactor = zFactor or 1
+	local walkStraight = zFactor == 0 -- TODO remove, probably not functioning atm.
+	maxActionDist = maxActionDist or 700
+	lowSweeperZ = Vector_ScalarMultiply2D(gsiPlayer.zAxisMagnitudeVector,
+			zFactor * min(1, max(0, (maxActionDist - distToDest) / maxActionDist))
+		)
+	circularHelp = Vector_CrossProduct(
+			HELPER_VECTOR_45_DEGREE,
+			lowSweeperZ
+		)
 	--circularHelp = Vector_ScalarMultiply(circularHelp, 1 - max(0.9, (distToDest / 1200)))
-	moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, 400)
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 48, string.format("(%5.0f, %5.0f, %5.0f)", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
-	if maxActionDist then
-		local p2p = Vector_PointToPointLine(gsiPlayer.lastSeen.location, moveTo)
-		if Vector_LengthOfVector(p2p) > maxActionDist then
+	local p2p = Vector_PointToPointLine(gsiPlayer.lastSeen.location, moveTo)
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 48, string.format("(%5.0f, %5.0f, %5.0f)", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) DEBUG_print("[positioning] lowSweeperZ %s, circularHelp %s", lowSweeperZ, circularHelp) end
+	if (p2p.x^2 + p2p.y^2)^0.5 < maxActionDist -- .'. needs zFactor increasing over closeness to 0 from maxActionDist TODO
+		--[[	and (Vector_UnitFacingLoc(gsiPlayer, moveTo) > 0.66]] then
+		moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, 400)
+		moveTo = Vector_Addition(
+				gsiPlayer.lastSeen.location,
+				Vector_ScalarMultiply2D(
+						Vector_ToDirectionalUnitVector(Vector_PointToPointLine(gsiPlayer.lastSeen.location, moveTo)),
+						maxActionDist 
+				)
+			)
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 56, string.format("(%5.0f, %5.0f, %5.0f)", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
+		-- if gsiPlayer.shortName == "void_spirit" then DebugDrawText(1000, 500, string.format("%f, %f, %f", plusCircularization.x, plusCircularization.y, plusCircularization.z), 255, 255, 0) end
+		if not walkStraight then
 			moveTo = Vector_Addition(
-					gsiPlayer.lastSeen.location,
-					Vector_ScalarMultiply2D(
-							Vector_ToDirectionalUnitVector(Vector_PointToPointLine(gsiPlayer.lastSeen.location, moveTo)),
-							maxActionDist 
+					moveTo, 
+					circularHelp
+				)
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 64, string.format("(%5.0f, %5.0f, %5.0f)s", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
+		end
+
+		if careFactor and careFactor > 0 then
+			moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ENEMY, careFactor)
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 72, string.format("(%5.0f, %5.0f, %5.0f)a", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
+			moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, careFactor)
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 80, string.format("(%5.0f, %5.0f, %5.0f)a", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
+		end
+		local closestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
+		if DEBUG and DEBUG_IsBotTheIntern() and not closestTower then print(gsiPlayer.shortName, "No tower found move casual.") end
+		if closestTower and Positioning_MovingToLocationAgrosTower(gsiPlayer, moveTo, closestTower) then 
+			moveTo = Positioning_AdjustToAvoidLocationFlipAggressive(moveTo, gsiPlayer.lastSeen.location, closestTower.lastSeen.location, closestTower.attackRange+150)
+			--print(gsiPlayer.shortName, "movement vector addition performed")
+--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 88, string.format("(%5.0f, %5.0f, %5.0f)t", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
+		end
+		if not walkStraight then
+			moveTo = Vector_Addition(
+					moveTo,
+					Vector_CrossProduct( -- Add some motion in the directional axis, for when standing still
+						circularHelp, 
+						lowSweeperZ
 					)
 				)
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 56, string.format("(%5.0f, %5.0f, %5.0f)", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
+	--[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 96, string.format("(%5.0f, %5.0f, %5.0f)z", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
+		
 		end
 	end
-	if not walkStraight then
-		moveTo = Vector_Addition(
-				moveTo, 
-				circularHelp
-			)
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 64, string.format("(%5.0f, %5.0f, %5.0f)s", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
-	end
-	-- if gsiPlayer.shortName == "void_spirit" then DebugDrawText(1000, 500, string.format("%f, %f, %f", plusCircularization.x, plusCircularization.y, plusCircularization.z), 255, 255, 0) end
-
-	if careFactor and careFactor > 0 then
-		moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ENEMY, careFactor)
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 72, string.format("(%5.0f, %5.0f, %5.0f)a", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
-		moveTo = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveTo, SET_HERO_ALLIED, careFactor)
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 80, string.format("(%5.0f, %5.0f, %5.0f)a", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
-	end
-	local closestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
-	if DEBUG and DEBUG_IsBotTheIntern() and not closestTower then print(gsiPlayer.shortName, "No tower found move casual.") end
-	if closestTower and Positioning_MovingToLocationAgrosTower(gsiPlayer, moveTo, closestTower) then 
-		moveTo = Positioning_AdjustToAvoidLocationFlipAggressive(moveTo, gsiPlayer.lastSeen.location, closestTower.lastSeen.location, closestTower.attackRange+150)
-		--print(gsiPlayer.shortName, "movement vector addition performed")
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 88, string.format("(%5.0f, %5.0f, %5.0f)t", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
-	end
-	if not walkStraight then
-		moveTo = Vector_Addition(
-				moveTo,
-				Vector_CrossProduct( -- Add some motion in the directional axis, for when standing still
-					circularHelp, 
-					lowSweeperZ
-				)
-			)
---[[DEV]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1220, 55 + 96, string.format("(%5.0f, %5.0f, %5.0f)z", moveTo.x, moveTo.y, moveTo.z), 155, 255, 35) end
-	end
 	--[[DEBUG]if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveTo, 0, 0, 0) end --]]
-	if checkPort ~= false then
+	if checkPort == true or (checkPort ~= false
+				and (maxActionDist or 16000) > MINIMUM_ALLOWED_USE_TP_INSTEAD
+			) then
 		Positioning_MoveDirectlyCheckPort(gsiPlayer, moveTo) -- TODO Doesn't account for ETA of objectives
+	else
+		gsiPlayer.recentMoveTo = moveTo
+		gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
 	end
 end
 
@@ -550,58 +568,66 @@ end
 -------- Positioning_ZSAttackRangeUnitHugAllied()
 function Positioning_ZSAttackRangeUnitHugAllied(
 			gsiPlayer, locationOfUnit, unitSetToAvoid,
-			careFactor, timeTillStartAttack, forceAttackRange, aheadness
+			careFactor, timeTillStartAttack, forceAttackRange, aheadness,
+			dryRun, zFactor
 		)
+	--[[DEV]]if VERBOSE then VEBUG_print("[positioning] %s -> %s X=%s C=%s tta=%s, f=%s, aR=%s, d=%s", STR(gsiPlayer), STR(locationOfUnit), unitSetToAvoid, STR(careFactor), STR(timeTillStartAttack), forceAttackRange, STR(aheadness), dryRun) end
+	--[[DEV]]if VERBOSE and DEBUG_IsBotTheIntern() then print(debug.traceback()) end
 --[[DEV]]if VERBOSE then DebugDrawText(1400+(TEAM_IS_RADIANT and 0 or 50), gsiPlayer.nOnTeam*8, "ARUHA", 180, 180, 180) end
-	if Team_GetRoleBasedLane(gsiPlayer) ~= MAP_LOGICAL_MIDDLE_LANE and Map_GetLaneValueOfMapPoint(locationOfUnit) == MAP_LOGICAL_MIDDLE_LANE then
---		print(gsiPlayer.shortName, "GOING TO MID FROM :: ", debug.traceback())
-	end
 
 	local brokenStr
 
-	local aheadness = aheadness or 0.0
-	local closestAlliedCreepSet = Set_GetNearestAlliedCreepSetInLane(gsiPlayer, Team_GetRoleBasedLane(gsiPlayer))
---[[DEV]]if closestAlliedCreepSet then
---[[DEV]]brokenStr = brokenStr or tostring(closestAlliedCreepSet.center.z):find("nan") and "closestAlliedCreepSet.center "..tostring(closestAlliedCreepSet.center) or nil
---[[DEV]]end
+	local aheadness = max(0, aheadness or 0.25)
+	local closestAlliedCreepSet
+	if aheadness < 0.5 then
+		closestAlliedCreepSet = Set_GetNearestAlliedCreepSetInLane(gsiPlayer, Team_GetRoleBasedLane(gsiPlayer))
+	--[[DEV]]if closestAlliedCreepSet then
+	--[[DEV]]brokenStr = brokenStr or tostring(closestAlliedCreepSet.center.x):find("nan") and "closestAlliedCreepSet.center "..tostring(closestAlliedCreepSet.center) or nil
+	--[[DEV]]end
+	end
 	local safeOrAheadnessTargetLoc = aheadness < 0.5 and
-			(closestAlliedCreepSet and closestAlliedCreepSet.center or
-			TEAM_FOUNTAIN)
-			or ENEMY_FOUNTAIN
---[[DEV]]brokenStr = brokenStr or tostring(safeOrAheadnessTargetLoc.z):find("nan") and "targetToCloseAlliedCreepSetVector "..tostring(safeOrAheadnessTargetLoc) or nil
-	local targetToCloseAlliedCreepSetVector =
-			Positioning_FlipAxisTeamIfAggressiveOrientationMovement(
-				Vector_ToDirectionalUnitVector(
-					Vector_PointToPointLine(
-						locationOfUnit, safeOrAheadnessTargetLoc
-					)
-				),
-				safeOrAheadnessTargetLoc
+			( closestAlliedCreepSet and closestAlliedCreepSet.center
+				or TEAM_FOUNTAIN
+			) or ENEMY_FOUNTAIN
+
+	local directionalFromUnit
+	if safeOrAheadnessTargetLoc == locationOfUnit then
+		local offset = UNIT_2D_VEC_COMPONENT
+		offset = TEAM_IS_RADIANT
+				and (aheadness < 0.5 and -offset or offset)
+				or (aheadness < 0.5 and offset or -offset)
+		directionalFromUnit = Vector(offset, offset)
+	else
+		directionalFromUnit = Vector_UnitDirectionalPointToPoint2D(
+				locationOfUnit, safeOrAheadnessTargetLoc
 			)
---[[DEV]]brokenStr = brokenStr or tostring(targetToCloseAlliedCreepSetVector.z):find("nan") and "targetToCloseAlliedCreepSetVector "..tostring(targetToCloseAlliedCreepSetVector) or nil
+	end
+	--[[DEV]]print("D", directionalFromUnit, safeOrAheadnessTargetLoc, locationOfUnit)
+--[[DEV]]brokenStr = brokenStr or tostring(safeOrAheadnessTargetLoc.x):find("nan") and "safeOrAhead "..tostring(safeOrAheadnessTargetLoc) or nil
+	local targetToCloseAlliedCreepSetVector = aheadness < 0.5
+			and Positioning_FlipAxisTeamIfAggressiveOrientationMovement(
+					directionalFromUnit,
+					safeOrAheadnessTargetLoc
+				)
+			or directionalFromUnit
+	--[[DEV]]print(targetToCloseAlliedCreepSetVector)
+--[[DEV]]brokenStr = brokenStr or tostring(targetToCloseAlliedCreepSetVector.x):find("nan") and "targetToCloseAlliedCreepSetVector "..tostring(targetToCloseAlliedCreepSetVector) or nil
 	-- TODO ranged heroes use a -^- shape where carrot is stradling the enemy, to avoid
 	-- - unneccesary opportunity to melee enemies. (i.e. shaped over the aheadness
 	-- - 0.0 to 1.0 scale)
 	local standingDistance = gsiPlayer.attackRange
-			+ ( gsiPlayer.isRanged and 
-					SAFE_STANDING_NEAR_ATTACK_VARIANCE_RANGED
-					* ( SAFE_STANDING_NEAR_ATTACK_SHIFT_TIME_RANGED
-						+ max(
-							0, 
-							min(
+			+ max( gsiPlayer.isRanged
+				and SAFE_STANDING_NEAR_ATTACK_VARIANCE_RANGED
+					* ( SAFE_STANDING_NEAR_ATTACK_SHIFT_TIME_RANGED + max(0, min(
 								MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME, 
-								timeTillStartAttack
+								timeTillStartAttack-0.65
 							)
 						)
 					)
-				or
-					SAFE_STANDING_NEAR_ATTACK_VARIANCE_MELEE
-					* ( SAFE_STANDING_NEAR_ATTACK_SHIFT_TIME_MELEE
-						+ max(
-							0, 
-							min(
+				or SAFE_STANDING_NEAR_ATTACK_VARIANCE_MELEE
+					* ( SAFE_STANDING_NEAR_ATTACK_SHIFT_TIME_MELEE + max(0, min(
 								MAXIMUM_CONSIDERED_MOVE_CLOSER_TIME_FRAME, 
-								max(0, timeTillStartAttack-0.5)
+								timeTillStartAttack-0.25
 							)
 						)
 					)
@@ -619,66 +645,95 @@ function Positioning_ZSAttackRangeUnitHugAllied(
 					standingDistance
 				)
 			)
---[[DEV]]brokenStr = brokenStr or tostring(unitToCloseAlliedCreepSetAtAttackRange.z):find("nan") and "unitToClose "..standingDistance or nil
---[[DEV]]if DEBUG then DebugDrawLine(unitToCloseAlliedCreepSetAtAttackRange, Vector_Addition(unitToCloseAlliedCreepSetAtAttackRange, Vector_ScalarMultiply2D(Vector_CrossProduct(targetToCloseAlliedCreepSetVector,(gsiPlayer.isRanged and gsiPlayer.zAxisMagnitudeVector or Vector_ScalarMultiply2D(gsiPlayer.zAxisMagnitudeVector, math.log(1.05+timeTillStartAttack)/2))*0.25), 350)), gsiPlayer.DBGColor[1],gsiPlayer.DBGColor[2],gsiPlayer.DBGColor[3]) end
-	local location = forceAttackRange and location or Vector_Addition(
-			unitToCloseAlliedCreepSetAtAttackRange,
-			Vector_ScalarMultiply2D(
+	--[[DEV]]print(unitToCloseAlliedCreepSetAtAttackRange, standingDistance)
+--[[DEV]]brokenStr = brokenStr or tostring(unitToCloseAlliedCreepSetAtAttackRange.x):find("nan") and "unitToClose "..standingDistance or nil
+--[[DEV]]if DEBUG then DebugDrawLine(unitToCloseAlliedCreepSetAtAttackRange, Vector_Addition(unitToCloseAlliedCreepSetAtAttackRange, Vector_ScalarMultiply2D(Vector_CrossProduct(targetToCloseAlliedCreepSetVector,(gsiPlayer.isRanged and gsiPlayer.zAxisMagnitudeVector or Vector_ScalarMultiply2D(gsiPlayer.zAxisMagnitudeVector, math.log(1.05+timeTillStartAttack)/2))*0.25), 350)), GetDBGColor(gsiPlayer, 1), GetDBGColor(gsiPlayer, 2), GetDBGColor(gsiPlayer, 3)) end
+	local location = forceAttackRange and unitToCloseAlliedCreepSetAtAttackRange
+			or Vector_Addition(unitToCloseAlliedCreepSetAtAttackRange,
 				Vector_CrossProduct(
-					targetToCloseAlliedCreepSetVector,
-					(gsiPlayer.isRanged and gsiPlayer.zAxisMagnitudeVector or Vector_ScalarMultiply2D(gsiPlayer.zAxisMagnitudeVector, math.log(1.05+timeTillStartAttack)/2))*0.25
-				),
-				350	
+					Vector_ToLength(targetToCloseAlliedCreepSetVector,
+						max(0, min(350, 175 * timeTillStartAttack))
+					),
+					( gsiPlayer.isRanged and gsiPlayer.zAxisMagnitudeVector
+						or Vector_ScalarMultiply2D(
+							gsiPlayer.zAxisMagnitudeVector,
+							timeTillStartAttack > 0
+								and math.log(1.05+timeTillStartAttack)/2
+								or 1
+						)
+					)
+				)
 			)
-		)
-	--[[DEV]]brokenStr = brokenStr or tostring(location.z):find("nan") and "loc1" or nil
-	location = Positioning_AdjustToAvoidCrowdingSetType( 
-			gsiPlayer, location, SET_HERO_ALLIED, (gsiPlayer.isRanged and 550 or 250)*min(1, max(0.3, timeTillStartAttack))
+	--[[DEV]]	print(targetToCloseAlliedCreepSetVector, brokenStr, location,
+	--[[DEV]]	Vector_ToLength(targetToCloseAlliedCreepSetVector, max(0, min(350, 175 * timeTillStartAttack))))
+	--[[DEV]]brokenStr = brokenStr or (tostring(location.x):find("nan") and "loc1") or nil
+	location = Positioning_AdjustToAvoidCrowdingSetType( gsiPlayer, location,
+				SET_HERO_ALLIED,
+				(gsiPlayer.isRanged and 550 or 250)
+					* min(1, max(0.3, timeTillStartAttack))
 	-- ^^ i.e. range bots may go wide in a lane at attack range, and melee should have some knowledge of bumping, but don't get pushed below the creep wave by a range hero
 		)
-	--[[DEV]]brokenStr = brokenStr or tostring(location.z):find("nan") and "loc2avoidallied" or nil
+	--[[DEV]]brokenStr = brokenStr or tostring(location.x):find("nan") and "loc2avoidallied" or nil
 	if unitSetToAvoid ~= UNIT_TYPE_NONE then
-		careFactor = (careFactor and careFactor or 10000) * min(forceAttackRange and 0 or 1, timeTillStartAttack)
+		careFactor = (careFactor and careFactor or 150) * min(forceAttackRange and 0 or 1, timeTillStartAttack)
 		location = Positioning_AdjustToAvoidCrowdingSetType(
 				gsiPlayer, location, unitSetToAvoid ~= nil and unitSetToAvoid or SET_HERO_ENEMY, careFactor
 			)
 	end
-	--[[DEV]]brokenStr = brokenStr or tostring(location.z):find("nan") and "loc3avoidset" or nil
+	--[[DEV]]print("q", location)
+	--[[DEV]]brokenStr = brokenStr or tostring(location.x):find("nan") and "loc3avoidset" or nil
 	if not dontCheckTower then
 		local closestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
 		if closestTower and Positioning_MovingToLocationAgrosTower(gsiPlayer, location, closestTower) then 
-			location = Positioning_AdjustToAvoidLocation(location, gsiPlayer.lastSeen.location, closestTower.lastSeen.location, closestTower.attackRange+150)
+			location = Positioning_AdjustToAvoidLocation(location, gsiPlayer.lastSeen.location,
+					closestTower.lastSeen.location, closestTower.attackRange+150
+				)
 			--print(gsiPlayer.shortName, "movement vector addition performed sporadic")
 		end
-	--[[DEV]]brokenStr = brokenStr or tostring(location.z):find("nan") and "loc4avoidenemytower" or nil
+	--[[DEV]]brokenStr = brokenStr or tostring(location.x):find("nan") and "loc4avoidenemytower" or nil
 	end
 	
-	if location then
-		if forceAttackRange then -- OPT We've done our best to move away / towards what's important, push it in to know we're in range
-			location = Vector_Addition(
-					location,
-					Vector_ScalarMultiply2D(
-							Vector_UnitDirectionalPointToPoint(
-									location, 
-									locationOfUnit),
-							Math_PointToPointDistance2D(location, locationOfUnit) - gsiPlayer.attackRange + 50
-						)
-				)
-		--[[DEV]]brokenStr = brokenStr or tostring(location.z):find("nan") and "loc4forceattack" or nil
-		end
---[[DEV]]if DEBUG then DebugDrawLine(location, gsiPlayer.lastSeen.location, gsiPlayer.DBGColor[1], gsiPlayer.DBGColor[2], gsiPlayer.DBGColor[3]) end
---[[DEV]]if brokenStr then ERROR_print(string.format("[positioning] nan z found at step %s", brokenStr)) end
-		Positioning_MoveDirectlyCheckPort(gsiPlayer, location)
+	--[[DEV]]print("r", location)
+	if forceAttackRange -- OPT We've done our best to move away / towards what's important, push it in to know we're in range
+			and Math_PointToPointDistance2D(location, locationOfUnit)
+				> gsiPlayer.attackRange - 10 then
+		location = Vector_Addition(
+				locationOfUnit,
+				Vector_ScalarMultiply2D(
+						Vector_UnitDirectionalPointToPoint(
+								locationOfUnit, 
+								location),
+						gsiPlayer.attackRange - 10
+					)
+			)
+	--[[DEV]]brokenStr = brokenStr or tostring(location.x):find("nan") and "loc4forceattack" or nil
 	end
+	--[[DEV]]print("s", location)
+	local low = MAP_COORD_LOW
+	local high = MAP_COORD_HIGH
+	location.x = max(low, min(high, location.x))-- TODO other funcs
+	location.y = max(low, min(high, location.y))
+	location.z = max(0, min(640, location.z)) --[[HEIGHT BAKE]]
+--[[DEV]]if DEBUG and not dryRun then DebugDrawLine(location, gsiPlayer.lastSeen.location, GetDBGColor(gsiPlayer, 1), GetDBGColor(gsiPlayer, 2), GetDBGColor(gsiPlayer, 3)) end
+--[[DEV]]if brokenStr then ERROR_print(false, not DEBUG, "[positioning] nan z found at step %s", brokenStr) end
+	if dryRun then 
+		local portLocation = Port_CheckPortNeeded(gsiPlayer, location, dryRun)
+		--[[DEV]]print("Dry run giving", location, low, high)
+		return location, portLocation or false
+	end
+	Positioning_MoveDirectlyCheckPort(gsiPlayer, location)
 end
 
 function Positioning_MoveDirectlyCheckPort(gsiPlayer, location)
 	location = Vector_BoundedToWorld(location)
 	Port_CheckPortNeeded(gsiPlayer, location)
-	--[[DEV]]if DEBUG then DebugDrawText(1220 + (TEAM_IS_RADIANT and 0 or 350), 55 + gsiPlayer.nOnTeam*8, string.format("%s.mv(%5.0f, %5.0f, %5.0f)stb[%1.2f],sp[%3.0f]", string.sub(gsiPlayer.shortName, 1,4), location.x, location.y, location.z, gsiPlayer.hUnit:GetMovementDirectionStability(), gsiPlayer.hUnit:GetCurrentMovementSpeed()), 155, 255, 35) end
+	--[[DEV]]if DEBUG then DebugDrawText(1220 + (TEAM_IS_RADIANT and 0 or 350), 55 + gsiPlayer.nOnTeam*8, string.format("%s.mv(%5.0f, %5.0f, %5.0f)stb[%1.2f],sp[%3.0f].%d", string.sub(gsiPlayer.shortName, 1,4), location.x, location.y, location.z, gsiPlayer.hUnit:GetMovementDirectionStability(), gsiPlayer.hUnit:GetCurrentMovementSpeed(), gsiPlayer.locationVariation or -0), 155, 255, 35) end
 	gsiPlayer.hUnit:Action_MoveDirectly(location)
+	gsiPlayer.recentMoveTo = location
 end
 
 function Positioning_PanicButtonFountain(gsiPlayer)
-	gsiPlayer.hUnit:Action_MoveDirectly(Map_GetLogicalLocation(TEAM==TEAM_RADIANT and MAP_POINT_RADIANT_FOUNTAIN or MAP_ZONE_DIRE_FOUNTAIN))
+	local loc = TEAM_FOUNTAIN
+	gsiPlayer.hUnit:Action_MoveDirectly(loc)
+	gsiPlayer.recentMoveTo = loc
 end

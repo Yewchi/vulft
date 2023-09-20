@@ -1,10 +1,10 @@
 local hero_data = {
 	"tusk",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 3, 3, 4, 3, 3, 8, 6, 4, 10, 11},
+	{1, 2, 3, 3, 3, 4, 3, 2, 2, 1, 2, 4, 1, 6, 7, 1, 4, 9, 12},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_quelling_blade","item_ward_observer","item_bottle","item_boots","item_blades_of_attack","item_phase_boots","item_falcon_blade","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aether_lens","item_gem","item_point_booster","item_vitality_booster","item_octarine_core",
+		"item_faerie_fire","item_tango","item_quelling_blade","item_magic_stick","item_branches","item_branches","item_magic_wand","item_boots","item_chainmail","item_phase_boots","item_cornucopia","item_claymore","item_bfury","item_blight_stone","item_mithril_hammer","item_desolator","item_javelin","item_demon_edge","item_blitz_knuckles","item_monkey_king_bar","item_hyperstone","item_buckler","item_assault","item_lesser_crit",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
+	{ {3,3,3,3,5,}, {3,3,3,4,4,}, 0.1 },
 	{
 		"Ice Shards","Snowball","Tag Team","Walrus PUNCH!","+25 Tag Team Damage","+0.5s Walrus Punch Stun Duration","+325 Health","+120 Snowball Damage","-6s Ice Shards Cooldown","+75% Walrus Punch Crit","12% Chance Walrus Punch","-8s Snowball Cooldown",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

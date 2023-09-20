@@ -1,10 +1,13 @@
-##  Terjemahan 
-
-Terjemahan membutuhkan waktu lama bagi saya, sekitar 30 menit. Saya perlu kembali ke pemrograman, jadi file ini mungkin sudah ketinggalan zaman. Jika proses instalasi manual diperbaiki dan tidak lagi diperlukan, saya akan memperbarui dokumen ini. Lihat halaman lokakarya bahasa Inggris untuk tanggal pembuatan DotaBuff saat ini dan tanggal rilis perangkat lunak.
-
+## VULFT
 
 
 VULFT - Total Override Bot Script. Peran DotaBuff dan urutan pembuatan inventaris diperbarui pada: 19/03/23. Memerlukan instalasi manual ke folder vscripts/bots (sama seperti Phalanx Bot, dan bot terbaru lainnya, karena bug bengkel Dota). VUL-FT tidak berafiliasi dengan DotaBuff.
+
+
+
+##  Terjemahan 
+
+Terjemahan membutuhkan waktu lama bagi saya, sekitar 30 menit. Saya perlu kembali ke pemrograman, jadi file ini mungkin sudah ketinggalan zaman. Jika proses instalasi manual diperbaiki dan tidak lagi diperlukan, saya akan memperbarui dokumen ini. Lihat halaman lokakarya bahasa Inggris untuk tanggal pembuatan DotaBuff saat ini dan tanggal rilis perangkat lunak.
 
 
 

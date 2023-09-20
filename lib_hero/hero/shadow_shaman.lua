@@ -1,12 +1,12 @@
 local hero_data = {
 	"shadow_shaman",
-	{3, 1, 1, 2, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 8, 6, 4, 10, 12},
+	{3, 1, 3, 2, 3, 4, 3, 2, 2, 2, 6, 4, 1, 1, 8, 1, 4, 10},
 	{
-		"item_ward_dispenser","item_magic_wand","item_boots","item_arcane_boots","item_aether_lens","item_aghanims_shard","item_tranquil_boots","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_pers","item_void_stone","item_ring_of_health","item_refresher","item_gem","item_vitality_booster","item_soul_booster",
+		"item_blood_grenade","item_faerie_fire","item_tango","item_branches","item_ward_sentry","item_enchanted_mango","item_tango","item_branches","item_ward_sentry","item_magic_wand","item_boots","item_wind_lace","item_arcane_boots","item_blink","item_void_stone","item_aether_lens","item_tranquil_boots","item_vitality_booster","item_energy_booster","item_aeon_disk",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {5,5,5,3,3,}, {4,4,4,4,4,}, 0.1 },
 	{
-		"Ether Shock","Hex","Shackles","Mass Serpent Ward","+155 Shackles Total Damage","-3.0s Hex Cooldown","+140 Serpent Wards Attack Range","+1.0s Shackles Duration","Hex Breaks","+1 Serpent Wards Max HP","+380 Ether Shock Damage","+25 Wards Attack Damage",
+		"Ether Shock","Hex","Shackles","Mass Serpent Ward","+170 Shackles Total Damage","-2.0s Hex Cooldown","+140 Serpent Wards Attack Range","+1.0s Shackles Duration","Hex Breaks","+1 Serpent Wards Max HP","+400 Ether Shock Damage","+25 Wards Attack Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

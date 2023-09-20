@@ -1,16 +1,16 @@
 local hero_data = {
 	"abaddon",
-	{2, 3, 2, 3, 2, 4, 2, 3, 3, 5, 1, 4, 1, 1, 7, 1, 4, 10, 11},
+	{2, 1, 1, 2, 2, 4, 2, 1, 1, 6, 3, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_magic_wand","item_wind_lace","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_falcon_blade","item_relic","item_radiance","item_yasha","item_manta","item_blink","item_hyperstone","item_buckler","item_assault","item_basher","item_abyssal_blade","item_overwhelming_blink",
+		"item_blood_grenade","item_enchanted_mango","item_tango","item_branches","item_quelling_blade","item_branches","item_branches","item_boots","item_chainmail","item_phase_boots","item_magic_wand","item_robe","item_oblivion_staff","item_ogre_axe","item_echo_sabre","item_blitz_knuckles","item_broadsword","item_shadow_amulet","item_broadsword","item_invis_sword","item_blades_of_attack","item_silver_edge","item_belt_of_strength","item_basher","item_diadem","item_gem","item_lifesteal","item_harpoon","item_ultimate_orb","item_ultimate_orb","item_skadi","item_claymore","item_satanic",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,4,1,3,}, 0.1 },
 	{
-		"Mist Coil","Aphotic Shield","Curse of Avernus","Borrowed Time","+15% Curse of Avernus Movement Slow","+8 Strength","+65 Damage","+50 Mist Coil Heal/Damage","+100 Aphotic Shield Health","-8s Borrowed Time Cooldown","-1 Curse of Avernus Attacks Required","+400 AoE Mist Coil",
+		"Mist Coil","Aphotic Shield","Curse of Avernus","Borrowed Time","+15% Curse of Avernus Movement Slow","+7 Strength","+55 Damage","+40 Mist Coil Heal/Damage","+100 Aphotic Shield Barrier Amount","+400 DPS Borrowed Time Immolation","-1 Curse of Avernus Attacks Required","+400 AoE Mist Coil",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"abaddon_death_coil", ABILITY_TYPE.HEAL + ABILITY_TYPE.NUKE, 0},
@@ -69,6 +69,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -135,8 +136,9 @@ d = {
 			end
 		end
 		if CAN_BE_CAST(gsiPlayer, aphoticShield) then
-			nearbyEnemies = #nearbyEnemies > 1 and Set_NumericalIndexUnion(nearbyEnemies, outerEnemies)
-					or outerEnemies
+			nearbyEnemies = #nearbyEnemies > 1 and Set_NumericalIndexUnion(nil, nearbyEnemies,
+					outerEnemies
+				) or outerEnemies
 			-- NB. nearbyEnemies set changed
 			local _, saveUnit = SAVE_JIT(
 				gsiPlayer, nil, nearbyEnemies, aphoticShield:GetCastRange(), true
@@ -147,9 +149,12 @@ d = {
 				USE_ABILITY(gsiPlayer, aphoticShield, saveUnit, 500, nil)
 				return;
 			end
-			nearbyAllies[#nearbyAllies] = gsiPlayer
 			if not lowestAlliedHpp then
-				lowestAllied, lowestAlliedHpp = LOWEST_HPP_PLAYER(nearbyAllies)
+				if not nearbyAllies[1] then
+					lowestAllied, lowestAlliedHpp = gsiPlayer, playerHpp
+				else
+					lowestAllied, lowestAlliedHpp = LOWEST_HPP_PLAYER(nearbyAllies)
+				end
 			end
 			if lowestAllied and arbitraryEnemy
 					and HIGH_USE(gsiPlayer, aphoticShield, highUse, lowestAlliedHpp) then

@@ -1,16 +1,16 @@
 local hero_data = {
 	"spirit_breaker",
-	{3, 1, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 5, 4, 10, 11},
+	{3, 1, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 6, 4, 10, 12},
 	{
-		"item_gauntlets","item_gauntlets","item_branches","item_tango","item_branches","item_faerie_fire","item_bracer","item_boots","item_bracer","item_chainmail","item_blades_of_attack","item_phase_boots","item_wind_lace","item_magic_wand","item_blitz_knuckles","item_broadsword","item_invis_sword","item_ogre_axe","item_point_booster","item_ultimate_scepter","item_black_king_bar","item_aghanims_shard","item_yasha","item_kaya","item_yasha_and_kaya",
+		"item_tango","item_branches","item_branches","item_magic_stick","item_branches","item_ward_observer","item_bottle","item_magic_wand","item_boots","item_wind_lace","item_phase_boots","item_blitz_knuckles","item_broadsword","item_invis_sword","item_void_stone","item_point_booster","item_octarine_core","item_point_booster","item_ultimate_scepter","item_aghanims_shard","item_yasha_and_kaya","item_ultimate_orb","item_cornucopia","item_sphere","item_ultimate_scepter_2","item_sheepstick","item_silver_edge","item_assault","item_moon_shard",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,4,4,}, 0.1 },
+	{ {3,3,3,1,5,}, {3,3,3,5,4,}, 0.1 },
 	{
-		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+10% Greater Bash Chance","+175 Charge of Darkness Move Speed","+25% Greater Bash Damage","+800 Health",
+		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-3.0s Bulldoze Cooldown","+40 Damage","+25% Greater Bash Damage","+200 Charge of Darkness Bonus Speed","+20% Greater Bash Chance","Bulldoze +500 All Damage Barrier",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"spirit_breaker_charge_of_darkness", ABILITY_TYPE.STUN + ABILITY_TYPE.SMITE},
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

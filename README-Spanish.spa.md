@@ -1,10 +1,13 @@
-##  Traducción 
-
-La traducción me lleva mucho tiempo, unos 30 minutos. Necesito volver a la programación, por lo que este archivo puede estar desactualizado. Si el proceso de instalación manual está solucionado y ya no es necesario, actualizaré este documento. Consulte la página del taller en inglés para conocer la fecha de compilación actual de DotaBuff y la fecha de lanzamiento del software.
-
+## VULFT
 
 
 VULFT - Script de bot de anulación total. Comportamiento de lucha altamente dinámico. Los roles de DotaBuff y las secuencias de compilación de inventario se actualizan el: 19/03/23. Requiere instalación manual en la carpeta vscripts/bots (igual que Phalanx Bot y otros bots recientes, debido a un error de taller de Dota). VUL-FT no está afiliado con DotaBuff.
+
+
+
+##  Traducción 
+
+La traducción me lleva mucho tiempo, unos 30 minutos. Necesito volver a la programación, por lo que este archivo puede estar desactualizado. Si el proceso de instalación manual está solucionado y ya no es necesario, actualizaré este documento. Consulte la página del taller en inglés para conocer la fecha de compilación actual de DotaBuff y la fecha de lanzamiento del software.
 
 
 

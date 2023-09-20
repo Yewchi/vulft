@@ -1,12 +1,12 @@
 local hero_data = {
 	"riki",
-	{2, 1, 2, 3, 2, 4, 2, 1, 1, 5, 1, 4, 3, 3, 8, 3, 4, 9, 11},
+	{2, 3, 2, 1, 2, 4, 2, 1, 3, 3, 5, 4, 3, 1, 7, 1, 4, 9, 11},
 	{
-		"item_quelling_blade","item_orb_of_venom","item_tango","item_branches","item_branches","item_wraith_band","item_blight_stone","item_fluffy_hat","item_orb_of_corrosion","item_boots","item_ring_of_health","item_crown","item_pers","item_meteor_hammer","item_gloves","item_boots_of_elves","item_power_treads","item_aghanims_shard","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_point_booster","item_ultimate_scepter","item_gem","item_lesser_crit","item_demon_edge","item_greater_crit","item_gem","item_monkey_king_bar",
+		"item_quelling_blade","item_tango","item_faerie_fire","item_branches","item_ward_observer","item_branches","item_bottle","item_wraith_band","item_wraith_band","item_boots","item_magic_wand","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_diffusal_blade_2","item_ultimate_orb","item_cornucopia","item_sphere","item_blade_of_alacrity","item_yasha","item_manta","item_black_king_bar","item_disperser","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_gem","item_ultimate_scepter","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,3,2,}, {1,1,4,5,2,}, 0.1 },
+	{ {3,3,3,2,2,}, {3,3,3,2,4,}, 0.1 },
 	{
-		"Smoke Screen","Blink Strike","Tricks of the Trade","Cloak and Dagger","+60 Smoke Screen Radius","+0.4s Blink Strike Slow","8% Cloak and Dagger Movement Speed","-4s Smoke Screen Cooldown","+0.5 Backstab Multiplier","-4s Blink Strike Replenish Time","-4 Tricks of the Trade Cooldown","Tricks of the Trade Applies a Basic Dispel",
+		"Smoke Screen","Blink Strike","Tricks of the Trade","Cloak and Dagger","+50 Smoke Screen Radius","+8% Cloak and Dagger Movement Speed","+40% Tricks of the Trade Agility Increase","-3s Smoke Screen Cooldown","+0.4 Backstab Multiplier","-4s Blink Strike Replenish Time","-4 Tricks of the Trade Cooldown","Tricks of the Trade Applies a Basic Dispel",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

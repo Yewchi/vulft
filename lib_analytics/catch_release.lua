@@ -133,7 +133,7 @@ function CatchRelease_CanWeCatch(gsiPlayer, targetUnit, groupOfAllies)
 	local currTime = GameTime()
 	local pnot = gsiPlayer.nOnTeam
 
-	groupOfAllies = groupOfAllies or Set_GetAlliedHeroesInLocRadius(
+	groupOfAllies = groupOfAllies or Set_GetAlliedHeroesInLocRad(
 			gsiPlayer, targetUnit.lastSeen.location, 1600, -- Lua. (extensibility)
 			true
 		)

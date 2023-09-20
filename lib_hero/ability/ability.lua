@@ -50,7 +50,7 @@ local t_enemy_skill_build = {}
 local t_enemy_ability_name_indices = {}
 local t_enemy_abilities = {}
 
-local t_enemy_ability_cooldown = {} -- Idea would be to process discrete data with inaccuracies and another layer of bot-brain-memory. The conclusion of the idea is a simulated communication channel between the bots, which may incorporate personalities and randomized "how-im-feeling-todays", to essentially randomize when they may or may not behave engage in behaviours that players engage in by saying and responding to statements like "Queen of Pain ulti [approximately] off cd, care."
+local t_enemy_ability_cooldown = {} -- Idea would be to process discrete data with inaccuracies and another layer of bot-brain-memory. The conclusion of the idea is a simulated communication channel between the bots, which may incorporate personalities and randomized "how-im-feeling-todays", to essentially randomize when they may or may not behave engage in behaviors that players engage in by saying and responding to statements like "Queen of Pain ulti [approximately] off cd, care."
 
 local job_domain
 
@@ -179,7 +179,7 @@ function Ability_HandleAbilityUpgrades(gsiPlayer) -- TODO Locks ability points i
 	end
 end
 
-function Ability_PassPlayerAbilityData(gsiPlayer, skillBuild, abilityNameIndices, abilities)
+function Ability_InitializePlayer(gsiPlayer, skillBuild, abilityNameIndices, abilities)
 	-- store data
 	--print("PRELOAD", Util_PrintableTable(skillBuild), Util_PrintableTable(abilityNameIndices), Util_PrintableTable(abilities))
 	local pnot = gsiPlayer.nOnTeam

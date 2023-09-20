@@ -39,6 +39,7 @@ local DENY_GOLD_TAKEN_PERCENT = 0.5 -- because they might've hit the last hit
 local DENY_XP_TAKEN_PERCENT = 0.5 -- because 50% xp denied
 
 XETA_SCORE_DO_NOT_RUN = -0xFFFF
+XETA_SCORE_DO_NOT_RUN_SOFT = -0x0FFF
 
 VALUE_OF_ONE_MANA = 50*0.6 / (6 * 30) -- (50g / (clarity mana))*(depreciation for 'dont-get-hit' cave-at)
 VALUE_OF_ONE_HEALTH = 110*0.8 / (40*10) -- (110g / (healing salve health))*(depreciation for 'dont-get-hit' cave-at)

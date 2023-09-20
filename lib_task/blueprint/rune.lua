@@ -39,6 +39,16 @@ RUNE_LOCATIONS = {} -- TODO the indexing on this is very poorly done, needs sepa
 -- .NORTH_POWER
 -- .SOUTH_POWER
 
+RUNE_MODIFIERS = {
+		"modifier_rune_arcane",
+		"modifier_rune_doubledamage",
+		"modifier_rune_regen",
+		"modifier_rune_hast",
+		"modifier_rune_invis",
+		"modifier_rune_shield"
+	}
+local RUNE_MODIFIERS = RUNE_MODIFIERS
+
 local PRE_GAME_END_TIME = PRE_GAME_END_TIME
 local BOUNTY_RUNE_PREP_TIME = 30
 local POWER_RUNE_PREP_TIME = 8 -- Not quite as important
@@ -117,6 +127,7 @@ local RUNE_I__WHILE_WAITING_TEST_PICKUP = 7
 local RUNE_I__CLOSEST_SAFE_HERO = 8
 local RUNE_I__ENEMY_MISSING_TIME = 9
 local RUNE_I__ODDS_AVAILABLE = 10
+local RUNE_I__ENEMY_MISSING_LOC = 11
 
 local fast_data = {}
 
@@ -128,6 +139,18 @@ local t_enemy_members
 local task_handle = Task_CreateNewTask()
 
 local zone_defend_run
+
+local STR__CANT_RUNE = "Full-takeover bots cannot pickup stacked runes. I'll try to grab the new spawn."
+RegisterLocalize(STR__CANT_RUNE,
+		"zh", "完全接管机器人无法拾取堆叠的赏金和南部水域护身符。 我会尝试拿起下一个出现的。",
+		"ru", "Боты полного переопределения не могут собирать сложенные руны и Нижняя вода руна. "..
+				"попробую собрать следующую"
+	)
+local STR__CANT_RUNE_FUN = "Humans love stacked runes, right?"
+RegisterLocalize(STR__CANT_RUNE_FUN,
+		"zh", "人类喜欢堆叠的符文，对吧？",
+		"ru", "Ба! дуна руна"
+	)
 
 local BOUNTY_PRE_TEAM_GOLD = 40*5
 local BOUNTY_POST_TEAM_GOLD = 36*5
@@ -167,7 +190,7 @@ local function check_if_closer_set_rune(fromLoc, currDist, runeNumerical, key)
 	local thisDistance = Math_PointToPointDistance2D(fromLoc, toLoc)
 	if thisDistance < currDist then
 		RUNE_LOCATIONS[key] = {toLoc, runeHandle, GetRuneStatus(runeHandle)}
-		if DEBUG then print("rune", key, "==", runeHandle, "numerically", runeNumerical, fromLoc, toLoc, thisDistance) end
+		--[[DEV]]if DEBUG then print("rune", key, "==", runeHandle, "numerically", runeNumerical, fromLoc, toLoc, thisDistance) end
 		return thisDistance
 	end
 	return currDist
@@ -179,7 +202,7 @@ function abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpHandle)
 	local closestDist = 0xFFFF
 	local closestPlayer
 	--[[DEV]]if VERBOSE and not wpHandle[POSTER_I.OBJECTIVE].runeHandle then
-	--[[DEV]]	ERROR_print(string.format("[rune] Found an iobjective rune without a rune handle"))
+	--[[DEV]]	ERROR_print(false, not DEBUG, "[rune] Found an iobjective rune without a rune handle")
 	--[[DEV]]	Util_TablePrint(wpHandle[POSTER_I.OBJECTIVE], 4)
 	--[[DEV]]	DEBUG_KILLSWITCH = true
 	--[[DEV]]	Util_ThrowError()
@@ -269,7 +292,8 @@ local function get_closest_rune_possible(gsiPlayer, spawnTimeAllowed)
 	--[[RUNE_I___FAST]]
 	for i=1,I_BOUNTIES_MAX do
 		local thisRune = RUNE_LOCATIONS[i]
-		local thisDist = Math_PointToPointDistance2D(thisRune[1], playerLoc)
+		local runeLoc = thisRune[1]
+		local thisDist = ((runeLoc.x-playerLoc.x)^2 + (runeLoc.y-playerLoc.y)^2)^0.5
 
 		-- Update status
 		thisRune[RUNE_I__STATUS] = GetRuneStatus(thisRune[RUNE_I__HANDLE])
@@ -278,7 +302,7 @@ local function get_closest_rune_possible(gsiPlayer, spawnTimeAllowed)
 			thisRune[RUNE_I__WHILE_WAITING_TEST_PICKUP] = false
 		end
 
-		if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "CLOSENESS", thisRune[RUNE_I__STATUS], thisRune[RUNE_I__PRESUMED_UNOBTAINABLE], thisRune[RUNE_I__NEXT_SPAWN_TIME], thisDist) end
+		--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "CLOSENESS", thisRune[RUNE_I__STATUS], thisRune[RUNE_I__PRESUMED_UNOBTAINABLE], thisRune[RUNE_I__NEXT_SPAWN_TIME], thisDist) end
 		if thisRune[RUNE_I__STATUS] ~= RUNE_STATUS_MISSING
 				and ( not thisRune[RUNE_I__PRESUMED_UNOBTAINABLE]
 					or thisRune[RUNE_I__NEXT_SPAWN_TIME] - spawnTimeAllowed < currTime
@@ -305,14 +329,12 @@ local function get_bounty_rune_required_power_level(runeLocation)
 		considerEnemies = Set_GetEnemyHeroesInPlayerRadiusAndOuter(thisRuneLoc, rangeToCheck, 8000, 90) --TODO mgk
 		rangeToCheck = closestHero and rangeToCheck+1200 or 6000 -- TODO mgk
 	end
-	if VERBOSE then print("/VUL-FT/", thisRuneLoc, "BOUNTY POWER REQUIRED:", Analytics_GetTheoreticalEncounterPower(considerEnemies, thisRuneLoc, rangeToCheck/2, rangeToCheck)) end
+	--[[DEV]]if VERBOSE then print("/VUL-FT/", thisRuneLoc, "BOUNTY POWER REQUIRED:", Analytics_GetTheoreticalEncounterPower(considerEnemies, thisRuneLoc, rangeToCheck/2, rangeToCheck)) end
 	return Analytics_GetTheoreticalEncounterPower(considerEnemies, thisRuneLoc, rangeToCheck/2, rangeToCheck)
 end
 local Positioning_ProjectedRace = Positioning_ProjectedRace
 local function score_bounty_rune(gsiPlayer, objective, forTaskComparison, wpHandle)
 	-- TODO include scoring around roles / greed.
-	-- TODO elswhere Vector_SpontaneousRaceResult(unit, unit, finishLoc, [unit1Loc, [unit2Loc]]);
-	-- TODO ProjectedRace needs testing for reliability and how bots will react to enemies in fog, approaching, leaving the bounty area (when the bounty would be/is spawned by the time they get there)
 	local bottleSlot = gsiPlayer.hUnit:FindItemSlot("item_bottle")
 	local bottleValue = bottleSlot ~= ITEM_NOT_FOUND and max(0, (RECHARGED_BOTTLE_CHARGES - gsiPlayer.hUnit:GetItemInSlot(bottleSlot):GetCurrentCharges())) * BOTTLE_CHARGE_VALUE or 0
 	local taskComparisonFactor = 1
@@ -331,7 +353,7 @@ local function score_bounty_rune(gsiPlayer, objective, forTaskComparison, wpHand
 				local bestCompetitor
 				local enemyTeam = GSI_GetTeamPlayers(ENEMY_TEAM)
 				for i=1,ENEMY_TEAM_NUMBER_OF_PLAYERS do
-					local _, thisWonBy = Positioning_ProjectedRace(gsiPlayer, enemyTeam[i], objective.lastSeen.location, 4) -- see if we win a race to bounty if both bots continue doing what they're doing now for 4 seconds, then race.
+					local _, thisWonBy = Positioning_ProjectedRace(gsiPlayer, enemyTeam[i], objective.lastSeen.location, 0.5) -- see if we win a race to bounty if both bots continue doing what they're doing now for 0.5 seconds, then race.
 					if thisWonBy < lowestTime then 
 						lowestTime = thisWonBy
 						bestCompetitor = enemyTeam[i]
@@ -358,6 +380,7 @@ end
 							)
 					end
 					WP_InformBail(gsiPlayer, wpHandle)
+					taskComparisonFactor = 0
 				elseif DEBUG then DebugDrawLine(bestCompetitor.lastSeen.location, gsiPlayer.lastSeen.location, 0, 255, 0) end
 			end
 		end
@@ -366,7 +389,7 @@ end
 	taskComparisonFactor = taskComparisonFactor*throwFactor
 	local healthDiff = FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
 	local healthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
-	if VERBOSE then print("/VUL-FT/", "score_bounty_rune", gsiPlayer.shortName, objective.runeHandle, taskComparisonFactor, bounty_rune_basic_value, (4*gsiPlayer.vibe.greedRating), (1+TOTAL_BARRACKS_TEAM-NUM_BARRACKS_UP_TEAM), Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location), (3*(2-healthPercent)), bottleValue, NUM_BARRACKS_UP_TEAM) end
+	--[[DEV]]if VERBOSE then print("/VUL-FT/", "score_bounty_rune", gsiPlayer.shortName, objective.runeHandle, taskComparisonFactor, bounty_rune_basic_value, (4*gsiPlayer.vibe.greedRating), (1+TOTAL_BARRACKS_TEAM-NUM_BARRACKS_UP_TEAM), Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location), (3*(2-healthPercent)), bottleValue, NUM_BARRACKS_UP_TEAM) end
 	return taskComparisonFactor
 			* RUNE_LOCATIONS[objective.runeHandle+1][RUNE_I__ODDS_AVAILABLE]
 			* ( bounty_rune_basic_value
@@ -398,7 +421,7 @@ if DEBUG then
 				DebugDrawLine(gsiPlayer.lastSeen.location, objective.lastSeen.location, 155, 155, 155)
 end
 				for i=1,ENEMY_TEAM_NUMBER_OF_PLAYERS do
-					local _, thisWonBy = Positioning_ProjectedRace(gsiPlayer, enemyTeam[i], objective.lastSeen.location, 4) -- see if we win a race to bounty if both bots continue doing what they're doing now for 4 seconds, then race.
+					local _, thisWonBy = Positioning_ProjectedRace(gsiPlayer, enemyTeam[i], objective.lastSeen.location, 0.5) -- see if we win a race to bounty if both bots continue doing what they're doing now for 0.5s, then race.
 					if thisWonBy < lowestTime then 
 						lowestTime = thisWonBy
 						bestCompetitor = enemyTeam[i]
@@ -431,19 +454,20 @@ end
 	local throwFactor = (1.0 - min(0.92, max(0.0, (DotaTime() - 1000)/2000)))
 	taskComparisonFactor = taskComparisonFactor*throwFactor
 	local healthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
-	if VERBOSE then print("/VUL-FT/", "score_power_rune", gsiPlayer.shortName, objective.runeHandle, taskComparisonFactor, Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location), (1-healthPercent), (TOTAL_BARRACKS_TEAM - NUM_BARRACKS_UP_TEAM), bottleValue) end
+	--[[DEV]]if VERBOSE then print("/VUL-FT/", "score_power_rune", gsiPlayer.shortName, objective.runeHandle, taskComparisonFactor, Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location), (1-healthPercent), (TOTAL_BARRACKS_TEAM - NUM_BARRACKS_UP_TEAM), bottleValue) end
 	return taskComparisonFactor
 			* RUNE_LOCATIONS[objective.runeHandle+1][RUNE_I__ODDS_AVAILABLE]
-			* (POWER_RUNE_BASIC_VALUE
-				- 1.5 * (TOTAL_BARRACKS_TEAM - NUM_BARRACKS_UP_TEAM)
+			* (POWER_RUNE_BASIC_VALUE * ((GetRuneStatus(POWERS_MIN) == RUNE_STATUS_AVAILABLE
+					or GetRuneStatus(POWERS_MIN) == RUNE_STATUS_AVAILABLE
+					or GameTime() < 295)
+					and 1 or 0.5
+				) - 1.5 * (TOTAL_BARRACKS_TEAM - NUM_BARRACKS_UP_TEAM)
 					* Xeta_CostOfTravelToLocation(gsiPlayer, objective.lastSeen.location)
 			+ bottleValue)
 end
 
 function Rune_OddsEnemyIsAttemptingRuneGet(gsiPlayer, spawnTimeAllowed)
 	local closestRuneToEnemy = get_closest_rune_possible(gsiPlayer, spawnTimeAllowed)
-
-	-- Currently asking for a specific location that is different from a player's location itself
 end
 local Rune_OddsEnemyIsAttemptingRuneGet = Rune_OddsEnemeyIsAttemptingRuneGet
 
@@ -476,20 +500,48 @@ local function update_enemy_missing_timestamps()
 	local runes = RUNE_LOCATIONS
 	for i=I_POWERS_MIN,I_BOUNTIES_MAX do
 		local thisMissingTimes = runes[i][RUNE_I__ENEMY_MISSING_TIME]
+		local thisMissingLocs = runes[i][RUNE_I__ENEMY_MISSING_LOC]
 		for iEnemy=1,#enemies do
-			thisMissingTimes[iEnemy] = enemies[iEnemy].lastSeen.previousTimeStamp
+			thisMissingTimes[iEnemy] = enemies[iEnemy].lastSeen.timeStamp
+			thisMissingLocs[iEnemy] = enemies[iEnemy].lastSeen.location
 		end
 	end
 end
-local function update_rune_odds_available(rune)
+local function update_rune_odds_available(rune, powerIsTaken)
 	if rune[RUNE_I__STATUS] == RUNE_STATUS_AVAILABLE then
 		rune[RUNE_I__ODDS_AVAILABLE] = 1
 		return;
 	end
+	
+	local enemyPlayers = t_enemy_members
+
+	if rune[RUNE_I__HANDLE] <= POWERS_MAX then
+		if powerIsTaken == nil then
+			powerIsTaken = false
+			local RUNE_MODIFIERS = RUNE_MODIFIERS
+			local enemyhUnit
+			for i=1,#enemyPlayers do
+				enemyhUnit = enemyPlayers[i].hUnit
+				if enemyhUnit and enemyhUnit.IsNull and not enemyhUnit:IsNull() then
+					for j=1,#RUNE_MODIFIERS do
+						if enemyhUnit:HasModifier(RUNE_MODIFIERS[j]) then
+							powerIsTaken = true
+							goto END_MODIFIER_SEARCH;
+						end
+					end
+				end
+			end
+			::END_MODIFIER_SEARCH::
+		end
+		if powerIsTaken then
+			rune[RUNE_I__ODDS_AVAILABLE] = 0
+			return powerIsTaken;
+		end
+	end
 	local addedDivisorAvailable = 0
 	local missingTimes = rune[RUNE_I__ENEMY_MISSING_TIME] 
+	local missingLocs = rune[RUNE_I__ENEMY_MISSING_LOC]
 	local updateInterval = PRIORITY_UPDATE_RUNES
-	local enemyPlayers = t_enemy_members
 	local addedDivisor = 0
 	for i=1,#enemyPlayers do
 		local thisEnemy = enemyPlayers[i]
@@ -497,31 +549,32 @@ local function update_rune_odds_available(rune)
 if DEBUG then
 		DebugDrawText(1000+thisEnemy.nOnTeam*8, 490, "_", 255, 255, 255)
 end
-		if missingTimes[i] ~= thisEnemy.lastSeen.previousTimeStamp then -- but was missing in previous run through
+		if missingLocs[i] and missingTimes[i] ~= thisEnemy.lastSeen.timeStamp then -- but was missing in previous run through
 			-- In a fresh reveal on the map, add the odds the rune was taken
 			-- TODO Rare false-negative when hero flashes in and out of vision since previous run
-			local durationMissing = GameTime() - thisEnemy.lastSeen.previousTimeStamp
+			local durationMissing = GameTime() - thisEnemy.lastSeen.timeStamp
 			local approxTravelDistance = (thisEnemy.currentMovementSpeed * durationMissing)
 			-- TODO Ignores movement abilities and items
 			local runeIncludedInTravelFit = approxTravelDistance
-					/ (Vector_PointDistance2D(thisEnemy.lastSeen.previousLocation, pickupLoc)
-							+ Vector_PointDistance2D(pickupLoc, thisEnemy.lastSeen.location)
+					/ (Vector_PointDistance(missingLocs[i], pickupLoc)
+							+ Vector_PointDistance(pickupLoc, thisEnemy.lastSeen.location)
 						)
 			if runeIncludedInTravelFit > 0.8 then
 if DEBUG then
-				DebugDrawText(1000+thisEnemy.nOnTeam*8, 500, "Y", 0, 255, 0)
+				DebugDrawText(1000+thisEnemy.nOnTeam*8, 488, "Y", 0, 255, 0)
 end
 				-- Nipple / small hill in a field shape, 3 meaning 1/3 odds available if perfect fit to rune movement
 				-- -| 1/6 odds for two , etc.
 				addedDivisor = addedDivisor + 3 / (runeIncludedInTravelFit^2 - 2*runeIncludedInTravelFit + 2)
-				if VERBOSE then VEBUG_print(string.format("[rune] update_rune_odds_avail %s added total %.4f", thisEnemy.shortName, addedDivisor)) end
+				--[[DEV]]if VERBOSE then VEBUG_print(string.format("[rune] update_rune_odds_avail %s added total %.4f", thisEnemy.shortName, addedDivisor)) end
 			elseif DEBUG then
 				DebugDrawText(1000+thisEnemy.nOnTeam, 500, "Y", 255, 0, 0)
-				if VERBOSE then VEBUG_print(string.format("[rune] update_rune_odds_avail %s ignoring approx distance as low %.3f %.3f", thisEnemy.shortName, runeIncludedInTravelFit, approxTravelDistance)) end
+				--[[DEV]]if VERBOSE then VEBUG_print(string.format("[rune] update_rune_odds_avail %s ignoring approx distance as low %.3f %.3f", thisEnemy.shortName, runeIncludedInTravelFit, approxTravelDistance)) end
 			end
 		end
 	end
 	rune[RUNE_I__ODDS_AVAILABLE] = 1 / (1/rune[RUNE_I__ODDS_AVAILABLE] + addedDivisor)
+	return powerIsTaken
 end
 
 function Rune_CheckBountySpawnPre()
@@ -548,6 +601,9 @@ function Rune_CheckBountySpawnPre()
 	elseif future_bounty_posters_waiting and timeTilPosters < 0 then
 		for i=I_BOUNTIES_MIN,I_BOUNTIES_MAX do
 			local thisRune = rl[i]
+			if thisRune[RUNE_I__WANTED_POSTER] then
+				WP_BurnPoster(thisRune[RUNE_I__WANTED_POSTER])
+			end
 			thisRune[RUNE_I__STATUS] = RUNE_STATUS_AWAITING_INFORM 
 			thisRune[RUNE_I__PRESUMED_UNOBTAINABLE] = false
 			thisRune[RUNE_I__WHILE_WAITING_TEST_PICKUP] = true
@@ -583,8 +639,9 @@ function Rune_CheckPowerSpawnPre()
 	local rl = RUNE_LOCATIONS
 	if timeTilPosters > 0 then
 		-- Update odds rune is available
+		local powerIsTaken = nil
 		for i=I_POWERS_MIN,I_POWERS_MAX do
-			update_rune_odds_available(rl[i])
+			powerIsTaken = update_rune_odds_available(rl[i], powerIsTaken)
 		end
 	end
 	if timeTilPosters < -POWER_RUNE_PREP_TIME+0.017 then
@@ -600,6 +657,10 @@ function Rune_CheckPowerSpawnPre()
 	elseif future_power_posters_waiting and timeTilPosters < 0 then
 		for i=I_POWERS_MIN,I_POWERS_MAX do
 			local thisRune = rl[i]
+			if thisRune[RUNE_I__WANTED_POSTER] then
+				-- TODO "UpdatePoster"?
+				WP_BurnPoster(thisRune[RUNE_I__WANTED_POSTER])
+			end
 			thisRune[RUNE_I__STATUS] = RUNE_STATUS_AWAITING_INFORM 
 			thisRune[RUNE_I__PRESUMED_UNOBTAINABLE] = false
 			thisRune[RUNE_I__WHILE_WAITING_TEST_PICKUP] = true
@@ -616,7 +677,7 @@ function Rune_CheckPowerSpawnPre()
 					nil,
 					DotaTime() > 89 and 0 or get_bounty_rune_required_power_level(thisRune) -- TODO
 				)
-			if VERBOSE then print("/VUL-FT/ [rune]", thisRune[RUNE_I__WANTED_POSTER], "<<<<<<<<<<<< POSTER", i) end
+			--[[DEV]]if VERBOSE then print("/VUL-FT/ [rune]", thisRune[RUNE_I__WANTED_POSTER], "<<<<<<<<<<<< POSTER", i) end
 		end
 		any_runes_for_consider = true
 		future_power_posters_waiting = false -- returns to true when the pre-spawn period is over, to await next pre
@@ -629,9 +690,10 @@ local function estimated_time_til_completed(gsiPlayer, objective)
 end
 
 -- // Init //
+-------------- task_init_func()
 local function task_init_func(taskJobDomain)
 	Blueprint_RegisterTaskName(task_handle, "rune")
-	if VERBOSE then VEBUG_print(string.format("rune: Initialized with handle #%d.", task_handle)) end
+	--[[DEV]]if VERBOSE then VEBUG_print(string.format("rune: Initialized with handle #%d.", task_handle)) end
 
 	t_team_members = GSI_GetTeamPlayers(TEAM)
 	t_enemy_members = GSI_GetTeamPlayers(ENEMY_TEAM)
@@ -640,8 +702,15 @@ local function task_init_func(taskJobDomain)
 
 	-- - Set up the rune locations dynamically - 
 	local bounds = GetWorldBounds()
-	local teamBountyCheck = Map_GetLogicalLocation(TEAM == TEAM_RADIANT and MAP_POINT_RADIANT_FOUNTAIN_CENTER or MAP_POINT_DIRE_FOUNTAIN_CENTER)
-	local enemyBountyCheck = Map_GetLogicalLocation(TEAM == TEAM_RADIANT and MAP_POINT_DIRE_FOUNTAIN_CENTER or MAP_POINT_RADIANT_FOUNTAIN_CENTER)
+	-- TODO HOTFIX
+	local safeLaneTeamTower = GSI_GetLowestTierTeamLaneTower(TEAM, MAP_LOGICAL_SAFE_LANE)
+	local teamBountyCheck = safeLaneTeamTower and safeLaneTeamTower.tier == 1
+			and safeLaneTeamTower.lastSeen.location
+			or TEAM_IS_RADIANT and Vector(1500, -6000) or Vector(-1500, 6000)
+	local safeLaneEnemyTower = GSI_GetLowestTierTeamLaneTower(ENEMY_TEAM, MAP_LOGICAL_OFF_LANE)
+	local enemyBountyCheck = safeLaneEnemyTower and safeLaneEnemyTower.tier == 1
+			and safeLaneEnemyTower.lastSeen.location
+ 			or TEAM_IS_RADIANT and Vector(-1500, 6000) or Vector(1500, -6000)
 	local northBountyCheck = Vector(-1000, 1000) -- Assumes river rune is closer to center-bottom and center-top than team-map-side bounties from 7.30
 	local southBountyCheck = Vector(1000, -1000)
 	local closestAlliedBounty = HIGH_32_BIT
@@ -655,21 +724,31 @@ local function task_init_func(taskJobDomain)
 		mostNorthernRune = check_if_closer_set_rune(northBountyCheck, mostNorthernRune, i, "NORTH_BOUNTY")
 	 	mostSouthernRune = check_if_closer_set_rune(southBountyCheck, mostSouthernRune, i, "SOUTH_BOUNTY")
 	end
+--[[DEV]]Util_TablePrint(RUNE_LOCATIONS)
 	local swapTable = {}
 	for _,runeLoc in pairs(RUNE_LOCATIONS) do
 		swapTable[runeLoc[RUNE_I__HANDLE]+1] = runeLoc -- index bounties to named 1 - 4. TODO BAD
 		runeLoc[RUNE_I__NEXT_SPAWN_TIME] = 0
 		runeLoc[RUNE_I__ODDS_AVAILABLE] = 0
 		local newMissingTimes = {}
+		local newMissingLocs = {}
 		for i=1,#t_enemy_members do
 			newMissingTimes[i] = t_enemy_members[i].lastSeen.timeStamp
+			newMissingLocs[i] = t_enemy_members[i].lastSeen.location
 		end
 		runeLoc[RUNE_I__ENEMY_MISSING_TIME] = newMissingTimes
+		runeLoc[RUNE_I__ENEMY_MISSING_LOC] = newMissingLocs
 	end
+	--[[DEV]]Util_TablePrint(RUNE_LOCATIONS)
 	for i=1,BOUNTIES_MAX+1 do
 		RUNE_LOCATIONS[i] = swapTable[i]
 	end
-
+--[[DEV]]Util_TablePrint(RUNE_LOCATIONS)
+--[[DEV]]print("all runes")
+--[[DEV]]for i=0,10 do
+--[[DEV]]	print(GetRuneSpawnLocation(i))
+--[[DEV]]	print(GetRuneStatus(i))
+--[[DEV]]end
 	-- - task.lua stuff - 
 	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
 
@@ -726,7 +805,7 @@ blueprint = {
 			return XETA_SCORE_DO_NOT_RUN
 		end
 		
-		local hasBottle = gsiPlayer.hUnit:FindItemSlot("item_bottle") ~= ITEM_NOT_FOUND -- also used to say you stand closer
+		local hasBottle = gsiPlayer.usableItemCache.bottle -- also used to say you stand closer
 		if hasBottle then
 			Item_UseBottleIntelligently(gsiPlayer, true)
 		end
@@ -741,10 +820,12 @@ blueprint = {
 			)
 		local gameUnderway = GameTime() >= PRE_GAME_END_TIME
 		local pnot = gsiPlayer.nOnTeam
-		local runeAreaVisible = IsLocationVisible(wpObjective.lastSeen.location)
+		local runeLoc = wpObjective.lastSeen.location
+		local playerLoc = gsiPlayer.lastSeen.location
+		local runeAreaVisible = IsLocationVisible(runeLoc)
 
-		local playerDistanceToRune = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, wpObjective.lastSeen.location)
-		local adjustedForLossesCutLoc = return_worth_loc(gsiPlayer.lastSeen.location, objective.lastSeen.location)
+		local playerDistanceToRune = Math_PointToPointDistance2D(playerLoc, runeLoc)
+		local adjustedForLossesCutLoc = return_worth_loc(playerLoc, runeLoc)
 		local thisRune = RUNE_LOCATIONS[objective.runeHandle+1]
 		local tryWaitingAvailablePickups = thisRune[RUNE_I__WHILE_WAITING_TEST_PICKUP]
 		--[[print(gsiPlayer.shortName, "checking burn", GameTime(), ">", player_pick_up_time_limit[pnot], (GetRuneStatus(objective.runeHandle) == RUNE_STATUS_MISSING and notPreSpawnPeriod), string.format("%.2f, %.2f",
@@ -754,10 +835,10 @@ blueprint = {
 					and tryWaitingAvailablePickups then
 				-- Stop trying to pick up the singular available rune during preSpawn.
 				if not alerted_unable_to_pickup_old_runes then
-					if RandomInt(1,111) == 11 then
-						gsiPlayer.hUnit:ActionImmediate_Chat("So the data is like \"rune here!\" right? and I go, and I click, and nothing happens...", false)
+					if RandomInt(1,29) == 29 then
+						gsiPlayer.hUnit:ActionImmediate_Chat(GetLocalize(STR__CANT_RUNE_FUN), false)
 					else
-						gsiPlayer.hUnit:ActionImmediate_Chat("Full-takeover bots cannot pickup stacked runes. I'll try to grab the new spawn.", false)
+						gsiPlayer.hUnit:ActionImmediate_Chat(GetLocalize(STR__CANT_RUNE), false)
 					end
 					alerted_unable_to_pickup_old_runes = true
 				end
@@ -772,26 +853,26 @@ blueprint = {
 				end
 			end
 			--print(gsiPlayer.shortName, "game has started")
-			if DEBUG then print("/VUL-FT/ [rune]", gsiPlayer.shortName, "waiting rune info", notPreSpawnPeriod, tryWaitingAvailablePickups, GetRuneStatus(objective.runeHandle), runeAreaVisible) end
+			--[[DEV]]if DEBUG then print("/VUL-FT/ [rune]", gsiPlayer.shortName, "waiting rune info", notPreSpawnPeriod, tryWaitingAvailablePickups, GetRuneStatus(objective.runeHandle), runeAreaVisible) end
 			if gameUnderway and abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpForBotTask) then
 				return XETA_SCORE_DO_NOT_RUN
 			end
 			if notPreSpawnPeriod and (
 						GameTime() > player_pick_up_time_limit[pnot]
 						or (runeAreaVisible and GetRuneStatus(objective.runeHandle) == RUNE_STATUS_MISSING)
-					) then -- *^ wrong TODO What, why?
+					) then
 				-- '-1', i.e. ignore the bail if there is 1 sec till spawn, or we are in equal or less danger
 				-- essentially, in the 1 danger case, where the enemy and you are equal, there is a tug of war of intent, which is guided by the volatility of the match state for each player.
 				-- a late-game death is game-losing, and it shouldn't be given over a known as contested or suspected as contested bounty rune. this is not represented. TODO
 				WP_BurnPoster(wpForBotTask)	
-				if TEST then print(string.format("%s burns poster because %.2f > %.2f || (%s ? %d : NULL == %d && %s)", gsiPlayer.shortName, GameTime(), player_pick_up_time_limit[pnot], runeAreaVisible, GetRuneStatus(objective.runeHandle), RUNE_STATUS_MISSING, notPreSpawnPeriod)) end
+				--[[DEV]]if TEST then print(string.format("%s burns poster because %s && (%.2f > %.2f || (%s && %d == %d))", gsiPlayer.shortName, notPreSpawnPeriod, GameTime(), player_pick_up_time_limit[pnot], runeAreaVisible, GetRuneStatus(objective.runeHandle), RUNE_STATUS_MISSING)) end
 				thisRune[RUNE_I__WANTED_POSTER] = nil
 				thisRune[RUNE_I__PRESUMED_UNOBTAINABLE] = true
-				gsiPlayer.hUnit:ActionImmediate_Ping(wpObjective.lastSeen.location.x, wpObjective.lastSeen.location.y, false)
+				gsiPlayer.hUnit:ActionImmediate_Ping(runeLoc.x, runeLoc.y, false)
 				player_pick_up_time_limit[pnot] = 0xFFFF
 				return XETA_SCORE_DO_NOT_RUN
 			elseif playerDistanceToRune > 400 and ( (-1 + (gsiPlayer.time.data.theorizedDanger or 0))
-								* (	-1 + max( Math_ETAFromLoc(gsiPlayer, adjustedForLossesCutLoc, objective.lastSeen.location),
+								* (	-1 + max( Math_ETAFromLoc(gsiPlayer, adjustedForLossesCutLoc, runeLoc),
 										max(1, min(timeTilNextSpawn, BOUNTY_RUNE_PREP_TIME)))
 									)
 							> 1
@@ -807,10 +888,10 @@ blueprint = {
 			elseif (notPreSpawnPeriod or tryWaitingAvailablePickups)
 						and GetRuneStatus(objective.runeHandle) == RUNE_STATUS_AVAILABLE
 						and runeAreaVisible then
-				if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "tries start 1, picking up") end
+				--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "tries start 1, picking up") end
 				WP_PlayerTryStart(gsiPlayer, wpForBotTask, true)
 				if objective.runeHandle+1 <= I_POWERS_MAX and DotaTime() > END_DOUBLE_POWER_RUNES then
-					if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "removes opposite rune") end
+					--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "removes opposite rune") end
 					local oppositeSidePowerIndex = objective.runeHandle+1 == I_POWERS_MIN and I_POWERS_MAX or I_POWERS_MIN
 					local oppositeSidePower = RUNE_LOCATIONS[oppositeSidePowerIndex][RUNE_I__WANTED_POSTER]
 					if oppositeSidePower then
@@ -820,53 +901,60 @@ blueprint = {
 					end
 				end
 if DEBUG then
-				DebugDrawLine(gsiPlayer.lastSeen.location, GetRuneSpawnLocation(wpObjective.runeHandle), 255, 0, 255)
+				DebugDrawLine(playerLoc, GetRuneSpawnLocation(wpObjective.runeHandle), 255, 0, 255)
 end
 				if playerDistanceToRune > 120 then
 if DEBUG then
-					DebugDrawLine(gsiPlayer.lastSeen.location, objective.lastSeen.location, 255, 255, 0)
+					DebugDrawLine(playerLoc, runeLoc, 255, 255, 0)
 end
 					if playerDistanceToRune < 900 then
-						gsiPlayer.hUnit:Action_MoveDirectly(objective.lastSeen.location)
+						Positioning_MoveDirectly(gsiPlayer, runeLoc)
 					else
-						if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "moving directly") end
-						Positioning_ZSMoveCasual(gsiPlayer, objective.lastSeen.location, 0, 1250)
+						--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "moving directly") end
+						Positioning_ZSMoveCasual(gsiPlayer, runeLoc, 400, 1250, 1.0)
 					end
 				else
-					if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "picking up.") end
+					--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "picking up.") end
 if DEBUG then
-					DebugDrawLine(gsiPlayer.lastSeen.location, GetRuneSpawnLocation(objective.runeHandle), 255, 0, 255)
+					DebugDrawLine(playerLoc, GetRuneSpawnLocation(objective.runeHandle), 255, 0, 255)
 end
 					gsiPlayer.hUnit:Action_PickUpRune(objective.runeHandle)
 				end
 				return xetaScore
 			end
 		end
+		local locationVariationPushed = max(1000, 2500 - (gsiPlayer.locationVariation and gsiPlayer.locationVariation or 1000))
 		if WP_PlayerTryStart(gsiPlayer, wpForBotTask, true) then
-			if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "tries start 2") end
-			if playerDistanceToRune/gsiPlayer.currentMovementSpeed < timeTilNextSpawn then
+			--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "tries start 2", timeTilNextSpawn) end
+			if 1.1*playerDistanceToRune/gsiPlayer.currentMovementSpeed < timeTilNextSpawn then
 				local nearestEnemy, dist = Set_GetNearestEnemyHeroToLocation(objective.lastSeen.location, 4)
 				if nearestEnemy and dist < START_DEFENSE_PROXIMITY then
 					if GSI_UnitCanStartAttack(gsiPlayer) then
-						if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "zone defend") end
+						--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "zone defend") end
 						zone_defend_run(gsiPlayer, nearestEnemy, xetaScore, true)
 						return xetaScore
 					end
 				else
 					if not notPreSpawnPeriod and FarmJungle_SimpleRunLimitTime(gsiPlayer, timeTilNextSpawn-3.5) then
-						if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "jungle farm") end
+						--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "jungle farm") end
 						return xetaScore
 					end
 				end
 			end
-			if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "move to rune 1") end
-			Positioning_ZSMoveCasual(gsiPlayer, objective.lastSeen.location, timeTilNextSpawn/(hasBottle and 40 or 3), 1250)
+			--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "move to rune 1") end
+			Positioning_ZSMoveCasual(gsiPlayer, runeLoc,
+					timeTilNextSpawn/(hasBottle and 40 or 10), locationVariationPushed, 1.0)
 		else
-			if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "move to rune 2") end
+			--[[DEV]]if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "move to rune 2") end
 if DEBUG then
-			DebugDrawLine(gsiPlayer.lastSeen.location, wpObjective.lastSeen.location, 255, 255, 0)
+			DebugDrawLine(playerLoc, runeLoc, 255, 255, 0)
 end
-			Positioning_ZSMoveCasual(gsiPlayer, objective.lastSeen.location, timeTilNextSpawn/(hasBottle and 40 or 3), 1250)
+			local moveTo = Positioning_AdjustToAvoidCrowdingSetType( gsiPlayer,
+					Vector_PointToPointLimitedMin2D(playerLoc, runeLoc, locationVariationPushed),
+					SET_HERO_ENEMY, min(playerDistanceToRune/3, 1600), 2800
+				)
+			Positioning_ZSMoveCasual(gsiPlayer, runeLoc,
+					timeTilNextSpawn/(hasBottle and 40 or 3), locationVariationPushed, 0.15)
 		end
 		return xetaScore
 	end,
@@ -886,30 +974,29 @@ end
 		if true or any_runes_for_consider then
 			rl = RUNE_LOCATIONS
 			any_runes_for_consider = false
-			local currGameTime = GameTime()
 			for i=1,SAFE_BOUNTIES_MAX+1 do
 				local wpHandle = rl[i][RUNE_I__WANTED_POSTER]
 				if wpHandle and not rl[i][RUNE_I__PRESUMED_UNOBTAINABLE] then
-					if not wpHandle[POSTER_I.ALLOCATE_PERFORMED] then
-						-- force inform -- we will skip over bailed bots on reallocs
-						if not WP_InformInterest(gsiPlayer, wpHandle, WP_COMMIT_TYPES.INTEREST_BOUNTY, 0, true) then
+					--if not wpHandle[POSTER_I.ALLOCATE_PERFORMED] then
+					--	-- force inform -- we will skip over bailed bots on reallocs
+						if not WP_InformInterest(gsiPlayer, wpHandle, WP_COMMIT_TYPES.INTEREST_BOUNTY, 0, false) then
 							any_runes_for_consider = true
 						end
-					elseif GameTime() - wpHandle[POSTER_I.LAST_ALLOCATE] > 6.0 then
-						WP_AllowReinform(wpHandle)
-					end
+				--	elseif GameTime() - wpHandle[POSTER_I.LAST_ALLOCATE] > 6.0 then
+				--		WP_AllowReinform(wpHandle)
+				--	end
 				end
 			end
 		end
-		if DEBUG and wpForBotTask then print(gsiPlayer.shortName, "has a wp for runes - commit is", wpForBotTask[POSTER_I.COMMIT_TYPES][gsiPlayer.nOnTeam], wpForBotTask[POSTER_I.OBJECTIVE].name) end
+		--[[DEV]]if DEBUG and wpForBotTask then print(gsiPlayer.shortName, "has a wp for runes - commit is", wpForBotTask[POSTER_I.COMMIT_TYPES][gsiPlayer.nOnTeam], wpForBotTask[POSTER_I.OBJECTIVE].name) end
 		if wpForBotTask and WP_CommitIsCommit(gsiPlayer, wpForBotTask) then
 			if GetGameState() > GAME_STATE_PRE_GAME and abandon_wp_quietly_if_ally_close_safe(gsiPlayer, wpForBotTask) then
 				return false, XETA_SCORE_DO_NOT_RUN
 			end
-			local distToRune = Vector_PointDistance2D(wpForBotTask[POSTER_I.OBJECTIVE].lastSeen.location, gsiPlayer.lastSeen.location)
+			local runeObjective = wpForBotTask[POSTER_I.OBJECTIVE]
+			local distToRune = Vector_PointDistance2D(runeObjective.lastSeen.location, gsiPlayer.lastSeen.location)
 			local defOn, defWp = ZoneDefend_AnyBuildingDefence()
 			local defObj = defWp and defWp[POSTER_I.OBJECTIVE] 
-			local runeObjective
 			local defImportance = 0
 			if defObj then
 				defImportance = max(0, min(200, -150 +
@@ -919,15 +1006,21 @@ end
 			local allies = t_team_members
 			local playerLoc = gsiPlayer.lastSeen.location
 			local fightingCare = 0
+			local danger, known = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+			local alliedNearness = 0
 			if distToRune > 1600 then
 				for i=1,#t_team_members do
 					local thisAllied = t_team_members[i]
-					if thisAllied ~= gsiPlayer and not pUnit_IsNullOrDead(thisAllied)
-							and (FightClimate_InvolvedInAnyCombat(thisAllied)
-							or Blueprint_TaskHandleIsFighting(Task_GetCurrentTaskHandle(thisAllied))) then
+					if thisAllied ~= gsiPlayer and not pUnit_IsNullOrDead(thisAllied) then
 						local distToAllied = Vector_PointDistance2D(t_team_members[i].lastSeen.location, playerLoc)
-						if distToAllied < 3600 then
-							fightingCare = fightingCare + 200 * (2 - min(1.875, abs(Analytics_GetTheoreticalDangerAmount(thisAllied))))*max(0, 2300 - max(0, distToAllied-900))/2300
+						if (FightClimate_InvolvedInAnyCombat(thisAllied)
+								or Blueprint_TaskHandleIsFighting(Task_GetCurrentTaskHandle(thisAllied))) then
+							if distToAllied < 3600 then
+								fightingCare = fightingCare + 200 * (2 - min(1.875, abs(Analytics_GetTheoreticalDangerAmount(thisAllied))))*max(0, 2300 - max(0, distToAllied-900))/2300
+							end
+						end
+						if distToAllied < 1400 then
+							alliedNearness = alliedNearness + max(0, min(1, 2 - distToAllied/700))
 						end
 					end
 				end
@@ -936,12 +1029,54 @@ end
 				fightingCare = fightingCare * min(1, max(0, distToRune/800 - 2)) -- dist 1600 -> 2400 = 0 -> 1
 				--[[DEV]]if TEST then TEBUG_print(string.format('giving %d', fightingCare)) end
 			end
+			local pushHarder = Analytics_GetPushHarderMetricFightIgnorant(gsiPlayer)
+
+			local modStrat = 0
+			local isRegen = GetRuneType(runeObjective.runeHandle) == RUNE_REGENERATION
+--[[DEV]]	print("rune", runeObjective.runeHandle, I_POWERS_MAX)
+			local missingMana = gsiPlayer.maxMana - gsiPlayer.lastSeenMana
+			local missingHealth = gsiPlayer.maxHealth - gsiPlayer.lastSeenHealth
+			local dotaTime = DotaTime()
+			if runeObjective.runeHandle <= I_POWERS_MAX then
+				if currTime > PRE_GAME_END_TIME+85 and dotaTime < 300 --[[WATER RUNE BAKE]]
+						or isRegen then
+					local availMana = isRegen and 300 or 80
+					local manaGain = isRegen and min(missingMana, max(0, availMana - 150*#known))
+							or min(missingMana, availMana)
+					local healthGain = isRegen and 300 - 150*#known
+							or min(40, gsiPlayer.maxHealth - gsiPlayer.lastSeenHealth)
+					if distToRune < 3600 then
+						local useMana = (availMana - manaGain) / max(1, (2000 + distToRune)/2000)
+						if useMana > 0 and gsiPlayer.highUseManaExpendNow.mana < useMana then
+							AbilityLogic_SetExpendManaNow(gsiPlayer, useMana, 3, true)
+						end
+					end	
+					modStrat = -75 + 15*math.log(1 + missingMana + missingHealth)
+				elseif dotaTime > 300 then
+					local taskIsCurrent = Task_GetCurrentTaskHandle(gsiPlayer) == task_handle
+					--modStrat = (30-(dotaTime % 120))
+					--modStrat = modStrat > 0 and 0 or modStrat
+				end
+--[[DEV]]		if VERBOSE then VEBUG_print("[rune] %s mod strat for power runes is %.1f, h%d, m%d", gsiPlayer.shortName, modStrat, missingMana, missingHealth) end
+			end
+			local c, tta, cScore = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+			modStrat = modStrat - (c and max(0, (2-tta)*cScore/3) or 0)
+--[[DEV]]	DEBUG_print("[rune] %s EXIT SCORE %.2f, %.2f, %.2f, %.2f, %.2f", gsiPlayer.shortName,
+--[[DEV]]			THROTTLED_BOUNDED(
+--[[DEV]]				WP_ScorePoster(gsiPlayer, wpForBotTask, true),
+--[[DEV]]				80, 180, 700
+--[[DEV]]			), - fightingCare, -defImportance, -max(0, (pushHarder-0.75) * 60),
+--[[DEV]]			modStrat
+--[[DEV]]		)
+			local countCreeps = gsiPlayer.hUnit:GetNearbyCreeps(750, true)
+			local greep = gsiPlayer.hUnit
+			local creepsPresentFactor = countCreeps and -30*#countCreeps*max(0, 1+danger) / (1+2*alliedNearness)^2 or 0
 			return wpForBotTask[POSTER_I.OBJECTIVE],
 					THROTTLED_BOUNDED(
 							WP_ScorePoster(gsiPlayer, wpForBotTask, true),
 							80, 180, 700
-						) - fightingCare - defImportance
-
+						) - fightingCare - defImportance - max(0, (pushHarder-0.75) * 60)
+						+ modStrat + creepsPresentFactor
 		end
 		return false, XETA_SCORE_DO_NOT_RUN
 	end,

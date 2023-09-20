@@ -1,13 +1,12 @@
 local hero_data = {
 	"windrunner",
-	--{2, 3, 2, 1, 2, 4, 2, 1, 3, 3, 1, 4, 1, 3, 7, 6, 4, 10, 12},
-	{2},
+	{2, 3, 2, 3, 2, 4, 2, 1, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 12},
 	{
-		"item_faerie_fire","item_branches","item_tango","item_branches","item_circlet","item_circlet","item_bracer","item_magic_wand","item_wraith_band","item_javelin","item_mithril_hammer","item_maelstrom","item_boots","item_robe","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_ghost","item_blink","item_ghost","item_kaya","item_ethereal_blade",
+		"item_tango","item_branches","item_branches","item_circlet","item_circlet","item_branches","item_bracer","item_bracer","item_gloves","item_boots","item_magic_wand","item_power_treads","item_javelin","item_maelstrom","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_point_booster","item_ultimate_scepter","item_dragon_lance","item_cornucopia","item_ultimate_orb","item_sphere","item_lesser_crit","item_ultimate_scepter_2","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_greater_crit",
 	},
-	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
-		"Shackleshot","Powershot","Windrun","Gale Force","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.8s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
+		"Shackleshot","Powershot","Windrun","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-2.5s Windrun Cooldown","-15% Powershot Damage Reduction","+0.75s Shackleshot Duration","-12% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 18s",
 	}
 }
 --@EndAutomatedHeroData
@@ -15,7 +14,7 @@ if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"windrunner_shackleshot", ABILITY_TYPE.STUN},
-		{"windrunner_powershot", ABILITY_TYPE.NUKE},
+		{"windrunner_powershot", ABILITY_TYPE.NUKE + ABILITY_TYPE.AOE},
 		{"windrunner_windrun", ABILITY_TYPE.MOBILITY + ABILITY_TYPE.BUFF + ABILITY_TYPE.SHIELD},
 		{"windrunner_gale_force", ABILITY_TYPE.SLOW + ABILITY_TYPE.AOE},
 		[5] = {"windrunner_focusfire", ABILITY_TYPE.NUKE},
@@ -72,7 +71,7 @@ local avoid_and_hide_handle = AvoidHide_GetTaskHandle()
 local SHACKLE_CAST_RANGE = 800
 local SHACKLE_CONE_RANGE = 575
 local SHACKLE_LIMIT_RANGE_LINKED = SHACKLE_CAST_RANGE + SHACKLE_CONE_RANGE
-local SHACKLE_CONE_ANGLE = math.rad(25.5) -- I think it's 25.5 dgrees based on fandom. unsure.
+local SHACKLE_CONE_ANGLE = math.rad(12.25) -- I think it's 25.5 dgrees based on fandom. unsure.
 local SHACKLE_TRAVEL_SPEED = 1650
 local SHACKLE_USE_EXPIRY = 0.15
 
@@ -104,9 +103,43 @@ d = {
 		Xeta_RegisterAbscondScore("windrunnerShackleShotMultiple", 0, 2, 5, 0.167)
 		Xeta_RegisterAbscondScore("windrunnerPowerShotCrowded", 0, 2, 5, 0.167)
 		gsiPlayer.InformLevelUpSuccess = d.InformLevelUpSuccess
+		SpecialBehavior_RegisterBehavior("fightHarassRunOverride",
+				function(gsiPlayer, objective, score)
+					local hUnit = gsiPlayer.hUnit
+					if not hUnit:HasModifier("modifier_windrunner_focusfire")
+							or objective.hUnit:IsNull() then
+						return false;
+					end
+					local playerLoc = gsiPlayer.lastSeen.location
+					local fhtLoc = objective.lastSeen.location
+					local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+					if GameTime() - gsiPlayer.hUnit:GetLastAttackTime()
+								< gsiPlayer.hUnit:GetSecondsPerAttack()+0.1
+							or gsiPlayer.hUnit:GetAttackTarget() then
+						Positioning_ZSAttackRangeUnitHugAllied(
+								gsiPlayer, objective.lastSeen.location, SET_HERO_ENEMY,
+								min(gsiPlayer.attackRange*0.85, 250 + gsiPlayer.attackRange * (danger+1)),
+								0, true, 0.4 + max(0, (-danger-1))
+							)
+					else
+						gsiPlayer.hUnit:Action_AttackUnit(objective.hUnit, false)
+					end
+					return true;
+				end
+			)
+
+		gsiPlayer.modPowerLevel = function(gsiPlayer, powerLevel)
+			if gsiPlayer.hUnit:HasModifier("modifier_windrunner_focusfire") then
+				local enemiesToWind = Set_GetTeamHeroesInLocRad(gsiPlayer.team == TEAM
+						and ENEMY_TEAM or TEAM, gsiPlayer.lastSeen.location, 1250
+					)
+				return powerLevel*(1 + 0.67^(1+#enemiesToWind))
+			end
+		end
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		local playerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
@@ -177,9 +210,7 @@ d = {
 
 		-- falsify attack range in focusfire
 		
-		local allEnemies = {}
-		Util_TableCopyArray(allEnemies, nearbyEnemies)
-		Set_NumericalIndexUnion(allEnemies, outerEnemies)
+		local allEnemies = Set_NumericalIndexUnion(nil, nearbyEnemies, outerEnemies)
 
 		--[[DEV]]if TEST then TEBUG_print(string.format("wind 1 %s", #allEnemies)) end
 
@@ -201,7 +232,8 @@ d = {
 						true, POWERSHOT_TRAVEL_SPEED
 					)
 				
-				if POINT_DISTANCE_2D(hitGuess, playerLoc) < powerShotRange then
+				if not IsLocationVisible(hitGuess)
+						and POINT_DISTANCE_2D(hitGuess, playerLoc) < powerShotRange then
 					--[[DEV]]if TEST then TEBUG_print("wind 4 skettit") end
 					t_powershot_expire_before_cast[gsiPlayer.nOnTeam] = GameTime() + POWERSHOT_USE_EXPIRY
 					USE_ABILITY(gsiPlayer, powerShot, hitGuess, 400, nil)
@@ -230,12 +262,14 @@ d = {
 				and castSucceedsUnitsNearby[1]
 				and gsiPlayer.lastSeenMana > shackleShot:GetManaCost() then
 			--[[DEV]]if TEST then print("wind 5.2") end
-			bestScoreShackle, bestTarget, bestHitLoc, bestHitCount = SCORE_CONE_HEROES(
-					gsiPlayer, castSucceedsUnitsNearby, shackleShot, SHACKLE_CONE_RANGE,
-					SHACKLE_CONE_ANGLE, fht, true, 1.3,
-					1.0, 0.2, 1.0, 0.01,
-					shackleShot:GetCastPoint()+0.03, SHACKLE_TRAVEL_SPEED, -0, false, 1
-				)
+			if castSucceedsUnitsNearby[2] then
+				bestScoreShackle, bestTarget, bestHitLoc, bestHitCount = SCORE_CONE_HEROES(
+						gsiPlayer, castSucceedsUnitsNearby, shackleShot, SHACKLE_CONE_RANGE,
+						SHACKLE_CONE_ANGLE, fht, true, 1.3,
+						1.0, 0.2, 1.0, 0.01,
+						shackleShot:GetCastPoint()+0.03, SHACKLE_TRAVEL_SPEED, -0, false, 1
+					)
+			end
 			if bestTarget and bestHitCount >= 2 then
 				local abscondScore = Xeta_AbscondCompareNamedScore("windrunnerShackleShotMultiple", bestScoreShackle)
 				local heat, heatPerc = GET_HEAT(nearbyEnemies) 

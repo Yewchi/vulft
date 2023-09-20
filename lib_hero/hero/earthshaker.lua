@@ -1,12 +1,12 @@
 local hero_data = {
 	"earthshaker",
-	{1, 2, 3, 1, 1, 4, 1, 3, 3, 3, 6, 4, 2, 2, 8, 2, 4, 10, 11},
+	{1, 2, 3, 2, 2, 4, 2, 1, 3, 3, 6, 4, 1, 1, 8, 3, 4, 9, 12},
 	{
-		"item_tango","item_enchanted_mango","item_clarity","item_ward_sentry","item_boots","item_arcane_boots","item_blink","item_aghanims_shard","item_wind_lace","item_void_stone","item_cyclone","item_void_stone","item_aether_lens","item_soul_booster",
+		"item_branches","item_branches","item_branches","item_magic_stick","item_tango","item_quelling_blade","item_magic_wand","item_bracer","item_boots","item_gloves","item_belt_of_strength","item_power_treads","item_blink","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_soul_booster","item_octarine_core","item_aghanims_shard","item_cornucopia","item_cornucopia","item_refresher","item_wind_lace","item_void_stone","item_mystic_staff","item_staff_of_wizardry","item_cyclone","item_wind_waker","item_gem","item_ultimate_scepter_2","item_reaver","item_overwhelming_blink",
 	},
-	{ {5,5,5,3,3,}, {4,4,4,4,4,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,4,2,}, 0.1 },
 	{
-		"Fissure","Enchant Totem","Aftershock","Echo Slam","+40 Base Damage","+90 Fissure Damage","+50% Enchant Totem Damage","+50 Aftershock Damage","+40 Echo Damage","+320 Fissure Range","+200 Aftershock Range","-1.5s Enchant Totem Cooldown",
+		"Fissure","Enchant Totem","Aftershock","Echo Slam","+40 Base Damage","+90 Fissure Damage","+50% Enchant Totem Damage","+50 Aftershock Damage","+50 Echo Damage","+300 Fissure Range","+200 Aftershock Range","-2.0s Enchant Totem Cooldown",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

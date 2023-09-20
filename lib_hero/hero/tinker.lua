@@ -1,12 +1,12 @@
 local hero_data = {
 	"tinker",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 6, 3, 4, 3, 3, 7, 3, 4, 10, 12},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 3, 3, 4, 3, 3, 8, 6, 4, 10, 12},
 	{
-		"item_branches","item_faerie_fire","item_circlet","item_tango","item_ward_observer","item_circlet","item_branches","item_bottle","item_blink","item_soul_ring","item_mystic_staff","item_platemail","item_shivas_guard","item_black_king_bar","item_null_talisman","item_ghost","item_sheepstick","item_ethereal_blade","item_overwhelming_blink","item_meteor_hammer","item_desolator","item_mask_of_madness",
+		"item_faerie_fire","item_circlet","item_tango","item_branches","item_circlet","item_ward_observer","item_bottle","item_blink","item_soul_ring","item_mystic_staff","item_shivas_guard","item_black_king_bar","item_kaya","item_ethereal_blade","item_mystic_staff","item_void_stone","item_ultimate_orb","item_sheepstick","item_overwhelming_blink","item_ultimate_scepter","item_ultimate_scepter_2",
 	},
 	{ {2,2,2,2,5,}, {2,2,2,2,4,}, 0.1 },
 	{
-		"Laser","Heat-Seeking Missile","Defense Matrix","Rearm","+2.0s Laser Blind Duration","+8% Manacost/Manaloss Reduction","+125 Defense Matrix Damage Absorbed","+1 Heat-Seeking Missile Count","Defense Matrix Grants +25%  Cooldown Reduction","-0.5s Keen Conveyance Channel Time","+80 Laser Damage","+0.25s Heat-Seeking Missile Ministun",
+		"Laser","Heat-Seeking Missile","Defense Matrix","Rearm","+50 Laser Radius","+8% Manacost/Manaloss Reduction","+125 Defense Matrix Damage Absorbed","+1 Heat-Seeking Missile Count","Defense Matrix Grants +25%  Cooldown Reduction","-0.5s Keen Conveyance Channel Time","+80 Laser Damage","+0.2s Heat-Seeking Missile Ministun",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

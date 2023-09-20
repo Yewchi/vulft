@@ -1,12 +1,12 @@
 local hero_data = {
 	"faceless_void",
-	{1, 2, 3, 1, 3, 4, 1, 3, 3, 1, 2, 4, 2, 2, 7, 6, 9, 4, 11},
+	{1, 2, 3, 1, 3, 4, 3, 3, 1, 1, 2, 4, 2, 2, 7, 6, 4, 9, 11},
 	{
-		"item_quelling_blade","item_tango","item_branches","item_branches","item_magic_stick","item_tango","item_gloves","item_boots","item_boots_of_elves","item_power_treads","item_gloves","item_hand_of_midas","item_javelin","item_maelstrom","item_magic_wand","item_mithril_hammer","item_black_king_bar","item_sange","item_blade_of_alacrity","item_boots_of_elves","item_sange_and_yasha","item_hyperstone","item_mjollnir","item_ultimate_orb","item_skadi","item_refresher","item_silver_edge",
+		"item_slippers","item_circlet","item_tango","item_branches","item_branches","item_quelling_blade","item_wraith_band","item_gloves","item_hand_of_midas","item_boots","item_power_treads","item_boots_of_elves","item_javelin","item_maelstrom","item_blade_of_alacrity","item_yasha","item_manta","item_ultimate_orb","item_cornucopia","item_sphere","item_hyperstone","item_aghanims_shard","item_mjollnir","item_cornucopia","item_cornucopia","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_eagle","item_quarterstaff","item_black_king_bar","item_refresher","item_moon_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Time Walk","Time Dilation","Time Lock","Chronosphere","+6 Time Dilation DPS per cooldown","+0.5s Time Walk Backtrack Duration","-1.0s Time Walk Cooldown","+10% Time Dilation Slow per Cooldown","+95 Attack Speed during Chronosphere","+70 Time Lock Damage","+20% Backtrack","+140 Chronosphere AoE",
+		"Time Walk","Time Dilation","Time Lock","Chronosphere","+6 Time Dilation DPS per cooldown","+0.5s Time Walk Backtrack Duration","+50 Time Lock Damage","+10% Time Dilation Slow per Cooldown","+95 Attack Speed during Chronosphere","-1.0s Time Walk Cooldown","+20% Backtrack","+140 Chronosphere AoE",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

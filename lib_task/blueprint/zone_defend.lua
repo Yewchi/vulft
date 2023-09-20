@@ -79,16 +79,29 @@ end
 -- ALL CODE BELOW IS PROOF OF WP DEFENCE CONCEPT -- COMPLETELY TRASH AND RESTRICTIVE TEST CODE
 
 local function check_building_defence_end(building)
-	local nearbyEnemies, outerEnemies = Set_GetEnemyHeroesInPlayerRadiusAndOuter(building.lastSeen.location, 900, 1600, 5)
+	local nearbyEnemies, outerEnemies = Set_GetEnemyHeroesInPlayerRadiusAndOuter(building.lastSeen.location, 900, 1600, 2.5)
 	--DebugDrawText(400+building.lastSeen.location.x/200, 800+building.lastSeen.location.y/200, string.format("poster %d - %d ls: %f", #nearbyEnemies, #outerEnemies, (nearbyEnemies[1] and GameTime() - nearbyEnemies[1].lastSeen.timeStamp or outerEnemies[1] and GameTime() - outerEnemies[1].lastSeen.timeStamp or -1)), 255, 255, 255)
+	if not building.wp then
+		ERROR_print(true, not DEBUG, "[zone_defend] check_buildling_defence_end(%s) -- building is not being defended or building has not been updated.", Util_ParamString(building))
+		for i=1,#t_wp_stored do
+			local wp = t_wp_stored[i]
+			if wp and wp[POSTER_I__OBJECTIVE]
+					and wp[POSTER_I__OBJECTIVE].hUnit == building.hUnit then
+				WP_BurnPoster(table.remove(t_wp_stored, i))
+				i = i-1
+			end
+		end
+		WP_BurnPoster(building.wp)
+		return true;
+	end
 	if building.typeIsNone or (#nearbyEnemies == 0 and #outerEnemies*2 <= 1
 			and (not building.wpExpiryTime or building.wpExpiryTime < DotaTime())) then
 		for i=1,#t_wp_stored do
 			if t_wp_stored[i] == building.wp then
 				table.remove(t_wp_stored, i)
-				WP_BurnPoster(building.wp)
 			end
 		end
+		WP_BurnPoster(building.wp)
 		building.wp = nil
 		building.wpExpiryTime = nil
 		return true
@@ -148,6 +161,9 @@ function ZoneDefend_TakeCreepAggroTowerToHeroDownLane(gsiPlayer, objective)
 			) and distToSet < gsiPlayer.attackRange + (-currDanger*300) then
 		local pullUnit = Set_GetSetUnitNearestToLocation(gsiPlayer.lastSeen.location, enemyCreeps)
 		if pullUnit and pullUnit.creepType ~= CREEP_TYPE_SIEGE then
+			if Analytics_AttacksWho(pullUnit.hUnit) == gsiPlayer.hUnit then
+				return false
+			end
 			--[[DEV]]if VERBOSE and TEST then DebugDrawText(700, 300, string.format("%s pulls creeps off tower.", gsiPlayer.shortName), 255, 255, 255) end
 			gsiPlayer.hUnit:Action_AttackUnit(pullUnit.hUnit, true)
 			return true
@@ -159,7 +175,7 @@ end
 function ZoneDefend_RegisterBuildingDefenceBlip(building, pressure)
 	-- TODO SIMPLISTIC -- IMPROVE
 	if not building.wp then
-		--GetBot():ActionImmediate_Ping(building.lastSeen.location.x, building.lastSeen.location.y, building.isShrine)
+		GetBot():ActionImmediate_Ping(building.lastSeen.location.x, building.lastSeen.location.y, building.isShrine)
 		--print(building, "MAKING")
 		local thisWp = WP_Register(
 					WP_POSTER_TYPES.BUILDING_DEFENCE,
@@ -220,7 +236,6 @@ blueprint = {
 		-- -- better solution is probably a strong hook to FH.run().
 		Task_IncentiviseTask(gsiPlayer, fight_harass_handle, fightIncentive, fightIncentive/10)
 		local distToObjective = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, objective.lastSeen.location) 
-		
 		local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1800)
 		if distToObjective < 1400 or nearbyEnemies[1] then
 			if VERBOSE then INFO_print(string.format("[zone_defend] %s sees nearbyEnemies[1] '%s'.",
@@ -256,7 +271,7 @@ blueprint = {
 			local avoidHideScore = GET_TASK_SCORE(gsiPlayer, avoid_hide_handle)
 			local fightHarassScore = GET_TASK_SCORE(gsiPlayer, fight_harass_handle)
 			--print(gsiPlayer.shortName, avoidHideScore, fightHarassScore)
-			if avoidHideScore > fightHarassScore then
+			if avoidHideScore > fightHarassScore and (not forceRun or #nearbyEnemies > 0) then
 				if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "running avoid hide in zone defend") end
 				Blueprint_RegisterCustomActivityType(gsiPlayer, ACTIVITY_TYPE.CAREFUL)
 				avoid_hide_run(gsiPlayer, gsiPlayer, avoidHideScore, true)
@@ -267,10 +282,9 @@ blueprint = {
 					local commitTypes = wpForBotTask[POSTER_I.COMMIT_TYPES]
 					local towerHpp = wpObjective.lastSeenHealth / wpObjective.maxHealth
 					local towerNearFutureHealth = Analytics_GetNearFutureHealth(wpObjective)
-					local alliesNearObj = Set_GetAlliedHeroesInLocRad
 					if towerNearFutureHealth / wpObjective.maxHealth > 0.33
 							and (not wpForBotTask.skipWaitWhileFightingExpiry
-									or GameTime() > wpForBotTask.skipWaitWhileFightingExpiry
+									or GameTime() > wpForBotTask.skipWaitWhileFightingExpiry -- 'or the bot was not recently under attack'
 								) then
 						-- only avoid while waiting for incoming defenders unless soon destroyed
 						for i=1,TEAM_NUMBER_OF_PLAYERS do
@@ -302,7 +316,9 @@ blueprint = {
 						end
 					end
 				end
-				Blueprint_RegisterCustomActivityType(gsiPlayer, ACTIVITY_TYPE.CONTROLLED_AGGRESSION)
+				if not forceRun then
+					Blueprint_RegisterCustomActivityType(gsiPlayer, ACTIVITY_TYPE.CONTROLLED_AGGRESSION)
+				end
 				local fightHarassObj = GET_TASK_OBJ(gsiPlayer, fight_harass_handle)
 				if VERBOSE then print("/VUL-FT/", gsiPlayer.shortName, "running harass in zone_defend targetting", fightHarassObj and fightHarassObj.shortName) end
 				if fightHarassObj then
@@ -318,7 +334,9 @@ blueprint = {
 			local nearestTower, nearestTowerDist = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
 			Positioning_ZSMoveCasual(gsiPlayer, objective.lastSeen.location,
 					4.0, 
-					(nearestTowerDist < 1000 and 900)  -- TEST
+					(nearestTowerDist < 1000 and 900),
+					nil,
+					true -- TEST
 				)
 		end
 	end,

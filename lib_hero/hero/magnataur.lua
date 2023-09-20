@@ -1,12 +1,12 @@
 local hero_data = {
 	"magnataur",
-	{1, 3, 1, 3, 1, 4, 1, 3, 2, 3, 2, 4, 2, 2, 8, 5, 4, 10, 12},
+	{1, 3, 1, 2, 2, 4, 1, 2, 3, 3, 2, 4, 1, 3, 8, 5, 4, 10, 12},
 	{
-		"item_quelling_blade","item_circlet","item_gauntlets","item_enchanted_mango","item_magic_stick","item_branches","item_branches","item_ring_of_health","item_pers","item_meteor_hammer","item_boots","item_magic_wand","item_blink","item_cloak","item_ring_of_health","item_hood_of_defiance","item_headdress","item_pipe","item_arcane_boots","item_aether_lens","item_gem","item_aghanims_shard","item_gem","item_black_king_bar",
+		"item_tango","item_branches","item_quelling_blade","item_magic_stick","item_gauntlets","item_boots","item_magic_wand","item_bracer","item_gloves","item_belt_of_strength","item_power_treads","item_blink","item_oblivion_staff","item_echo_sabre","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_diadem","item_harpoon","item_platemail","item_mystic_staff","item_gem","item_shivas_guard","item_gem","item_reaver","item_overwhelming_blink","item_sheepstick",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,4,1,}, 0.1 },
 	{
-		"Shockwave","Empower","Skewer","Reverse Polarity","+10s Empower Duration","+0.5s Shockwave Slow Duration","+16 Strength per hero hit with Reverse Polarity","-7.0s Skewer Cooldown","+125 Shockwave Damage","+375 Skewer Range","+10% Empower Damage/Cleave","+1s Reverse Polarity Stun Duration",
+		"Shockwave","Empower","Skewer","Reverse Polarity","+10s Empower Duration","+0.5s Shockwave Slow Duration","+8 All Stats per hero hit with Reverse Polarity","-7.0s Skewer Cooldown","+125 Shockwave Damage","+375 Skewer Range","+10% Empower Damage/Cleave","+0.8s Reverse Polarity Stun Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

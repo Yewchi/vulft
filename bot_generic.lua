@@ -29,9 +29,28 @@
 -- Very U(gly, Unrolled, Unabstracted, and Fast) Lua Full Takeover -- Dota 2 script -- Welcome to perfomance Lua, where empty tables are 64 bytes, and abstraction doesn't matter.
 -- Written by zyewchi@gmail.com - Michael - github.com/Yewchi gitlab.com/yewchi
 
+_G = nil
+
 local FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST = 150
 
-if not GetBot():IsHero() then
+-- Illusions:
+	-- TODO Register illusions into a simulated player control module.
+	-- ---- -| Allow controlling all at once, or one at a time.
+	-- ---- -| Make decisions once every so often, move the illusions
+	-- ---- -| separately, low health illusions away at times.
+	-- ---- -| Block positioning for true heroes attacking a tower or
+	-- ---- -| pushing a creep wave occasionally, and run positioning code
+	-- ---- -| on a preferrably low health illusion that, if it's deemed
+	-- ---- -| not over-the-top, we know hasn't taken huge damage recently
+	-- ---- -| (for greater confusion), and run positioning avoid hide
+	-- ---- -| movement on them. More likely to occur with enemies nearby.
+	-- ---- -| Control-all more likely without.
+	-- ---- -| If someone like PL and going for a clutch kill, run one
+	-- ---- -| illusion out as well.
+	-- ---- -| Detect spell casts on illusions that were selected for
+	-- ---- -| mimicry. Dial back for difficulty.
+
+if not GetBot():IsHero() then -- or illusion.
 	INFO_print(string.format(
 			"Not creating nor running a full-takeover for non-hero unit '%s'",
 			GetBot():GetUnitName()
@@ -47,7 +66,6 @@ require(GetScriptDirectory().."/lib_util/util")
 require(GetScriptDirectory().."/lib_job/job_manager")
 require(GetScriptDirectory().."/lib_gsi/gsi_planar_gsi")
 require(GetScriptDirectory().."/partial_full_handover")
-
 
 local is_arc_warden_double = false
 
@@ -69,16 +87,17 @@ local THIS_BOT_DOMAIN_NAME
 						)..(is_arc_warden_double and "TEMPEST" or "")
 				)
 local job_domain = Job_CreateDomain(THIS_BOT_DOMAIN_NAME)
-local while_dead_behaviour_throttle = Time_CreateThrottle(0.17)
+local while_dead_behavior_throttle = Time_CreateThrottle(0.17)
 
 local dominated_unit_throttle = Time_CreateThrottle(0.2)
 
 -- Think
 local err_count = 0
 local err_flag = 0
+local dominated_print_next = 0
 local function bot_microthink__job(workingSet) -- The guts of the redefined Think. Think = generic_microthink(){bot_microthink__job()}
 	if this_bot.disabledAndDominatedFunc then
-		if TEST then print("calling dominated", this_bot.shortName) end
+		if TEST then print("calling dominated", this_bot.shortName, this_bot.disabledAndDominatedFuncName) end
 		this_bot:disabledAndDominatedFunc()
 		return
 	end
@@ -111,14 +130,13 @@ local function bot_microthink__job(workingSet) -- The guts of the redefined Thin
 	--[[DEV]]	if VERBOSE then
 	--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 60)
 	--[[DEV]]	end
---	print("bot_generic", 5, TEAM, this_bot.nOnTeam, this_bot.shortName)
 		Task_CurrentTaskContinue(this_bot)
 	--[[DEV]]	if VERBOSE then
 	--[[DEV]]		VEBUG_PlayerFrameProgressBar(this_bot.nOnTeam, 80)
 	--[[DEV]]	end
 		Hero_InvestAbilityPointsAndManageItems(this_bot)
 	else
-		if while_dead_behaviour_throttle:allowed() then
+		if while_dead_behavior_throttle:allowed() then
 			Player_InformDead(this_bot) -- TODO more abstraction
 			Task_InformDeadAndCancelAnyConfirmedDenial(this_bot)
 			Blueprint_InformDead(this_bot)
@@ -224,7 +242,7 @@ local function handover()
 	else
 		Think = (not DEBUG and generic_microthink or  -- -- -- -- -- -- --- Think() DECLARATION
 				function() 
-					if not DEBUG_KILLSWITCH then -- Killswitch is debug utility, like when a large data dump is required (should finish making a function to set-up the designated 'target dummy' to print their status, then kill all bots after)
+					if not DEBUG_KILLSWITCH then -- Killswitch is debug utility, e.g. data dump on console.
 						generic_microthink() 
 					end 
 				end

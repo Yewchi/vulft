@@ -1,12 +1,12 @@
 local hero_data = {
 	"oracle",
-	{1, 3, 3, 2, 3, 4, 3, 1, 2, 1, 1, 4, 2, 2, 8, 5, 4, 9, 11},
+	{1, 3, 3, 2, 3, 4, 3, 2, 2, 1, 6, 4, 1, 2, 8, 1, 4, 9, 12},
 	{
-		"item_tango","item_faerie_fire","item_ward_observer","item_branches","item_branches","item_branches","item_bottle","item_boots","item_arcane_boots","item_void_stone","item_aether_lens","item_point_booster","item_vitality_booster","item_octarine_core","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_blink","item_reaver",
+		"item_tango","item_branches","item_clarity","item_branches","item_wind_lace","item_ward_observer","item_magic_wand","item_boots","item_arcane_boots","item_void_stone","item_aether_lens","item_vitality_booster","item_aeon_disk","item_fluffy_hat","item_force_staff","item_void_stone","item_staff_of_wizardry","item_cyclone","item_mystic_staff","item_wind_waker","item_octarine_core","item_dragon_lance","item_hurricane_pike","item_point_booster","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,1,2,}, {5,5,5,5,2,}, 0.1 },
+	{ {1,1,1,5,2,}, {5,5,5,4,2,}, 0.1 },
 	{
-		"Fortune's End","Fate's Edict","Purifying Flames","False Promise","+0.5s Fortune's End Duration","+10 Armor False Promise","+80 Fortune's End Damage","-1.25s Purifying Flames Cooldown","-20s False Promise Cooldown","+30% Purifying Flames Enemy Damage","Instant Fortune's End","+1.5s False Promise Duration",
+		"Fortune's End","Fate's Edict","Purifying Flames","False Promise","+0.5s Fortune's End Duration","+10 Armor False Promise","+80 Fortune's End Damage","-1.0s Purifying Flames Cooldown","-20s False Promise Cooldown","+30% Purifying Flames Enemy Damage","Instant Fortune's End","+1.5s False Promise Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

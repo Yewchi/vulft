@@ -1,12 +1,12 @@
 local hero_data = {
 	"shadow_demon",
-	{1, 3, 3, 2, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 5, 8, 4, 10, 12},
+	{1, 3, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 5, 4, 10, 12},
 	{
-		"item_ward_dispenser","item_flask","item_enchanted_mango","item_faerie_fire","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_boots","item_ring_of_basilius","item_arcane_boots","item_cloak","item_aghanims_shard","item_shadow_amulet","item_glimmer_cape","item_void_stone","item_aether_lens","item_wind_lace","item_tranquil_boots","item_blink","item_gem","item_gem","item_gem","item_sheepstick","item_gem",
+		"item_blood_grenade","item_branches","item_tango","item_magic_stick","item_branches","item_ward_observer","item_magic_wand","item_boots","item_arcane_boots","item_aether_lens","item_wind_lace","item_tranquil_boots","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_aghanims_shard","item_gem","item_gem","item_soul_booster","item_octarine_core","item_gem","item_gem","item_ghost",
 	},
-	{ {3,3,3,1,5,}, {5,4,4,4,4,}, 0.1 },
+	{ {3,3,3,3,5,}, {4,4,4,4,4,}, 0.1 },
 	{
-		"Disruption","Disseminate","Shadow Poison","Demonic Purge","+15.0% Shadow Poison Damage","+12 Strength","+25 Movement Speed","+200 Demonic Purge Damage","+10% Disseminate Shared Damage","-1.25s Shadow Poison Cooldown","-30.0s Demonic Purge Cooldown","2 Charges of Disruption",
+		"Disruption","Disseminate","Shadow Poison","Demonic Purge","+15.0% Shadow Poison Damage","+12 Strength","+25 Movement Speed","-1.0s Shadow Poison Cooldown","+15% Disseminate Shared Damage","+200 Demonic Purge/Cleanse Damage/Heal","-30.0s Demonic Purge Cooldown","2 Charges of Disruption",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

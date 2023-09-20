@@ -1,12 +1,12 @@
 local hero_data = {
 	"life_stealer",
-	{2, 3, 3, 1, 3, 2, 3, 2, 2, 4, 1, 1, 1, 4, 7, 6, 4, 10, 12},
+	{2, 3, 1, 3, 3, 4, 3, 2, 2, 2, 1, 1, 4, 1, 8, 6, 4, 10, 12},
 	{
-		"item_tango","item_branches","item_branches","item_quelling_blade","item_gauntlets","item_gauntlets","item_orb_of_venom","item_blades_of_attack","item_boots","item_chainmail","item_phase_boots","item_helm_of_iron_will","item_armlet","item_ogre_axe","item_belt_of_strength","item_radiance","item_basher","item_aghanims_shard","item_sange_and_yasha","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_helm_of_iron_will","item_radiance","item_nullifier","item_abyssal_blade",
+		"item_quelling_blade","item_gauntlets","item_tango","item_branches","item_branches","item_gauntlets","item_blades_of_attack","item_boots","item_phase_boots","item_gloves","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_blitz_knuckles","item_javelin","item_monkey_king_bar","item_ultimate_orb","item_cornucopia","item_sphere","item_belt_of_strength","item_mithril_hammer","item_basher","item_hyperstone","item_gem","item_assault","item_aghanims_shard","item_abyssal_blade","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Rage","Feast","Ghoul Frenzy","Infest","+150 Infest Damage","+12% Rage Movement Speed","+325 Health","+25 Damage","+15%% Infest Target Movespeed/Health","+15% Ghoul Frenzy Slow","+1.2% Feast Lifesteal","+1.5s Rage Duration",
+		"Rage","Feast","Ghoul Frenzy","Infest","+150 Infest Damage","+12% Rage Movement Speed","+350 Health","+30 Damage","+15%% Infest Target Movespeed/Health","+15% Ghoul Frenzy Slow","+1.2% Feast Lifesteal and Damage","+1.5s Rage Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

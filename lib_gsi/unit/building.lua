@@ -48,6 +48,8 @@ local t_buildings_index = {} -- Storing tier 4s in [team][top/bottom][4]
 
 local t_team_lane_tier_locations = {}
 
+local t_outposts = {}
+
 local job_domain_gsi
 
 do
@@ -61,6 +63,7 @@ do
 			t_team_lane_tier_locations[team][lane] = {}
 		end
 	end
+	t_buildings[TEAM_NEUTRAL] = {}
 	t_buildings[TEAM_RADIANT] = {}
 	t_buildings[TEAM_DIRE] = {}
 end
@@ -173,15 +176,39 @@ local function update_team_buildings_data(list)
 					and hUnit:GetMaxHealth() or safeUnit.maxHealth
 			safeUnit.lastSeenHealth = hUnit:GetHealth() ~= INVALID_TOWER_HEALTH
 					and hUnit:GetHealth() or safeUnit.lastSeenHealth
-			safeUnit.attackPointPercent = hUnit:GetAttackPoint() / hUnit:GetAttackSpeed()
+			safeUnit.attackPointPercent = hUnit:GetAttackPoint()
 		end
 	end
 end
-local function update_team_buildings_none_typed(list)
+local function handle_dead_building(gsiBuilding)
+	gsiBuilding.typeIsNone = true
+	if gsiBuilding.lane
+			and t_buildings_index[gsiBuilding.team][gsiBuilding.lane][gsiBuilding.tier] then
+		if gsiBuilding.team == TEAM then
+			if gsiBuilding.isTower then
+				--print(gsiBuilding.name, gsiBuilding.shortName, "is a tower")
+				NUM_TOWERS_UP_TEAM = NUM_TOWERS_UP_TEAM - 1
+			elseif gsiBuilding.barracksType then
+				NUM_BARRACKS_UP_TEAM = NUM_BARRACKS_UP_TEAM - 1
+			end
+		end
+		t_buildings_index[gsiBuilding.team][gsiBuilding.lane][gsiBuilding.tier] = nil
+		Analytics_InformBuildingFell(gsiBuilding)
+		t_buildings[gsiBuilding.team][gsiBuilding.hUnit] = nil
+	else
+--[[DEV]]	if DEBUG then
+--[[DEV]]		DEBUG_print("[building] asking for check on dead tower %s\n.%s", gsiBuilding.name, debug.traceback())
+--[[DEV]] 		hUnit = gsiBuilding.hUnit
+--[[DEV]]		print(hUnit, hUnit and hUnit:IsNull(), hUnit and not hUnit:IsNull() and hUnit:IsAlive())
+--[[DEV]]		Util_TablePrint(gsiBuilding)
+--[[DEV]]	end
+	end
+end
+local function update_team_buildings_none_typed(team)
+	local list = t_buildings[team]
 	for hUnit,safeUnit in pairs(list) do
 		if hUnit:IsNull() or not hUnit:IsAlive() then
-			safeUnit.typeIsNone = true
-			t_buildings[safeUnit.team][hUnit] = nil
+			handle_dead_building(safeUnit)
 		end
 	end
 end
@@ -192,8 +219,8 @@ function GSI_CreateUpdateBuildingUnits()
 			update_team_buildings_data(t_buildings[runTeam])
 			workingSet.runTeam = runTeam == 3 and 2 or 3
 		else -- every frame none-type will be checked
-			update_team_buildings_none_typed(t_buildings[TEAM_RADIANT])
-			update_team_buildings_none_typed(t_buildings[TEAM_DIRE])
+			update_team_buildings_none_typed(TEAM_RADIANT)
+			update_team_buildings_none_typed(TEAM_DIRE)
 		end
 	end
 	
@@ -227,8 +254,7 @@ function bUnit_UpdateHealthAndLocation(gsiBuilding)
 			and hUnitBuilding:GetHealth() or gsiBuilding.lastSeenHealth or gsiBuilding.maxHealth
 	gsiBuilding.maxHealth = hUnitBuilding:GetMaxHealth() ~= INVALID_TOWER_HEALTH
 			and hUnitBuilding:GetMaxHealth() or gsiBuilding.maxHealth
-
-	gsiBuilding.attackPointPercent = hUnitBuilding:GetAttackPoint() / hUnitCreep:GetAttackSpeed()
+	newSafeUnit.halfSecAttack = hUnitBuilding:GetSecondsPerAttack() / 2
 end
 
 function bUnit_GetBuildingTeamGoldValue(gsiBuilding)
@@ -240,29 +266,25 @@ end
 function bUnit_IsNullOrDead(gsiBuilding)
 	if not gsiBuilding.hUnit or not gsiBuilding.hUnit.IsNull or
 			gsiBuilding.hUnit:IsNull() or not gsiBuilding.hUnit:IsAlive() then
-		gsiBuilding.typeIsNone = true
-		if gsiBuilding.lane
-				and t_buildings_index[gsiBuilding.team][gsiBuilding.lane][gsiBuilding.tier] then
-			if gsiBuilding.team == TEAM then
-				if gsiBuilding.isTower then
-					--print(gsiBuilding.name, gsiBuilding.shortName, "is a tower")
-					NUM_TOWERS_UP_TEAM = NUM_TOWERS_UP_TEAM - 1
-				elseif gsiBuilding.barracksType then
-					NUM_BARRACKS_UP_TEAM = NUM_BARRACKS_UP_TEAM - 1
-				end
-			end
-			t_buildings_index[gsiBuilding.team][gsiBuilding.lane][gsiBuilding.tier] = nil
-		end
-		Analytics_InformBuildingFell(gsiBuilding)
-		t_buildings[gsiBuilding.team][gsiBuilding.hUnit] = nil
+--[[DEV]]if DEBUG then DEBUG_print("[building] REMOVE %s %s %s, 'alive': %s, isTeam:%s", gsiBuilding.name, gsiBuilding.hUnit:IsNull(), not gsiBuilding.hUnit:IsNull() and gsiBuilding.hUnit:CanBeSeen(), not gsiBuilding.hUnit:IsNull() and gsiBuilding.hUnit:IsAlive(), gsiBuilding.team == TEAM) end
+		handle_dead_building(gsiBuilding)
 		return true
 	end
 	return false
 end
 
 function bUnit_ConvertListToSafeUnits(list)
+	local nCount = 0
 	for i=1,#list,1 do
-		list[i] = t_buildings[list[i]:GetTeam()][list[i]] or bUnit_NewSafeUnit(list[i])
+		local gsiUnit = t_buildings[list[i]:GetTeam()][list[i]] or bUnit_NewSafeUnit(list[i])
+		if gsiUnit then
+			nCount = nCount + 1
+			list[nCount] = gsiUnit
+		--[[DEV]]else print("THIS ACTUALLY HAPPENS")
+		end
+	end
+	for i=nCount+1,#list do
+		list[i] = nil
 	end
 	return list
 end
@@ -305,7 +327,7 @@ end
 
 local function assign_to_building_index(gsiBuilding) -- Initialization only
 	local team = gsiBuilding.team
-	if gsiBuilding.isFountain  then
+	if gsiBuilding.isFountain then
 		t_buildings_index[team][MAP_LOGICAL_MIDDLE_LANE][5] = gsiBuilding -- 4 is nil but #arr will fix
 		t_buildings_index[team][MAP_LOGICAL_TOP_LANE][5] = gsiBuilding
 		t_buildings_index[team][MAP_LOGICAL_BOTTOM_LANE][5] = gsiBuilding
@@ -356,14 +378,14 @@ local function assign_to_building_index(gsiBuilding) -- Initialization only
 end
 
 local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
-	if not hUnit or not hUnit:IsAlive() then return nil end
+	if not hUnit or hUnit:IsNull() or not hUnit:IsAlive() then return nil end
 	if t_buildings[hUnit:GetTeam()][hUnit] then return t_buildings[hUnit:GetTeam()][hUnit] end
 	local maxHealth = hUnit:GetMaxHealth()
-	
+
 	local newSafeUnit = {}
 	local unitLocation = hUnit:GetLocation()
 	
-	--[[DEV]]--DEBUG_print(string.format("well, the buildling %s at %s is facing %s", hUnit:GetUnitName(), hUnit:GetLocation(), hUnit:GetFacing()))
+	--[[DEV]]if DEBUG then DEBUG_print(string.format("[building] CREATE %s %s %s", hUnit:GetUnitName(), hUnit:GetLocation(), hUnit:GetFacing())) end
 
 	newSafeUnit.hUnit = hUnit
 	newSafeUnit.isNull = hUnit.IsNull
@@ -377,8 +399,12 @@ local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 	newSafeUnit.dotaType = TEAM == hUnit:GetTeam() and BUILDING_ALLIED or BUILDING_ENEMY
 	newSafeUnit.type = UNIT_TYPE_BUILDING
 	newSafeUnit.isTower = hUnit:IsTower()
+	newSafeUnit.isRanged = true
 	newSafeUnit.isFountain = newSafeUnit.name == "dota_fountain"
-	newSafeUnit.attackPointPercent = hUnit:GetAttackPoint() / hUnit:GetAttackSpeed()
+	newSafeUnit.releaseProjectileZ = newSafeUnit.isTower and 170 or 20 --[[PROJECTILE BAKE]]
+	newSafeUnit.getsHitZ = newSafeUnit.isTower and 144 or 20 --[[PROJECTILE BAKE]]
+	newSafeUnit.attackPointPercent = hUnit:GetAttackPoint() -- updated in projtl
+	newSafeUnit.halfSecAttack = hUnit:GetSecondsPerAttack() / 2
 	newSafeUnit.attackRange = newSafeUnit.isTower and BUILDING_TOWER_ATTACK_RANGE
 			or newSafeUnit.isFountain and FOUNTAIN_ATTACK_RANGE
 			or hUnit:GetAttackRange()
@@ -392,6 +418,10 @@ local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 			or string.find(newSafeUnit.name, "range") and BARRACKS_TYPE_RANGE or false
 	newSafeUnit.isShrine = string.find(newSafeUnit.name, "filler") and true or false
 	newSafeUnit.isAncient = hUnit:IsFort()
+	newSafeUnit.isOutpost = string.find(newSafeUnit.name, "Outpost") and true or false
+	newSafeUnit.isMangoTree = string.find(newSafeUnit.name, "mango_tree") and true or false
+	newSafeUnit.isTwinGate = string.find(newSafeUnit.name, "twin_gate") and true or false
+	newSafeUnit.isLamp = string.find(newSafeUnit.name, "lantern") and true or false
 	if newSafeUnit.isAncient then
 		if newSafeUnit.team == TEAM then
 			team_ancient = newSafeUnit
@@ -401,12 +431,18 @@ local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 	end
 	
 	if not dontIndex then
+		--[[DEV]]DEBUG_print("[building] assigning to index %s->%s", newSafeUnit.name, hUnit)
 		t_buildings[newSafeUnit.team][hUnit] = newSafeUnit
 		
 		if newSafeUnit.isTower or newSafeUnit.isFountain or newSafeUnit.barracksType then
 			assign_to_building_index(newSafeUnit)
+		elseif newSafeUnit.isOutpost then
+			t_outposts[hUnit] = newSafeUnit
 		end
+--[[DEV]]else
+	--[[DEV]]DEBUG_print("[building] not assigning to index %s!>%s", newSafeUnit.name, hUnit)
 	end
+
 
 	-- updated on seen
 	newSafeUnit.attackDamage = not (newSafeUnit.isTower or newSafeUnit.isFountain) and 0
@@ -418,6 +454,7 @@ local function bunit_new_safe_unit_no_scan(hUnit, dontIndex)
 end
 local function bunit_new_safe_unit_scan_data(hUnit, dontIndex)
 	local newSafeUnit = bunit_new_safe_unit_no_scan(hUnit, dontIndex)
+	if not newSafeUnit then return nil end
 
 	if newSafeUnit.team == TEAM and newSafeUnit.tier
 			and (newSafeUnit.isTower or newSafeUnit.isFountain) then
@@ -441,6 +478,13 @@ local function bunit_new_safe_unit_scan_data(hUnit, dontIndex)
 			)
 		Util_TablePrint(TOWER_TIER_ATTACK_DAMAGE)
 		bunit_new_safe_unit_scan_data = nil
+		local enemyTeam = ENEMY_TEAM
+		local dmgTiersTbl = TOWER_TIER_ATTACK_DAMAGE
+		for hUnit,gsiBuilding in pairs(t_buildings_index) do
+			if gsiBuilding.team == enemyTeam then
+				gsiBuilding.attackDamage = dmgTiersTbl[gsiBuilding.tier]
+			end
+		end
 	end
 	return newSafeUnit
 end

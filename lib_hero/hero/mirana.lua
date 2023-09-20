@@ -1,10 +1,10 @@
 local hero_data = {
 	"mirana",
-	{2, 3, 1, 1, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 7, 5, 4, 9, 11},
+	{2, 1, 1, 3, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_branches","item_enchanted_mango","item_circlet","item_slippers","item_branches","item_wraith_band","item_wraith_band","item_boots","item_javelin","item_maelstrom","item_crown","item_crown","item_staff_of_wizardry","item_gungir","item_gloves","item_boots_of_elves","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_invis_sword","item_lesser_crit","item_silver_edge","item_gem","item_gem","item_monkey_king_bar","item_gem",
+		"item_tango","item_branches","item_circlet","item_circlet","item_branches","item_blood_grenade","item_ward_sentry","item_magic_wand","item_boots","item_urn_of_shadows","item_crown","item_fluffy_hat","item_spirit_vessel","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_cloak","item_headdress","item_ring_of_health","item_pipe","item_tranquil_boots","item_ancient_janggo","item_boots_of_bearing","item_maelstrom",
 	},
-	{ {3,3,3,3,3,}, {4,4,4,4,3,}, 0.1 },
+	{ {3,3,3,1,1,}, {4,4,4,5,5,}, 0.1 },
 	{
 		"Starstorm","Sacred Arrow","Leap","Moonlight Shadow","-2.0s Sacred Arrow cooldown","+125 Leap Distance","Moonlight Shadow gives +20.0% Evasion","+80 Leap Attack Speed","-20s Moonlight Shadow Cooldown","+35 Damage","+2 Multishot Sacred Arrows","+200 Starstorm Damage",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

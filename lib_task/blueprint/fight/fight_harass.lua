@@ -24,7 +24,24 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
+-- fight_harass constants
 local XETA_SCORE_DO_NOT_RUN = XETA_SCORE_DO_NOT_RUN
+local VALUE_OF_ONE_HEALTH = VALUE_OF_ONE_HEALTH
+local CREEP_AGRO_RANGE = CREEP_AGRO_RANGE
+local UNIT_TYPE_CREEP = UNIT_TYPE_CREEP
+local UNIT_TYPE_BUILDING = UNIT_TYPE_BUILDING
+local UNIT_TYPE_HERO = UNIT_TYPE_HERO
+local DEBUG = DEBUG
+local VERBOSE = VERBOSE
+local TEST = TEST
+-- /consts
+
+-- ()
+local max = math.max
+local min = math.min
+local abs = math.abs
+local Positioning_WillAttackCmdExposeToLocRad = Positioning_WillAttackCmdExposeToLocRad
+local Task_GetTaskScore = Task_GetTaskScore
 local Math_PointToPointDistance2D = Math_PointToPointDistance2D
 local Set_GetEnemyHeroesInPlayerRadius = Set_GetEnemyHeroesInPlayerRadius
 local pUnit_GetAdjustedAttackTime = pUnit_GetAdjustedAttackTime
@@ -33,13 +50,19 @@ local Lhp_GetActualFromUnitToUnitAttackOnce = Lhp_GetActualFromUnitToUnitAttackO
 local FarmJungle_GetJungleCampClearViability = FarmJugnle_GetJungleCampClearViability
 local Analytics_GetTotalDamageInTimeline = Analytics_GetTotalDamageInTimeline
 local Analytics_GetMostDamagingUnitTypeToUnit = Analytics_GetMostDamagingUnitTypeToUnit
-local VALUE_OF_ONE_HEALTH = VALUE_OF_ONE_HEALTH
-local CREEP_AGRO_RANGE = CREEP_AGRO_RANGE
+local FarmLane_UtilizingLaneSafety = FarmLane_UtilizingLaneSafety
+local Task_CreateUpdatePriorityDeagroJob = Task_CreateUpdatePriorityDeagroJob
+local Set_GetCenterOfSetUnits = Set_GetCenterOfSetUnits
+local Set_GetAlliedHeroesInLocRad = Set_GetAlliedHeroesInLocRad
+local Set_GetNearestTeamTowerToPlayer = Set_GetNearestTeamTowerToPlayer
+local FightClimate_AnyIntentToHarm = FightClimate_AnyIntentToHarm
+local FightClimate_CreepPressureFast = FightClimate_CreepPressureFast
+local FarmLane_AnyCreepLastHitTracked = FarmLane_AnyCreepLastHitTracked
+local FarmLane_InformFightingNoFarming = FarmLane_InformFightingNoFarming
 local Positioning_WillAttackCmdExposeToLocRad = Positioning_WillAttackCmdExposeToLocRad
-local Task_GetTaskScore = Task_GetTaskScore
-local max = math.max
-local min = math.min
-local abs = math.abs
+local Xeta_CostOfWaitingSeconds = Xeta_CostOfWaitingSeconds
+local Vector_PointDistance = Vector_PointDistance
+-- /()
 
 local TEST = TEST and true
 
@@ -58,7 +81,6 @@ local APPROX_MJOL_STATIC_TAKEN_PER_HIT = APPROX_MJOL_STATIC_TAKEN_PER_HIT
 local APPROX_COST_OF_HARASSING_UNDER_TOWER = 27*BUILDING_T2_T4_ATTACK_DAMAGE * VALUE_OF_ONE_HEALTH / 1.1
 
 local MELEE_CREEP_HALF_VALUE = 20
-local CREEP_AGRO_RESET_LIMIT = 2 - 0.15
 
 local DEBUG = DEBUG
 local VERBOSE = VERBOSE
@@ -79,6 +101,11 @@ end
 
 function FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
 	return t_health_diff_outnumbered_factor[gsiPlayer.nOnTeam] or 0
+end
+
+function FightHarass_GetTarget(gsiPlayer)
+	local fht = Task_GetTaskObjective(gsiPlayer, task_handle)
+	return fht, fht and not pUnit_IsNullOrDead(fht)
 end
 
 local next_player = 1
@@ -138,8 +165,6 @@ local function task_init_func(taskJobDomain)
 end
 Blueprint_RegisterTask(task_init_func)
 
-local creep_agro_reset_time = {}
-local disallow_deagro_time = {}
 local enemy_intents = {}
 local friendly_intents = {}
 
@@ -148,37 +173,44 @@ local team_player_targetted = {} for pnot=1,TEAM_NUMBER_OF_PLAYERS do team_playe
 local adjust_safer_avoid_agro = (TEAM == TEAM_DIRE and Vector(-225, -225, 0) or Vector(255, 255, 0))
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
+		if SpecialBehavior_GetBooleanOr("fightHarassRunOverride", false, 
+				gsiPlayer, objective, xetaScore) then
+			return xetaScore
+		end
 		local hPlayer = gsiPlayer.hUnit
 		local pnot = gsiPlayer.nOnTeam
-		local creepPressure = Analytics_CreepPressureFast(gsiPlayer)
+		local creepPressure = Analytics_CreepPressureFast(gsiPlayer) - 0.02 * gsiPlayer.level -- TODO megas
 		local attackTarget = hPlayer:GetAttackTarget() 
 
-		if creep_agro_reset_time[pnot] and creep_agro_reset_time[pnot] < GameTime() then
-			creep_agro_reset_time[pnot] = false
-		end
-		if DEBUG and DEBUG_IsBotTheIntern() then
-			DebugDrawText(450, 860, string.format("%.1f;%.1f;%.1f;%.1f;%.1f", (creep_agro_reset_time[1] or -0.0), (creep_agro_reset_time[2] or -0.0), (creep_agro_reset_time[3] or -0.0), (creep_agro_reset_time[4] or -0.0), (creep_agro_reset_time[5] or -0.0)), 255, 255, 255)
-		end
+		--[[DEV]]local getsCrapJob = DEBUG and DEBUG_IsBotTheIntern()
+		
+		--[[DEV]]print("fh 1")
 
+		local timeData = gsiPlayer.time.data
+		-- Check if we are taking damage, and from what
+		local highRecentTakenType, highRecentTaken = timeData.highRecentTakenType
+		if not highRecenTakenType then
+			highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer, 2)
+			timeData.highRecentTakenType = highRecentTakenType
+			timeData.highRecentTaken = highRecentTaken
+		else
+			highRecentTaken = timeData.highRecentTaken
+		end
 		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
-		if not creep_agro_reset_time[pnot] and creepPressure >= 0.75
-				and danger > -0.8 then
---[[DEV]]	if DEBUG and DEBUG_IsBotTheIntern() then
+		local attackDamage = hPlayer:GetAttackDamage()
+		if highRecentTakenType == UNIT_TYPE_CREEP
+				and highRecentTaken*max(1, (1+danger)) > attackDamage then
+			local futureDmg = Analytics_GetFutureDamageInTimeline(hPlayer)
+			if futureDmg and Analytics_GetNearFutureHealth(gsiPlayer, 3) < 400
+					and LanePressure_DeagroCreepsNow(gsiPlayer) then
+				return xetaScore;
+			end
+		end
+		if LanePressure_CanAgroCreeps(gsiPlayer) and creepPressure + danger > 0.2 then
+		--[[DEV]]print("fh 2")
+--[[DEV]]	if getsCrapJob then
 --[[DEV]]		DebugDrawText(760, 660, string.format("avoid creep agro %s: %.2f", gsiPlayer.shortName, creepPressure), 255, 255, 255)
 --[[DEV]]	end
-			local highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer)
-			local attackDamage = hPlayer:GetAttackDamage()
-			if highRecentTakenType == UNIT_TYPE_CREEP and highRecentTaken > attackDamage then
-				local nearbyFriendly = Set_GetNearestAlliedCreepSetToLocation(gsiPlayer.lastSeen.location)
-				if nearbyFriendly[1] and Analytics_GetNearFutureHealth(gsiPlayer, 3) < 400
-						and ( not disallow_deagro_time[pnot] or disallow_deagro_time[pnot] < GameTime() ) then
-					-- SUPERHUMAN deagro and return to normal behaviour next frame.
-					-- Assumes server triggers a deagro to process from any friendly attack event, or checks deagros every frame.
-					disallow_deagro_time[pnot] = GameTime() + 6
-					hPlayer:Action_AttackUnit(nearbyFriendly[1].hUnit, false)
-					return xetaScore;
-				end
-			end
 			local nearbyEnemyCreeps = gsiPlayer.hUnit:GetNearbyCreeps(CREEP_AGRO_RANGE, false)
 			if objective.lastSeenHealth > attackDamage*2
 					and #nearbyEnemyCreeps > gsiPlayer.lastSeenHealth / 300 then
@@ -188,25 +220,31 @@ blueprint = {
 								gsiPlayer, adjust_safer_avoid_agro, SET_HERO_ENEMY, 500
 							)
 					)
-				if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawCircle(moveSafe, 20, 0, 255, 0) end
+--[[DEV]]if getsCrapJob then DebugDrawCircle(moveSafe, 20, 0, 255, 0) end
 				moveSafe = Positioning_AdjustToAvoidCrowdingSetType(gsiPlayer, moveSafe, SET_CREEP_ENEMY, 800)
-				if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawCircle(moveSafe, 20, 100, 255, 100) end
-	if abs(moveSafe.x) > 9000 or abs(moveSafe.y) > 9000 or abs(moveSafe.z) > 9000 then
-		WARN_print(string.format("[fight_harass] BIG DIST: %s", debug.traceback()));
-	end
-				hPlayer:Action_MoveToLocation(moveSafe)
-	--[[DEV]]	if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveSafe, 255, 50, 50) end
+--[[DEV]]if getsCrapJob then DebugDrawCircle(moveSafe, 20, 100, 255, 100) end
+--[[DEV]]if abs(moveSafe.x) > 9000 or abs(moveSafe.y) > 9000 or abs(moveSafe.z) > 9000 then
+--[[DEV]]	WARN_print(string.format("[fight_harass] BIG DIST: %s", debug.traceback()));
+--[[DEV]]end
+				Positioning_MoveDirectly(gsiPlayer, moveSafe)
+--[[DEV]]if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, moveSafe, 255, 50, 50) end
+		--[[DEV]]print("fh 3")
 				return xetaScore;
 			end
 		end
+		--[[DEV]]print("fh 4")
 		if GSI_UnitCanStartAttack(gsiPlayer) --[[or (attackTarget and attackTarget:IsHero())]] then
+		--[[DEV]]print("fh 5")
 			local hEnemy = objective.hUnit
+			if LanePressure_AgroCreepsNow(gsiPlayer, objective) then
+		--[[DEV]]print("fh 6")
+				return xetaScore
+			end
 			local inAttackRange = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, objective.lastSeen.location) < gsiPlayer.attackRange + 80
+		--[[DEV]]print("fh 7")
 			if inAttackRange or hPlayer:GetAttackTarget() then
-				hPlayer:Action_AttackUnit(hEnemy, false)
-				if not creep_agro_reset_time[pnot] then
-					creep_agro_reset_time[pnot] = GameTime() + CREEP_AGRO_RESET_LIMIT
-				end
+		--[[DEV]]print("fh attack")
+				gsiPlayer.hUnit:Action_AttackUnit(hEnemy, true)
 			else
 				if DEBUG and gsiPlayer.shortName == "arc_warden" then DebugDrawText(200, 200, ":3", 255, 255, 255) end
 				Positioning_ZSAttackRangeUnitHugAllied(
@@ -226,7 +264,8 @@ blueprint = {
 			--print(objective.name, gsiPlayer.shortName, "is dead")
 			return XETA_SCORE_DO_NOT_RUN
 		else
-			--[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then print(gsiPlayer.shortName, "waiting to be able to attack") end
+		--[[DEV]]print("fh 9")
+			--[[DEV]]--[DEBUG]]if getsCrapJob then print(gsiPlayer.shortName, "waiting to be able to attack") end
 			Positioning_ZSAttackRangeUnitHugAllied(
 					gsiPlayer, objective.lastSeen.location, SET_BUILDING_ENEMY,
 					2000, 0.5 + hPlayer:GetLastAttackTime() - GameTime(),
@@ -251,18 +290,27 @@ blueprint = {
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
 
-		local playerIsRooted = hUnitPlayer:IsRooted()
+		local timeData = gsiPlayer.time.data
 		-- Check if we are taking damage, and from what
-		local highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer)
+		local highRecentTakenType, highRecentTaken = timeData.highRecentTakenType
+		if not highRecenTakenType then
+			highRecentTakenType, highRecentTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer, 2)
+			timeData.highRecentTakenType = highRecentTakenType
+			timeData.highRecentTaken = highRecentTaken
+		else
+			highRecentTaken = timeData.highRecentTaken
+		end
+		local playerIsRooted = hUnitPlayer:IsRooted()
 		if not playerIsRooted then
-			if highRecentTaken*2 > 
-							math.max(
-									hUnitPlayer:GetAttackDamage()*2.5,
-									prevObjective and Analytics_GetTotalDamageInTimeline(prevObjective.hUnit) or 0
-								)
+			if highRecentTaken > 
+						max(
+								hUnitPlayer:GetAttackDamage()*2.5,
+								prevObjective and Analytics_GetTotalDamageInTimeline(prevObjective.hUnit, 2) or 0
+							)
 					and FarmLane_UtilizingLaneSafety(gsiPlayer) then
+				--[[DEV]]if VERBOSE and DEBUG_IsBotTheIntern() then DEBUG_print("[fight_harass] DNR damage taken %d > /[%d, %d]", highRecentTaken, hUnitPlayer:GetAttackDamage()*2.5, prevObjective and Analytics_GetTotalDamageInTimeline(prevObjective.hUnit, 2) or 0) end
 				return prevObjective, XETA_SCORE_DO_NOT_RUN
-			elseif highRecentTakenType == UNIT_TYPE_CREEP and highRecentTaken > hUnitPlayer:GetAttackDamage()*0.1
+			elseif highRecentTakenType == UNIT_TYPE_CREEP and highRecentTaken > hUnitPlayer:GetAttackDamage()*2
 					and FarmJungle_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) < 1 then
 				return prevObjective, XETA_SCORE_DO_NOT_RUN
 			elseif highRecentTakenType == UNIT_TYPE_BUILDING
@@ -279,11 +327,17 @@ blueprint = {
 		team_player_targetted[gsiPlayer.nOnTeam][1] = highRecentTakenType
 		team_player_targetted[gsiPlayer.nOnTeam][2] = highRecentTaken
 
+		--[[DEV]]local getsCrapJob = DEBUG and DEBUG_IsBotTheIntern() or (prevScore and prevScore > 450)
+
 		local playerLoc = gsiPlayer.lastSeen.location
 		local attackRange = gsiPlayer.attackRange
 		local harassRange, nearbyEnemies = get_harassable_enemies(gsiPlayer)
-		local centerOfEnemies = Set_GetCenterOfSetUnits(nearbyEnemies) or playerLoc
-		local nearbyAllies = Set_GetAlliedHeroesInLocRadius(gsiPlayer, centerOfEnemies, 1700, false)
+		local centerOfEnemies = timeData.centerOfEnemies
+		if not centerOfEnemies then
+			centerOfEnemies = Set_GetCenterOfSetUnits(nearbyEnemies) or playerLoc
+			timeData.centerOfEnemies = centerOfEnemies
+		end
+		local nearbyAllies = Set_GetAlliedHeroesInLocRad(gsiPlayer, centerOfEnemies, 1700, false)
 		local numNearbyEnemies = #nearbyEnemies
 		local numNearbyAllies = #nearbyAllies
 		local numOfTeamCenterPlayer = 1 + numNearbyAllies
@@ -292,7 +346,7 @@ blueprint = {
 		local mostHarassableEnemyValue = XETA_SCORE_DO_NOT_RUN
 		local nearestTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer) or GSI_GetTeamFountainUnit(ENEMY_TEAM)
 		local tLoc = nearestTower and nearestTower.lastSeen.location
-		local tRange = nearestTower and nearestTower.attackRange + 150
+		local tRange = nearestTower and nearestTower.attackRange + 70
 		local enemy_intents = enemy_intents
 		local friendly_intents = friendly_intents
 		-- update intents (in-func)
@@ -300,34 +354,53 @@ blueprint = {
 		FightClimate_AnyIntentToHarm(gsiPlayer, nearbyAllies, friendly_intents)
 		local numEnemyIntent = #enemy_intents
 		local numFriendlyIntent = #friendly_intents
-		--[[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(1600, 680, string.format("friendly_intents:%s %s", tostring(friendly_intents[1]), tostring(friendly_intents[2])), 255, 255, 255) DebugDrawText(1600, 690, string.format("enemy_intents:%s %s", tostring(enemy_intents[1]), tostring(enemy_intents[2])), 255, 255, 255) end
+		--[[DEBUG]]if getsCrapJob then DebugDrawText(1600, 680, string.format("friendly_intents:%s %s", tostring(friendly_intents[1]), tostring(friendly_intents[2])), 255, 255, 255) DebugDrawText(1600, 690, string.format("enemy_intents:%s %s", tostring(enemy_intents[1]), tostring(enemy_intents[2])), 255, 255, 255) end
 		local netPowerStruggle = 0 -- Used to inform the final score. If their Godlike Mid is in lane with MeatSim, we should know that attacking MeatSim might be a very bad idea.
+
+		local farmLaneScore = min(max(0, Task_GetTaskScore(gsiPlayer, farm_lane_task_handle)),
+				(not prevObjective and 67 or 67*(prevObjective.lastSeenHealth / prevObjective.maxHealth))
+			)
 		
 		-- create data for targetting based on positioning
 		local creepPressure = FightClimate_CreepPressureFast(gsiPlayer) -- used in score divisor
 
 		local totalDistanceOfEnemiesToMe = 0
+		local farmLaneCreep, farmLaneTta, farmLaneScore
+				= FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+		local creepIsPlausible = farmLaneCreep
+				and not farmLaneCreep.center
+				and gsiPlayer.attackPointPercent * gsiPlayer.hUnit:GetSecondsPerAttack()
+						+ (Vector_PointDistance2D(farmLaneCreep.lastSeen.location, playerLoc)
+							- gsiPlayer.attackRange - 40
+						) / gsiPlayer.currentMovementSpeed
+					< max(1, farmLaneTta)
 		local distanceScores = {}
+		local distances = {}
 		local challenge = 0
 		for i=1,numNearbyEnemies do
-			distanceScores[i] = Math_PointToPointDistance2D(
-					playerLoc,
-					nearbyEnemies[i].lastSeen.location
-				)	
-			totalDistanceOfEnemiesToMe = totalDistanceOfEnemiesToMe + distanceScores[i]
+			local enemyLoc = nearbyEnemies[i].lastSeen.location
+			distances[i] = ((playerLoc.x-enemyLoc.x)^2 + (playerLoc.y-enemyLoc.y)^2)^0.5
+			totalDistanceOfEnemiesToMe = totalDistanceOfEnemiesToMe + distances[i]
 			if enemy_intents[i] then
 				challenge = challenge + 1
 			end
 		end
-		if challenge > 1 then
+		local farmLaneAttackNowDecrement = gsiPlayer.difficulty >= 3
+				and farmLaneTta > (gsiPlayer.hUnit:GetSecondsPerAttack() + 0.75)
+				and 0 or farmLaneScore / (challenge + 0.2 + 0.3*gsiPlayer.level)
+		local missingManaCare = 0
+		if challenge > 1 and creepIsPlausible then
 			FarmLane_InformFightingNoFarming(gsiPlayer)
+			farmLaneAttackNowDecrement = farmLaneAttackNowDecrement + 15 
+		else
+			missingManaCare = max(0, min(16, (1 - gsiPlayer.lastSeenMana / (10 + gsiPlayer.highUseManaSimple)) * 16))
 		end
-		local avgDistance = totalDistanceOfEnemiesToMe / numNearbyEnemies
+		local avgDistance = nearbyEnemies[1] and totalDistanceOfEnemiesToMe / numNearbyEnemies or 0
 		for i=1,numNearbyEnemies do
-			distanceScores[i] = distanceScores[i] < attackRange+75 and 0
-					or min(0, avgDistance - distanceScores[i])*numNearbyEnemies/30
+			distanceScores[i] = distances[i] < attackRange+75 and 0
+					or min(0, avgDistance - distances[i])*numNearbyEnemies/30
 		end
-		if DEBUG and DEBUG_IsBotTheIntern() and nearbyEnemies[1] then print("ATTACK RANGE FROM AVG SCORES", nearbyEnemies[1].shortName, distanceScores[1], distanceScores[2], distanceScores[3]) end
+		--[[DEV]]if getsCrapJob then DebugDrawText(0, 950, string.format(" FLAND:%.2f", farmLaneAttackNowDecrement), 255, 255, 255) if nearbyEnemies[1] then print("ATTACK RANGE FROM AVG SCORES", nearbyEnemies[1].shortName, distanceScores[1], distanceScores[2], distanceScores[3]) end end
 		if DEBUG then
 			DebugDrawText(160, (TEAM_IS_RADIANT and 760 or 860)+gsiPlayer.nOnTeam*8, string.sub(gsiPlayer.shortName, 1, 5), 255, 255, 255)
 		end
@@ -388,42 +461,45 @@ blueprint = {
 					end
 				end
 			end
-			if DEBUG and DEBUG_IsBotTheIntern() then print("harass:", gsiPlayer.shortName, "to", thisEnemy.shortName, "free damage is", freeDamage) end
+			--[[DEV]]if getsCrapJob then print("harass:", gsiPlayer.shortName, "to", thisEnemy.shortName, "free damage is", freeDamage) end
 			local healthDiffAndOutnumbered = min(2, max(0.05, (gsiPlayer.lastSeenHealth / thisEnemy.lastSeenHealth))) * outnumberedFactor
 			local thisHarassableRating = VALUE_OF_ONE_HEALTH * (actualDamage + freeDamage)*healthDiffAndOutnumbered
-			if DEBUG and DEBUG_IsBotTheIntern() then print("harass:", gsiPlayer.shortName, "before health diff and outnumbered", thisHarassableRating, math.min(1.33, math.max(0.75, (gsiPlayer.lastSeenHealth / thisEnemy.lastSeenHealth))), outnumberedFactor) end
+					- farmLaneAttackNowDecrement
+			--[[DEV]]if getsCrapJob then print("harass:", gsiPlayer.shortName, "before health diff and outnumbered", thisHarassableRating, math.min(1.33, math.max(0.75, (gsiPlayer.lastSeenHealth / thisEnemy.lastSeenHealth))), outnumberedFactor) end
 			thisHarassableRating = thisHarassableRating - (VALUE_OF_ONE_HEALTH * actualDamageToMe)/healthDiffAndOutnumbered
 			--thisHarassableRating = thisHarassableRating * (thisHarassableRating>0 and healthDiffAndOutnumbered or 1/healthDiffAndOutnumbered)
 			netPowerStruggle = netPowerStruggle + thisHarassableRating*((thisEnemy.hUnit:IsStunned() or thisEnemy.hUnit:IsHexed()) and 1.66 or 1)
 
-			--[DEBUG]]if DEBUG and DEBUG_IsBotTheIntern() then print("harass:", gsiPlayer.shortName, thisHarassableRating, "tower will expose:", Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, thisEnemy, tLoc, tRange), APPROX_COST_OF_HARASSING_UNDER_TOWER) end
+			--[[DEV]]--[DEBUG]]if getsCrapJob then print("harass:", gsiPlayer.shortName, thisHarassableRating, "tower will expose:", Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, thisEnemy, tLoc, tRange), APPROX_COST_OF_HARASSING_UNDER_TOWER) end
 			thisHarassableRating = thisHarassableRating
 					- (nearestTower and
-							(Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, thisEnemy, tLoc, tRange+100)
-								and (500-thisHarassableRating)*nearestTower.hUnit:GetAttackDamage()*3/gsiPlayer.lastSeenHealth or 0
+							(Positioning_WillAttackCmdExposeToLocRad(gsiPlayer, thisEnemy, tLoc, tRange)
+								and (500-thisHarassableRating)*nearestTower.attackDamage*3/gsiPlayer.lastSeenHealth or 0
 							)
 						or 0
 					)
-			if DEBUG and DEBUG_IsBotTheIntern() then print("harass:", gsiPlayer.shortName, thisEnemy.shortName, thisHarassableRating) end
-			thisHarassableRating = thisHarassableRating + min(0, -Xeta_CostOfWaitingSeconds(gsiPlayer, secondsToAttack) + MELEE_CREEP_HALF_VALUE - Task_GetTaskScore(gsiPlayer, farm_lane_task_handle))
+			--[[DEV]]if getsCrapJob then print("harass:", gsiPlayer.shortName, thisEnemy.shortName, thisHarassableRating, -missingManaCare) end
+			thisHarassableRating = thisHarassableRating + min(0, -Xeta_CostOfWaitingSeconds(gsiPlayer, secondsToAttack) + MELEE_CREEP_HALF_VALUE - farmLaneScore)
 			for iIntent=1,numFriendlyIntent do
 				if friendly_intents[iIntent] == thisEnemy then
 					thisHarassableRating = thisHarassableRating + 15
 					if DEBUG then DebugDrawText(220+iIntent*8, (TEAM_IS_RADIANT and 610 or 710)+gsiPlayer.nOnTeam*8, "*", 255, 255, 255) end
+				else
+					thisHarassableRating = thisHarassableRating - missingManaCare
 				end
 			end
 		--	if not underAttack then
 			if enemy_intents[iEnemy] and enemy_intents[iEnemy].type == UNIT_TYPE_HERO then
-				if DEBUG and DEBUG_IsBotTheIntern() then print(gsiPlayer.shortName, "increased harass score due to intent of", thisEnemy.shortName) end
+				--[[DEV]]if getsCrapJob then print(gsiPlayer.shortName, "increased harass score due to intent of", thisEnemy.shortName) end
 				thisHarassableRating = thisHarassableRating + 10 -- retaliate for an ally under attack
 				--print(gsiPlayer.shortName, "more keen to attack as not under attack and harassment occuring.")
 			end
 		--	end
 			--print("harass: Time-based score taken was", math.min(0, -Xeta_CostOfWaitingSeconds(gsiPlayer, secondsToAttack) + MELEE_CREEP_HALF_VALUE - Task_GetTaskScore(gsiPlayer, farm_lane_task_handle)))
-			if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(300, 300+16*iEnemy, string.format("pre: %.2f cressure: %.2f dore:%.2f", thisHarassableRating, creepPressure, distanceScores[iEnemy]), 255, 255, 255) end
+			--[[DEV]]if getsCrapJob then DebugDrawText(300, 300+16*iEnemy, string.format("pre: %.2f cressure: %.2f dore:%.2f", thisHarassableRating, creepPressure, distanceScores[iEnemy]), 255, 255, 255) end
 			thisHarassableRating = thisHarassableRating
 					+ (2 - creepPressure) * max(0, (35 - thisEnemy.level)/35) * 10 + distanceScores[iEnemy]
-			if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(300, 308+16*iEnemy, string.format("post: %.2f", thisHarassableRating), 255, 255, 255) end
+			--[[DEV]]if getsCrapJob then DebugDrawText(300, 308+16*iEnemy, string.format("post: %.2f", thisHarassableRating), 255, 255, 255) end
 			-- e.g. having to walk an extra 1s to get to a target further away than some other arbitrary but assumed aggressive target, decrements the comparitive score by 10 points.
 			if thisHarassableRating > mostHarassableEnemyValue then
 				mostHarassableEnemyValue = thisHarassableRating
@@ -446,16 +522,16 @@ blueprint = {
 	--		LeechExp_UpdatePriority(gsiPlayer, 0) -- Will rescore once for this player (to inform low score)
 	--	end
 		
-		-- if DEBUG and DEBUG_IsBotTheIntern() then print("intern returns", mostHarassableEnemy and mostHarassableEnemy.shortName, mostHarassableEnemyValue) end
-		if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(650, 650, string.format("harass: %.2f", netPowerStruggle), 255, 255, 255) end
-		if DEBUG and DEBUG_IsBotTheIntern() then
-			print(gsiPlayer.shortName, "checking attack while rooted", playerIsRooted,
-					mostHarassableEnemy and Vector_PointDistance(
-							playerLoc,
-							mostHarassableEnemy.lastSeen.location),
-					gsiPlayer.attackRange
-				)
-		end
+		--[[DEV]]-- if getsCrapJob then print("intern returns", mostHarassableEnemy and mostHarassableEnemy.shortName, mostHarassableEnemyValue) end
+		--[[DEV]]if getsCrapJob then DebugDrawText(650, 650, string.format("harass: %.2f", netPowerStruggle), 255, 255, 255) end
+		--[[DEV]]if getsCrapJob then
+--[[DEV]]			print(gsiPlayer.shortName, "checking attack while rooted:", playerIsRooted,
+--[[DEV]]					mostHarassableEnemy and Vector_PointDistance(
+--[[DEV]]							playerLoc,
+--[[DEV]]							mostHarassableEnemy.lastSeen.location),
+--[[DEV]]					gsiPlayer.attackRange
+--[[DEV]]				)
+--[[DEV]]		end
 		return mostHarassableEnemy, mostHarassableEnemy
 				and mostHarassableEnemyValue + netPowerStruggle / 2
 					+ (playerIsRooted

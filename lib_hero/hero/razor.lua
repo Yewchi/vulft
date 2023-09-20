@@ -1,12 +1,12 @@
 local hero_data = {
 	"razor",
-	{1, 2, 1, 2, 1, 4, 1, 3, 3, 5, 3, 4, 3, 2, 8, 2, 4, 10, 11},
+	{1, 2, 1, 3, 1, 4, 1, 2, 3, 6, 3, 4, 2, 3, 8, 2, 4, 10, 11},
 	{
-		"item_tango","item_branches","item_branches","item_branches","item_circlet","item_slippers","item_wraith_band","item_boots","item_boots_of_elves","item_gloves","item_power_treads","item_falcon_blade","item_ogre_axe","item_mithril_hammer","item_magic_wand","item_black_king_bar","item_blade_of_alacrity","item_ogre_axe","item_yasha","item_sange_and_yasha","item_ultimate_orb","item_sphere","item_pers","item_refresher","item_lifesteal","item_claymore",
+		"item_tango","item_branches","item_magic_stick","item_branches","item_branches","item_branches","item_magic_wand","item_wraith_band","item_boots","item_boots_of_elves","item_power_treads","item_fluffy_hat","item_blades_of_attack","item_lifesteal","item_falcon_blade","item_mask_of_madness","item_ogre_axe","item_black_king_bar","item_blade_of_alacrity","item_yasha","item_manta","item_butterfly","item_claymore","item_satanic","item_buckler","item_assault","item_staff_of_wizardry","item_ogre_axe",
 	},
 	{ {1,1,1,3,3,}, {1,1,1,3,3,}, 0.1 },
 	{
-		"Plasma Field","Static Link","Storm Surge","Eye of the Storm","+30 Plasma Field Damage","+12 Agility","+5 Static Link Damage Steal","+14 Strength","+21% Storm Surge Move Speed","-0.1s Eye of the Storm Strike Interval","Creates A Second Plasma Field Delayed By +0.8s","Static Link Steals Attack Speed",
+		"Plasma Field","Static Link","Storm Surge","Eye of the Storm","+30 Plasma Field Damage","+14 Agility","+5 Static Link Damage Steal","+14 Strength","+25% Storm Surge Slow and Damage","-0.1s Eye of the Storm Strike Interval","Creates A Second Plasma Field Delayed By +30s","Static Link Steals Attack Speed",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

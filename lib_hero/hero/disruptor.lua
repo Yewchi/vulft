@@ -1,12 +1,12 @@
 local hero_data = {
 	"disruptor",
-	{2, 3, 2, 3, 2, 4, 2, 1, 3, 3, 5, 4, 1, 1, 8, 1, 4, 9},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 1, 3, 4, 1, 1, 8, 5, 4, 9},
 	{
-		"item_tango","item_ward_dispenser","item_enchanted_mango","item_enchanted_mango","item_faerie_fire","item_clarity","item_clarity","item_clarity","item_magic_stick","item_boots","item_arcane_boots","item_magic_wand","item_void_stone","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
+		"item_tango","item_blood_grenade","item_ward_sentry","item_branches","item_branches","item_enchanted_mango","item_clarity","item_boots","item_magic_wand","item_arcane_boots","item_ghost","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_gem","item_shadow_amulet","item_blitz_knuckles","item_invis_sword","item_wind_lace","item_gem",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
-		"Thunder Strike","Glimpse","Kinetic Field","Static Storm","-3s Kinetic Field Cooldown","+30 Thunder Strike Damage","250 Glimpse Max Damage","+2.0s Static Storm Duration","+2s Kinetic Field Duration","+3 Thunder Strike Hits","-12s Glimpse Cooldown","+200 Static Storm Radius",
+		"Thunder Strike","Glimpse","Kinetic Field","Static Storm","-3s Kinetic Field Cooldown","+10 Thunder Strike Damage per Strike","250 Glimpse Max Damage","+1.5s Static Storm Duration","+2s Kinetic Field Duration",".4s Thunder Strike Slow Duration","-12s Glimpse Cooldown","+200 Static Storm Radius",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

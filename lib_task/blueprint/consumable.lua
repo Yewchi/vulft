@@ -33,6 +33,8 @@
 ---- consumable constants --
 local INSTANT_CONSIDERATION = 250
 
+local HERO_BASE_KILL_GOLD = 135
+
 local FLASK_HEALTH_REGEN = 40
 local FLASK_EAT_TIME = 10
 local FLASK_BASIC_HEALTH_GAIN = FLASK_EAT_TIME * FLASK_HEALTH_REGEN
@@ -74,7 +76,7 @@ local BOTTLE_BASIC_MANA_GAIN = BOTTLE_BASIC_MANA_GAIN
 local BOTTLE_USE_ON_HEALTH_PERCENT = 0.85 -- After 25s basic regen
 local BOTTLE_USE_ON_MANA_PERCENT = 0.3
 
-local CONSUMABLE_RESCORE_THROTTLE = 0.083 -- nOnTeam Rotate
+local CONSUMABLE_RESCORE_THROTTLE = 0.167 -- nOnTeam Rotate
 
 local ITEM_NEEDED_SWITCH_SLOT_WAIT_TIME = ITEM_SWITCH_ITEM_READY_TIME + 2
 
@@ -116,6 +118,8 @@ local p_time_task_allowed = {} -- Report low scores until the item we saw was wo
 
 local task_handle = Task_CreateNewTask()
 
+local fight_harass_handle
+
 local WARD_LOCS -- nb. may be empty
 local ENEMY_FOUNTAIN
 local TEAM_FOUNTAIN_SUM
@@ -144,6 +148,7 @@ local function task_init_func(taskJobDomain)
 	Blueprint_RegisterInformDeadFunc(inform_dead)
 	
 	increase_safety_task_handle = IncreaseSafety_GetTaskHandle()
+	fight_harass_handle = FightHarass_GetTaskHandle()
 
 	local teamPlayers = GSI_GetTeamPlayers(TEAM)
 	for i=1,#teamPlayers,1 do
@@ -206,7 +211,8 @@ function Consumable_TryUseFlask(gsiPlayer, hItem, hUnit)
 	end
 	local ensureCarriedResult = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
 	--[[TEST]]if TEST then print("will attacks block flask for", gsiPlayer.shortName, ":", Analytics_RoshanOrHeroAttacksInTimeline(gsiPlayer) and not hUnit:TimeSinceDamagedByAnyHero()) end
-	if ensureCarriedResult and not Analytics_RoshanOrHeroAttacksInTimeline(gsiPlayer) and not hUnit:WasRecentlyDamagedByAnyHero(3.0) then
+	if ensureCarriedResult and not hUnit:WasRecentlyDamagedByAnyHero(2.0)
+			and not Analytics_RoshanOrHeroAttacksInTimeline(gsiPlayer, -2.5) then
 		hUnit:Action_UseAbilityOnEntity(hItem, hUnit)
 	elseif ensureCarriedResult == ITEM_ENSURE_RESULT_WAIT then
 		lock_bags_may_warn(gsiPlayer, ITEM_NEEDED_SWITCH_SLOT_WAIT_TIME, ITEM_SWITCH_ITEM_READY_TIME)
@@ -312,7 +318,8 @@ local function check_flask(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer
 	if gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.45 or playerHealthAfterPassiveRegenBuffer + FLASK_BASIC_HEALTH_GAIN < gsiPlayer.maxHealth then
 		local playerLoc = gsiPlayer.lastSeen.location
 		if abs(playerLoc.x + playerLoc.y - TEAM_FOUNTAIN_SUM) > 3200
-				and not gsiPlayer.hUnit:HasModifier("modifier_flask_healing") then
+				and not gsiPlayer.hUnit:HasModifier("modifier_flask_healing")
+				and not FightClimate_ImmediatelyExposedToAttack(gsiPlayer, nil, 3, 600) then
 			local score = Xeta_EvaluateObjectiveCompletion(XETA_HEALTH_GAIN, 0, FLASK_BASIC_HEALTH_GAIN, gsiPlayer, gsiPlayer)
 			--if DEBUG_IsBotTheIntern() then print("scored use flask", score) end 
 			if score > beatScore then
@@ -327,27 +334,32 @@ local function check_flask(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer
 	return hItem, XETA_SCORE_DO_NOT_RUN
 end
 
-local function check_tango(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, beatScore)
+local function check_tango(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer, beatScore, timeLimit)
 	if hItem:GetCooldownTimeRemaining() == 0 and not gsiPlayer.hUnit:HasModifier("modifier_tango_heal") then
 		local playerLoc = gsiPlayer.lastSeen.location
 		if abs(playerLoc.x + playerLoc.y - TEAM_FOUNTAIN_SUM) > 2400
 				and playerHealthAfterPassiveRegenBuffer + TANGO_BASIC_HEALTH_GAIN < gsiPlayer.maxHealth then
 			local treesNearby = gsiPlayer.hUnit:GetNearbyTrees(MAX_TREE_FIND_RADIUS)
+			local safeTreeLoc
+			local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+			local allowedMovingDanger = 150 - 160*min(1.0, danger)
+			local playerCoordsAddedAllowed = playerLoc.x+playerLoc.y
+					+ (TEAM==TEAM_RADIANT and allowedMovingDanger or -allowedMovingDanger)
 			if treesNearby then
 				local safeTree = false
 				local nearestEnemyTower = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer) or VERY_UNTHREATENING_UNIT
 				if nearestEnemyTower then 
 					local towerLocation = nearestEnemyTower.lastSeen.location
-					local playerIsUnderEnemyTower = Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, towerLocation) < nearestEnemyTower.attackRange-150
-					local towerAttackTarget = nearestEnemyTower.hUnit:GetAttackTarget()
+					local playerIsUnderEnemyTower = Math_PointToPointDistance2D(playerLoc, towerLocation) < nearestEnemyTower.attackRange-150
+					local towerAttackTarget = nearestEnemyTower.hUnit and nearestEnemyTower.hUnit:CanBeSeen()
+							and nearestEnemyTower.hUnit:GetAttackTarget()
 					local towerConsideredSafe = towerAttackTarget and towerAttackTarget ~= gsiPlayer.hUnit and true or false
 					local towerAttackDistance = nearestEnemyTower.attackRange+HERO_TARGET_DIAMETER
-					local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
-					local allowedMovingDanger = 150 - 160*min(1.0, danger)
-					local playerCoordsAddedAllowed = gsiPlayer.lastSeen.location.x+gsiPlayer.lastSeen.location.y
-							+ (TEAM==TEAM_RADIANT and allowedMovingDanger or -allowedMovingDanger)
 					if playerIsUnderEnemyTower then
 						safeTree = treesNearby[1] -- Debatable
+						if safeTree then
+							safeTreeLoc = GetTreeLocation(safeTree)
+						end
 					else
 						for i=1,math.min(10, #treesNearby),1 do
 							local treeLocation = GetTreeLocation(treesNearby[i])
@@ -356,16 +368,32 @@ local function check_tango(gsiPlayer, hItem, playerHealthAfterPassiveRegenBuffer
 									) and ((TEAM == TEAM_RADIANT and treeLocation.x+treeLocation.y < playerCoordsAddedAllowed) 
 									or (treeLocation.x+treeLocation.y > playerCoordsAddedAllowed) ) then
 								safeTree = treesNearby[i]
-								if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, GetTreeLocation(treesNearby[i]), 20, 100, 20) end
+								safeTreeLoc = treeLocation
+								if DEBUG then DebugDrawLine(playerLoc, GetTreeLocation(treesNearby[i]), 20, 100, 20) end
 								break
 							end
-							if DEBUG then DebugDrawLine(gsiPlayer.lastSeen.location, GetTreeLocation(treesNearby[i]), 100, 20, 20) end
+							if DEBUG then DebugDrawLine(playerLoc, GetTreeLocation(treesNearby[i]), 100, 20, 20) end
 						end
 					end
 				else
-					safeTree = treesNearby[1]
+					for i=1,math.min(10, #treesNearby),1 do
+						local treeLocation = GetTreeLocation(treesNearby[i])
+						if treeLocation.x > TEMP_BAD_TREE_FIX_X_LIMIT
+							and (towerConsideredSafe or towerAttackDistance < Math_PointToPointDistance2D(GetTreeLocation(treesNearby[i]), towerLocation)
+								) and ((TEAM == TEAM_RADIANT and treeLocation.x+treeLocation.y < playerCoordsAddedAllowed) 
+								or (treeLocation.x+treeLocation.y > playerCoordsAddedAllowed) ) then
+							safeTree = treesNearby[i]
+							safeTreeLoc = treeLocation
+							if DEBUG then DebugDrawLine(playerLoc, GetTreeLocation(treesNearby[i]), 20, 100, 20) end
+							break
+						end
+						if DEBUG then DebugDrawLine(playerLoc, GetTreeLocation(treesNearby[i]), 100, 20, 20) end
+					end
 				end
-				if safeTree then
+				if safeTree and ( timeLimit > 5
+							or timeLimit > Vector_PointDistance2D(playerLoc, safeTreeLoc)
+									/ gsiPlayer.currentMovementSpeed
+						) and abs(safeTreeLoc.z - playerLoc.z) < 110 then
 					local score = Xeta_EvaluateObjectiveCompletion(XETA_HEALTH_GAIN, BASIC_TIME_TO_CAST_TANGO, TANGO_BASIC_HEALTH_GAIN, gsiPlayer, gsiPlayer)
 					if score > beatScore then
 						local instruction = p_saved_instruction[gsiPlayer.nOnTeam]
@@ -429,7 +457,7 @@ local function check_faerie_fire(gsiPlayer, hItem, playerHealthAfterPassiveRegen
 				hItem, 
 				score,
 				(nearFutureHealth < 0 and nearFutureHealth + FAERIE_FIRE_HEALTH_GAIN > 0 
-						and INSTANT_CONSIDERATION or 0)
+						and INSTANT_CONSIDERATION+HERO_BASE_KILL_GOLD or 0)
 		end
 	end
 	return hItem, XETA_SCORE_DO_NOT_RUN
@@ -532,7 +560,16 @@ local function check_mango(gsiPlayer, hItem, playerManaAfterPassiveRegenBuffer, 
 	local manaPercent = Unit_GetManaPercent(gsiPlayer)
 	local healthPercent = Unit_GetHealthPercent(gsiPlayer)
 	-- (> CAREFUL && (GetBestEscape().GetManaCost < mana) || health > 25) || (<= KILL & mana < high use && health > 70)
-	if healthPercent > 0.95 and manaPercent < 0.15 then
+	local currTask = Task_GetCurrentTaskHandle(gsiPlayer)
+	local fht = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
+	local freeSlots = Item_HaveFreeInventorySlot(gsiPlayer)
+	-- TODO BAD -- only chasing
+	if currTask == fight_harass_handle and fht and fht.hUnit.IsNull and not fht.hUnit:IsNull()
+			and fht.lastSeenHealth < gsiPlayer.lastSeenHealth
+			and gsiPlayer.lastSeenHealth > 250 + gsiPlayer.level*50
+			and gsiPlayer.lastSeenMana < (freeSlots and gsiPlayer.highUseManaSimple
+				or gsiPlayer.maxMana - 150
+			) then
 		local score = 1234
 		local instruction = p_saved_instruction[gsiPlayer.nOnTeam]
 		instruction[SAVED_CONSUME_I__FUNC] = Consumable_TryUseClarity
@@ -550,12 +587,55 @@ blueprint = {
 		--print(instruction[SAVED_CONSUME_I__ITEM]:IsNull())
 		--print(gsiPlayer.shortName, "item cooldown", instruction[SAVED_CONSUME_I__ITEM]:GetCooldownTimeRemaining() == 0, instruction[SAVED_CONSUME_I__ITEM]:GetCooldownTimeRemaining())
 		if not instructionItem
-				or (instructionItem and (
-					not instructionItem:GetCooldownTimeRemaining() == 0
+				or (instructionItem and instructionItem:IsNull()
+				or ( instructionItem:GetCooldownTimeRemaining() > 0
 					or not instructionItem:IsFullyCastable()) )
 				or p_time_task_allowed[gsiPlayer.nOnTeam] > GameTime() then
 			return XETA_SCORE_DO_NOT_RUN -- Don't try to run us till we re-score high (because item is ready from backpack switch)
 		end
+--[[DEV]]		print(
+--[[DEV]]    instructionItem:CanAbilityBeUpgraded(),
+--[[DEV]]    instructionItem:GetAbilityDamage(),
+--[[DEV]]    instructionItem:GetAutoCastState(),
+--[[DEV]]    instructionItem:GetBehavior(),
+--[[DEV]]    instructionItem:GetCaster(),
+--[[DEV]]    instructionItem:GetCastPoint(),
+--[[DEV]]    instructionItem:GetCastRange(),
+--[[DEV]]    instructionItem:GetChannelledManaCostPerSecond(),
+--[[DEV]]    instructionItem:GetChannelTime(),
+--[[DEV]]    instructionItem:GetDuration(),
+--[[DEV]]    instructionItem:GetCooldownTimeRemaining(),
+--[[DEV]]    instructionItem:GetCurrentCharges(),
+--[[DEV]]    instructionItem:GetDamageType(),
+--[[DEV]]    instructionItem:GetHeroLevelRequiredToUpgrade(),
+--[[DEV]]    instructionItem:GetInitialCharges(),
+--[[DEV]]    instructionItem:GetLevel(),
+--[[DEV]]    instructionItem:GetManaCost(),
+--[[DEV]]    instructionItem:GetMaxLevel(),
+--[[DEV]]    instructionItem:GetName(),
+--[[DEV]]    instructionItem:GetSecondaryCharges(),
+--[[DEV]]    instructionItem:GetSpecialValueFloat("cooldown"),
+--[[DEV]]    instructionItem:GetSpecialValueInt("cd"),
+--[[DEV]]    instructionItem:GetTargetFlags(),
+--[[DEV]]    instructionItem:GetTargetTeam(),
+--[[DEV]]    instructionItem:GetTargetType(),
+--[[DEV]]    instructionItem:GetToggleState(),
+--[[DEV]]    instructionItem:IsActivated(),
+--[[DEV]]    instructionItem:IsChanneling(),
+--[[DEV]]    instructionItem:IsCooldownReady(),
+--[[DEV]]    instructionItem:IsFullyCastable(),
+--[[DEV]]    instructionItem:IsHidden(),
+--[[DEV]]    instructionItem:IsInAbilityPhase(),
+--[[DEV]]    instructionItem:IsItem(),
+--[[DEV]]    instructionItem:IsOwnersManaEnough(),
+--[[DEV]]    instructionItem:IsPassive(),
+--[[DEV]]    instructionItem:IsStealable(),
+--[[DEV]]    instructionItem:IsStolen(),
+--[[DEV]]    instructionItem:IsToggle(),
+--[[DEV]]    instructionItem:IsTrained(),
+--[[DEV]]    instructionItem:ProcsMagicStick(),
+--[[DEV]]    instructionItem:ToggleAutoCast()
+--[[DEV]]		)
 		--print(gsiPlayer.shortName, "consoom", instruction[SAVED_CONSUME_I__ITEM]:GetName(), instruction[SAVED_CONSUME_I__TARGET])
 		return instruction[SAVED_CONSUME_I__FUNC](gsiPlayer, instruction[SAVED_CONSUME_I__ITEM], instruction[SAVED_CONSUME_I__TARGET]) or xetaScore
 	end,
@@ -579,6 +659,10 @@ blueprint = {
 			-- Don't use consumables if there are no threats and we're going back to base
 			return false, XETA_SCORE_DO_NOT_RUN
 		end
+
+		local _, timeLimit = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+
+		timeLimit = Analytics_GetTheoreticalDangerAmount(gsiPlayer) > 1.2 and 60 or timeLimit
 
 		local allowInvisBreaks = not gsiPlayer.hUnit:IsInvisible()
 		if not allowInvisBreaks then
@@ -615,6 +699,7 @@ blueprint = {
 			for i=1,#healthReplenishAvailable,1 do
 				local thisItem = healthReplenishAvailable[i]
 				local thisItemName = thisItem:GetName()
+				--[[DEV]]if VERBOSE and not thisItem.GetName then Util_TablePrint(thisItem, 2) Util_TablePrint(getmetatable(thisItem) and getmetatable(thisItem).__index, 2) end
 				if checkFlask and string.find(thisItemName, "flask", ITEM_NAME_SEARCH_START) then
 					local obj, score, add = checkFlask(gsiPlayer, thisItem, playerHealthAfterPassiveRegenBuffer, highestScore)
 					checkFlask = false
@@ -623,8 +708,8 @@ blueprint = {
 						highestScore = score
 						highestScoreAdded = add
 					end
-				elseif checkTango and string.find(thisItemName, "tang", ITEM_NAME_SEARCH_START) then -- GetBehaviour() == 8?
-					local obj, score, add = checkTango(gsiPlayer, thisItem, playerHealthAfterPassiveRegenBuffer, highestScore)
+				elseif checkTango and string.find(thisItemName, "tang", ITEM_NAME_SEARCH_START) then -- GetBehavior() == 8?
+					local obj, score, add = checkTango(gsiPlayer, thisItem, playerHealthAfterPassiveRegenBuffer, highestScore, timeLimit)
 					checkTango = false
 					if score > highestScore then
 						highestScoringObjective = obj
@@ -685,6 +770,7 @@ blueprint = {
 		if manaReplenishAvailable then
 			for i=1,#manaReplenishAvailable,1 do
 				local thisItem = manaReplenishAvailable[i]
+				--[[DEV]]if VERBOSE and not thisItem.GetName then Util_TablePrint(thisItem, 2) Util_TablePrint(getmetatable(thisItem) and getmetatable(thisItem).__index, 2) end
 				local thisItemName = thisItem:GetName()
 				if checkMango and string.find(thisItemName, "ench", ITEM_NAME_SEARCH_START) then
 					local obj, score, add = checkMango(gsiPlayer, thisItem, playerManaAfterPassiveRegenBuffer, highestScore)
@@ -713,19 +799,35 @@ blueprint = {
 				end
 			end
 		end
-		if DotaTime() < 600 and highestScore < 30 and Unit_GetHealthPercent(gsiPlayer) < 0.85 and RandomInt(1, 50) % 50 == 0 and Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) < 1 then
-			if Unit_GetHealthPercent(gsiPlayer) < 0.45 and Item_GetNextItemBuildItem(gsiPlayer) ~= "item_flask" and not Item_ItemOwnedAnywhere(gsiPlayer, "item_flask") then
+		--[[DEV]]--if VERBOSE then VEBUG_print("[consumable] checks purchasing: %s: %.2f, ", nil, -0) end
+		if DotaTime() < 600 and highestScore < 30
+				and Unit_GetHealthPercent(gsiPlayer) < 0.85
+				and RandomInt(1, 35) == 35
+				and not Item_ItemInBuild(gsiPlayer, "item_flask", true)
+				and not Item_ItemInBuild(gsiPlayer, "item_tango", true)
+				and Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_HARD) < 1.5 then
+			if Unit_GetHealthPercent(gsiPlayer) < 0.45
+					and GetItemStockCount("item_flask")
+						> 2.1 - gsiPlayer.vibe.greedRating * 2
+					and not Item_ItemOwnedAnywhere(gsiPlayer, "item_flask") then
 				Item_InsertItemToItemBuild(gsiPlayer, "item_flask")
-				Task_IncentiviseTask(gsiPlayer, AvoidHide_GetTaskHandle(), 20, 0.33)
-				Task_IncentiviseTask(gsiPlayer, LeechExperience_GetTaskHandle(), 20, 0.33)
-				Task_IncentiviseTask(gsiPlayer, IncreaseSafety_GetTaskHandle(), 20, 0.33)
-			elseif Item_GetNextItemBuildItem(gsiPlayer) ~= "item_tango" and not Item_ItemOwnedAnywhere(gsiPlayer, "item_tango") and not Item_ItemOwnedAnywhere(gsiPlayer, "item_tango") then
+			elseif not Item_ItemOwnedAnywhere(gsiPlayer, "item_tango")
+					and GetItemStockCount("item_tango")
+						> 2.1 - gsiPlayer.vibe.greedRating * 2 then
 				Item_InsertItemToItemBuild(gsiPlayer, "item_tango")
 			end
 		end
-		if DotaTime() < 1800 and highestScore < 30 and RandomInt(1, 50) % 50 == 0 and Unit_GetHealthPercent(gsiPlayer) > 0.8 and Unit_GetManaPercent(gsiPlayer) < 0.25 then
-			if Item_GetNextItemBuildItem(gsiPlayer) ~= "item_clarity" and not Item_ItemOwnedAnywhere(gsiPlayer, "item_clarity") then
-				Item_InsertItemToItemBuild(gsiPlayer, "item_clarity")
+		if DotaTime() < 1800 and highestScore < 30 and RandomInt(1, 35) == 35
+				and gsiPlayer.lastSeenMana+gsiPlayer.hUnit:GetManaRegen()*20
+					< min(gsiPlayer.maxMana * 0.45, gsiPlayer.highUseManaSimple*1.33)
+				and ( gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth > 0.45
+					or Item_ItemOwnedAnywhere(gsiPlayer, "item_flask")
+					or Item_ItemOwnedAnywhere(gsiPlayer, "item_tango")
+				) then
+			if not Item_ItemInBuild(gsiPlayer, "item_clarity", true) 
+					and not Item_ItemOwnedAnywhere(gsiPlayer, "item_clarity")
+					and GetItemStockCount("item_clarity")
+						> 2.1 - gsiPlayer.vibe.greedRating * 2 then
 				Item_InsertItemToItemBuild(gsiPlayer, "item_clarity")
 			end
 		end
@@ -734,15 +836,20 @@ blueprint = {
 	end,
 	
 	init = function(gsiPlayer, objective, extrapolatedXeta)
+		if gsiPlayer.usableItemCache.powerTreads
+				and gsiPlayer.hUnit:FindItemSlot("item_power_treads") < ITEM_END_INVENTORY_INDEX then
+			UseItem_PowerTreadsStatLock(gsiPlayer, ATTRIBUTE_AGILITY, 0.5, 1500)
+		end
 		local hItem = p_saved_instruction[gsiPlayer.nOnTeam][SAVED_CONSUME_I__ITEM]
 		if not hItem or hItem:IsNull() then
 			if hItem then print("DEBUG --- ITEM WAS NULL FOR", gsiPlayer.shortName) end
 			if DEBUG then ALERT_print("[consumable]: task-score won but no consumable is stored for use.") end
 			return false
 		end
-		local ensureItemCarriedResult = Item_EnsureCarriedItemInInventory(gsiPlayer, p_saved_instruction[gsiPlayer.nOnTeam][SAVED_CONSUME_I__ITEM])
-		if ensureItemCarriedResult == ITEM_ENSURE_RESULT_WAIT then
-			if VERBOSE then print("/VUL-FT/ [consumable] locking", gsiPlayer.shortName, "for switched in item", p_saved_instruction[gsiPlayer.nOnTeam][SAVED_CONSUME_I__ITEM]:GetName()) end
+		local ensureItemCarriedResult = Item_EnsureCarriedItemInInventory(gsiPlayer, hItem)
+		--[[DEV]]if VERBOSE then VEBUG_print(string.format("[consumable] Initialize result of Item_EnsureCarriedItemInInventory(%s, %s) == %s", gsiPlayer.shortName, p_saved_instruction[gsiPlayer.nOnTeam][SAVED_CONSUME_I__ITEM], ensureItemCarriedResult)) end
+		if ensureItemCarriedResult == ITEM_ENSURE_RESULT_WAIT --[[or Item_OnItemSwapCooldown(gsiPlayer, hItem)]] then
+			if VERBOSE then print("/VUL-FT/ [consumable] locking", gsiPlayer.shortName, "for switched in item", hItem:GetName()) end
 			lock_bags_may_warn(gsiPlayer, ITEM_NEEDED_SWITCH_SLOT_WAIT_TIME, ITEM_SWITCH_ITEM_READY_TIME)
 			return false
 		end

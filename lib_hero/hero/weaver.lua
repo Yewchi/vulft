@@ -2,15 +2,15 @@ local hero_data = {
 	"weaver",
 	{2, 3, 1, 2, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 8, 1, 4, 9, 12},
 	{
-		"item_tango","item_ward_observer","item_circlet","item_slippers","item_quelling_blade","item_branches","item_branches","item_wraith_band","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_magic_wand","item_javelin","item_maelstrom","item_crown","item_crown","item_staff_of_wizardry","item_gungir","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_greater_crit","item_ultimate_orb","item_sphere","item_monkey_king_bar","item_blink","item_overwhelming_blink",
+		"item_branches","item_branches","item_branches","item_branches","item_magic_stick","item_tango","item_magic_wand","item_blight_stone","item_boots_of_elves","item_power_treads","item_javelin","item_maelstrom","item_mithril_hammer","item_black_king_bar","item_mjollnir","item_ultimate_orb","item_skadi","item_lifesteal","item_claymore","item_satanic","item_helm_of_iron_will","item_nullifier","item_monkey_king_bar","item_moon_shard","item_refresher","item_boots","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"The Swarm","Shukuchi","Geminate Attack","Time Lapse","+50 Shukuchi Damage","+9 Strength","+20 Mana Break","+2 Swarm Attacks to Kill","+90 Geminate Attack Damage","+0.5 Swarm Armor Reduction","+2 Shukuchi Charges","+1 Geminate Attack",
+		"The Swarm","Shukuchi","Geminate Attack","Time Lapse","+55 Shukuchi Damage","+9 Strength","+20 Mana Break","+2 Swarm Attacks to Kill","+90 Geminate Attack Damage","+0.5 Swarm Armor Reduction","-2.5s Shukuchi Cooldown","+1 Geminate Attack",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"weaver_the_swarm", ABILITY_TYPE.NUKE + ABILITY_TYPE.DEGEN + ABILITY_TYPE.AOE},
@@ -38,7 +38,10 @@ local VEC_POINT_DISTANCE = Vector_PointDistance
 local min = math.min
 
 local fight_harass_handle = FightHarass_GetTaskHandle()
+local farm_lane_handle = FarmLane_GetTaskHandle()
+local leech_exp_handle = LeechExperience_GetTaskHandle()
 local push_handle = Push_GetTaskHandle()
+local search_fog_handle = SearchFog_GetTaskHandle()
 
 local t_player_abilities = {}
 
@@ -59,6 +62,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -92,7 +96,8 @@ d = {
 
 		local attackRange = gsiPlayer.hUnit:GetAttackRange()
 
-		if not shukuchiOn and gsiPlayer.attackRange ~= attackRange then
+		if (not shukuchiOn or currTask == farm_lane_handle or currTask == leech_exp_handle)
+				and gsiPlayer.attackRange ~= attackRange then
 			pUnit_SetFalsifyAttackRange(gsiPlayer, false)
 		end
 
@@ -108,15 +113,19 @@ d = {
 			-- -| correctly (not just per maths, but also variables passed to USE_ABILITY) as is.
 			if playerHealthPercent < 0.75 and score > currTaskScore*1.1
 					and (
-							playerHealthPercent < 0.33
+							playerHealthPercent < 0.33 + recentDmgTaking*0.25/gsiPlayer.maxHealth
 							and recentDmgTaking > gsiPlayer.lastSeenHealth/5
 							or recentDmgTaking > playerHealthPercent*0.5
 						) then
 				USE_ABILITY(gsiPlayer, timeLapse, nil, 500, nil)
+				return;
 			end
 		end
 
-		if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION then
+		local searchingFog = currTask == search_fog_handle
+
+		if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+				or searchingFog then
 			if shukuchiOn then
 				-- TODO work around while UseAbility combos unfinished
 				local attackRange = gsiPlayer.hUnit:GetAttackRange()
@@ -125,21 +134,35 @@ d = {
 				end
 				INCENTIVISE(gsiPlayer, fight_harass_handle, 60, 30)
 			end
-			if fhtReal and not isInvis and CAN_BE_CAST(gsiPlayer, swarm)
+			if (fhtReal or searchingFog) and not isInvis and CAN_BE_CAST(gsiPlayer, swarm)
 					and HIGH_USE(gsiPlayer, swarm, highUse - swarm:GetManaCost(), fhtPercHp) then
-				local extrapolatedTime
-						= 0.3 + VEC_POINT_DISTANCE(
-								gsiPlayer.lastSeen.location,
-								fht.lastSeen.location
-							) / SWARM_TRAVEL_SPEED
-				local extrapolatedLoc = fht.hUnit:GetExtrapolatedLocation(extrapolatedTime)
-
-				USE_ABILITY(gsiPlayer, swarm, extrapolatedLoc, 500, nil)
-				return;
+				local extrapolatedLoc
+				if fhtReal then
+					local extrapolatedTime
+							= 0.3 + VEC_POINT_DISTANCE(
+									gsiPlayer.lastSeen.location,
+									fht.lastSeen.location
+								) / SWARM_TRAVEL_SPEED
+					extrapolatedLoc = fht.hUnit:GetExtrapolatedLocation(extrapolatedTime)
+				else
+					print("weaver abc in bez")
+					local bez = SearchFog_GetEscapeGuess(gsiPlayer)
+					if bez then
+						print("has bez")
+						extrapolatedLoc = bez:computeForwards(0.1)
+			--[[DEV]]	if bez.val then DEBUG_print("[weaver] swarming bez @ %s", bez.val) end
+					end
+				end
+				if extrapolatedLoc then
+					USE_ABILITY(gsiPlayer, swarm, extrapolatedLoc, 500, nil)
+					return;
+				end
 			end
-			if fhtReal and (not geminate:GetCooldownTimeRemaining() == 0 or
-					Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
-						> gsiPlayer.attackRange
+			if searchingFog or ( fhtReal
+					and ( not geminate:GetCooldownTimeRemaining() == 0 or
+							Vector_PointDistance2D(gsiPlayer.lastSeen.location, fht.lastSeen.location)
+								> gsiPlayer.attackRange
+						)
 					) then
 				if CAN_BE_CAST(gsiPlayer, shukuchi)
 						and HIGH_USE(gsiPlayer, shukuchi, highUse - shukuchi:GetManaCost(), fhtPercHp) then

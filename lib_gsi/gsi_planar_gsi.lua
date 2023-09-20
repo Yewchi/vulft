@@ -42,6 +42,10 @@ ENEMY_TEAM_NUMBER_OF_HUMANS = 0 -- tentative
 RADIANT_NUMBER_OF_PLAYERS = #GetTeamPlayers(TEAM_RADIANT)
 DIRE_NUMBER_OF_PLAYERS = #GetTeamPlayers(TEAM_DIRE)
 TEAM_IS_RADIANT = TEAM == TEAM_RADIANT
+TEAM_NUETRAL = TEAM_NEUTRAL
+
+
+BOTH_TEAMS = -1
 
 TYPE_NONE = 				nil -- (0 and 1) == 1; u.type and u.type or "no type"
 UNIT_TYPE_HERO = 			20 -- N.B. Used in Set as a less-than comparison to detect Dota UNIT_LIST_X-based set types.
@@ -67,6 +71,8 @@ WARDS_ENEMY =		UNIT_LIST_ENEMY_WARDS -- 10
 BUILDING_ENEMY =	UNIT_LIST_ENEMY_BUILDINGS -- 11
 CREEP_NEUTRAL =		UNIT_LIST_NEUTRAL_CREEPS -- 13
 
+DOTA_TIME_GAME_INIT = 90
+
 require(GetScriptDirectory().."/lib_math/math")
 require(GetScriptDirectory().."/lib_gsi/unit/unit")
 require(GetScriptDirectory().."/lib_gsi/map")
@@ -82,13 +88,17 @@ local known_teleports = {}
 
 local job_domain
 
+local floor = math.floor
+
 local initialize_attempted = false
 function GSI_Initialize()
 --[[DEBUG]]if DEBUG then DEBUG_print("gsi: Initializing game state interface.") end		
 	if initialize_attempted == true then
 		DEBUG_KILLSWITCH = true
+		ERROR_print(true, true, string.format("[GSI] Attempted to re-initialize GSI -- %s cannot initialize.", TEAM_READABLE))
 		return
 	end
+	
 	initialize_attempted = true
 	-- Initialize Job Domain
 	job_domain = Job_CreateDomain("DOMAIN_GSI")
@@ -96,16 +106,22 @@ function GSI_Initialize()
 	-- Allies
 	TEAM_NUMBER_OF_BOTS = 0
 	TEAM_NUMBER_OF_HUMANS = 0
-	local teamplayerIDs = GetTeamPlayers(TEAM)
-	for i=1,#teamplayerIDs,1 do
-		INFO_print(string.format("[gsi_planar_gsi] Loading team player, ID:%d, pnot:%d", teamplayerIDs[i], i))
-		local player = pUnit_LoadTeamPlayer(teamplayerIDs[i], i)
+	local teamPlayerIDs = GetTeamPlayers(TEAM)
+	for k,v in pairs(teamPlayerIDs) do
+		INFO_print(string.format("[gsi_planar_gsi] ** Loading team player, ID:%d, pnot:%d", v, k))
+		local player = pUnit_LoadTeamPlayer(v, k)
 		if player.hUnit:IsBot() then
 			TEAM_NUMBER_OF_BOTS = TEAM_NUMBER_OF_BOTS + 1
 		end
 	end
+	for i=1,#teamPlayerIDs,1 do
+		INFO_print(string.format("[gsi_planar_gsi] Loading team player, ID:%d, pnot:%d", teamPlayerIDs[i], i))
+		--local player = pUnit_LoadTeamPlayer(teamPlayersIDs[i], i)
+		--if player.hUnit:IsBot() then
+			--TEAM_NUMBER_OF_BOTS = TEAM_NUMBER_OF_BOTS + 1
+		--end
+	end
 	TEAM_NUMBER_OF_HUMANS = TEAM_NUMBER_OF_PLAYERS - TEAM_NUMBER_OF_BOTS
-	Time_InitializePlayerTimeData()
 	pUnit_hCourierFindAndLoad()
 	
 	-- Enemies
@@ -116,6 +132,8 @@ function GSI_Initialize()
 		pUnit_LoadEnemyPlayer(enemyPlayerIDs[i], i)
 	end
 	ENEMY_TEAM_NUMBER_OF_HUMANS = ENEMY_TEAM_NUMBER_OF_PLAYERS - ENEMY_TEAM_NUMBER_OF_BOTS
+
+	Time_InitializePlayerTimeData()
 	
 	GSI_RegisterGSIJobDomainToScoreboard(job_domain)
 	GSI_RegisterGSIJobDomainToSet(job_domain)
@@ -160,4 +178,9 @@ end
 function GSI_UnitCanStartAttack(gsiUnit)
 	-- TODO Depreciate into Unit_
 	return Unit_GetTimeTilNextAttackStart(gsiUnit) == 0
+end
+
+function GSI_DifficultyDiv(div)
+	div = floor(div or 50)
+	return GetBot():GetDifficulty()^2 > RandomInt(1, div)
 end

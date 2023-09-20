@@ -104,8 +104,14 @@ MAP_LOGICAL_MIDDLE_LANE =		0x0002
 MAP_LOGICAL_BOTTOM_LANE =		0x0003
 MAP_LOGICAL_RADIANT_BASE =		0x0004
 MAP_LOGICAL_DIRE_BASE =			0x0005
+MAP_LOGICAL_ALL =				0x0006
 
-MAX_LANES = 3
+MAP_LOGICAL_SAFE_LANE = TEAM_IS_RADIANT and MAP_LOGICAL_BOTTOM_LANE or MAP_LOGICAL_TOP_LANE
+MAP_LOGICAL_MID_LANE = MAP_LOGICAL_MIDDLE_LANE
+MAP_LOGICAL_OFF_LANE = TEAM_IS_RADIANT and MAP_LOGICAL_TOP_LANE or MAP_LOGICAL_BOTTOM_LANE
+
+MAX_DOTA_LANES = 3
+MAX_LOGICAL_LANES = 5 -- + radiantBase, direBase
 
 MID_CREEP_RACE_LENGTH = 13300
 SIDE_LANE_CREEP_RACE_LENGTH = 19400 -- approx, with curve
@@ -117,6 +123,9 @@ UNITS_SPAWNER_TO_MID_VIA_LANE = MID_CREEP_RACE_LENGTH / 2
 LANE_ELL_BEND_OFFSET = 6100 -- Both top and bottom lanes bend around this offset
 FACTOR_FOR_COORDINATES_PROGRESS = LANE_ELL_BEND_OFFSET / 2
 MAP_COORDINATE_BOUND_NUMERICAL = 8000
+
+local sin = math.sin
+local cos = math.cos
 
 local SIDE_LANE_MEET_TIME = 29.9
 local MIDDLE_LANE_MEET_TIME = 18
@@ -130,6 +139,10 @@ local NEXT_CREEPS_SPAWN_DURING_RACE_DIST = 30 * 325
 local LIMIT_TO_TOWER_FRIENDLY_OFFSET = 200
 
 local RATIO_OF_CARTESIAN_AXIS_TO_45_DEGREE_LINE = math.cos(MATH_PI/4)
+
+local BIN_TREE_LEFT_OR_UP = 1
+local BIN_TREE_RIGHT_OR_DOWN = 2
+local DATA_TBL = 3
 
 local logical_zones = {
 	[MAP_ZONE_RADIANT_OFFLANE] = {
@@ -180,6 +193,133 @@ local ward_locations = {
 		Vector(-3249, -1393, 0)
 	},
 }
+
+local fountain_entrance_top_loc = TEAM_IS_RADIANT
+		and Vector(TEAM_FOUNTAIN.x, TEAM_FOUNTAIN.y + 300, TEAM_FOUNTAIN.z)
+		or Vector(TEAM_FOUNTAIN.x - 300, TEAM_FOUNTAIN.y, TEAM_FOUNTAIN.z)
+local fountain_entrance_bot_loc = TEAM_IS_RADIANT
+		and Vector(TEAM_FOUNTAIN.x + 300, TEAM_FOUNTAIN.y, TEAM_FOUNTAIN.z)
+		or Vector(TEAM_FOUNTAIN.x, TEAM_FOUNTAIN.y - 300, TEAM_FOUNTAIN.z)
+
+local GIVE_UP_FINDING_GOAL_POSTS = GameTime() + 80
+
+-------------- set_fountain_search_move()
+local function set_fountain_search_move(gsiPlayer, isTop, isGetOut)
+	local isRadiant = TEAM_IS_RADIANT
+	local startOffset = isRadiant and 1400 or -1400
+	local testCoord
+	if isRadiant then
+		testCoord = isTop and 'y' or 'x'
+	else
+		testCoord = isTop and 'x' or 'y'
+	end
+	local addConstant = isRadiant and -50 or 50
+	local testVec = Vector(TEAM_FOUNTAIN.x, TEAM_FOUNTAIN.y)
+	testVec[testCoord] = testVec[testCoord] + startOffset
+	local depth = GetHeightLevel(testVec)
+	local i = 1
+	while(true) do
+		i = i + 1 if i > 50 then WARN_print("[map] set_fountain_search_move TERRAIN UNEXPECTED; BREAK") break; end
+		--[[DEV]]print(GetTeam(), testVec, addConstant, depth, GetHeightLevel(testVec))
+		--[[DEV]]DebugDrawCircle(testVec, 50, 0, 0, 255)
+		if GetHeightLevel(testVec) < depth then
+			testVec[testCoord] = testVec[testCoord] + (isGetOut and -addConstant*7 or addConstant)
+			gsiPlayer.checkingFountainMove = testVec
+			break;
+		end
+		if isRadiant and testVec[testCoord] < TEAM_FOUNTAIN[testCoord]
+				or not isRadiant and testVec[testCoord] > TEAM_FOUNTAIN[testCoord] then
+			GIVE_UP_FINDING_GOAL_POSTS = 0 -- end
+			return;
+		end
+		testVec[testCoord] = testVec[testCoord] + addConstant
+	end
+end
+-------- Map_FindFountainGoalPosts()
+function Map_FindFountainGoalPosts(gsiPlayer)
+	if GameTime() > GIVE_UP_FINDING_GOAL_POSTS
+			or Vector_PointDistance2D(gsiPlayer.lastSeen.location,
+					TEAM_FOUNTAIN
+				) > 1400 then
+		--[[DEV]]DEBUG_print(string.format("[map] Fountain goal posts search off for %.2f, %.2f", GameTime(), GIVE_UP_FINDING_GOAL_POSTS))
+		gsiPlayer.checkingFountain = nil
+		gsiPlayer.checkingFountainMove = nil
+		gsiPlayer.checkingFountainGetOutMove = nil
+		DOMINATE_SetDominateFunc(gsiPlayer, "map_find_fountain_goal_posts", Map_FindFountainGoalPosts, false)
+		Map_FindFountainGoalPosts = nil
+		return;
+	end
+	if (not gsiPlayer.checkingFountain) then
+		set_fountain_search_move(gsiPlayer, true, true)
+		gsiPlayer.checkingFountain = "topGetOut"
+		return;
+	end
+		
+	local hasFountainAura = gsiPlayer.hUnit:HasModifier("modifier_fountain_aura_buff")
+	local isGetOut = string.find(gsiPlayer.checkingFountain, "GetOut") and true
+	local isTop = string.find(gsiPlayer.checkingFountain, "top") and true
+
+	--[[DEV]]DEBUG_print(string.format("[map] Fountain goal posts hasFountain %s, isGetOut %s, isTop %s; %s", hasFountainAura, isGetOut, isTop, gsiPlayer.checkingFountain))
+
+	if hasFountainAura then
+		if isGetOut then
+			--[[DEV]]print("Move to", gsiPlayer.checkingFountainMove)
+			gsiPlayer.hUnit:Action_MoveDirectly(gsiPlayer.checkingFountainMove)
+			return;
+		elseif isTop then -- top not get out has fontain aura
+			fountain_entrace_top_loc = gsiPlayer.lastSeen.location
+			set_fountain_search_move(gsiPlayer, false, true)
+			gsiPlayer.checkingFountain = "botGetOut"
+			GIVE_UP_FINDING_GOAL_POSTS = GameTime() + 9
+			return;
+		else -- bot not get out has fountain aura
+			fountain_entrance_bot_loc = gsiPlayer.lastSeen.location
+			DOMINATE_print(gsiPlayer, true, "[map] Found fountain goal posts on %s, %s %s",
+					TEAM_IS_RADIANT and "Radiant" or "Dire",
+					tostring(fountain_entrance_top_loc),
+					tostring(fountain_entrance_bot_loc)
+				)
+			fountain_back_estimate = Vector_Addition(
+					Vector_PointBetweenPoints(
+							fountain_entrance_top_loc,
+							fountain_entrance_bot_loc
+						),
+					Vector_ScalarMultiply(Vector_CrossProduct(
+								Vector_UnitDirectionalPointToPoint(
+									fountain_entrance_top_loc,
+									fountain_entrance_bot_loc
+								),
+								TEAM_IS_RADIANT and Vector(0, 0, 1) or Vector(0, 0, -1)
+							),
+							1300
+						)
+				)
+			gsiPlayer.hUnit:ActionImmediate_Ping(fountain_back_estimate.x, fountain_back_estimate.y, false)
+			GIVE_UP_FINDING_GOAL_POSTS = 0
+			return;
+		end
+	else -- not aura'd
+		if not isGetOut then
+			gsiPlayer.hUnit:Action_MoveDirectly(gsiPlayer.checkingFountainMove)
+			return;
+		end
+		if isTop then
+			-- chance of minor top inaccuracy if the bot is reloaded just outside of fountain
+			set_fountain_search_move(gsiPlayer, true)
+			gsiPlayer.checkingFountain = "top"
+		else
+			set_fountain_search_move(gsiPlayer, false, false)
+			gsiPlayer.checkingFountain = "bot"
+			set_fountain_search_move = nil
+		end
+	end
+end
+
+function Map_LocIsInTeamFountain(location)
+	return Vector_PointWithinTriangle(location, fountain_entrance_top_loc,
+			fountain_entrance_bot_loc, fountain_back_estimate
+		)
+end
 
 local function is_location_bottom_lane(p)
 	return p.x > 4440 and p.y < 2531 + 1.33*(p.x-4440)
@@ -280,6 +420,11 @@ function Map_BaseLogicalLocationIsTeam(logicalLocation)
 	elseif logicalLocation == MAP_LOGICAL_DIRE_BASE then
 		return TEAM == TEAM_DIRE
 	end
+end
+
+function Map_GetTeamBaseLogicalLane(team)
+	return team == TEAM_RADIANT and MAP_LOGICAL_RADIANT_BASE
+			or team == TEAM_DIRE and MAP_LOGICAL_DIRE_BASE or -1
 end
 
 function Map_LaneLogicalToNaturalMeet(lane)
@@ -389,7 +534,7 @@ end
 
 -- Takes the half-way point, then uses y = -x and the difference of the shorter line to the lane to determine the crash
 function Map_LaneHalfwayPoint(lane, p1, p2)
-	local additionalPregameTime = DotaTime() < 0 and -DotaTime() or 0
+	local additionalPregameTime = DotaTime() < 0 and -DotaTime() or 0 -- Good bug puts bots in lanes, for now TODO
 	local pointBetweenPoints = Vector_PointBetweenPoints(p1, p2)
 if DEBUG then
 	DebugDrawLine(p1, p2, 180, 100, 255)
@@ -445,6 +590,7 @@ local function update_last_seen(this, newLoc, facingDegrees)
 		this.location = Vector(newLoc.x, newLoc.y, newLoc.z)
 	end
 	if facingDegrees then
+		this.previousFacingDegrees = this.facingDegrees or 0
 		this.facingDegrees = facingDegrees
 	end
 	this.timeStamp = currTime
@@ -467,6 +613,22 @@ end
 function Map_GetNearestPortableStructure(gsiPlayer, location)
 	local laneApproximation = Map_GetLaneValueOfMapPoint(location)
 	return Map_LimitLaneLocationToLowTierTeamTower(gsiPlayer.team, laneApproximation, location)
+end
+
+local lurk_pockets_tree = {}
+
+function Map_ConfirmLurks(gsiPlayer, lurk)
+	
+end
+
+function Map_CheckForLurkPockets(gsiPlayer)
+	local playerLoc = gsiPlayer.lastSeen.location
+	local prevVector = Vector(playerLoc.x, playerLoc.y)
+	for rad=0,6.08,0.2094 do
+		local currVec = Vector(playerLoc.x + sin(rad), playerLoc.y + cos(rad))
+		DebugDrawLine(prevVector, currVec, 255, 255, 255)
+		prevVec = currVec
+	end
 end
 
 local SAFER_TP_DISTANCE = 1400

@@ -157,11 +157,12 @@ end
 -- theorizedAggressorAmount ranges from 0.44
 -- TODO Currently, providing a location (if even implemented) would've set incorrect data temporarily
 function Analytics_GetKnownTheorizedEngageables(gsiPlayer, location)
-	local allowCache = location -- don't cache if we're not using the player's location
-			and Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, location) < IGNORE_CUSTOM_LOC_DIST
-				and false or true
+	local allowCache = (not location -- don't cache if we're not using the player's location
+				or Math_PointToPointDistance2D(gsiPlayer.lastSeen.location, location) < IGNORE_CUSTOM_LOC_DIST
+			) or false
 	if not gsiPlayer.time.data.knownEngageables or not allowCache then
 		local playerLoc = allowCache and gsiPlayer.lastSeen.location or location
+		--[[DEV]]--print("theorizedEngage loc", playerLoc)
 		local enemies = GSI_GetTeamPlayers(ENEMY_TEAM)
 		local iKnown=1
 		local iTheorized=1

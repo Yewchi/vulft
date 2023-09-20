@@ -1,12 +1,12 @@
 local hero_data = {
 	"shredder",
-	{1, 3, 3, 2, 3, 4, 2, 1, 2, 1, 2, 4, 5, 1, 7, 3, 4, 9, 12},
+	{1, 3, 3, 1, 2, 4, 2, 2, 2, 1, 1, 4, 6, 3, 7, 3, 4, 9, 11},
 	{
-		"item_quelling_blade","item_circlet","item_gauntlets","item_branches","item_branches","item_tango","item_bracer","item_ring_of_health","item_soul_ring","item_boots","item_arcane_boots","item_staff_of_wizardry","item_magic_wand","item_kaya","item_sange","item_kaya_and_sange","item_pers","item_lotus_orb","item_blink","item_black_king_bar","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_black_king_bar","item_point_booster","item_ultimate_scepter","item_ultimate_scepter_2","item_void_stone","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_overwhelming_blink","item_aghanims_shard",
+		"item_ward_observer","item_tango","item_branches","item_gauntlets","item_branches","item_branches","item_bottle","item_magic_wand","item_boots","item_arcane_boots","item_soul_ring","item_ring_of_health","item_vanguard","item_ogre_axe","item_belt_of_strength","item_sange","item_kaya_and_sange","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_blink","item_platemail","item_mystic_staff","item_shivas_guard","item_heavens_halberd","item_void_stone","item_void_stone","item_octarine_core","item_ultimate_scepter_2","item_black_king_bar","item_aghanims_shard",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
-		"Whirling Death","Timber Chain","Reactive Armor","Chakram","+200 Health","+1.5 Mana Regen","+8% Spell Amplification","+6 Reactive Armor Stacks and Duration","+16 Strength","+4% Chakram Slow","+12% Whirling Death Attribute Reduction","+1125 Timber Chain Range",
+		"Whirling Death","Timber Chain","Reactive Armor","Chakram","+200 Health","+1.5 Mana Regen","+3% Whirling Death Stat Loss","+6 Reactive Armor Stacks and Duration","+20% Magic Resistance","+4% Chakram Slow","Second Chakram","+1125 Timber Chain Range",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

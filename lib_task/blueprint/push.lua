@@ -28,7 +28,7 @@ local TEST = TEST
 
 local task_handle = Task_CreateNewTask()
 
-local PUSH_THROTTLE = 0.179 -- rotates
+local PUSH_THROTTLE = 0.23807 -- rotates
 
 local TIME_TOWER_STILL_UNAGROABLE = 0.82 - 0.03
 local LEVEL_AND_SAFETY_ALLOW_PUSH_TOWERS = 4 + (-(-2)) -- level + (-danger)
@@ -50,6 +50,7 @@ local ENEMY_FOUNTAIN_UNIT
 local t_tower_wont_agro = {}
 
 local farm_lane_handle
+local dawdle_handle
 
 local blueprint
 function PushLane_InformUnagroablePush(hUnit)
@@ -77,6 +78,7 @@ local function task_init_func(taskJobDomain)
 	if VERBOSE then VEBUG_print(string.format("push: Initialized with handle #%d.", task_handle)) end
 
 	farm_lane_handle = FarmLane_GetTaskHandle()
+	dawdle_handle = Dawdle_GetTaskHandle()
 
 	ENEMY_FOUNTAIN_UNIT = GSI_GetTeamFountainUnit(ENEMY_TEAM)
 	
@@ -101,15 +103,18 @@ Blueprint_RegisterTask(task_init_func)
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
 		FarmJungle_IncentiviseJungling(gsiPlayer, objective)
-		--[[DEV]]if DEBUG and objective then DebugDrawLine(gsiPlayer.lastSeen.location, objective and objective.center or objective.lastSeen.location, gsiPlayer.DBGColor[1], gsiPlayer.DBGColor[2], gsiPlayer.DBGColor[3]) end
+		--[[DEV]]if DEBUG and objective then DebugDrawLine(gsiPlayer.lastSeen.location, objective and objective.center or objective and objective.lastSeen and objective.lastSeen.location, GetDBGColor(gsiPlayer, 1), GetDBGColor(gsiPlayer, 2), GetDBGColor(gsiPlayer, 3)) end
 		if objective.type == UNIT_TYPE_IMAGINARY then
 			Positioning_ZSAttackRangeUnitHugAllied(gsiPlayer, objective.lastSeen.location, nil, nil, 0)
 			return;
 		end
-		if objective.center and objective.units[1].team == TEAM then
-			-- Chase the allied creep set into an enemy base for pushing buildings
-			Positioning_ZSAttackRangeUnitHugAllied(gsiPlayer, objective.center, nil, nil, 0)
-			return;
+		if objective.center then
+			if objective.units[1] and objective.units[1].team == TEAM then
+				-- Chase the allied creep set into an enemy base for pushing buildings
+				Positioning_ZSAttackRangeUnitHugAllied(gsiPlayer, objective.center, nil, nil, 0)
+				return;
+			end
+			return XETA_SCORE_DO_NOT_RUN;
 		end
 		if Unit_IsNullOrDead(objective) then
 			return XETA_SCORE_DO_NOT_RUN
@@ -129,12 +134,13 @@ blueprint = {
 	end,
 	
 	score = function(gsiPlayer, prevObjective, prevScore)
+--[[DEV]]if TEST_PARTY then return false, XETA_SCORE_DO_NOT_RUN end
 		local playerLoc = gsiPlayer.lastSeen.location
 		local theoreticalDanger, knownEngage, theorizedEngage = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 		local attackTarget = gsiPlayer.hUnit:GetAttackTarget()
 		local finishAttack = attackTarget and attackTarget:IsBuilding() and 50 or 0
 		local underAttack = FightClimate_AnyIntentToHarm(gsiPlayer, Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1350))
-				and -50 or 0
+				and -150*max(0.25, 1+theoreticalDanger) or 0
 		local highestRecentType, highestTaken = Analytics_GetMostDamagingUnitTypeToUnit(gsiPlayer)
 		--print("highest recent in push", highestRecentType, highestTaken)
 	--	if highestTaken/gsiPlayer.maxHealth > 0.15 or (highestRecentType == SET_BUILDING_ENEMY and highestTaken/gsiPlayer.maxHealth > 0.05) then -- TODO bad
@@ -180,12 +186,13 @@ blueprint = {
 								1.0,
 								gsiPlayer,
 								building
-							), 50, 250, 2000)  - underAttack + finishAttack - min(0, increasingDanger)
+							), 50, 250, 2000)  + underAttack + finishAttack - min(0, increasingDanger)
 					end
 				end
 			end
 		end
 		local nearestTower, nearestTowerDist = Set_GetNearestTeamTowerToPlayer(ENEMY_TEAM, gsiPlayer)
+		local nearbyAllies = Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 2400, false)
 		if nearestTower then
 			local playerAttackDmg = gsiPlayer.hUnit:GetAttackDamage()
 			local towerAttackDmg = gsiPlayer.hUnit:GetAttackDamage()
@@ -208,8 +215,9 @@ blueprint = {
 						* 6 * (1+#Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 1800, 16))
 				) end
 			
-			local attackNowSafety = max(0, (#Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 1200, false)*0.25
-					- theoreticalDanger*0.25)
+			
+			local attackNowSafety = max(0, (#nearbyAllies*0.25
+					- theoreticalDanger*0.35)
 				)
 
 			if towerHealth > 0 
@@ -239,7 +247,7 @@ blueprint = {
 				return false, XETA_SCORE_DO_NOT_RUN
 			end
 		end
-		if Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_MEDIUM) < 0.5 then return false, XETA_SCORE_DO_NOT_RUN end -- Early game lane eq. for good core behaviour TODO ROBUST
+		if Farm_JungleCampClearViability(gsiPlayer, JUNGLE_CAMP_MEDIUM) < 0.5 then return false, XETA_SCORE_DO_NOT_RUN end -- Early game lane eq. for good core behavior TODO ROBUST
 		local baseToCheck = TEAM==TEAM_RADIANT and MAP_LOGICAL_DIRE_BASE or MAP_LOGICAL_RADIANT_BASE
 		local enemy = Set_GetNearestEnemyCreepSetAtLaneLoc(
 				gsiPlayer.lastSeen.location,
@@ -274,7 +282,7 @@ blueprint = {
 			end
 			if farmLaneObjective and farmLaneObjective.type == UNIT_TYPE_IMAGINARY then
 				local _, crashTime = Set_GetPredictedLaneFrontLocation(farmLaneObjective.lane)
-				crashTime = DotaTime() - crashTime
+				crashTime = GameTime() - crashTime
 				crashTime = crashTime < 0 and 10 or crashTime
 				local exposesToTowerDanger = nearestTower and Positioning_WillAttackCmdExposeToLocRad(
 						gsiPlayer, farmLaneObjective,
@@ -307,13 +315,14 @@ blueprint = {
 						gsiPlayer, arbitraryUnit,
 						nearestTower.lastSeen.location, nearestTower.attackRange + 100
 					) or (not nearestTower.hUnit:IsNull()
+						and allied and allied.units[2]
 						and IsLocationVisible(nearestTower.lastSeen.location)
 						and nearestTower.hUnit:GetAttackTarget() and nearestTower.hUnit:GetAttackTarget():IsCreep()
 					) then
 				if VERBOSE then print("returning last push") end
 
 				-- Avoid attacking enemy creeps when you're standing next to enemy heroes
-				local _, _, potentialDpsToMeIsBad = FightClimate_ImmediatelyExposedToAttack(gsiPlayer)
+				local _, _, potentialDpsToMeIsBad = FightClimate_ImmediatelyExposedToAttack(gsiPlayer, nil, 16)
 				potentialDpsToMeIsBad = potentialDpsToMeIsBad
 							* Unit_GetArmorPhysicalFactor(gsiPlayer)
 							/ (gsiPlayer.lastSeenHealth*0.01) -- "30 points per dps per 10th of health = 0.01"
@@ -322,12 +331,46 @@ blueprint = {
 				local farmLaneLoc = farmLaneObjective and (farmLaneObjective.center or farmLaneObjective.lastSeen
 						and farmLaneObjective.lastSeen.location)
 
+				arbitraryUnit = farmLaneObjective == arbitraryUnit
+						and enemy.units[2] or arbitraryUnit
+
+				local shouldPushHard, pushHarderFactor
+						= Analytics_ShouldPushHard(gsiPlayer, theoreticalDanger)
+
 				local farmLaneDist = farmLaneLoc
 						and sqrt((farmLaneLoc.x - playerLoc.x)^2 + (farmLaneLoc.y - playerLoc.y)^2)
-				local farmTaskScoreGetLastHit = farmLaneDist and max(0, farmTaskScore*2 - 40)
-						/ sqrt(0.05*max(1, farmLaneDist-max(700, gsiPlayer.attackRange*1.33))) or 0
+				local farmTaskScoreGetLastHit = 0
+				if not shouldPushHard then
+					local creep, tta = FarmLane_AnyCreepLastHitTracked(gsiPlayer)
+					if tta <= 0 and creep then
+						arbitraryCreep = creep
+					end
+					if creep and (#knownEngage > 0 or creep.team ~= gsiPlayer.team) and tta then
+						farmTaskScoreGetLastHit = tta < gsiPlayer.hUnit:GetSecondsPerAttack()
+									* (gsiPlayer.isRanged and 2 or 1) + 0.35
+								and farmLaneDist and max(0, farmTaskScore*2 - 40)
+									/ sqrt(0.05*max(1, farmLaneDist-max(700, gsiPlayer.attackRange*1.33)))
+								or 0
+						farmTaskScoreGetLastHit = farmTaskScoreGetLastHit / (1 + max(0, pushHarderFactor))
+					end
+				end
 
 				--[[DEV]]if VERBOSE then print(gsiPlayer.shortName, "LAST HIT INSTEAD", farmTaskScoreGetLastHit) end
+				
+				local dontPushWithPusherFactor = 0
+				if #nearbyAllies > 0 then
+					local pusher = Dawdle_GetCantJunglePushHeroNearby(gsiPlayer)
+					if pusher and pusher ~= gsiPlayer then
+						dontPushWithPusherFactor = - math.log(1 + Vector_PointDistance2D(
+										playerLoc, arbitraryUnit.lastSeen.location
+									) / gsiPlayer.currentMovementSpeed
+								) * 100
+					end
+				end
+
+				--[[DEV]]if VERBOSE then VEBUG_print("[push] %s - %s + %s + %s + %s - %s - %s - %s - %s + %s + %s",
+				--[[DEV]]		min(gsiPlayer.level*3, max(-10, (GSI_GetAliveAdvantageFactor()*50))-40*(theoreticalDanger)), Xeta_CostOfTravelToLocation(gsiPlayer, enemy.center), underAttack, finishAttack, attackStraysScore, #knownEngage * 40, #theorizedEngage * 10, potentialDpsToMeIsBad, farmTaskScoreGetLastHit, 30*max(0, (1.25 - pushHarderFactor)), dontPushWithPusherFactor) end
+
 
 				return arbitraryUnit,
 						min(gsiPlayer.level*3,
@@ -335,10 +378,13 @@ blueprint = {
 							)
 						- Xeta_CostOfTravelToLocation(gsiPlayer, enemy.center)
 						+ underAttack + finishAttack + attackStraysScore
-						- #knownEngage * 40 + #theorizedEngage * 10
+						- #knownEngage * 40 - #theorizedEngage * 10
 						- potentialDpsToMeIsBad - farmTaskScoreGetLastHit
+						+ 30*max(0, (1.25 - pushHarderFactor))
+						+ dontPushWithPusherFactor
 			end
 		end
+		--[[ But if the next creep set was there, what would you score, store for others ]]
 		return false, XETA_SCORE_DO_NOT_RUN
 	end,
 	

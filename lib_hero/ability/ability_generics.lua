@@ -111,6 +111,16 @@ function AbilityLogic_RegisterGenericsModule()
 	AbilityLogic_RegisterGenericsModule = nil
 end
 
+function AbilityLogic_GetTargetBehavior(hAbility)
+	local b = hAbility:GetBehavior()
+	local team = hAbility:GetTargetTeam()
+	local types = hAbility:GetTargetFlags()
+	return B_AND(team, ABILITY_TARGET_TEAM_FRIENDLY), B_AND(team, ABILITY_TARGET_TEAM_ENEMY),
+			B_AND(types, ABILITY_TARGET_TYPE_HERO), B_AND(b, ABILITY_BEHAVIOR_AOE),
+			B_AND(b, ABILITY_BEHAVIOR_UNIT_TARGET), B_AND(b, ABILITY_BEHAVIOR_POINT_TARGET),
+			B_AND(b, ABILITY_BEHAVIOR_NO_TARGET), B_AND(types, ABILITY_BEHAVIOR_TREE)
+end
+
 -- Return: funcName, targetType, targetTeam
 function AbilityLogic_GetBestFitCastFunc(gsiPlayer, hAbility, target, asString)
 	local behaviorFlags = hAbility:GetBehavior()
@@ -120,7 +130,8 @@ function AbilityLogic_GetBestFitCastFunc(gsiPlayer, hAbility, target, asString)
 	if B_AND(behaviorFlags, ABILITY_BEHAVIOR_AUTOCAST) > 0 then
 		funcStr = asString and "ToggleAutoCast" or hAbility.ToggleAutoCast
 		if TEST then print(gsiPlayer.shortName, hAbility:GetName(), "ToggleAutoCast", funcStr) end
-	elseif B_AND(behaviorFlags, ABILITY_BEHAVIOR_POINT) > 0 and (not target or target.x) then
+	elseif B_AND(behaviorFlags, ABILITY_BEHAVIOR_POINT) > 0 and (not target or target.x
+			or B_AND(behaviorFlags, ABILITY_BEHAVIOR_UNIT_TARGET) == 0) then
 		funcStr = asString and "Action_UseAbilityOnLocation" or gsiPlayer.hUnit.Action_UseAbilityOnLocation
 		if TEST then print(gsiPlayer.shortName, hAbility:GetName(), "UseAbilityOnLocation", funcStr) end
 	elseif B_AND(behaviorFlags, ABILITY_BEHAVIOR_UNIT_TARGET) > 0 and (
@@ -259,6 +270,113 @@ local make_target_building_far_safe = function(gsiPlayer, target)
 	return target
 end
 
+-- TODO move all the action stuff into this file.
+function AbilityLogic_UseLantern(gsiPlayer, lantern)
+	local useLantern = gsiPlayer.hUnit:GetAbilityByName("ability_lamp_use")
+	--local useLantern = gsiPlayer.hUnit:GetAbilityByName("ability_pluck_famango")
+	print(useLantern)
+	if useLantern then
+		print('using lantern', useLantern:GetCastRange())
+		if Vector_DistUnitToUnit(gsiPlayer, lantern)
+				> useLantern:GetCastRange()*0.8 then
+			gsiPlayer.hUnit:Action_MoveDirectly(lantern.lastSeen.location)
+			return true
+		end
+		-- 'attempting' 201 0 3 64
+		print('attemping', useLantern:GetBehavior(), useLantern:GetTargetType(), useLantern:GetTargetTeam(), useLantern:GetTargetFlags())
+		print(gsiPlayer.shortName, lantern.hUnit)
+		local hUnit = gsiPlayer.hUnit
+		if RandomInt(1, 5) == 5 then 
+			--[[ TEST FAILED 2023-05-03 ]]
+			-- RESULT: IDLES -- hUnit confirmed, and tried straight from GetUnitList,
+			-- -| they will move to the unit, get in range, and never trigger a cast.
+			-- -| Players cast ability_lamp_use, the location associated with
+			-- -| the cast is <0,0,0>. Famangoes and Twin Gates will show the cast at
+			-- -| the location of the building/caster didn't check.
+			-- - Tried stealing the player's ability handle as well, also failed.
+			gsiPlayer.hUnit:Action_UseAbilityOnEntity(useLantern, lantern.hUnit)--nothing
+			--gsiPlayer.hUnit:Action_UseAbility(useLantern, lantern.hUnit)--nothing
+			--gsiPlayer.hUnit:Action_UseShrine(lantern.hUnit)--nothing
+		end
+		return true
+	end
+	return false
+end
+
+function AbilityLogic_UseOutpost(gsiPlayer, outpost)
+	if outpost then
+		if outpost.hUnit:HasModifier("modifier_invulnerable") then
+			return false, false
+		end
+		if Vector_DistUnitToUnit(gsiPlayer, outpost) > 400 then
+			gsiPlayer.hUnit:Action_MoveDirectly(outpost.lastSeen.location)
+			return true, false
+		end
+		local abilityCapture = gsiPlayer.hUnit:GetAbilityByName("ability_capture")
+		local activeAbility = gsiPlayer.hUnit:GetCurrentActiveAbility()
+		-- WORKS
+		if gsiPlayer.hUnit:GetCurrentActiveAbility() ~= abilityCapture then
+			gsiPlayer.hUnit:Action_UseAbilityOnEntity(abilityCapture, outpost.hUnit)
+			return true, false
+		else
+			return true, true
+		end
+	end
+	return false, false
+end
+
+function AbilityLogic_UseFamangoTree(gsiPlayer, mangoTree, distLimit)
+--	local humans = GSI_GetTeamHumans(TEAM)
+	if mangoTree then
+		local distToUnit = Vector_DistUnitToUnit(gsiPlayer, mangoTree)
+		if distLimit and distToUnit > distLimit then
+			return false, false, distToUnit
+		end
+		if distToUnit > 500 then
+			gsiPlayer.hUnit:Action_MoveDirectly(mangoTree.lastSeen.location)
+			return true, false, distToUnit
+		end
+		local pluck = gsiPlayer.hUnit:GetAbilityByName("ability_pluck_famango")
+--		pluck = humans[1] and humans[1].hUnit:GetAbilityByName("ability_pluck_famango")
+		if pluck then
+			INFO_print("[ability_generics] %s plucking %s at %s", gsiPlayer.shortName,
+					mangoTree.name, mangoTree.lastSeen.location
+				) -- prints
+			-- RESULT: IDLES
+			if RandomInt(1, 7) == 7 then
+				gsiPlayer.hUnit:Action_UseAbilityOnEntity(abilityCapture, mangoTree)
+			end
+			return true, gsiPlayer.hUnit:GetCurrentActiveAbility() == abilityCapture,
+					distToUnit
+		end
+	end
+	return false, false, distToUnit
+end
+
+function AbilityLogic_UseTwinGate(gsiPlayer, twinGate, distLimit)
+	if twinGate then
+		local distToUnit = Vector_DistUnitToUnit(gsiPlayer, twinGate)
+		if distLimit and distToUnit > distLimit then
+			return false, false, distToUnit
+		end
+		if distToUnit > 350 then
+			gsiPlayer.hUnit:Action_MoveDirectly(twinGate.lastSeen.location)
+			return true, false, distToUnit
+		end
+		local gateWarp = gsiPlayer.hUnit:GetAbilityByName("twin_gate_portal_warp")
+		if gateWarp then
+			INFO_print("[ability_generics] %s warping from %s at %s",
+					gsiPlayer.shortName, twinGate.name, twinGate.lastSeen.location
+				)
+			-- RESULT: IDLES
+			gsiPlayer.hUnit:Action_UseAbilityOnEntity(gateWarp, twinGate)
+			return true, gsiPlayer.hUnit:GetCurrentActiveAbility() == gateWarp,
+					distToUnit
+		end
+	end
+	return false, false, distToUnit
+end
+
 function AbilityLogic_GetBlinkLocation(gsiPlayer, hAbility, castRange, activityType,
 		activityHandle, fightHarassTarget, dangerLimit, nearbyAllies, nearbyEnemies)
 	-- Assumes a blink at FHT is desirable if aggressive AcTy. i.e. they are not dead / dotted up
@@ -334,7 +452,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 			-- target ground infront of self
 			target = Vector_Addition(
 					target,
-					Vector_ScalarMultiply(
+					Vector_ScalarMultiply2D(
 							Vector_UnitDirectionalFacingDirection(gsiPlayer.hUnit:GetFacing()),
 							castRange
 						)
@@ -365,7 +483,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 			if distToTarget < castRange*0.88 then
 				target = Vector_Addition(
 						gsiPlayer.lastSeen.location,
-						Vector_ScalarMultiply(
+						Vector_ScalarMultiply2D(
 								Vector_UnitDirectionalPointToPoint(gsiPlayer.lastSeen.location, target),
 								min(castRange, distToTarget + 175)
 							)
@@ -389,7 +507,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 						gsiPlayer.lastSeen.location,
 						target.x and target or target.lastSeen.location
 					) then -- BEST_FIT_CAST was not informed we were using a location if we are. use_ability will confirm
-			UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, hAbility, target, 400)
+			UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, hAbility, target.x and gsiPlayer or target, 400)
 			return true
 		end
 	elseif castFunc == "Action_UseAbility" then
@@ -405,10 +523,7 @@ function AbilityLogic_DeduceBestFitCastAndUse(gsiPlayer, hAbility, target, setAu
 		end
 		if TEST then print(gsiPlayer.shortName, hAbility:GetName(), "out of range.") end
 	elseif castFunc == "ToggleAutoCast" then
-		if TEST then print(setAutoCastOn, hAbility:GetAutoCastState()) end
-		if setAutoCastOn and not hAbility:GetAutoCastState() or (not setAutoCastOn and hAbility:GetAutoCastState()) then
-			hAbility:ToggleAutoCast()
-		end
+		AbilityLogic_HandleAutocastGeneric(gsiPlayer, hAbility)
 		return false -- shouldn't matter for toggle auto
 	end
 	return false

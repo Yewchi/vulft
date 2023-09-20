@@ -1,12 +1,12 @@
 local hero_data = {
 	"crystal_maiden",
-	{1, 2, 3, 2, 2, 4, 2, 1, 3, 5, 1, 4, 3, 3, 7, 1, 4, 10, 11},
+	{1, 2, 3, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_ward_sentry","item_faerie_fire","item_tango","item_branches","item_clarity","item_enchanted_mango","item_boots","item_tranquil_boots","item_blink","item_magic_wand","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_staff_of_wizardry","item_wind_lace","item_void_stone","item_cyclone","item_point_booster","item_ultimate_scepter","item_staff_of_wizardry","item_robe","item_kaya",
+		"item_tango","item_clarity","item_faerie_fire","item_enchanted_mango","item_blood_grenade","item_ward_observer","item_boots","item_wind_lace","item_tranquil_boots","item_bracer","item_cloak","item_wind_lace","item_shadow_amulet","item_glimmer_cape","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_black_king_bar",
 	},
 	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Crystal Nova","Frostbite","Arcane Aura","Freezing Field","+250 Health","+125 Crystal Nova AoE","+125 Frostbite Cast Range","-3s Crystal Nova Cooldown","+200 Attack Speed","+50 Freezing Field Damage","+1.25s Frostbite Duration","+240 Crystal Nova Damage",
+		"Crystal Nova","Frostbite","Arcane Aura","Freezing Field","+250 Health","+125 Crystal Nova AoE","+125 Frostbite Cast Range","-3s Crystal Nova Cooldown","+225 Attack Speed","+50 Freezing Field Damage","+1.25s Frostbite Duration","+240 Crystal Nova Damage",
 	}
 }
 --@EndAutomatedHeroData
@@ -45,6 +45,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

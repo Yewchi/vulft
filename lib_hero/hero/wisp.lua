@@ -1,10 +1,10 @@
 local hero_data = {
 	"wisp",
-	{1, 3, 1, 3},
+	{1, 3, 3, 2, 3, 4, 3, 1, 2, 6, 2, 4, 9},
 	{
-		"item_magic_stick","item_ring_of_regen","item_tango","item_headdress","item_chainmail","item_mekansm","item_cloak","item_shadow_amulet","item_glimmer_cape","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_aeon_disk",
+		"item_tango","item_ward_sentry","item_magic_stick","item_blood_grenade","item_branches","item_branches","item_faerie_fire","item_branches","item_branches","item_faerie_fire","item_branches","item_ring_of_regen","item_headdress","item_magic_wand","item_mekansm","item_medallion_of_courage","item_crown","item_wind_lace","item_solar_crest","item_cloak","item_glimmer_cape","item_heart","item_gem",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Tether","Spirits","Overcharge","Relocate","+15% Tether Enemy Move/Attack Slow","+15 Attack Damage to Tethered Units","+6% Tether Movement Speed","+55 Spirits Hero Damage","+0.2% Overcharge Max HP Regen Bonus","-25s Relocate Cooldown","+400 Health to Tethered Units","Attack Tethered Ally's Target",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

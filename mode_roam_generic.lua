@@ -32,7 +32,8 @@ local DEBUG_KILLSWITCH = false
 local FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST = 150
 function Think() --[[annoying in the early game] print("RUNNING ROAM")--]] end
 function GetDesire()
-	if DotaTime() >= -1 and DotaTime() < 110
+	local thisBot = GSI_GetPlayerFromPlayerID(GetBot():GetPlayerID())
+	if (DotaTime() >= -1 and thisBot and thisBot.awaitsDefaultBotsInterruptedFullTakeoverForHookHandoverToFull)
 			and ( (GetRuneStatus(RUNE_POWERUP_1) == RUNE_STATUS_AVAILABLE
 						and Vector_PointDistance2D(GetBot():GetLocation(), GetRuneSpawnLocation(RUNE_POWERUP_1))
 							< FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST
@@ -41,8 +42,16 @@ function GetDesire()
 						and Vector_PointDistance2D(GetBot():GetLocation(), GetRuneSpawnLocation(RUNE_POWERUP_2))
 							< FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST
 					)
+					or (GetRuneStatus(RUNE_BOUNTY_1) == RUNE_STATUS_AVAILABLE
+						and Vector_PointDistance2D(GetBot():GetLocation(), GetRuneSpawnLocation(RUNE_BOUNTY_1))
+							< FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST
+					)
+					or (GetRuneStatus(RUNE_BOUNTY_2) == RUNE_STATUS_AVAILABLE
+						and Vector_PointDistance2D(GetBot():GetLocation(), GetRuneSpawnLocation(RUNE_BOUNTY_2))
+							< FLIP_TO_DEFAULT_BOT_BEHAVIOUR_NEAR_RUNE_DIST
+					)
 				) then
-		INFO_print("Using default bot Think() to attempt pick up the river bounty runes. Handover to full-takeover will occur shortly.")
+		INFO_print("Using default bot Think() to attempt pick up runes. Handover to full-takeover will occur when holding 7 items. "..(thisBot.shortName or "no name"))
 		return 0.0
 	elseif DEBUG_KILLSWITCH then
 		if not DEBUG_KILLSWITCH_ALERT then
@@ -51,6 +60,6 @@ function GetDesire()
 		end
 		return 0.0
 	else
-		return 0xFFFF -- run the full-takeover code.
+		return 0xFFFF -- run the full-takeover hook code via ability_item_usage_generic.lua (until it completes partial_full_handover at 7 items held, but they can't pick up water / stacked runes after it occurs and bot_generic Think function is defined)
 	end
 end

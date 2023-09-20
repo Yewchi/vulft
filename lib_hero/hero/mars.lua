@@ -1,12 +1,12 @@
 local hero_data = {
 	"mars",
-	{2, 1, 1, 2, 1, 4, 1, 2, 2, 3, 5, 4, 3, 3, 8, 3, 4, 10, 11},
+	{2, 1, 1, 2, 1, 4, 1, 2, 2, 3, 5, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_ring_of_protection","item_gauntlets","item_quelling_blade","item_branches","item_branches","item_tango","item_branches","item_branches","item_ward_observer","item_ring_of_health","item_void_stone","item_pers","item_crown","item_meteor_hammer","item_boots","item_arcane_boots","item_magic_wand","item_blink","item_aghanims_shard","item_aether_lens","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_void_stone","item_ultimate_orb","item_sheepstick","item_soul_booster",
+		"item_branches","item_tango","item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_bracer","item_magic_wand","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_blink","item_soul_ring","item_staff_of_wizardry","item_wind_lace","item_cyclone","item_aghanims_shard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_hyperstone","item_buckler","item_assault","item_ultimate_orb","item_void_stone",
 	},
 	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Spear of Mars","God's Rebuke","Bulwark","Arena Of Blood","+100 God's Rebuke Distance","+30% Bulwark Active Redirect Chance","-4s God's Rebuke Cooldown","+100.0 Spear Of Mars Damage","+6%/+6% Bulwark Front/Side damage reduction","+0.8s Spear of Mars Stun","God's Rebuke +65% Crit","Arena Of Blood Grants Team +180 HP Regen",
+		"Spear of Mars","God's Rebuke","Bulwark","Arena Of Blood","+100 God's Rebuke Distance","+30% Bulwark Active Redirect Chance","-4s God's Rebuke Cooldown","+100.0 Spear Of Mars Damage","+6%/+6% Bulwark Front/Side damage reduction","+0.6s Spear of Mars Stun","God's Rebuke +65% Crit","Arena Of Blood Grants Team +180 HP Regen",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

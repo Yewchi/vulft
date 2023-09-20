@@ -1,12 +1,12 @@
 local hero_data = {
 	"chen",
-	{2, 1, 2, 1, 2, 4, 2, 1, 1, 3, 3, 4, 3, 3, 7, 5, 4, 9, 12},
+	{1, 2, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 7, 3, 4, 9},
 	{
-		"item_ward_dispenser","item_ring_of_basilius","item_boots","item_chainmail","item_mekansm","item_aghanims_shard","item_lifesteal","item_buckler","item_vladmir","item_ring_of_health","item_cloak","item_belt_of_strength","item_hood_of_defiance","item_tranquil_boots","item_ancient_janggo","item_headdress","item_boots_of_bearing","item_pipe","item_point_booster","item_wraith_pact",
+		"item_blood_grenade","item_circlet","item_branches","item_branches","item_branches","item_tango","item_ward_sentry","item_blight_stone","item_bracer","item_medallion_of_courage","item_magic_wand","item_diadem","item_headdress","item_holy_locket","item_belt_of_strength","item_robe","item_wind_lace","item_solar_crest","item_ancient_janggo","item_tranquil_boots","item_boots_of_bearing","item_buckler","item_ring_of_basilius","item_lifesteal","item_blades_of_attack","item_vladmir","item_gem","item_hyperstone","item_buckler","item_platemail","item_assault",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
-		"Penitence","Holy Persuasion","Divine Favor","Hand of God","Penitence Deals 225 Damage","-2s Holy Persuasion Teleport Delay","+12 Holy Persuasion Damage","+12% Penitence Slow","-30s Hand of God Cooldown","+1200 Holy Persuasion Minimum Health","Hand of God applies a Strong Dispel","+10/+10 Hand of God Heal/Heal Over Time",
+		"Penitence","Holy Persuasion","Divine Favor","Hand of God","Penitence Deals +225 Damage","-2s Holy Persuasion Teleport Delay","+12 Holy Persuasion Damage","-14% Penitence Slow","-30s Hand of God Cooldown","+1200 Holy Persuasion Minimum Health","Hand of God applies a Strong Dispel","+10/+10 Hand of God Heal/Heal Over Time",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

@@ -29,22 +29,39 @@ local t_lane_data = {}
 t_lane_data.enemy = {}
 t_lane_data.allied = {}
 
-for team_str,team_lane in pairs(t_lane_data) do
-	team_lane.bot = {}
-	team_lane.mid = {}
-	team_lane.top = {}
-	for _,lane in pairs(team_lane) do
-		lane.kdr = 1
-		lane.heroes = {}
-		lane.presence = {}
-		lane.expected_return_time = {}
-		lane.expected_farm_rate = {} -- time spent farming lane unchallenged
+farm_lane_handle = FarmLane_GetTaskHandle()
+leech_exp_handle = LeechExperience_GetTaskHandle()
+push_handle = Push_GetTaskHandle()
+avoid_hide_handle = AvoidHide_GetTaskHandle()
+
+local t_team
+local t_enemy
+local t_pnot_update_time = {}
+
+function LanePerformance_Initialize()
+	t_team, t_enemy = GSI_GetTeamPlayers(BOTH_TEAMS)
+	for i=1,#t_team do
+		t_pnot_update_time[i] = 0
+	end
+
+	for team_str,team_data in pairs(t_lane_data) do
+		team_data.bot = {}
+		team_data.mid = {}
+		team_data.top = {}
+		for _,lane in pairs(team_data) do
+			lane.kdr = 1
+			lane.heroes = {}
+			lane.presence = {}
+			lane.expected_return_time = {}
+			lane.expected_farm_rate = {} -- time spent farming lane unchallenged
+		end
 	end
 end
 
-function 
+function LanePerformance_GetLaningModifier(gsiPlayer, task)
+	
+end
 
 lanes.bot = {}
 lanes.mid = {}
 lanes.top = {}
-

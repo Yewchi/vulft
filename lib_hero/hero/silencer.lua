@@ -1,12 +1,12 @@
 local hero_data = {
 	"silencer",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10, 11},
+	{1, 2, 1, 3, 1, 4, 1, 3, 3, 5, 3, 4, 2, 2, 7, 2, 4, 10},
 	{
-		"item_magic_stick","item_tango","item_faerie_fire","item_circlet","item_branches","item_ward_observer","item_null_talisman","item_magic_wand","item_boots","item_robe","item_gloves","item_power_treads","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_aghanims_shard","item_blade_of_alacrity","item_belt_of_strength","item_hurricane_pike","item_ultimate_orb","item_pers","item_sphere","item_invis_sword","item_lesser_crit","item_silver_edge",
+		"item_magic_stick","item_tango","item_faerie_fire","item_circlet","item_branches","item_ward_observer","item_null_talisman","item_magic_wand","item_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_robe","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_hurricane_pike","item_aghanims_shard","item_ultimate_orb","item_sheepstick","item_gem","item_sphere",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+10 Arcane Curse Damage","+20 Attack Speed","-20.0s Global Silence Cooldown","+0.8x Last Word Int Multiplier","+10% Glaives of Wisdom Damage","Arcane Curse Undispellable","+2 Glaives of Wisdom Bounces","Last Word Mutes",
+		"Arcane Curse","Glaives of Wisdom","Last Word","Global Silence","+10 Arcane Curse Damage","+20 Attack Speed","-20.0s Global Silence Cooldown","+0.8x Last Word Int Multiplier","+1 Glaives of Wisdom Bounce","Arcane Curse Undispellable","+25% Glaives of Wisdom Damage","Last Word Mutes",
 	}
 }
 --@EndAutomatedHeroData
@@ -62,6 +62,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) or true then
@@ -99,80 +100,6 @@ d = {
 
 		local arbitraryEnemy = nearbyEnemies[1] or outerEnemies[1]
 
-		if fhtReal and CAN_BE_CAST(gsiPlayer, arcaneCurse) then
-			if currentActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
-					and distToFht < 1300
-					and HIGH_USE(gsiPlayer, phantasm, highUse, fhtHpp) then
-				local armlet = playerHUnit:FindItemSlot("item_armlet")
-				armlet = armlet ~= -1 and playerHUnit:GetItemInSlot(armlet) or false
-				--print("ck 2", armlet)
-				local previousMaxHealth = 0
-				if not playerHUnit:HasModifier("modifier_ancient_apparition_ice_blast")
-						and armlet then
-					--print("ck 3, registering phantasm")
-					USE_ABILITY(gsiPlayer, function()
-								if not CAN_BE_CAST(gsiPlayer, phantasm) then return true end
-								if not CAN_BE_CAST(gsiPlayer, armlet) then return 1 end
-								if armlet:GetAutoCastState() then
-									--DebugDrawText(500, 500, "running armlet"..previousMaxHealth, 255, 255, 255)
-									local newMaxHealth = playerHUnit:GetMaxHealth()
-									if newMaxHealth > previousMaxHealth then
-										previousMaxHealth = newMaxHealth
-									else
-										return 1
-									end
-								else
-									armlet:ToggleAutoCast()
-								end
-								return false
-							end,
-							nil, 500, "CHAOS_KNIGHT_ARMLET_PHANTASM",
-							nil, nil, 1.5
-						)
-					USE_ABILITY(gsiPlayer, phantasm, nil, 500, "CHAOS_KNIGHT_ARMLET_PHANTASM", nil, nil, 1)
-				else
-					USE_ABILITY(gsiPlayer, phantasm, nil, 500, nil)
-				end
-				return;
-			end
-		end
-		-- TODO Defensive rift into displaced enemy towards fountain
-		if fhtReal and CAN_BE_CAST(gsiPlayer, rift)
-				and distToFht < rift:GetCastRange()
-				and not playerHUnit:GetAttackTarget()
-				and distToFht > gsiPlayer.attackRange
-				and currentActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
-				and HIGH_USE(gsiPlayer, rift, highUse, fhtHpp) then
-			USE_ABILITY(gsiPlayer, rift, fht, 500, nil)
-			return;
-		end
-		if arbitraryEnemy and CAN_BE_CAST(gsiPlayer, bolt) then
-			if fhtReal and currentActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
-					and HIGH_USE(gsiPlayer, bolt, highUse, fhtHpp)
-					and distToFht < bolt:GetCastRange() then
-				USE_ABILITY(gsiPlayer, bolt, fht, 500, nil)
-				return;
-			end
-			if currentActivityType < ACTIVITY_TYPE.CAREFUL then
-				local saveFromUnit, saveUnit = FightClimate_GetIntentCageFightSaveJIT(
-						gsiPlayer, nil, nearby, bolt:GetCastRange(), true
-					)
-				if saveFromUnit and HIGH_USE(
-								gsiPlayer, bolt, highUse,
-								saveFromUnit.lastSeenHealth / saveFromUnit.maxHealth
-						) then
-					DebugDrawCircle(saveFromUnit.lastSeen.location, bolt:GetCastRange(), 0, 255, 0)
-					USE_ABILITY(gsiPlayer, bolt, saveFromUnit, 500, nil)
-					return;
-				end
-			elseif HIGH_USE(gsiPlayer, bolt, highUse, playerHpp) then
-				local nearestEnemy, distToNearest = Set_GetSetUnitNearestToLocation(playerLoc, nearbyEnemies)
-				if distToNearest < bolt:GetCastRange() then
-					USE_ABILITY(gsiPlayer, bolt, nearestEnemy, 500, nil)
-					return;
-				end
-			end
-		end
 	end,
 }
 

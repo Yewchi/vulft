@@ -42,6 +42,15 @@ local DROP_IN_FOUNTAIN_DIST = 500
 local AVOID_UNNEEDED_NEAR_FOUNTAIN_DIST = 1000
 local DROP_EXTRA_JUNGLE_FOR_DELIVERY_SPACE_DIST = 4000
 
+local VERBOSE = VERBOSE or DEBUG_TARGET and string.find(DEBUG_TARGET, "pick_up_item")
+local DEBUG = VERBOSE or DEBUG
+local TEST = TEST
+
+local ITEMS_GOODIES = ITEM_GOODIES
+
+local t_whose_rapier = {}
+
+
 local task_handle = Task_CreateNewTask()
 
 local blueprint
@@ -52,6 +61,52 @@ local sqrt = math.sqrt
 local farm_lane_handle
 
 local t_team_humans
+
+local function open_jungle_token_item(gsiPlayer, hItem)
+	if nil and DEBUG then 
+		--[[
+		print("use", gsiPlayer.hUnit:Action_UseAbility(hItem))
+		for k,_ in pairs(ITEMS_JUNGLE) do
+			print("purchase", k, gsiPlayer.hUnit:ActionImmediate_PurchaseItem(k))
+		end
+		print("sell", hItem and hItem:GetName(), hItem and gsiPlayer.hUnit:ActionImmediate_SellItem(hItem))
+		for i=0,40 do
+			print("move", i, JUNGLE_ITEM_ITEM_SLOT)
+			print(gsiPlayer.hUnit:ActionImmediate_SwapItems(i, JUNGLE_ITEM_ITEM_SLOT))
+		end
+		for i=0,40 do
+			print("move", JUNGLE_ITEM_ITEM_SLOT, i)
+			print(gsiPlayer.hUnit:ActionImmediate_SwapItems(i, JUNGLE_ITEM_ITEM_SLOT))
+		end
+		print("use on me", gsiPlayer.hUnit:Action_UseAbilityOnEntity(hItem, gsiPlayer.hUnit))]]
+		--[[ TEST FAILED 2023-05-03 ]]
+		print("use", gsiPlayer.hUnit:Action_UseAbility(hItem))
+		print("use on digit", gsiPlayer.hUnit:Action_UseAbilityOnTree(hItem, 1))
+		for k,v in pairs(getmetatable(hItem).__index) do
+			print(hItem:GetName(), k, v)
+		end
+		local b = hItem:GetBehavior()
+		a = 1
+		while a < 0xFFFFFFFF do
+			print(hItem:GetName(), "band", a, bit.band(b, a))
+			a = a *2
+		end
+		--[[
+		local hUnit = gsiPlayer.hUnit
+		print(hItem:GetName())
+		if hItem and hItem.GetName and string.find(hItem:GetName(), "item_tier") then
+			print("DOING NEW THING", hItem:GetName())
+			gsiPlayer.hUnit:Action_UseAbility(hItem)
+			if RandomInt(1,2) == 1 then
+				print("DIS")
+				hUnit:ActionImmediate_DisassembleItem(hItem)
+			else
+				print("LOC")
+				hUnit:Action_UseAbilityOnLocation(hItem, gsiPlayer.lastSeen.location)
+			end
+		end--]]
+	end
+end
 
 local function estimated_time_til_completed(gsiPlayer, objective)
 	return 0
@@ -76,7 +131,7 @@ local function task_init_func(taskJobDomain)
 							local thisHuman = t_team_humans[i]
 							local hUnitHuman = thisHuman.hUnit
 							local jungleItemSlotted = hUnitHuman:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)
-							if jungleItemSlotted then
+							if jungleItemSlotted and jungleItems[jungleItemSlotted:GetName()] then
 								-- Set to slotted tier + 1 desire
 								thisHuman.giveMeAJungleItemTier = jungleItems[jungleItemSlotted:GetName()]+1
 							end
@@ -115,11 +170,11 @@ Blueprint_RegisterTask(task_init_func)
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
 		local currSlottedJungle = gsiPlayer.hUnit:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)
-		Util_TablePrint(getmetatable(objective))
 		if currSlottedJungle and objective.item
+				and ITEMS_JUNGLE[objective.item:GetName()]
 				and objective.item:GetName()
 					~= (currSlottedJungle and currSlottedJungle:GetName() or "!") then
-			--[[DEV]]if VERBOSE then print("DROP LOWER TIER") end
+			--[[DEV]]if VERBOSE then print("DROP LOWER TIER",  objective.item:GetName(), currSlottedJungle:GetName()) end
 			Item_DropItemNow(gsiPlayer, currSlottedJungle)
 			return xetaScore - 5
 		end
@@ -130,6 +185,7 @@ blueprint = {
 						objective.location
 					) < 1000 then
 			gsiPlayer.hUnit:Action_PickUpItem(objective.item)
+			gsiPlayer.recentMoveTo = objective.location
 			return xetaScore
 		end
 		return XETA_SCORE_DO_NOT_RUN
@@ -138,9 +194,10 @@ blueprint = {
 	score = function(gsiPlayer, prevObjective, prevScore)
 		local jungleItemKeys = ITEMS_JUNGLE
 		local droppedItems = GetDroppedItemList()
-		--[[DEV]]if VERBOSE then Util_TablePrint({["droppedItems"] = droppedItems and droppedItems[1] and getmetatable(droppedItems[1])}) end
-		--[[DEV]]if VERBOSE then print('pickupitem', gsiPlayer.shortName, droppedItems and droppedItems[1]) end
+		--[[DEV]]if _VERBOSE then Util_TablePrint({"droppedItems", droppedItems}) end
+		--[[DEV]]if _VERBOSE then print('pickupitem', gsiPlayer.shortName, droppedItems and droppedItems[1]) end
 		--Util_TablePrint(table.sort(getmetatable(gsiPlayer.hUnit)))
+		
 		local countHeld = 0
 		local hUnit = gsiPlayer.hUnit
 		local jungleItemLoose
@@ -161,6 +218,9 @@ blueprint = {
 	
 		-- Put your only jungle item held in the jungle slot
 		local jungleItemSlotted = gsiPlayer.hUnit:GetItemInSlot(JUNGLE_ITEM_ITEM_SLOT)
+		if jungleItemSlotted and not jungleItemKeys[jungleItemSlotted:GetName()] then
+			jungleItemKeys[jungleItemSlotted:GetName()] = 0
+		end
 		if not jungleItemSlotted
 				or (jungleItemLoose
 					and jungleItemKeys[jungleItemSlotted:GetName()]
@@ -172,9 +232,13 @@ blueprint = {
 				return false, XETA_SCORE_DO_NOT_RUN;
 			end
 			gsiPlayer.giveMeAJungleItemTier = 0
-		else
+		elseif jungleItemKeys[jungleItemSlotted:GetName()] then
 			gsiPlayer.giveMeAJungleItemTier = jungleItemKeys[jungleItemSlotted:GetName()]+1
 					or math.floor(MAX_JUNGLE_ITEM_TIER / 2)
+		end
+
+		if jungleItemSlotted then
+			open_jungle_token_item(gsiPlayer, jungleItemSlotted)
 		end
 
 		local nearbyAllies
@@ -221,7 +285,7 @@ blueprint = {
 		for i=1,#droppedItems do
 			local thisItem = droppedItems[i]
 			local thisDist = PointDistance(playerLoc, thisItem.location)
-			--[[DEV]]if VERBOSE then print(thisItem.item:GetName(), jungleItemKeys[thisItem.item:GetName()], thisDist) end
+			--[[DEV]]if _VERBOSE then print(thisItem.item:GetName(), jungleItemKeys[thisItem.item:GetName()], thisDist) end
 			local thisTierOrNilJungle = jungleItemKeys[thisItem.item:GetName()]
 			if thisTierOrNilJungle then
 				if thisDist < PICK_UP_ITEM_DIST and thisTierOrNilJungle > bestItemTier then
@@ -230,6 +294,11 @@ blueprint = {
 					bestItemDist = thisDist
 				end
 			end
+		--	local thisScoreOrNilGoodie = ITEMS_GOODIES[thisItem.item:GetName()]
+		--	if thisScoreOrNilGoodie then
+		--		if thisScore - thisDist / 40 > 
+
+		--	end
 		end
 		--[[DEV]]if VERBOSE then print("pickupitem", gsiPlayer.shortName, bestItemDist, bestItemTier) end
 		if not bestItem then

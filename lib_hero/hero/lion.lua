@@ -1,16 +1,16 @@
 local hero_data = {
 	"lion",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 8, 5, 4, 9},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 6, 2, 4, 2, 2, 8, 3, 4, 10, 12},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_ward_sentry","item_branches","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_tango","item_magic_wand","item_boots","item_tranquil_boots","item_blink","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_gem","item_aeon_disk",
+		"item_tango","item_branches","item_branches","item_branches","item_magic_stick","item_blood_grenade","item_ward_sentry","item_ward_sentry","item_boots","item_tranquil_boots","item_magic_wand","item_blink","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_ghost","item_kaya","item_ethereal_blade","item_diadem","item_voodoo_mask","item_dagon_5","item_dagon_3L",
 	},
-	{ {1,1,4,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-3s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
+		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","-2s Hex Cooldown","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","Earth Spike affects a 30º cone","Mana Drain Deals Damage","+250 AoE Hex",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"lion_impale", ABILITY_TYPE.NUKE + ABILITY_TYPE.STUN + ABILITY_TYPE.AOE},
@@ -23,7 +23,6 @@ local ZEROED_VECTOR = ZEROED_VECTOR
 local playerRadius = Set_GetEnemyHeroesInPlayerRadius
 local ENCASED_IN_RECT = Set_GetEnemiesInRectangle
 local currentTask = Task_GetCurrentTaskHandle
-local GSI_AbilityCanBeCast = GSI_AbilityCanBeCast
 local CROWDED_RATING = Set_GetCrowdedRatingToSetTypeAtLocation
 local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
 local INCENTIVISE = Task_IncentiviseTask
@@ -80,8 +79,18 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
+		local playerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
+		local earthSpike = playerAbilities[1]
+		local hex = playerAbilities[2]
+		local drain = playerAbilities[3]
+		local foD = playerAbilities[4]
+		local foDKillCounterIndex = gsiPlayer.hUnit:GetModifierByName("modifier_lion_finger_of_death_kill_counter")
+		local foDNetDmg = foD:GetSpecialValueInt("damage")
+				+ (foDKillCounterIndex and gsiPlayer.hUnit:GetModifierStackCount(foDKillCounterIndex)
+					or 0)*foD:GetSpecialValueInt("damage_per_kill")
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
 			-- TODO Break drain if you should kill the target instead, there are no allies killing them.
 			local currActiveAbility = gsiPlayer.hUnit:GetCurrentActiveAbility()
@@ -89,16 +98,16 @@ d = {
 				if Analytics_GetTotalDamageInTimeline(gsiPlayer.hUnit) > gsiPlayer.lastSeenHealth/10
 						and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.8 then
 					UseAbility_ClearQueuedAbilities(gsiPlayer)
+				elseif AbilityLogic_AbilityCanBeCast(gsiPlayer, foD) then
+					local foDRangeEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, foD:GetCastRange()*0.95)
+					if AbilityLogic_HighestPowerOHK(gsiPlayer, foD, foDRangeEnemies, foDNetDmg) then
+						UseAbility_ClearQueuedAbilities(gsiPlayer)
+					end
 				end
 			else
 				return;
 			end
 		end
-		local playerAbilities = t_player_abilities[gsiPlayer.nOnTeam]
-		local earthSpike = playerAbilities[1]
-		local hex = playerAbilities[2]
-		local drain = playerAbilities[3]
-		local foD = playerAbilities[4]
 
 		local playerLoc = gsiPlayer.lastSeen.location
 		local highUse = gsiPlayer.highUseManaSimple
@@ -110,7 +119,7 @@ d = {
 		local currTask = currentTask(gsiPlayer)
 		local nearbyEnemies, outerEnemies
 				= Set_GetEnemyHeroesInLocRadOuter(gsiPlayer.lastSeen.location, ABILITY_USE_RANGE, OUTER_RANGE, 6)
-		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+		local danger, knownE, theoryE = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
 		local fht = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)
 		local fhtReal = fht
 				and fht.hUnit.IsNull and not fht.hUnit:IsNull()
@@ -143,9 +152,10 @@ d = {
 				return;
 			end
 		end
-		local succeedsUnits = AbilityLogic_GetCastSucceedsUnits(gsiPlayer, earthSpike, nearbyEnemies)
+		local succeedsUnits = AbilityLogic_GetCastSucceedsUnits(gsiPlayer, nearbyEnemies, earthSpike)
 		local arbitrarySucceedsHero = succeedsUnits[1] and not pUnit_IsNullOrDead(succeedsUnits[1])
 				and succeedsUnits[1] or false
+		--[[DEV]]print("LION CHECKS SPIKE FEAR", currActivityType >= ACTIVITY_TYPE.CAREFUL, arbitrarySucceedsHero, #succeedsUnits, "nearby", #nearbyEnemies, #outerEnemies, AbilityLogic_AbilityCanBeCast(gsiPlayer, earthSpike), disallowTarget ~= arbitrarySucceedsHero, "stunhex", arbitrarySucceedsHero and arbitrarySucceedsHero.hUnit:IsStunned(), arbitrarySucceedsHero and arbitrarySucceedsHero.hUnit:IsHexed(), HIGH_USE(gsiPlayer, earthSpike, highUse - earthSpike:GetManaCost(), playerHealthPercent))
 		if currActivityType >= ACTIVITY_TYPE.CAREFUL
 				and arbitrarySucceedsHero and AbilityLogic_AbilityCanBeCast(gsiPlayer, earthSpike)
 				and disallowTarget ~= arbitrarySucceedsHero
@@ -158,14 +168,16 @@ d = {
 		end
 		if currTask == push_handle and AbilityLogic_AbilityCanBeCast(gsiPlayer, earthSpike)
 				and HIGH_USE(gsiPlayer, earthSpike, highUse - earthSpike:GetManaCost(), 1-playerHealthPercent)
-				and (not gsiPlayer.theoreticalDanger or gsiPlayer.theoreticalDanger < 0) then
+				and (not gsiPlayer.theoreticalDanger or gsiPlayer.theoreticalDanger < 0) 
+				and #knownE + #theoryE == 0 then
 			local nearbyCreeps = Set_GetNearestEnemyCreepSetAtLaneLoc(
 					gsiPlayer.lastSeen.location, Map_GetBaseOrLaneLocation(gsiPlayer.lastSeen.location)
 				)
+
 			if nearbyCreeps then
 				-- TODO USE_ABILITY queue with move to loc facing from vector between two random creeps
 				local crowdingCenter, crowdedRating
-						= CROWDED_RATING(nearbyCreeps.center, SET_CREEP_ENEMY, nearbyCreeps, 190)
+						= CROWDED_RATING(nearbyCreeps.center, SET_CREEP_ENEMY, nearbyCreeps.units, 250)
 				if crowdedRating > 2 then
 					USE_ABILITY(gsiPlayer, earthSpike, crowdingCenter, 400, nil)
 					return;
@@ -179,9 +191,7 @@ d = {
 						gsiPlayer,
 						fht,
 						foD:GetCastRange(),
-						foD:GetSpecialValueInt("damage")
-							+ (foDKillCounterIndex and gsiPlayer.hUnit:GetModifierStackCount(foDKillCounterIndex)
-								or 0)*LION_FOD_COUNT_DMG,
+						foDNetDmg,
 						foD:GetDamageType()
 					) then
 			USE_ABILITY(gsiPlayer, foD, fht, 400, nil)

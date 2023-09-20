@@ -1,10 +1,10 @@
 local hero_data = {
 	"elder_titan",
-	{2, 1, 2, 1, 2, 1, 2, 1, 4, 3, 3, 4, 3, 3, 8, 5, 4, 9, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 3, 3, 3, 1, 1, 4, 7, 5, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_magic_stick","item_gauntlets","item_faerie_fire","item_boots","item_blight_stone","item_orb_of_venom","item_gloves","item_hand_of_midas","item_phase_boots","item_blade_of_alacrity","item_point_booster","item_ogre_axe","item_ultimate_scepter","item_lesser_crit","item_invis_sword","item_silver_edge","item_blitz_knuckles","item_javelin","item_monkey_king_bar","item_basher","item_abyssal_blade","item_desolator",
+		"item_ward_sentry","item_tango","item_blood_grenade","item_magic_stick","item_branches","item_branches","item_ward_observer","item_magic_wand","item_wind_lace","item_boots","item_wind_lace","item_tranquil_boots","item_soul_ring","item_chainmail","item_chainmail","item_blight_stone","item_chainmail","item_medallion_of_courage","item_solar_crest","item_wind_lace","item_belt_of_strength","item_robe","item_ancient_janggo","item_boots_of_bearing","item_ogre_axe","item_blade_of_alacrity","item_echo_sabre","item_gem","item_vladmir",
 	},
-	{ {1,1,1,3,3,}, {5,5,3,4,1,}, 0.1 },
+	{ {3,3,1,1,1,}, {4,4,4,5,5,}, 0.1 },
 	{
 		"Echo Stomp","Astral Spirit","Natural Order","Earth Splitter","+2% Astral Spirit Move Speed Per Hero","+25 Attack Speed","+75 Echo Stomp Damage","+25 Astral Spirit Hero Attack","+100% Cleave","+100 Natural Order Radius","-60s Earth Splitter Cooldown","+450 Echo Stomp Wake Damage",
 	}
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

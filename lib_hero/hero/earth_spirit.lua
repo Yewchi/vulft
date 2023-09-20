@@ -1,16 +1,16 @@
 local hero_data = {
 	"earth_spirit",
-	{1, 2, 1, 3, 1, 4, 2, 2, 2, 5, 1, 4, 3, 3, 8, 3, 4, 9, 11},
+	{1, 2, 1, 2, 1, 4, 2, 2, 1, 6, 3, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_quelling_blade","item_tango","item_circlet","item_ring_of_protection","item_ward_dispenser","item_urn_of_shadows","item_wind_lace","item_boots","item_tranquil_boots","item_wind_lace","item_magic_wand","item_void_stone","item_cyclone","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_platemail","item_pers","item_lotus_orb","item_aghanims_shard",
+		"item_tango","item_quelling_blade","item_branches","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_boots","item_bottle","item_magic_wand","item_gloves","item_power_treads","item_chainmail","item_broadsword","item_blade_mail","item_reaver","item_heart","item_kaya","item_kaya_and_sange","item_void_stone","item_void_stone","item_vitality_booster","item_energy_booster","item_octarine_core","item_dagon_5","item_dagon_4L",
 	},
-	{ {3,3,3,2,2,}, {4,4,4,2,2,}, 0.1 },
+	{ {2,2,2,2,5,}, {2,2,2,2,4,}, 0.1 },
 	{
-		"Boulder Smash","Rolling Boulder","Geomagnetic Grip","Magnetize","+325 Rolling Boulder Distance","+3s Magnetize Duration","+20 Magnetize Damage Per Second","+120 Rolling Boulder Damage","Geomagnetic Grip Targets Allies","+3.0s Geomagnetic Grip Silence","+25% Spell Amplification","+0.6s Rolling Boulder Stun Duration",
+		"Boulder Smash","Rolling Boulder","Geomagnetic Grip","Magnetize","+325 Rolling Boulder Distance","+10% Spell Amplification","+30%% Magnetize Damage &amp; Duration","+120 Rolling Boulder Damage","+125 Boulder Smash Damage","-2s Geomagnetic Grip Cooldown","Magnetize Undispellable","+0.5s Rolling Boulder Stun Duration",
 	}
 }
 --@EndAutomatedHeroData
-if GetGameState() <= GAME_STATE_HERO_SELECTION then return hero_data end
+if GetGameState() <= GAME_STATE_STRATEGY_TIME then return hero_data end
 
 local abilities = {
 		[0] = {"earth_spirit_boulder_smash", ABILITY_TYPE.STUN + ABILITY_TYPE.AOE + ABILITY_TYPE.NUKE},
@@ -47,6 +47,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

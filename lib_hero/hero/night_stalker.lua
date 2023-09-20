@@ -1,12 +1,12 @@
 local hero_data = {
 	"night_stalker",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 6, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 1, 1, 3, 3, 4, 2, 1, 3, 6, 3, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_gauntlets","item_gauntlets","item_tango","item_flask","item_faerie_fire","item_branches","item_bracer","item_bracer","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_ogre_axe","item_quarterstaff","item_echo_sabre","item_aghanims_shard","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_blink","item_mithril_hammer","item_belt_of_strength","item_basher","item_hyperstone","item_buckler","item_assault",
+		"item_tango","item_quelling_blade","item_ward_observer","item_branches","item_branches","item_bottle","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_quarterstaff","item_robe","item_oblivion_staff","item_echo_sabre","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_diadem","item_harpoon","item_gem","item_hyperstone","item_assault","item_blink","item_gem","item_overwhelming_blink",
 	},
 	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Void","Crippling Fear","Hunter in the Night","Dark Ascension","+50 Void Damage","+8s Dark Ascension Duration","+35 Dark Ascension Damage","+15% Hunter in the Night Status Resistance","-5.0s Crippling Fear Cooldown","+20 Strength","+100 Hunter In The Night Attack Speed","-50s Dark Ascension Cooldown",
+		"Void","Crippling Fear","Hunter in the Night","Dark Ascension","+50 Void Damage","+8s Dark Ascension Duration","+35 Dark Ascension Damage","+25% Hunter in the Night Status Resistance","-5.0s Crippling Fear Cooldown","+20 Strength","+100 Hunter In The Night Attack Speed","-50s Dark Ascension Cooldown",
 	}
 }
 --@EndAutomatedHeroData
@@ -48,6 +48,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then

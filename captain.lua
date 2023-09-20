@@ -24,8 +24,27 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
-require(GetScriptDirectory().."/lib_job/modules/communication")
+local VERBOSE = VERBOSE or DEBUG_TARGET and string.find(DEBUG_TARGET, "Dcaptain")
+local DEBUG = VERBOSE or DEBUG
+local TEST = TEST or DEBUG_TARGET and string.find(DEBUG_TARGET, "Tcaptain")
+
 local player_role_and_lane_file
+
+local STR__IN_PLAY_VS_BOTS_UNTESTED = "untested / unreleased vulft bots are running"
+local STR__IN_PLAY_VS_BOTS_USE_SERVER = "please run vulft from the local server to allow vulft to control hero selection"
+local STR__IN_PLAY_VS_BOTS_MESSAGE_DISAPPEARS = "this message will disappear at 1:40"
+RegisterLocalize(STR__IN_PLAY_VS_BOTS_UNTESTED,
+		"zh", "未经测试/未发布的 vulft 机器人正在运行",
+		"ru", "запускаются непроверенные/невыпущенные vulft-боты"
+	)
+RegisterLocalize(STR__IN_PLAY_VS_BOTS_USE_SERVER,
+		"zh", "请从本地服务器运行 vulft 以允许 vulft 控制英雄选择",
+		"ru", "пожалуйста, запустите vulft с локального сервера, чтобы vulft мог управлять выбором героя"
+	)
+RegisterLocalize(STR__IN_PLAY_VS_BOTS_MESSAGE_DISAPPEARS,
+		"zh", "此消息将在 1:40 消失",
+		"ru", "это сообщение исчезнет в 1:40"
+	)
 
 local THIS_BOT = {}
 local job_domain = {} -- Table is collected, but a useful allocated-table check skip
@@ -51,9 +70,9 @@ local should_draw_unimplemented_heroes_func
 local function draw_unimplemented_heroes()
 	if DotaTime() < 100 then
 		local red = math.min(255, math.max(0, (DotaTime() - 90)*25))
-		DebugDrawText(300, 300, "untested / unreleased vulft bots are running", red, 255-red, 255-red)
-		DebugDrawText(300, 310, "please run vulft from the local server to allow vulft to control hero selection", red, 255-red, 255-red)
-		DebugDrawText(300, 320, "this message will disappear at 1:40", red, 255-red, 255-red)
+		DebugDrawText(300, 300, GetLocalize(STR__IN_PLAY_VS_BOTS_UNTESTED), red, 255-red, 255-red)
+		DebugDrawText(300, 310, GetLocalize(STR__IN_PLAY_VS_BOTS_USE_SERVER), red, 255-red, 255-red)
+		DebugDrawText(300, 320, GetLocalize(STR__IN_PLAY_VS_BOTS_MESSAGE_DISAPPEARS), red, 255-red, 255-red)
 	end
 	DebugDrawText(160, 5, "VUL-FT untested:", 80, 0, 0)
 	if TEAM_IS_RADIANT and GameTime() % 16 < 8 or not TEAM_IS_RADIANT and GameTime() % 16 > 8 then
@@ -63,12 +82,10 @@ local function draw_unimplemented_heroes()
 	end
 end
 
-CHAT_CALLBACK_FUNCS = {}
-
 function Captain_ConfigIndicateNonStandardSetting(setting, ...)
 	if setting == CAPTAIN_CONFIG_NON_STANDARD.HERO_UNTESTED_ABILITY_USE then
 		local args = {...}
-		print("args1", args[1])
+		--[[DEV]]DEBUG_print("[captain] Non-standard args1 %s", args[1])
 		table.insert(t_unimplemented_heroes, args[1])
 		Util_TableAlphabeticalSortValue(t_unimplemented_heroes)
 		should_draw_unimplemented_heroes_func = draw_unimplemented_heroes
@@ -79,11 +96,53 @@ function Captain_ConfigIndicateNonStandardSetting(setting, ...)
 	end
 end
 
-function Captain_Chat(msg, allChat)
+local STR__CAPTAIN = "captain"
+RegisterLocalize(STR__CAPTAIN,
+		"zh", "机器人队长",
+		"ru", "капитан роботов"
+	)
+local CAPTAIN_CHAT_QUEUE_DEFAULT_DELAY = 4.4
+local CAPTAIN_CHAT_DELAY_INTERRUPTED = 0.5
+local captain_chat_queue = {}
+function Captain_Chat(msg, allChat, isQueue)
 	if not THIS_BOT then
-		ERR_print("Captain not initialized for chatting.")
+		ERROR_print(false, not VERBOSE, "Captain not initialized for chatting.")
 	end
-	THIS_BOT.hUnit:ActionImmediate_Chat("[Captain] "..(msg or "<missing message text>"), allChat)
+	if not msg then
+		ERROR_print(false, not VERBOSE, "No message given to captain chat")
+	end
+	if not isQueue then
+		for i=1,#captain_chat_queue do
+			captain_chat_queue[i][3] = captain_chat_queue[i][3] + CAPTAIN_CHAT_DELAY_INTERRUPTED
+		end
+	end
+	THIS_BOT.hUnit:ActionImmediate_Chat(string.format("[%s] %s", 
+				GetLocalize("captain"), GetLocalize(msg)
+			),
+			allChat
+		)
+end
+
+-------- Captain_AddChatToQueue()
+function Captain_AddChatToQueue(msg, allChat, delayBefore)
+	local chatTime = captain_chat_queue[#captain_chat_queue]
+			and captain_chat_queue[#captain_chat_queue][3]
+				+ (delayBefore or  CAPTAIN_CHAT_QUEUE_DEFAULT_DELAY)
+			or GameTime()
+	table.insert(captain_chat_queue, {msg, allChat or false, chatTime})
+end
+
+local function check_captain_chat_queue()
+	local nextChatQueued = captain_chat_queue[1]
+	if nextChatQueued
+			and GameTime()
+				> nextChatQueued[3] then
+		if nextChatQueued[1] then
+			table.remove(captain_chat_queue, 1)
+			--[[DEV]]DEBUG_print("[captain] doing chat %s", Util_PrintableTable(captain_chat_queue))
+			Captain_Chat(nextChatQueued[1], nextChatQueued[2], true)
+		end
+	end
 end
 
 function Captain_RegisterCaptain(thisBot, microThinkFunc, deleteThisFunc)
@@ -115,7 +174,13 @@ function Captain_RegisterCaptain(thisBot, microThinkFunc, deleteThisFunc)
 													"[Captain] Ensure GameMode: ALL PICK; Five vs Five heroes on the standard Dota 2 map.. "
 														.."Missing player was N: %d, ID: %d, time: %f, clock: %f",
 													i, teamplayerIDs[n] or -1, GameTime(), DotaTime() )
-									workingSet.printFuncEscalates(adviseStr)
+
+									if workingSet.printFuncEscalates == ERROR_print then -- bad refactor
+										workingSet.printFuncEscalates(false, false, adviseStr)
+									else
+										workingSet.printFuncEscalates(adviseStr)
+									end
+
 									workingSet.printFuncEscalates = ERROR_print
 									INFO_print(string.format("[captain] Num players on %s: %d.", GSI_GetTeamString(TEAM), #teamplayerIDs))
 								end
@@ -236,21 +301,28 @@ function Captain_InitializeCaptain(thisBot) -- This is ran via job_domain:JOB_WA
 
 	THIS_BOT.Chat("/VUL-FT/ "..VULFT_VERSION, true)
 
+	DOMINATE_SetDominateFunc(THIS_BOT, "map_find_fountain_goal_posts", Map_FindFountainGoalPosts, true)
+
+	--[[DEV]]--DEBUG_StartTestParty()
+	--[[DEV]]--DEBUG_PlayerIDDominate(-1, DEBUG_GetPlayerIDRune)
+
 	Captain_Initialize = nil
 end
 
-local DEBUG_timeTest = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-local DEBUG_fromTime
-local i = 0
+local DEBUG_timeTest = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+local DEBUG_fromTime = RealTime() + 0xFFFF
+local i = 1
 local DEBUG_timeTestThrottle = Time_CreateThrottle(10.0)
 local err_count = 0
 local err_check = 0
---[[DEV]]local dev_progress = 0.0001 + 100/15--[[/DEV]]
---[[DEV]]local floor = math.floor--[[/DEV]]
+--[[DEV]]local dev_progress = 0.0001 + 100/15
+--[[DEV]]local floor = math.floor
 function Captain_CaptainThink()	
+	local DEBUG_timeTest = DEBUG_timeTest
 	--[[TESTTRUE]]if DEBUG then
 		if err_check == 1 then err_count = err_count + 1 end err_check = 1 if err_count > 0 then DebugDrawText(140, 30, string.format("%d", err_count), 150, 0, 0) end
 		--[[DEV]]WP_DEBUG_Display()
+		--[[DEV]]DEBUG_print(string.format("~~~~~~~~~~~%s~~~~~~~~~~~ t=%.2f", TEAM_IS_RADIANT and "RADIANT" or "DIRE", GameTime()))
 	end
 
 	if captain_config_non_standard_settings ~= CAPTAIN_CONFIG_STANDARD then
@@ -267,9 +339,10 @@ function Captain_CaptainThink()
 		should_draw_unimplemented_heroes_func()
 	end
 
+	i=1;
 	if job_domain_gsi.active then
 		Time_TryTimeDataReset()
-		if DEBUG and DEBUG_timeTestThrottle:allowed() then 
+		if TEST and DEBUG_timeTestThrottle:allowed() then 
 			print(TEAM_READABLE, "job retort:")
 			for j=1,11,1 do 
 				if DEBUG_timeTest[j] then 
@@ -278,90 +351,111 @@ function Captain_CaptainThink()
 				DEBUG_timeTest[j] = 0
 			end
 		end
-		i = 1 DEBUG_fromTime = RealTime()
+		--[[DEV]]DEBUG_fromTime = RealTime()
 
-		--[[DEV]]VEBUG_PlayerFrameProgressBarStart(-1)--[[/DEV]]
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(0*dev_progress))--[[/DEV]]
+		--[[DEV]]VEBUG_PlayerFrameProgressBarStart(-1)
+		--[[DEV]]print('1', collectgarbage("count"))
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(0*dev_progress))
 		job_domain_gsi:DoJob("JOB_UPDATE_ENEMY_PLAYERS_NONE_TYPED")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(1*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 1
+		--[[DEV]]print('2', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(1*dev_progress))
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYER_DATA")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(2*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 2
+		--[[DEV]]print('3', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(2*dev_progress))
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYERS_LAST_SEEN")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(3*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 3
+		--[[DEV]]print('4', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(3*dev_progress))
 		job_domain_gsi:DoJob("JOB_UPDATE_CREEP_UNITS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(4*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 4
+		--[[DEV]]print('5', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(4*dev_progress))
 		job_domain_gsi:DoJob("JOB_UPDATE_UNIT_SETS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(5*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 5
+		--[[DEV]]print('6', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(5*dev_progress))
 		job_domain_gsi:DoJob("JOB_UPDATE_BUILDING_UNITS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(6*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 6
+		--[[DEV]]print('7', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(6*dev_progress))
 		job_domain_gsi:DoJob("JOB_UPDATE_SCOREBOARD_AND_KILLSTREAKS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 7
+		--[[DEV]]print('8', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
 	end
 	
 	if job_domain_analytics.active then
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(7*dev_progress))--[[/DEV]]
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(7*dev_progress))
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_CURRENT_ATTACKS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(8*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 8
+		--[[DEV]]print('9', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(8*dev_progress))
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_FUTURE_DAMAGE_LISTS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime 
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(9*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 9
+		--[[DEV]]print('10', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(9*dev_progress))
 		job_domain_analytics:DoJob("JOB_UPDATE_FOW_PREDICTION")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(10*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 10
+		--[[DEV]]print('11', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(10*dev_progress))
 		job_domain_analytics:DoJob("JOB_UPDATE_LANE_PRESSURE")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
-		i = i + 1 DEBUG_fromTime = RealTime()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(11*dev_progress))--[[/DEV]]
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 11
+		--[[DEV]]print('12', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(11*dev_progress))
 		job_domain_analytics:DoJob("JOB_UPDATE_STRATEGIZE_WARDS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime
+		--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 12
+		--[[DEV]]print('13', collectgarbage("count"))
+		--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
 	end
 	
 	if job_domain_task.active then
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(12*dev_progress))--[[/DEV]]
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(12*dev_progress))
 		job_domain_task:DoAllJobs()
 	end
+	--[[DEV]]DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 13
+	--[[DEV]]print('14', collectgarbage("count"))
+	--[[DEV]]i = i + 1; DEBUG_fromTime = RealTime()
 
 	if job_domain.active then
-		--[[DEV]]if DEBUG then VEBUG_PlayerFrameProgressBar(-1, floor(13*dev_progress))--[[/DEV]]
-		--[[DEV]]	DEBUG_print("printing captin job_domain")--[[/DEV]]
+		--[[DEV]]if DEBUG then VEBUG_PlayerFrameProgressBar(-1, floor(13*dev_progress))
+		--[[DEV]]	DEBUG_print("printing captin job_domain")
 		--[[DEV]]	job_domain:ListJobKeys()
-		--[[DEV]]end--[[/DEV]]--[[/DEV]]--[[/DEV]]
+		--[[DEV]]end
 		job_domain:DoAllJobs()
 	end
+	DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 14
+	--[[DEV]]print('15', collectgarbage("count"))
+	i = i + 1; DEBUG_fromTime = RealTime()
 
---[[DEV]]	if DEBUG and TEAM == TEAM_DIRE then
+--[[DEV]]	if DEBUG and TEAM_IS_RADIANT then
 --[[DEV]]		DEBUG_CreepAdventure()
 --[[DEV]]	end
 	if job_domain_gsi.active then
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(14*dev_progress))--[[/DEV]]
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(14*dev_progress))
 		AbilityThink_RotateAbilityThinkSetRun()
-		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(15*dev_progress))--[[/DEV]]
+		--[[DEV]]VEBUG_PlayerFrameProgressBar(-1, floor(15*dev_progress))
 		Task_TryDecrementIncentives()
 	end
 	--[[TESTTRUE]]if DEBUG then
 		err_check = 0
 	end
-	generic_microthink()
 	if VERBOSE then 
+		DebugDrawText(350, 5, string.format("%.2f,%.3f", GameTime(), RealTime()), 0, 255, 255)
 		local locs = VAN_GetWardLocations()
 		local correctedLocs = VAN_GetWardLocationsCorrected()
+		print("locs would draw", #correctedLocs)
 		if locs then
 			for i=1,#locs do
 				if correctedLocs[i] then
@@ -370,8 +464,18 @@ function Captain_CaptainThink()
 			end
 		end
 	end
+
+	check_captain_chat_queue()
+
+	--[[DEV]]print('16', collectgarbage("count"))
+	generic_microthink()
+	--[[DEV]]print('17', collectgarbage("count"))
 end
 
 function Captain_GetCaptainJobDomain()
 	return job_domain
+end
+
+function Captain_GetCaptain()
+	return THIS_BOT
 end

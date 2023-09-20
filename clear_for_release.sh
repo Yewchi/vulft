@@ -32,6 +32,8 @@ LANG_TBL_MD_PROVIDED=("$VULFT_GIVE_ALL_READMES" "README-Chinese.zho.md" "README-
 LANG_TBL_STAY_SAFE_HUMAN=(0 1 1)
 LANG_TBL_README_GIVEN_NAME=("README.md" "安装说明" "инструкции по установке") # 'README' might be weird in other languages
 LANG_TBL_LOCALE=("en" "zh" "ru")
+LANG_TBL_WORKSHOP_IMG_LANG=("" "中文" "Русский")
+LANG_TBL_WORKSHOP_IMG_FONT=("arialb.ttf" "malgunbd.ttf" "arialb.ttf")
 
 CURR_LOCALE=
 
@@ -123,6 +125,10 @@ ITERATE_PACKAGE_WORKSHOP_LANGUAGE() {
 	indexlang=0
 
 	echo
+	read -p "enter current Dota 2 vers: " reply
+	dota2_vers_string=$reply
+	echo
+
 	echo "- Removing any existing READMEs -"
 	ls $VULFT_RELEASE_DIR/README* -C1
 	sleep 1
@@ -142,6 +148,8 @@ ITERATE_PACKAGE_WORKSHOP_LANGUAGE() {
 		md_steam_conv="${LANG_TBL_STEAM_MD_TO_CONV[$indexlang]}"
 		main_readme_given_name="${LANG_TBL_README_GIVEN_NAME[$indexlang]}"
 		stay_safe_human="${LANG_TBL_STAY_SAFE_HUMAN[$indexlang]}"
+		workshop_img_lang_txt="${LANG_TBL_WORKSHOP_IMG_LANG[$indexlang]}"
+		workshop_img_lang_font="${LANG_TBL_WORKSHOP_IMG_FONT[$indexlang]}"
 
 		echo "- Packing for language: '$locale' -"
 		read -p "sed -i 's/^LOCALE = .*/LOCALE = $locale/g' $VULFT_RELEASE_DIR/lib_util/util.lua" reply_safe
@@ -178,20 +186,34 @@ ITERATE_PACKAGE_WORKSHOP_LANGUAGE() {
 			if ! [[ -f $md_steam_conv ]]; then
 				echo "Error - README not found!!!"
 			fi
-			read -p "cp $md_steam_conv ../bots/$main_readme_given_name ..." reply_safe
-			cp $md_steam_conv ../bots/$main_readme_given_name
+			read -p "PRINT_CONVERT_MD_TO_STEAM > $VULFT_STEAM_DESCRIPTION" reply_safe
+			this_convert_file=$md_steam_conv
+			PRINT_CONVERT_MD_TO_STEAM > $VULFT_STEAM_DESCRIPTION
+			cp $VULFT_STEAM_DESCRIPTION ../bots/$main_readme_given_name
 		else
 			read -p "cp $md_provided ../bots/$main_readme_given_name ..." reply_safe
 			cp $md_provided ../bots/$main_readme_given_name
+			read -p "PRINT_CONVERT_MD_TO_STEAM > $VULFT_STEAM_DESCRIPTION" reply_safe
+			this_convert_file=$md_steam_conv
+			PRINT_CONVERT_MD_TO_STEAM > $VULFT_STEAM_DESCRIPTION
 		fi
 
-		PROMPT_UPLOAD_STORE_LANGUAGE_RELEASE
-
-		this_convert_file=$md_steam_conv
-		PRINT_CONVERT_MD_TO_STEAM > $VULFT_STEAM_DESCRIPTION
 		echo
 		cat $VULFT_STEAM_DESCRIPTION
 		echo
+
+		echo "- Creating workshop upload image -"
+		read -p "ffmpeg -i vulft_wide_novers.jpg -vf \"drawtext=text='$dota2_vers_string':fontcolor=0x66BB22:fontsize=250:x=(w-text_w)/2:y=130:fontfile=/c/Windows/fonts/arialbi.ttf\" $VULFT_RELEASE_DIR/workshop.jpg" reply_safe
+		ffmpeg -i vulft_wide_novers.jpg -vf "drawtext=text='$dota2_vers_string':fontcolor=0x66BB22:fontsize=250:x=(w-text_w)/2:y=130:fontfile=/c/Windows/fonts/arialbi.ttf" $VULFT_RELEASE_DIR/workshop.jpg
+		echo "ws img lang text: $workshop_img_lang_txt"
+		if [[ -n $workshop_img_lang_txt ]]; then
+			read -p "ffmpeg -i $VULFT_RELEASE_DIR/workshop.jpg -vf \"drawtext=text='$workshop_img_lang_txt':fontcolor=0x66BB22:fontsize=175:x=(w-text_w)/8:y=880:fontfile=/c/Windows/fonts/$workshop_img_lang_font\" $VULFT_RELEASE_DIR/workshop2.jpg" reply_safe
+			ffmpeg -i $VULFT_RELEASE_DIR/workshop.jpg -vf "drawtext=text='$workshop_img_lang_txt':fontcolor=0x66BB22:fontsize=175:x=(w-text_w)/8:y=880:fontfile=/c/Windows/fonts/$workshop_img_lang_font" $VULFT_RELEASE_DIR/workshop2.jpg
+			rm $VULFT_RELEASE_DIR/workshop.jpg
+			mv $VULFT_RELEASE_DIR/workshop2.jpg $VULFT_RELEASE_DIR/workshop.jpg
+		fi
+
+		PROMPT_UPLOAD_STORE_LANGUAGE_RELEASE
 
 		read -p "Continue?: " reply
 		if [[ $reply =~ ^[Nn] ]]; then
@@ -200,7 +222,7 @@ ITERATE_PACKAGE_WORKSHOP_LANGUAGE() {
 		indexlang=$(echo "$indexlang + 1" | bc -l)
 		if [[ $indexlang -lt ${#LANG_TBL_LOCALE} ]]; then
 			read -p "rm $VULFT_RELEASE_DIR" reply_safe
-			rm $VULFT_RELEASE_DIR
+			rm -r $VULFT_RELEASE_DIR
 			read -p "cp -r $VULFT_WORKING_COPY_DIR $VULFT_RELEASE_DIR" reply_safe
 			cp -r $VULFT_WORKING_COPY_DIR $VULFT_RELEASE_DIR
 		fi
@@ -278,6 +300,27 @@ REMOVE_DEV_LUA_LINES() {
 		find $VULFT_RELEASE_DIR/ -type f -name "*.lua" | xargs sed -i -e 's/\-\-\[\[DEV\]\].*//g'
 		printf " --                 done                    --\n\n"
 	fi
+}
+
+FIND_AND_EDIT_DATES() {
+	files=$(find . -name "README*")
+	for f in $files; do
+		echo "$f"
+		dates=$(grep -o "[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9]" README.md)
+		n=0
+		for d in $dates; do
+			echo "$d"
+			m=0
+			for e in $dates; do
+				echo "$e"
+				if [[ $m -ne $n ]]; then
+					echo "$m is not $n"
+				fi
+				m=$(echo "$m+1" | bc -l)
+			done
+			n=$(echo "$n+1" | bc -l)
+		done
+	done
 }
 
 RUN() {
@@ -423,6 +466,7 @@ RUN() {
 		this_convert_file=$2
 		PRINT_CONVERT_MD_TO_STEAM
 	else
+		FIND_AND_EDIT_DATES
 		PRINT_USAGE
 		exit;
 	fi

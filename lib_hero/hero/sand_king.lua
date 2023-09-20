@@ -1,12 +1,12 @@
 local hero_data = {
 	"sand_king",
-	{1, 3, 2, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 2, 2, 5, 2, 4, 2, 1, 1, 1, 3, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_tango","item_ward_observer","item_branches","item_branches","item_ring_of_health","item_pers","item_crown","item_meteor_hammer","item_boots","item_magic_wand","item_blink","item_void_stone","item_wind_lace","item_staff_of_wizardry","item_cyclone","item_aghanims_shard","item_ogre_axe","item_belt_of_strength","item_sange","item_staff_of_wizardry","item_robe","item_kaya_and_sange","item_platemail",
+		"item_quelling_blade","item_tango","item_gauntlets","item_magic_stick","item_branches","item_branches","item_branches","item_boots","item_magic_wand","item_tranquil_boots","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_blink","item_headdress","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_ring_of_health","item_cloak","item_boots_of_bearing","item_pipe","item_gem","item_aghanims_shard",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.5s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Base Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
+		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.4s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100/+100 Base/Incremental Radius of Epicenter","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
 	}
 }
 --@EndAutomatedHeroData
@@ -66,6 +66,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
@@ -85,7 +86,7 @@ d = {
 		local nearbyEnemies, outerEnemies
 				= Set_GetEnemyHeroesInLocRadOuter(gsiPlayer.lastSeen.location, ABILITY_USE_RANGE, OUTER_RANGE, 6)
 		local nearbyAllies
-				= Set_GetAlliedHeroesInLocRadius(gsiPlayer, gsiPlayer.lastSeen.location,
+				= Set_GetAlliedHeroesInLocRad(gsiPlayer, gsiPlayer.lastSeen.location,
 					ABILITY_USE_RANGE, false
 				)
 		local fightHarassTarget = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)

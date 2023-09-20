@@ -1,12 +1,12 @@
 local hero_data = {
 	"slark",
-	{3, 2, 1, 1, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 7, 5, 4, 9, 12},
+	{3, 2, 1, 1, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_magic_stick","item_tango","item_branches","item_circlet","item_quelling_blade","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_magic_wand","item_power_treads","item_oblivion_staff","item_echo_sabre","item_blade_of_alacrity","item_diffusal_blade_2","item_aghanims_shard","item_blade_of_alacrity","item_staff_of_wizardry","item_ultimate_scepter","item_cloak","item_mage_slayer","item_ultimate_orb","item_ultimate_orb","item_skadi","item_gem","item_blitz_knuckles","item_claymore","item_bloodthorn","item_basher","item_ultimate_scepter_2","item_vanguard","item_abyssal_blade",
+		"item_quelling_blade","item_magic_stick","item_branches","item_tango","item_branches","item_branches","item_orb_of_venom","item_branches","item_branches","item_flask","item_tango","item_boots","item_magic_wand","item_gloves","item_boots_of_elves","item_power_treads","item_oblivion_staff","item_echo_sabre","item_blade_of_alacrity","item_robe","item_diffusal_blade_2","item_blade_of_alacrity","item_staff_of_wizardry","item_point_booster","item_ultimate_scepter","item_ultimate_orb","item_skadi","item_aghanims_shard","item_cornucopia","item_sphere","item_mage_slayer","item_blitz_knuckles","item_staff_of_wizardry","item_bloodthorn","item_ultimate_scepter_2","item_refresher",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Dark Pact","Pounce","Essence Shift","Shadow Dance","-0s Dark Pact Cooldown","+0.5s Pounce Leash","+70 Dark Pact Damage","+40 Shadow Dance Regen","+1 Agility gain/stolen per Essence Shift Stack","+75 Shadow Dance Attack Speed","+1.0s Shadow Dance Duration","+50s Essence Shift Duration",
+		"Dark Pact","Pounce","Essence Shift","Shadow Dance","-0s Dark Pact Cooldown","+0.5s Pounce Leash","+70 Dark Pact Damage","+40 Shadow Dance Regen","+1 Agility gain/stolen per Essence Shift Stack","+80 Shadow Dance Attack Speed","+1.0s Shadow Dance Duration","+50s Essence Shift Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -53,6 +53,7 @@ d = {
 	end,
 	["InformLevelUpSuccess"] = function(gsiPlayer)
 		AbilityLogic_UpdateHighUseMana(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam])
+		AbilityLogic_UpdatePlayerAbilitiesIndex(gsiPlayer, t_player_abilities[gsiPlayer.nOnTeam], abilities)
 	end,
 	["AbilityThink"] = function(gsiPlayer)  
 		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then
