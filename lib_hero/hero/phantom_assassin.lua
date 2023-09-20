@@ -2,7 +2,7 @@ local hero_data = {
 	"phantom_assassin",
 	{1, 2, 1, 3, 1, 4, 2, 2, 2, 5, 1, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_branches","item_circlet","item_slippers","item_cornucopia","item_broadsword","item_claymore","item_bfury","item_boots","item_boots_of_elves","item_power_treads","item_blight_stone","item_mithril_hammer","item_desolator","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_mithril_hammer","item_belt_of_strength","item_basher","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_ultimate_scepter_2","item_abyssal_blade","item_gem","item_moon_shard","item_aghanims_shard",
+		"item_branches","item_tango","item_magic_stick","item_circlet","item_quelling_blade","item_orb_of_venom","item_blight_stone","item_orb_of_venom","item_fluffy_hat","item_orb_of_corrosion","item_gloves","item_boots_of_elves","item_power_treads","item_cornucopia","item_claymore","item_broadsword","item_bfury","item_blight_stone","item_mithril_hammer","item_mithril_hammer","item_desolator","item_blade_of_alacrity","item_ultimate_scepter","item_aghanims_shard","item_ultimate_orb","item_sphere","item_blitz_knuckles","item_staff_of_wizardry","item_orchid","item_mage_slayer","item_bloodthorn","item_black_king_bar","item_ultimate_scepter_2","item_basher","item_abyssal_blade","item_moon_shard","item_rapier",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

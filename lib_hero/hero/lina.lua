@@ -1,12 +1,12 @@
 local hero_data = {
 	"lina",
-	{2, 3, 1, 2, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 7, 1, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_blight_stone","item_tango","item_branches","item_branches","item_branches","item_branches","item_ward_observer","item_boots","item_arcane_boots","item_staff_of_wizardry","item_magic_wand","item_fluffy_hat","item_force_staff","item_aether_lens","item_tranquil_boots","item_mystic_staff","item_ultimate_orb","item_void_stone","item_sheepstick","item_aghanims_shard","item_ultimate_scepter",
+		"item_ward_observer","item_faerie_fire","item_tango","item_branches","item_branches","item_branches","item_bottle","item_boots","item_arcane_boots","item_void_stone","item_aether_lens","item_wind_lace","item_staff_of_wizardry","item_robe","item_kaya","item_void_stone","item_staff_of_wizardry","item_cyclone","item_aghanims_shard","item_ghost","item_ethereal_blade","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_blink","item_wind_waker","item_mystic_staff","item_arcane_blink","item_sheepstick","item_refresher","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,2,3,}, {4,4,4,2,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
 	{
-		"Dragon Slave","Light Strike Array","Fiery Soul","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+250 Health","+130 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure",
+		"Dragon Slave","Light Strike Array","Fiery Soul","Laguna Blade","+20 Damage","-3.5s Dragon Slave Cooldown","+275 Health","+150 Light Strike Array Damage","+11% Spell Amplification","+1/+1% Fiery Soul Per Stack","-25s Laguna Blade Cooldown","Laguna Blade damage is Pure",
 	}
 }
 --@EndAutomatedHeroData

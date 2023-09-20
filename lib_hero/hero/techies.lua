@@ -1,10 +1,10 @@
 local hero_data = {
 	"techies",
-	{1, 3, 1, 3, 1, 4, 1, 2, 3, 3, 5, 4, 2, 2, 7, 2, 4, 10, 12},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 5, 2, 4, 2, 2, 7, 2, 4, 10},
 	{
-		"item_branches","item_branches","item_tango","item_faerie_fire","item_circlet","item_ward_observer","item_bottle","item_boots","item_null_talisman","item_magic_wand","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_magic_wand","item_arcane_boots","item_aether_lens","item_ogre_axe","item_black_king_bar","item_soul_booster","item_pers","item_energy_booster","item_soul_booster","item_octarine_core","item_sheepstick","item_cornucopia","item_cornucopia","item_refresher","item_blink","item_overwhelming_blink",
+		"item_branches","item_magic_stick","item_tango","item_circlet","item_branches","item_branches","item_ward_observer","item_magic_wand","item_boots","item_arcane_boots","item_wind_lace","item_cloak","item_glimmer_cape","item_wraith_band","item_headdress","item_chainmail","item_mekansm","item_belt_of_strength","item_robe","item_ancient_janggo","item_guardian_greaves","item_gem","item_lotus_orb",
 	},
-	{ {1,1,2,3,3,}, {4,4,4,5,5,}, 0.1 },
+	{ {3,3,3,5,5,}, {4,4,4,4,4,}, 0.1 },
 	{
 		"Sticky Bomb","Reactive Tazer","Blast Off!","Proximity Mines","+20% Magic Resistance","-3s Proximity Mines Cooldown","+200 Blast Off! Damage","+3 Mana Regen","+125 Sticky Bomb Latch/Explosion Radius","-15s Blast Off! Cooldown","+252 Damage","-0.8s Proximity Mines Activation Delay",
 	}

@@ -41,7 +41,7 @@ TEAM_COLORS = {
 
 ARC_DISABLE_FRAMES = 0
 
-DEBUG_SHORTNAME = "windrunner"
+DEBUG_SHORTNAME = "zuus"
 
 MAP_COORDS_TO_SCREEN_SCALE = 0.08
 MAP_COORDS_TO_MINIMAP_SCALE = 0.015
@@ -120,7 +120,7 @@ for i=1, #GetTeamPlayers(GetBot():GetTeam()) do
 end
 function VEBUG_PlayerFrameProgressBarStart(pnot, offsetx, offsety, force)
 	if not DEBUG and not force then return end
-	offsety = (offsety or 130) + (pnot-1)*10
+	offsety = (offsety or 75) + (pnot-1)*10
 	if TEAM_IS_RADIANT then
 		DebugDrawText((offsetx or 300), offsety, "[", 100, 255, 100)
 	else
@@ -129,7 +129,7 @@ function VEBUG_PlayerFrameProgressBarStart(pnot, offsetx, offsety, force)
 end
 function VEBUG_PlayerFrameProgressBar(pnot, progress, offsetx, offsety)
 	if not DEBUG and not force then return end
-	offsety = (offsety or 130) + (pnot-1)*10
+	offsety = (offsety or 75) + (pnot-1)*10
 	if TEAM_IS_RADIANT then
 		offsetx = (offsetx or 200) + 8 + progress
 		DebugDrawText(offsetx, offsety, progress < 100 and "|" or "|]", 100, 255, 100)
@@ -508,7 +508,7 @@ end
 function DEBUG_StartTestParty()
 	local p = GSI_GetTeamPlayers(TEAM)
 	for i=1,#p do
-		if i~=4 then
+		if true or i~=4 then
 			DOMINATE_SetDominateFunc(p[i], "DEBUG_TestParty", DEBUG_TestParty, true)
 		end
 	end
@@ -546,11 +546,11 @@ function DEBUG_TestParty(gsiPlayer)
 	local targReal = th and not targ.needsVisibleData and not th:IsNull() and th:IsAlive()
 	local targLoc = targReal and th:GetLocation()
 
-	local isatt = TEAM_IS_RADIANT  -- will be attacking
+	local isatt = not TEAM_IS_RADIANT  -- will be attacking
 
-	print("n", #nE)
+	print("n", #nE, gsiPlayer.nOnTeam, tpN)
 	
-	local bountyLoc = TEAM_FOUNTAIN or GetRuneSpawnLocation(RUNE_BOUNTY_2)
+	local bountyLoc = GetRuneSpawnLocation(RUNE_BOUNTY_2) or TEAM_FOUNTAIN
 	local thatSide = GetTeam() == gsiPlayer.nOnTeam % 2 + 2
 	if gsiPlayer.nOnTeam ~= tpN then
 		local meMoveTo = vadd(bountyLoc, vsca(
@@ -560,6 +560,7 @@ function DEBUG_TestParty(gsiPlayer)
 				600)
 			)
 		m(h, meMoveTo)
+		print(gsiPlayer.shortName, "might move to", meMoveTo)
 		local distDesig = vdist(pl, meMoveTo)
 		if distDesig > 1450 then
 			gsiPlayer.DBGGetBackTime = curr + 8
@@ -588,13 +589,14 @@ function DEBUG_TestParty(gsiPlayer)
 			end
 		end
 		if gsiPlayer.nOnTeam == 5 then
-			h:Action_PurchaseItem("item_ward_observer")
+			h:ActionImmediate_PurchaseItem("item_ward_observer")
 			local ob = h:GetItemInSlot(h:FindItemSlot("item_ward_observer"))
 			if ob then
 				local offset = RandomInt(-500, 500)
 				h:Action_UseAbilityOnLocation(ob, Vector(bountyLoc.x + offset, bountyLoc.y + offset))
 			end
 		end
+		m(h, meMoveTo)
 		return;
 	end
 	t.ttlStartsNow = targReal and Projectile_TimeToLandProjectile(gsiPlayer, targ)
@@ -605,7 +607,7 @@ function DEBUG_TestParty(gsiPlayer)
 		DEBUG_NicePrint("@%s, dist %s, facingToUnit-1to1 %s, animActivity %s",
 				targReal and string.sub(targ.shortName, 1, 5), targReal and vdist(pl, targ.hUnit:GetLocation()),
 				vufu(gsiPlayer, targ), h:GetAnimActivity())
-		dnp("targVec (%.3f, %.3f, %.3f), acquiredTarget %s", targReal and targLoc.x, targReal and targLoc.y, targReal and targLoc.z, Util_Printable(h:GetAttackTarget()))
+		dnp("targVec (%.3f, %.3f, %.3f), acquiredTarget %s", targReal and targLoc.x or -0, targReal and targLoc.y or -0, targReal and targLoc.z or -1, Util_Printable(h:GetAttackTarget()))
 		dnp("secPAttk %s, atkPnt %s, atkReleaseSec %s, animCycle %s",  h:GetSecondsPerAttack(), h:GetAttackPoint(),
 				h:GetSecondsPerAttack()*h:GetAttackPoint(), h:GetAnimCycle())
 		dnp("projectileSpeed %s, vulftAttackPoint %s, vulftReleaseSec %s", h:GetAttackProjectileSpeed(),
@@ -621,11 +623,14 @@ function DEBUG_TestParty(gsiPlayer)
 		dnp("gnacT %s; gnacHits %s; gnacNeeds %s", Util_Printable(gnacTarg), t.ttlLive, needs)
 	end
 
+	print(gsiPlayer.shortName, "TEST OF TEAM")
+
 
 	local moveTo = t.moveTo or vadd(bountyLoc, vsca(vec(sin((TEAM_IS_RADIANT and pi*1.5 or pi*0.5)), 0), 600))
 	if not isatt then
 		m(h, moveTo)
-		--Lhp_AttackNowForBestLastHit(gsiPlayer, gsiPlayer)
+		Lhp_AttackNowForBestLastHit(gsiPlayer, GSI_GetTeamPlayers(TEAM)[1])
+		DEBUG_LHP_DrawLhpTarget(GSI_GetTeamPlayers(TEAM)[1], GSI_GetTeamPlayers(TEAM)[1].hUnit)
 	elseif stage == 0 and isatt then
 		-- [[ STAGE 0 ]]
 		local delay = t.delay

@@ -1,12 +1,12 @@
 local hero_data = {
 	"omniknight",
-	{3, 2, 1, 1, 1, 4, 1, 2, 2, 2, 5, 4, 3, 3, 8, 3, 4, 9, 11},
+	{3, 1, 3, 1, 1, 3, 1, 2, 3, 6, 4, 4, 2, 2, 8, 2, 4, 10, 11},
 	{
-		"item_blood_grenade","item_enchanted_mango","item_tango","item_branches","item_branches","item_magic_stick","item_ward_sentry","item_ward_sentry","item_tango","item_boots","item_magic_wand","item_arcane_boots","item_energy_booster","item_void_stone","item_aether_lens","item_cloak","item_shadow_amulet","item_glimmer_cape","item_force_staff","item_point_booster","item_ultimate_scepter","item_mekansm","item_buckler","item_guardian_greaves",
+		"item_gauntlets","item_circlet","item_quelling_blade","item_tango","item_branches","item_branches","item_gauntlets","item_ring_of_health","item_soul_ring","item_boots","item_vanguard","item_magic_wand","item_blades_of_attack","item_phase_boots","item_aghanims_shard","item_helm_of_iron_will","item_crimson_guard","item_ogre_axe","item_robe","item_quarterstaff","item_echo_sabre","item_diadem","item_harpoon","item_ogre_axe","item_belt_of_strength","item_sange","item_heavens_halberd","item_basher",
 	},
-	{ {3,3,5,1,1,}, {4,4,4,5,5,}, 0.1 },
+	{ {3,3,3,3,1,}, {3,3,3,3,5,}, 0.1 },
 	{
-		"Purification","Heavenly Grace","Hammer of Purity","Guardian Angel","+4s Heavenly Grace Duration","+50 Base Damage","-2.0s Purification Cooldown","-30.0s Guardian Angel Cooldown","+3 Heavenly Grace Strength/HP Regen per Debuff","-6s Hammer of Purity Cooldown","+160 Purification Damage/Heal","+75% Hammer of Purity Damage",
+		"Purification","Repel","Hammer of Purity","Guardian Angel","-2.0s Purification Cooldown","+50 Base Damage","+3 Repel Strength/HP Regen per Debuff","-30.0s Guardian Angel Cooldown","+2s Repel Duration","-6s Hammer of Purity Cooldown","+160 Purification Damage/Heal","+75% Hammer of Purity Damage",
 	}
 }
 --@EndAutomatedHeroData

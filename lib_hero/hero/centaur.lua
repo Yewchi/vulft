@@ -1,12 +1,12 @@
 local hero_data = {
 	"centaur",
-	{1, 2, 3, 2, 1, 5, 2, 1, 1, 3, 7, 5, 2, 3, 9, 3, 5, 11, 6, 13},
+	{1, 2, 2, 1, 2, 5, 2, 3, 1, 1, 6, 5, 3, 3, 8, 3, 5, 11, 9, 13},
 	{
-		"item_tango","item_branches","item_quelling_blade","item_ring_of_protection","item_gauntlets","item_ring_of_health","item_crown","item_vanguard","item_ring_of_health","item_meteor_hammer","item_boots","item_magic_wand","item_wind_lace","item_tranquil_boots","item_blink","item_belt_of_strength","item_wind_lace","item_robe","item_ancient_janggo","item_boots_of_bearing","item_headdress","item_cloak","item_ring_of_health","item_pipe","item_crimson_guard","item_sheepstick","item_shivas_guard",
+		"item_quelling_blade","item_tango","item_ring_of_protection","item_branches","item_branches","item_ring_of_health","item_vanguard","item_boots","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_blink","item_cloak","item_ring_of_health","item_headdress","item_pipe","item_helm_of_iron_will","item_crimson_guard","item_reaver","item_heart","item_platemail","item_shivas_guard","item_overwhelming_blink","item_black_king_bar","item_buckler","item_platemail","item_hyperstone","item_assault",
 	},
-	{ {3,3,3,3,4,}, {3,3,3,3,4,}, 0.1 },
+	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Hoof Stomp","Double Edge","Retaliate","Hitch A Ride","Stampede","+5 Health Regen","+20 Movement Speed","+15 Strength","+40% Double Edge Strength Damage","+45 Retaliate Damage","-25s Stampede Cooldown","Gains Retaliate Aura","+0.8s Hoof Stomp Duration",
+		"Hoof Stomp","Double Edge","Retaliate","Work Horse","Stampede","+5 Health Regen","+20 Movement Speed","+15 Strength","+40% Double Edge Strength Damage","+45 Retaliate Damage","-25s Stampede Cooldown","Gains Retaliate Aura","+0.8s Hoof Stomp Duration",
 	}
 }
 --@EndAutomatedHeroData

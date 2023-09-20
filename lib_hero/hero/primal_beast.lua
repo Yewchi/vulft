@@ -1,12 +1,12 @@
 local hero_data = {
 	"primal_beast",
-	{1, 2, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 8, 3, 4, 9, 12},
+	{1, 2, 2, 3, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 8, 3, 4, 9, 12},
 	{
-		"item_branches","item_branches","item_tango","item_branches","item_branches","item_branches","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_chainmail","item_blades_of_attack","item_phase_boots","item_wind_lace","item_magic_wand","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_staff_of_wizardry","item_robe","item_kaya","item_sange","item_kaya_and_sange","item_platemail","item_shivas_guard",
+		"item_branches","item_tango","item_branches","item_gauntlets","item_gauntlets","item_quelling_blade","item_tango","item_magic_wand","item_boots","item_wind_lace","item_chainmail","item_phase_boots","item_broadsword","item_blade_mail","item_reaver","item_vitality_booster","item_ogre_axe","item_heart","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_platemail","item_mystic_staff","item_shivas_guard","item_gem","item_kaya_and_sange","item_cornucopia","item_cornucopia","item_refresher","item_ultimate_scepter_2",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,4,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Onslaught","Trample","Uproar","Pulverize","+90 Onslaught Damage","+20% Magic Resistance During Trample","-5s Trample Cooldown","Beast dispels himself when activating Uproar","+25% Trample Attack Multiplier","+4 Uproar Armor Per Stack","Cannot be slowed or rooted during Trample","+100%% Pulverize Duration",
+		"Onslaught","Trample","Uproar","Pulverize","+90 Onslaught Damage","+25% Magic Resistance During Trample","-5s Trample Cooldown","Beast dispels himself when activating Uproar","+20% Trample Attack Multiplier","+7 Uproar Armor Per Stack","Cannot be slowed or rooted during Trample","+100%% Pulverize Duration",
 	}
 }
 --@EndAutomatedHeroData

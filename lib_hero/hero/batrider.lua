@@ -1,10 +1,10 @@
 local hero_data = {
 	"batrider",
-	{1, 1, 2, 3, 1, 4, 1, 3, 3, 3, 2, 2, 2, 4, 7, 5, 4, 10, 12},
+	{2, 3, 3, 1, 3, 4, 3, 1, 1, 1, 2, 4, 2, 2, 8, 5, 4, 10, 12},
 	{
-		"item_blood_grenade","item_tango","item_branches","item_faerie_fire","item_branches","item_branches","item_ward_observer","item_bottle","item_boots","item_magic_wand","item_chainmail","item_robe","item_witch_blade","item_blink","item_aghanims_shard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_blade_of_alacrity","item_dragon_lance","item_hurricane_pike","item_energy_booster","item_aether_lens","item_cornucopia","item_refresher",
+		"item_tango","item_branches","item_circlet","item_circlet","item_branches","item_faerie_fire","item_bracer","item_boots","item_magic_wand","item_arcane_boots","item_vitality_booster","item_point_booster","item_void_stone","item_octarine_core","item_blink","item_void_stone","item_staff_of_wizardry","item_wind_lace","item_cyclone","item_black_king_bar","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_mystic_staff","item_wind_waker","item_cornucopia","item_cornucopia","item_refresher","item_ultimate_scepter_2",
 	},
-	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
+	{ {2,2,1,5,3,}, {2,2,5,4,3,}, 0.1 },
 	{
 		"Sticky Napalm","Flamebreak","Firefly","Flaming Lasso","+50 Sticky Napalm Radius","+50 Flamebreak Knockback Distance","+20 Movement Speed","-10s Flaming Lasso Cooldown","+4.5s Firefly Duration","+2 Flamebreak Charges","+10 Sticky Napalm Damage","Flamebreak applies +2 Sticky Napalm Stacks",
 	}

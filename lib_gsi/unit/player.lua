@@ -251,7 +251,10 @@ local function update_players_data()
 			thisPlayer.needsVisibleData = false
 			thisPlayer.typeIsNone = false
 			thisPlayer.isRanged = Unit_UnitIsRanged(thisPlayer)
-			thisPlayer.armor = thisEnemyPlayerHeroUnit:GetArmor()
+			local armor = thisEnemyPlayerHeroUnit:GetArmor()
+			thisPlayer.armor = armor
+			thisPlayer.physicalTaken = 1-0.06*armor/(1+0.06*armor)
+			thisPlayer.ehpArmor = 1 / thisPlayer.physicalTaken
 			thisPlayer.magicTaken = 1 - thisEnemyPlayerHeroUnit:GetMagicResist()
 			thisPlayer.evasion = thisEnemyPlayerHeroUnit:GetEvasion()
 
@@ -671,7 +674,10 @@ local function insert_player_data(thisPlayer, hUnit)
 	thisPlayer.maxHealth = hUnit:GetMaxHealth()
 	thisPlayer.lastSeenMana = hUnit:GetMana()
 	thisPlayer.maxMana = hUnit:GetMaxMana()
-	thisPlayer.armor = hUnit:GetArmor()
+	local armor = hUnit:GetArmor()
+	thisPlayer.armor = armor
+	thisPlayer.physicalTaken = 1-0.06*armor/(1+0.06*armor)
+	thisPlayer.ehpArmor = 1 / thisPlayer.physicalTaken
 	thisPlayer.magicTaken = 1 - hUnit:GetMagicResist()
 	thisPlayer.evasion = hUnit:GetEvasion()
 	thisPlayer.attackPointPercent = hUnit:GetAttackPoint() -- updated in projtl
@@ -806,7 +812,10 @@ function pUnit_LoadEnemyPlayer(playerId, nOnTeam)
 	thisEnemyPlayer.maxHealth = 600
 	thisEnemyPlayer.lastSeenMana = 300
 	thisEnemyPlayer.maxMana = 300
-	thisEnemyPlayer.armor = 2
+	local armor = 2
+	thisEnemyPlayer.armor = armor
+	thisEnemyPlayer.physicalTaken = 1-0.06*armor/(1+0.06*armor)
+	thisEnemyPlayer.ehpArmor = 1 / thisEnemyPlayer.physicalTaken
 	thisEnemyPlayer.magicTaken = 0.75
 	thisEnemyPlayer.evasion = 0
 	thisEnemyPlayer.attackRange = 200
@@ -888,6 +897,14 @@ function GSI_GetPlayerByName(name)
 end
 
 function GSI_GetTeamPlayers(team)
+	for i=1,#t_enemy_players do
+		if t_enemy_players[i].type ~= UNIT_TYPE_HERO then
+			Util_TablePrint(t_enemy_players)
+			Util_TablePrint(t_team_players)
+			print("YUP 2")
+			break;
+		end
+	end
 	if team == BOTH_TEAMS then
 		return t_team_players, t_enemy_players
 	end

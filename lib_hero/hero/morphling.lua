@@ -1,8 +1,8 @@
 local hero_data = {
 	"morphling",
-	{3, 2, 2, 1, 2, 1, 1, 1, 2, 6, 4, 3, 3, 3, 8, 4, 4, 9, 11},
+	{3, 2, 2, 1, 2, 1, 3, 1, 1, 6, 2, 4, 3, 3, 8, 4, 4, 9, 11},
 	{
-		"item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_branches","item_quelling_blade","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_lifesteal","item_falcon_blade","item_yasha","item_aghanims_shard","item_manta","item_skadi","item_gem","item_lesser_crit","item_silver_edge","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_black_king_bar","item_claymore","item_ultimate_scepter_2","item_satanic",
+		"item_tango","item_branches","item_branches","item_circlet","item_magic_stick","item_branches","item_boots_of_elves","item_magic_wand","item_boots","item_gloves","item_power_treads","item_fluffy_hat","item_falcon_blade","item_lifesteal","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_yasha","item_manta","item_ultimate_orb","item_skadi","item_claymore","item_satanic","item_lesser_crit","item_aghanims_shard","item_blink","item_demon_edge","item_greater_crit","item_blink","item_eagle","item_swift_blink",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

@@ -1,8 +1,8 @@
 local hero_data = {
 	"huskar",
-	{2, 3, 2, 1, 2, 3, 3, 3, 4, 2, 1, 4, 1, 1, 8, 6, 4, 9, 12},
+	{1, 3, 2, 2, 2, 4, 3, 3, 3, 2, 1, 1, 1, 4, 7, 5, 4, 9, 11},
 	{
-		"item_ward_observer","item_bracer","item_boots","item_helm_of_iron_will","item_gloves","item_blades_of_attack","item_armlet","item_belt_of_strength","item_ogre_axe","item_sange","item_heavens_halberd","item_lifesteal","item_claymore","item_claymore","item_satanic","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_reaver","item_blink","item_overwhelming_blink","item_ultimate_scepter_2","item_black_king_bar","item_assault","item_silver_edge",
+		"item_gauntlets","item_branches","item_gauntlets","item_faerie_fire","item_ward_observer","item_gauntlets","item_boots","item_gloves","item_blades_of_attack","item_helm_of_iron_will","item_armlet","item_ogre_axe","item_sange","item_heavens_halberd","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_platemail","item_hyperstone","item_buckler","item_assault","item_lifesteal","item_claymore","item_satanic","item_ultimate_scepter_2",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

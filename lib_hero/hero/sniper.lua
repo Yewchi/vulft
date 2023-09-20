@@ -1,10 +1,10 @@
 local hero_data = {
 	"sniper",
-	{2, 3, 2, 3, 2, 3, 1, 1, 3, 6, 2, 4, 1, 1, 7, 4, 4, 9},
+	{2, 3, 2, 3, 2, 1, 2, 3, 3, 6, 4, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_slippers","item_slippers","item_tango","item_branches","item_circlet","item_wraith_band","item_wraith_band","item_wraith_band","item_boots","item_boots_of_elves","item_power_treads","item_mithril_hammer","item_javelin","item_maelstrom","item_blade_of_alacrity","item_dragon_lance","item_mask_of_madness","item_hurricane_pike","item_aghanims_shard","item_butterfly","item_claymore","item_satanic","item_lesser_crit","item_greater_crit","item_mjollnir","item_moon_shard",
+		"item_ward_observer","item_circlet","item_quelling_blade","item_branches","item_magic_stick","item_faerie_fire","item_wraith_band","item_magic_wand","item_boots_of_elves","item_gloves","item_boots","item_power_treads","item_javelin","item_maelstrom","item_dragon_lance","item_ogre_axe","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_shadow_amulet","item_silver_edge","item_aghanims_shard","item_eagle","item_talisman_of_evasion","item_butterfly","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_sphere","item_gem","item_satanic",
 	},
-	{ {2,2,2,3,1,}, {2,2,2,4,1,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
 		"Shrapnel","Headshot","Take Aim","Assassinate","+1.0s Take Aim Duration","+30 Headshot Damage","+30 Attack Speed","+-15% Shrapnel Movement Slow","+25 Headshot Knockback Distance","+25 Shrapnel DPS","+100 Attack Range","+6 Shrapnel Charges",
 	}

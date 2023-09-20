@@ -1,12 +1,12 @@
 local hero_data = {
 	"keeper_of_the_light",
-	{1, 3, 1, 3, 1, 4, 1, 3, 3, 6, 2, 4, 2, 2, 7, 2, 4, 9, 12},
+	{1, 3, 1, 3, 1, 4, 1, 3, 3, 2, 6, 4, 2, 2, 7, 2, 4, 9, 12},
 	{
-		"item_faerie_fire","item_tango","item_branches","item_ring_of_protection","item_circlet","item_branches","item_urn_of_shadows","item_boots","item_vitality_booster","item_spirit_vessel","item_tranquil_boots","item_cloak","item_ring_of_health","item_headdress","item_pipe","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_ultimate_orb","item_mystic_staff","item_sheepstick",
+		"item_circlet","item_tango","item_quelling_blade","item_faerie_fire","item_branches","item_ward_observer","item_boots","item_urn_of_shadows","item_crown","item_fluffy_hat","item_spirit_vessel","item_staff_of_wizardry","item_robe","item_kaya","item_ghost","item_ethereal_blade","item_ultimate_orb","item_mystic_staff","item_sheepstick","item_ogre_axe","item_black_king_bar","item_diadem","item_voodoo_mask","item_dagon_5","item_dagon_3L","item_dagon_5L","item_octarine_core","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter_2",
 	},
-	{ {2,2,3,5,3,}, {2,2,3,4,4,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,4,}, 0.1 },
 	{
-		"Illuminate","Blinding Light","Chakra Magic","Spirit Form","+30% Blinding Light Miss","-2s Illuminate Cooldown","-4.0s Chakra Magic Cooldown","2 Solar Bind Charges","+15.0s Spirit Form Duration","Chakra Magic Dispels","+1.2s Blinding Light Stun","+180 Illuminate Damage",
+		"Illuminate","Blinding Light","Chakra Magic","Spirit Form","+30% Blinding Light Miss","-2s Illuminate Cooldown","-3s Chakra Magic Cooldown","2 Solar Bind Charges","+15.0s Spirit Form Duration","Chakra Magic Dispels","+1.2s Blinding Light Stun","+180 Illuminate Damage",
 	}
 }
 --@EndAutomatedHeroData

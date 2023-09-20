@@ -1,12 +1,12 @@
 local hero_data = {
 	"viper",
-	{1, 3, 1, 3, 1, 4, 1, 2, 2, 5, 3, 4, 3, 2, 8, 2, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 2, 5, 4, 2, 2, 7, 3, 4, 10, 11},
 	{
-		"item_circlet","item_slippers","item_branches","item_tango","item_enchanted_mango","item_enchanted_mango","item_magic_stick","item_circlet","item_branches","item_branches","item_branches","item_wraith_band","item_boots","item_boots_of_elves","item_gloves","item_wind_lace","item_magic_wand","item_power_treads","item_blade_of_alacrity","item_dragon_lance","item_staff_of_wizardry","item_hurricane_pike","item_yasha","item_manta","item_blade_of_alacrity","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_buckler","item_platemail","item_hyperstone","item_aghanims_shard","item_assault",
+		"item_branches","item_branches","item_circlet","item_magic_stick","item_slippers","item_wraith_band","item_wraith_band","item_magic_wand","item_boots","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_staff_of_wizardry","item_hurricane_pike","item_blade_of_alacrity","item_yasha","item_manta","item_aghanims_shard","item_ultimate_orb","item_ultimate_orb","item_skadi","item_quarterstaff","item_butterfly","item_blade_of_alacrity","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter",
 	},
-	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,3,3,}, 0.1 },
 	{
-		"Poison Attack","Nethertoxin","Corrosive Skin","Viper Strike","+5% Poison Attack Magic Resistance Reduction","+18 Corrosive Skin Damage Per Second","+40 Nethertoxin Min/Max Damage","+15% Corrosive Skin Magic Resistance","+80 Viper Strike DPS","+25%% Poison Attack slow/damage","-11.0s Nethertoxin Cooldown","-50%% Viper Strike manacost/cooldown",
+		"Poison Attack","Nethertoxin","Corrosive Skin","Viper Strike","+5% Poison Attack Magic Resistance Reduction","+18 Corrosive Skin Damage Per Second","+40 Nethertoxin Min/Max Damage","+15% Corrosive Skin Magic Resistance","+80 Viper Strike DPS","+25%% Poison Attack slow/damage","Become Universal","-50%% Viper Strike manacost/cooldown",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,12 +1,12 @@
 local hero_data = {
 	"windrunner",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 12},
+	{2, 3, 2, 3, 2, 4, 2, 1, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 12},
 	{
-		"item_branches","item_tango","item_faerie_fire","item_quelling_blade","item_ward_observer","item_bottle","item_magic_wand","item_javelin","item_boots","item_power_treads","item_mithril_hammer","item_maelstrom","item_staff_of_wizardry","item_crown","item_crown","item_gungir","item_mithril_hammer","item_belt_of_strength","item_basher","item_blink","item_staff_of_wizardry","item_cyclone","item_demon_edge","item_lesser_crit","item_greater_crit","item_vanguard","item_abyssal_blade","item_aghanims_shard",
+		"item_tango","item_branches","item_branches","item_circlet","item_circlet","item_branches","item_bracer","item_bracer","item_gloves","item_boots","item_magic_wand","item_power_treads","item_javelin","item_maelstrom","item_blade_of_alacrity","item_yasha","item_ultimate_orb","item_manta","item_point_booster","item_ultimate_scepter","item_dragon_lance","item_cornucopia","item_ultimate_orb","item_sphere","item_lesser_crit","item_ultimate_scepter_2","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_greater_crit",
 	},
-	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,2,3,}, 0.1 },
 	{
-		"Shackleshot","Powershot","Windrun","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-3s Windrun Cooldown","-15% Powershot Damage Reduction","+0.65s Shackleshot Duration","-16% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 20s.",
+		"Shackleshot","Powershot","Windrun","Focus Fire","+225 Windrun Radius","-2.0s Shackleshot Cooldown","-2.5s Windrun Cooldown","-15% Powershot Damage Reduction","+0.75s Shackleshot Duration","-12% Focus Fire Damage Reduction","Windrun Cannot Be Dispelled","Focus Fire Kills Advance Cooldown by 18s",
 	}
 }
 --@EndAutomatedHeroData
@@ -210,9 +210,7 @@ d = {
 
 		-- falsify attack range in focusfire
 		
-		local allEnemies = {}
-		Util_TableCopyArray(allEnemies, nearbyEnemies)
-		Set_NumericalIndexUnion(allEnemies, outerEnemies)
+		local allEnemies = Set_NumericalIndexUnion(nil, nearbyEnemies, outerEnemies)
 
 		
 
@@ -264,12 +262,14 @@ d = {
 				and castSucceedsUnitsNearby[1]
 				and gsiPlayer.lastSeenMana > shackleShot:GetManaCost() then
 			
-			bestScoreShackle, bestTarget, bestHitLoc, bestHitCount = SCORE_CONE_HEROES(
-					gsiPlayer, castSucceedsUnitsNearby, shackleShot, SHACKLE_CONE_RANGE,
-					SHACKLE_CONE_ANGLE, fht, true, 1.3,
-					1.0, 0.2, 1.0, 0.01,
-					shackleShot:GetCastPoint()+0.03, SHACKLE_TRAVEL_SPEED, -0, false, 1
-				)
+			if castSucceedsUnitsNearby[2] then
+				bestScoreShackle, bestTarget, bestHitLoc, bestHitCount = SCORE_CONE_HEROES(
+						gsiPlayer, castSucceedsUnitsNearby, shackleShot, SHACKLE_CONE_RANGE,
+						SHACKLE_CONE_ANGLE, fht, true, 1.3,
+						1.0, 0.2, 1.0, 0.01,
+						shackleShot:GetCastPoint()+0.03, SHACKLE_TRAVEL_SPEED, -0, false, 1
+					)
+			end
 			if bestTarget and bestHitCount >= 2 then
 				local abscondScore = Xeta_AbscondCompareNamedScore("windrunnerShackleShotMultiple", bestScoreShackle)
 				local heat, heatPerc = GET_HEAT(nearbyEnemies) 

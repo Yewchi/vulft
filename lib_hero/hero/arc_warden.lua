@@ -1,12 +1,12 @@
 local hero_data = {
 	"arc_warden",
-	{3, 1, 1, 3, 1, 4, 1, 3, 2, 5, 2, 4, 3, 2, 8, 2, 4, 10, 11},
+	{3, 1, 1, 3, 1, 4, 1, 3, 3, 6, 2, 4, 2, 2, 8, 2, 4, 10, 12},
 	{
-		"item_branches","item_branches","item_branches","item_circlet","item_faerie_fire","item_circlet","item_ward_observer","item_bottle","item_wraith_band","item_gloves","item_wraith_band","item_hand_of_midas","item_boots","item_boots_of_elves","item_power_treads","item_javelin","item_fluffy_hat","item_maelstrom","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_blitz_knuckles","item_invis_sword","item_silver_edge","item_aghanims_shard","item_ogre_axe","item_mjollnir","item_black_king_bar","item_satanic",
+		"item_circlet","item_circlet","item_slippers","item_slippers","item_branches","item_branches","item_tango","item_branches","item_wraith_band","item_gloves","item_hand_of_midas","item_boots","item_mithril_hammer","item_maelstrom","item_vitality_booster","item_rod_of_atos","item_gungir","item_blitz_knuckles","item_shadow_amulet","item_invis_sword","item_broadsword","item_silver_edge","item_dragon_lance","item_force_staff","item_hurricane_pike","item_hyperstone","item_moon_shard","item_sheepstick","item_aghanims_shard","item_blink","item_eagle","item_swift_blink","item_octarine_core","item_black_king_bar","item_desolator","item_overwhelming_blink",
 	},
-	{ {2,2,2,1,1,}, {2,2,2,1,1,}, 0.1 },
+	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+200 Health","+2s Flux Duration","+40 Magnetic Field Attack Speed/Bonus Magic Damage","+35%% Spark Wraith Damage","-9s Magnetic Field Cooldown","No Damage Penalty Distance For Tempest Double","+12s Tempest Double Duration",
+		"Flux","Magnetic Field","Spark Wraith","Tempest Double","+175 Flux Cast Range","+250 Health","+1.5s Flux Duration","+25 Magnetic Field Attack Speed/Bonus Damage","+35%% Spark Wraith Damage","-8s Magnetic Field Cooldown","No Damage Penalty Distance For Tempest Double","+12s Tempest Double Duration",
 	}
 }
 --@EndAutomatedHeroData
@@ -275,7 +275,7 @@ d = {
 								)
 							)
 						) then
-				USE_ABILITY(gsiPlayer, tempestDouble, nil, 400)
+				USE_ABILITY(gsiPlayer, tempestDouble, gsiPlayer.lastSeen.location, 400)
 				return
 			end
 			if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION or tempestAggressive then

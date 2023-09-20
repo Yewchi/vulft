@@ -1,12 +1,12 @@
 local hero_data = {
 	"dragon_knight",
-	{2, 3, 3, 1, 3, 4, 1, 1, 1, 5, 3, 4, 2, 2, 8, 2, 4, 9, 11},
+	{1, 3, 3, 1, 3, 4, 1, 1, 2, 5, 2, 4, 2, 2, 8, 3, 4, 9, 11},
 	{
-		"item_tango","item_branches","item_quelling_blade","item_gauntlets","item_faerie_fire","item_gauntlets","item_gloves","item_belt_of_strength","item_power_treads","item_magic_wand","item_soul_ring","item_gloves","item_blink","item_hand_of_midas","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_manta","item_buckler","item_assault","item_helm_of_iron_will","item_nullifier","item_reaver",
+		"item_quelling_blade","item_tango","item_branches","item_gauntlets","item_gauntlets","item_ward_observer","item_bracer","item_bracer","item_boots","item_gloves","item_belt_of_strength","item_power_treads","item_fluffy_hat","item_falcon_blade","item_blink","item_gloves","item_hand_of_midas","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_yasha","item_manta","item_hyperstone","item_platemail","item_assault","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_black_king_bar","item_reaver","item_overwhelming_blink",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,4,3,}, 0.1 },
 	{
-		"Breathe Fire","Dragon Tail","Dragon Blood","Elder Dragon Form","+15 Damage","-30% Breathe Fire Damage Reduction","+0.4s Dragon Tail Stun","+400 Health","+150 Elder Dragon Form Attack Range","+75% Breathe Fire Damage/Cast Range in Dragon Form","+12 Dragon Blood HP Regen/Armor","+400 AoE Dragon Tail During Elder Dragon Form",
+		"Breathe Fire","Dragon Tail","Dragon Blood","Elder Dragon Form","+15 Damage","-30% Breathe Fire Damage Reduction","+0.4s Dragon Tail Stun","+400 Health","+150 Elder Dragon Form Attack Range","+85% Breathe Fire Damage/Cast Range in Dragon Form","+12 Dragon Blood HP Regen/Armor","+400 AoE Dragon Tail During Elder Dragon Form",
 	}
 }
 --@EndAutomatedHeroData

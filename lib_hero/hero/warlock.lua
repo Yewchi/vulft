@@ -1,10 +1,10 @@
 local hero_data = {
 	"warlock",
-	{2, 3, 3, 2, 3, 4, 3, 2, 1, 6, 1, 4, 1, 1, 7, 2, 4, 10, 11},
+	{1, 3, 1, 3, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 7, 2, 4, 9, 11},
 	{
-		"item_clarity","item_branches","item_enchanted_mango","item_ward_sentry","item_tango","item_branches","item_faerie_fire","item_magic_wand","item_ring_of_basilius","item_boots","item_arcane_boots","item_void_stone","item_aether_lens","item_wind_lace","item_cloak","item_tranquil_boots","item_glimmer_cape","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_aghanims_shard","item_gem","item_boots_of_bearing",
+		"item_ward_sentry","item_ward_sentry","item_faerie_fire","item_blood_grenade","item_branches","item_branches","item_branches","item_tango","item_tango","item_magic_wand","item_boots","item_medallion_of_courage","item_wind_lace","item_solar_crest","item_ancient_janggo","item_aghanims_shard","item_tranquil_boots","item_boots_of_bearing","item_fluffy_hat","item_force_staff","item_gem","item_cornucopia","item_refresher","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter",
 	},
-	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Fatal Bonds","Shadow Word","Upheaval","Chaotic Offering","+4% Fatal Bonds Damage","+75 Upheaval Radius","+12 Upheaval Attack Speed per second on Allies","+18 Shadow Word Heal/Damage","Summons a Golem on death","450 Shadow Word AoE","+20 Chaotic Offering Golems Armor","80% Magic Resistance for Chaotic Offering Golems",
 	}

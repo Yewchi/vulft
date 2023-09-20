@@ -1,3 +1,35 @@
+v0.9-230919 // Dota 2 7.34c -- 19th September meta
+
+> Danger analytics
+	-| Fixed issues with danger analytics not considering team and enemy towers proximity accurately
+	-| Team and enemy tower proximity both multiply danger with range [0.91, 1.2]
+
+> Performance improved
+	-| More robust memory management in a major codebase module that everything in the script depends on.
+	-| Lowered memory use, activity and lowered CPU.
+	-| Also made some minor performance improvements in many other modules.
+	-| Testing indicates that the bot script runs with a higher and much more consistent framerate.
+	-| A low guess is 3 FPS increase, high guess 10, but if it was fluctuating wildly from 60 to 75 it will now fluctuate from ~70 to ~80
+
+> Last hitting
+	-| Removed a bug that might cause a (caught) problem with last hitting data, where attacks are repeatedly created.
+	-| Also reduces unneeded memory and unneeded CPU time.
+
+> Grimstroke
+	-| More likely to use phantom when feared
+
+> Bristleback
+	-| Fixed a bug where bristle thought he was invincible for fight considerations for a few minutes after trying to attack a very low health enemy, rampaging all over the map versus anyone he could find.
+
+> Minor tweaks and fixes.
+
+>> Known Issues
+	-| Standing too close for last hitting as ranged, or too long for melee.
+	-| Attacking too early for last hits, something has fundamentally changed, at least I think, it requires very difficult debugging, I was sure it was working in a release candidate from 3 months ago.
+	-| Towers affecting last hitting may or may not be wrong, due to an untested incorrect equation fixed.
+
+~~~~
+
 v0.8a // 2023-04-29 (25th April meta) -- Dota 2 7.33
 > Positioning
 	-| Fixed a positioning bug that made units stand strangely when near to attack times of creeps

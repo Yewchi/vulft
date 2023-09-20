@@ -1,12 +1,12 @@
 local hero_data = {
 	"lich",
-	{1, 2, 1, 3, 1, 4, 1, 2, 3, 6, 3, 4, 3, 2, 7, 2, 4, 10, 11},
+	{1, 2, 1, 2, 1, 4, 2, 2, 3, 5, 3, 4, 3, 3, 7, 1, 4, 10, 11},
 	{
-		"item_tango","item_blood_grenade","item_enchanted_mango","item_magic_stick","item_smoke_of_deceit","item_ward_observer","item_wind_lace","item_boots","item_fluffy_hat","item_tranquil_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_energy_booster","item_guardian_greaves","item_cloak","item_headdress","item_ring_of_health","item_pipe","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity",
+		"item_tango","item_enchanted_mango","item_blood_grenade","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_magic_wand","item_wind_lace","item_ring_of_basilius","item_boots","item_tranquil_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_cloak","item_shadow_amulet","item_glimmer_cape","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_gem","item_gem","item_aether_lens","item_ancient_janggo","item_boots_of_bearing","item_gem","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
-		"Frost Blast","Frost Shield","Sinister Gaze","Chain Frost","+10% Frost Shield Damage Reduction","+150 Frost Blast Radius and Damage","+0.4s Sinister Gaze Duration","-3s Frost Blast Cooldown","+100 Chain Frost Damage","+4s Frost Shield Duration","Frost Shield Provides +50 HP Regen","Chain Frost Unlimited Bounces",
+		"Frost Blast","Frost Shield","Sinister Gaze","Chain Frost","+10% Frost Shield Damage Reduction","+150 Frost Blast Radius and Damage","+0.4s Sinister Gaze Duration","-3s Frost Blast Cooldown","Chain Frost on Death","+4s Frost Shield Duration","Frost Shield Provides +50 HP Regen","Chain Frost Unlimited Bounces",
 	}
 }
 --@EndAutomatedHeroData

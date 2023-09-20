@@ -1,12 +1,12 @@
 local hero_data = {
 	"ancient_apparition",
-	{3, 1, 2, 1, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 8, 3, 4, 9},
+	{3, 2, 3, 2, 2, 4, 2, 1, 3, 5, 1, 4, 1, 3, 7, 1, 4, 9, 11},
 	{
-		"item_blood_grenade","item_tango","item_tango","item_branches","item_branches","item_branches","item_ward_observer","item_flask","item_ring_of_basilius","item_magic_wand","item_crown","item_veil_of_discord","item_boots","item_shadow_amulet","item_cloak","item_glimmer_cape","item_force_staff","item_tranquil_boots","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_gem","item_boots_of_bearing","item_solar_crest",
+		"item_tango","item_branches","item_magic_stick","item_blood_grenade","item_enchanted_mango","item_ward_observer","item_boots","item_tranquil_boots","item_wind_lace","item_magic_wand","item_shadow_amulet","item_glimmer_cape","item_ghost","item_gem","item_aether_lens","item_gem","item_staff_of_wizardry","item_gem","item_kaya","item_gem","item_ethereal_blade","item_gem","item_gem","item_ultimate_orb","item_cornucopia","item_sphere","item_gem",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {3,3,3,1,1,}, {4,4,4,5,5,}, 0.1 },
 	{
-		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+300 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+300 Cold Feet Breaking distance","-5% Ice Vortex Slow/Increased Magic Damage","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
+		"Cold Feet","Ice Vortex","Chilling Touch","Ice Blast","+300 Chilling Touch Attack Range","+40 Cold Feet Damage Per Second","-2s Ice Vortex Cooldown","+300 Cold Feet Breaking distance","+4s Ice Vortex Duration","+80 Chilling Touch Damage","+450 AoE Cold Feet","+4% Ice Blast Kill Threshold",
 	}
 }
 --@EndAutomatedHeroData
@@ -88,7 +88,7 @@ local function ice_blast_release_limit_loss_of_range(gsiPlayer, hAbility)
 				ice_blast_parameters[3],
 				Vector_ScalarMultiply2D(ice_blast_parameters[4], currTracerDist)
 			)
-		DebugDrawCircle(currTracerLoc, 150, 255,0,0)
+		
 --		if max(abs(currTraceLoc.x), abs(currTraceLoc.y)) > abs(GetWorldBounds()[1]*0.75) then -- tracer out of bounds?
 --			ice_blast_parameters[1] = 0
 --			if AbilityLogic_AbilityCanBeCast(gsiPlayer, hAbility) then 
@@ -241,6 +241,7 @@ d = {
 
 		remove_ice_vortex(gsiPlayer)
 
+		local playerHealthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 		local abilityLocked, _, abilityQueued = UseAbility_IsPlayerLocked(gsiPlayer) 
 		local currTask = currentTask(gsiPlayer)
 		local currActivityType = Blueprint_GetCurrentTaskActivityType(gsiPlayer)
@@ -363,7 +364,6 @@ d = {
 				end
 			end
 
-			local playerHealthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
 			local fightingHere, fightingElsewhere = Set_GetEnemyHeroesInPlayerRadiusAndOuter(gsiPlayer.lastSeen.location, 2500, 22000)
 			if AbilityLogic_AbilityCanBeCast(gsiPlayer, iceBlast) and gsiPlayer.lastSeenMana - iceBlast:GetManaCost() > 0 then
 				if #fightingHere > 0 or #fightingElsewhere > 0 then 
@@ -394,6 +394,20 @@ d = {
 						end
 					end
 				end
+			end
+			if fightHarassTarget and AbilityLogic_AbilityCanBeCast(gsiPlayer, coldFeet)
+					and not fightHarassTarget.typeIsNone
+					and currActivityType >= ACTIVITY_TYPE.FEAR
+					and FightClimate_AnyIntentToHarm(gsiPlayer, nearbyEnemies)
+					and playerHealthPercent < 0.3
+							- 0.2*Analytics_GetTheoreticalDangerAmount(gsiPlayer)
+					and AbilityLogic_HighUseAllowOffensive(gsiPlayer, coldFeet, 
+							HIGH_USE_C_F_REMAINING_MANA,
+							playerHealthPercent)
+					and Vector_DistUnitToUnit(fightHarassTarget, gsiPlayer)
+							< coldFeet:GetCastRange()*1.1 then
+				USE_ABILITY(gsiPlayer, coldFeet, fightHarassTarget, 400, nil)
+				return;
 			end
 		--	if chillingTouchOnCd then return end 
 		--	if (playerManaPercent > 0.95 and currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION) or AbilityLogic_HighUseAllowOffensive(gsiPlayer, chillingTouch, HIGH_USE_C_T_REMAINING_MANA, 1.0) then -- consider using when dying

@@ -56,12 +56,14 @@ local number_str = "number"
 -- RULE OF USE Do not give me a hAbility that is already on the queue. It must be in a combo if there are to be multiple of the same ability used in a sequence.
 
 ---- On chosing a list: array benefit was only for score-based removal
+-------------- free_queue_node()
 local function free_queue_node(node)
 	node[QUEUED_ABILITY_I__PREV_NODE] = false		 -- 5
 	node[QUEUED_ABILITY_I__NEXT_NODE] = false		 -- 6 ... 
 	table.insert(queue_node_recyclable, node)
 end
 
+-------------- alloc_or_recycle_queue_node()
 local function alloc_or_recycle_queue_node(hAbility, target, score, comboIdentifier, actionFunc, elapseExpiry)
 	local new = table.remove(queue_node_recyclable) or {}
 	new[1] = hAbility							 -- 1
@@ -75,6 +77,7 @@ local function alloc_or_recycle_queue_node(hAbility, target, score, comboIdentif
 	return new
 end
 
+-------------- take_and_sew_queue_node()
 local function take_and_sew_queue_node(pnot, node)
 	local prevNode = node[QUEUED_ABILITY_I__PREV_NODE]
 	local nextNode = node[QUEUED_ABILITY_I__NEXT_NODE]
@@ -92,6 +95,7 @@ local function take_and_sew_queue_node(pnot, node)
 end
 
 local registered_callbacks = {}
+-------- UseAbility_RegisterCallbackFunc()
 function UseAbility_RegisterCallbackFunc(gsiPlayer, ability, funcToCall)
 	local pnot = gsiPlayer.nOnTeam
 	local abilityName = ability:GetName()
@@ -105,6 +109,7 @@ function UseAbility_RegisterCallbackFunc(gsiPlayer, ability, funcToCall)
 	table.insert(thisPlayerCallbacks[abilityName], funcToCall)
 end
 
+-------- UseAbility_IndicateCastCompleted()
 function UseAbility_IndicateCastCompleted(castInfo) -- Installed @ AbilityThink_Initialize()
 	if VERBOSE then print("DOUBLE CALLBACKS?", castInfo.ability:GetName()) end
 	local gsiPlayer = GSI_GetPlayerFromPlayerID(castInfo.player_id) if gsiPlayer.team ~= TEAM then return end 
@@ -163,6 +168,7 @@ function UseAbility_SetComboScore(gsiPlayer, comboIdentifier)
 	end
 end
 
+-------- UseAbility_PopComboQueue()
 function UseAbility_PopComboQueue(gsiPlayer, comboIdentifier)
 	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	local i = 1
@@ -187,6 +193,7 @@ end
 	-- end
 -- end
 
+-------- UseAbility_ClearQueuedComboAbilities()
 function UseAbility_ClearQueuedComboAbilities(gsiPlayer, comboIdentifier)
 	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	local pnot = gsiPlayer.nOnTeam
@@ -202,6 +209,7 @@ function UseAbility_ClearQueuedComboAbilities(gsiPlayer, comboIdentifier)
 	if VERBOSE then VEBUG_print(string.format("use_ability: Cleared %s combo with comboId:'%s'.", gsiPlayer.shortName, comboIdentifier)) end
 end
 
+-------- UseAbility_ClearQueuedAbilities()
 function UseAbility_ClearQueuedAbilities(gsiPlayer, scoreBreaking)
 	local currNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	local pnot = gsiPlayer.nOnTeam
@@ -229,6 +237,7 @@ function UseAbility_ClearQueuedAbilities(gsiPlayer, scoreBreaking)
 end
 
 local squelch_not_off_cd = 5
+-------- UseAbility_RegisterAbilityUseAndLockToScore()
 function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, target, scoreToBreak, comboIdentifier, doNotCastPointSkip, skipQueue, elapseExpiry, forceAbilityFunc)
 	if gsiPlayer.level-gsiPlayer.vibe.greedRating*10 < 5 then
 		local attackTarget = gsiPlayer.hUnit:GetAttackTarget()
@@ -300,6 +309,7 @@ function UseAbility_RegisterAbilityUseAndLockToScore(gsiPlayer, abilityOrFunc, t
 end
 
 -- return: isLocked, isHAbility, abilityOrFunc
+-------- UseAbility_IsPlayerLocked()
 function UseAbility_IsPlayerLocked(gsiPlayer)
 	local nextAbilityNode = t_abilities_queued[gsiPlayer.nOnTeam]
 	if nextAbilityNode then
@@ -311,6 +321,16 @@ function UseAbility_IsPlayerLocked(gsiPlayer)
 	end
 end
 
+-------- UseAbility_GetTarget()
+function UseAbility_GetTarget(gsiPlayer)
+	local nextAbilityNode = t_abilities_queued[gsiPlayer.nOnTeam]
+	if nextAbilityNode then
+		return nextAbilityNode[QUEUED_ABILITY_I__TARGET];
+	end
+	return nil;
+end
+
+-------- UseAbility_RefreshQueueTop()
 function UseAbility_RefreshQueueTop(gsiPlayer) 
 	-- Call this inside of combo functions that may run over 1s long. (Expiry gives castpoint + channel time + 1s). Combo function include it's own fallback cancellation logic if used
 	local topNode = t_abilities_queued[gsiPlayer.nOnTeam]
@@ -319,10 +339,12 @@ function UseAbility_RefreshQueueTop(gsiPlayer)
 	end
 end
 
+-------------- estimated_time_til_completed()
 local function estimated_time_til_completed(gsiPlayer, objective)
 	return 0.3 -- don't care
 end
 local next_player = 1
+-------------- task_init_func()
 local function task_init_func(taskJobDomain)
 	Blueprint_RegisterTaskName(task_handle, "use_ability")
 	if VERBOSE then VEBUG_print(string.format("use_ability: Initialized with handle #%d.", task_handle)) end
@@ -481,6 +503,7 @@ blueprint = {
 	end
 }
 
+-------- UseAbility_GetTaskHandle()
 function UseAbility_GetTaskHandle()
 	return task_handle
 end

@@ -124,6 +124,7 @@ blueprint = {
 		--print(gsiPlayer.shortName, "AvoidHide", nearbyFriendlyTower)
 		if nearbyFriendlyTower then	
 			local nearbyTowerLoc = nearbyFriendlyTower.lastSeen.location
+	
 			local nearestEnemy, distToEnemyHero = Set_GetNearestEnemyHeroToLocation(playerLoc, 9) -- TODO Redundantly checking full hero list
 			local enemiesCenter = nearestEnemy and Set_GetCrowdedRatingToSetTypeAtLocation(nearestEnemy.lastSeen.location, SET_HERO_ENEMY)
 			local healthDiffOutnumbered = FightHarass_GetHealthDiffOutnumbered(gsiPlayer)
@@ -170,7 +171,7 @@ blueprint = {
 						800
 					)
 				)
-			 if DEBUG then DebugDrawLine(playerLoc, behindTowerFromEnemy, 255, 255, 255) end
+			if DEBUG then DebugDrawLine(playerLoc, behindTowerFromEnemy, 255, 255, 255) end
 		
 			if distanceToTower < 1400 then -- Get to tha chopper
 				Positioning_ZSMoveCasual(gsiPlayer, behindTowerFromEnemy, 150, 1000,

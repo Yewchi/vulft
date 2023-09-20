@@ -287,6 +287,7 @@ function AbilityLogic_UseLantern(gsiPlayer, lantern)
 		print(gsiPlayer.shortName, lantern.hUnit)
 		local hUnit = gsiPlayer.hUnit
 		if RandomInt(1, 5) == 5 then 
+			--[[ TEST FAILED 2023-05-03 ]]
 			-- RESULT: IDLES -- hUnit confirmed, and tried straight from GetUnitList,
 			-- -| they will move to the unit, get in range, and never trigger a cast.
 			-- -| Players cast ability_lamp_use, the location associated with
@@ -326,7 +327,6 @@ end
 
 function AbilityLogic_UseFamangoTree(gsiPlayer, mangoTree, distLimit)
 --	local humans = GSI_GetTeamHumans(TEAM)
-
 	if mangoTree then
 		local distToUnit = Vector_DistUnitToUnit(gsiPlayer, mangoTree)
 		if distLimit and distToUnit > distLimit then

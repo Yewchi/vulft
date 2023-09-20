@@ -40,7 +40,6 @@ local abs = math.abs
 local max = math.max
 local floor = math.floor
 local min = math.min
-local sqrt = math.sqrt
 local pi = math.pi
 local pi2 = pi*2
 
@@ -55,7 +54,11 @@ TURN_RATE_BASIC = TURN_RATE_MIN / 0.03 -- higher-end (turnRate rad) / tickRate
 local TURN_RATE_BASIC = TURN_RATE_BASIC
 local START_CAST_RAD = rad(11.5) -- 0.201 rad - source:dota2 gamepedia 02/14/21
 
-local TWICE_HIT_BOX = 40
+local HIT_BOX = 20
+local TWICE_HIT_BOX = HIT_BOX*2
+
+local DEBUG = DEBUG
+local VERBOSE = VERBOSE
 
 local function update_apx_released_diff(unitName, time)
 	time = time + 0.0083 -- small buffer for tick
@@ -110,18 +113,20 @@ local block_repeat_projectile_diff = 0
 function Projectile_TimeToLandProjectile(gsiUnit, gsiTarget)
 	local hUnit = gsiUnit.hUnit
 	local hUnitTarget = gsiTarget.hUnit
-	local attackingLoc = hUnit:GetLocation()
-	local attackedLoc = hUnitTarget:GetLocation()
+	local attackingLoc = gsiUnit.lastSeen.location
+	local attackedLoc = gsiTarget.lastSeen.location
 	local attackPointPercent = gsiUnit.attackPointPercent
 	local hUnitProjectileSpeed = gsiUnit.hUnit:GetAttackProjectileSpeed()
 	local facingDeg = hUnit:GetFacing()
 	local directionalToTarget = Vector_PointToPointLine(attackingLoc, attackedLoc)
-	local distToTarget = sqrt(directionalToTarget.x^2, directionalToTarget.y^2, directionalToTarget.z^2)
-	local rangeOfAttack = min(gsiUnit.attackRange + TWICE_HIT_BOX, distToTarget)
+	local distToTarget = (directionalToTarget.x^2 + directionalToTarget.y^2 + directionalToTarget.z^2)^0.5
+	local rangeOfAttack = gsiUnit.attackRange + TWICE_HIT_BOX
+	rangeOfAttack = rangeOfAttack < distToTarget and rangeOfAttack or distToTarget
 	local timeToTurn = Projectile_TimeTilFacingDirectional(rad(facingDeg), directionalToTarget, gsiUnit.turnRate)
-	local timeToArriveAtAttack = max( Vector_LengthOfVector(directionalToTarget)
-				- gsiUnit.attackRange - TWICE_HIT_BOX, 0 )
-				/ gsiUnit.currentMovementSpeed
+	local timeToArriveAtAttack = Vector_LengthOfVector(directionalToTarget)
+				- gsiUnit.attackRange - HIT_BOX
+	timeToArriveAtAttack = timeToArriveAtAttack < 0 and 0
+			or timeToArriveAtAttack / gsiUnit.currentMovementSpeed
 
 	local lastAttackTime = hUnit:GetLastAttackTime()
 	local attackedThisFrame = GameTime() - lastAttackTime < 0.0333
@@ -131,7 +136,7 @@ function Projectile_TimeToLandProjectile(gsiUnit, gsiTarget)
 			local aPP = hUnit:GetAnimCycle()
 			local secondsPerAttack = hUnit:GetSecondsPerAttack()
 			-- CK test bot reported 0.305 animCycle lands, GetAttackPoint() gives 0.5
-			aPP = math.floor((aPP * secondsPerAttack) / 0.033) * 0.033
+			aPP = floor((aPP * secondsPerAttack) / 0.033) * 0.033
 			local aPP = aPP / secondsPerAttack -- reverse the frame floor, expressed in % anim.
 			local prevAnim = gsiUnit.attackPointPercent
 			gsiUnit.attackPointPercent = prevAnim + (aPP - prevAnim)
@@ -142,7 +147,7 @@ function Projectile_TimeToLandProjectile(gsiUnit, gsiTarget)
 		local testTarget = hUnit:GetAttackTarget()
 		if gsiUnit.isRanged and attackedThisFrame
 				and testTarget and not testTarget:IsNull() then
-			local testTargetLoc = testTarget:GetLocation()
+			local testTargetLoc = attackingLoc
 			local projectiles = testTarget:GetIncomingTrackingProjectiles()
 			local avoidTeleports = gsiUnit.attackRange * 1.2
 			local furthestDart
@@ -150,7 +155,10 @@ function Projectile_TimeToLandProjectile(gsiUnit, gsiTarget)
 			for i=0,#projectiles do
 				local thisDart = projectiles[i]
 				if thisDart and thisDart.caster == hUnit then
-					local dist = Vector_PointDistance(thisDart.location, testTargetLoc)
+					local thisDartLoc = thisDart.location
+					local dist = ( (thisDartLoc.x - testTargetLoc.x)^2
+							+ (thisDartLoc.y - testTargetLoc.y)^2
+							+ (thisDartLoc.z - testTargetLoc.z)^2 )^0.5
 					if dist > furthestDist and dist < avoidTeleports then
 						furthestDart = thisDart.location
 						furthestDist = dist
@@ -189,7 +197,7 @@ function Projectile_GetNextAttackComplete(gsiUnit, needsProjectile)
 	-- TODO turning time is time till start attack
 	local attackTarget = hUnit:GetAttackTarget()
 	if attackTarget then
-		local attackerLoc = hUnit:GetLocation()
+		local attackerLoc = gsiUnit.lastSeen.location
 		local attackedLoc = attackTarget:GetLocation()
 		local gsiAttacked = Unit_GetSafeUnit(attackTarget)
 		if not gsiAttacked then return; end
@@ -201,7 +209,7 @@ function Projectile_GetNextAttackComplete(gsiUnit, needsProjectile)
 				local aPP = hUnit:GetAnimCycle()
 				local secondsPerAttack = hUnit:GetSecondsPerAttack()
 				-- CK test bot reported 0.305 animCycle lands, GetAttackPoint() gives 0.5
-				aPP = math.floor((aPP * secondsPerAttack) / 0.033) * 0.033
+				aPP = floor((aPP * secondsPerAttack) / 0.033) * 0.033
 				local aPP = aPP / secondsPerAttack -- reverse the frame floor, expressed in % anim.
 				local prevAnim = gsiUnit.attackPointPercent
 				gsiUnit.attackPointPercent = prevAnim + (aPP - prevAnim)
@@ -227,16 +235,18 @@ function Projectile_GetNextAttackComplete(gsiUnit, needsProjectile)
 		if not needsProjectile then
 			if gsiUnit.isTower then
 				local towerReleaseLoc = attackerLoc
-				towerReleaseLoc.z = towerReleaseLoc.z + gsiUnit.releaseProjectileZ --[[PROJECTILE BAKE]]
 				
 				
 				
 				return attackTarget,
 						max(0, lastAttackTime - GameTime()
 								+ secPerAttack
-							) + Math_PointToPointDistance(towerReleaseLoc, attackTargetGetsHit)
+							) + ( (towerReleaseLoc.x-attackTargetGetsHit.x)^2
+									+ (towerReleaseLoc.y-attackTargetGetsHit.y)^2
+									+ (towerReleaseLoc.z+gsiUnit.releaseProjectileZ-attackTargetGetsHit.z)^2 )^0.5 --[[PROJECTILE BAKE]]
 								/ hUnitProjectileSpeed,
-						GameTime() - lastAttackTime < 0.067
+						GameTime() - lastAttackTime < 0.067,
+						true
 			end
 		elseif isRanged then
 			local projectiles = attackTarget:GetIncomingTrackingProjectiles()
@@ -246,7 +256,10 @@ function Projectile_GetNextAttackComplete(gsiUnit, needsProjectile)
 				local thisProjectile = projectiles[i]
 				if thisProjectile then
 					
-					local projDist = Vector_PointDistance(thisProjectile.location, attackedLoc)
+					local projLoc = thisProjectile.location
+					local projDist = ( (projLoc.x-attackedLoc.x)^2
+							+ (projLoc.y-attackedLoc.y)^2 )^0.5
+			--				+ (projLoc.z-attackedLoc.z)^2 )^0.5
 					if thisProjectile.caster == hUnit
 							and projDist > furthestDist then
 						furthestDist = projDist
@@ -256,12 +269,16 @@ function Projectile_GetNextAttackComplete(gsiUnit, needsProjectile)
 			end
 			if furthestProjectile then
 				local projLoc = furthestProjectile.location
-				attackDist = Math_PointToPointDistance(projLoc, attackTargetGetsHit)
+				attackDist = ( (projLoc.x-attackTargetGetsHit.x)^2
+						+ (projLoc.y-attackTargetGetsHit.y)^2 )^0.5
+						--+ (projLoc.z-attackTargetGetsHit.z)^2 )^0.5
 				if hUnit:CanBeSeen() and GameTime() - lastAttackTime < 0.0333 then
 					
 					update_apx_released_diff(gsiUnit.name,
 							( furthestDist
-								- Vector_PointDistance(attackerLoc, attackedLoc)
+								- ( (attackerLoc.x-attackedLoc.x)^2
+									+ (attackerLoc.y-attackedLoc.y)^2 )^0.5
+									--+ (attackerLoc.z-attackedLoc.z)^2 )^0.5
 							) / hUnitProjectileSpeed
 						)
 				end
@@ -277,7 +294,9 @@ function Projectile_GetNextAttackComplete(gsiUnit, needsProjectile)
 		-- melee, or pre projectile ranged:
 		
 		attackDist = isRanged
-				and Vector_PointDistance(hUnit:GetLocation(), attackTargetGetsHit)
+				and ( (attackerLoc.x-attackTargetGetsHit.x)^2
+					+ (attackerLoc.y-attackTargetGetsHit.y)^2 )^0.5
+					--+ (attackedLoc.z-attackTargetGetsHit.z)^2 )^0.5
 
 		
 		return attackTarget,
@@ -341,7 +360,7 @@ function Projectile_SkillShotFogLocation(gsiPlayer, gsiEnemyHero, castPointTime,
 		)
 	for i=1,4 do
 		approxExtrapolateT = releaseTime
-				+ sqrt((extrapolatedLoc.x-playerLoc.x)^2 + (extrapolatedLoc.y-playerLoc.y)^2)
+				+ ((extrapolatedLoc.x-playerLoc.x)^2 + (extrapolatedLoc.y-playerLoc.y)^2)^0.5
 					/ shotSpeed
 		 extrapolatedLoc = Vector_Addition(
 		 		enemyLastSeenLoc,

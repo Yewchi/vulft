@@ -303,8 +303,6 @@ function Captain_InitializeCaptain(thisBot) -- This is ran via job_domain:JOB_WA
 
 	DOMINATE_SetDominateFunc(THIS_BOT, "map_find_fountain_goal_posts", Map_FindFountainGoalPosts, true)
 
-	TEST_PARTY = false
-	print("hello")
 	
 	
 
@@ -353,68 +351,82 @@ function Captain_CaptainThink()
 				DEBUG_timeTest[j] = 0
 			end
 		end
-		DEBUG_fromTime = RealTime()
+		
 
 		
 		
+		
 		job_domain_gsi:DoJob("JOB_UPDATE_ENEMY_PLAYERS_NONE_TYPED")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 1
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYER_DATA")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 2
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_gsi:DoJob("JOB_UPDATE_PLAYERS_LAST_SEEN")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 3
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_gsi:DoJob("JOB_UPDATE_CREEP_UNITS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 4
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_gsi:DoJob("JOB_UPDATE_UNIT_SETS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 5
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_gsi:DoJob("JOB_UPDATE_BUILDING_UNITS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 6
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_gsi:DoJob("JOB_UPDATE_SCOREBOARD_AND_KILLSTREAKS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 7
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 	end
 	
 	if job_domain_analytics.active then
 		
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_CURRENT_ATTACKS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 8
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_analytics:DoJob("JOB_UPDATE_LHP_FUTURE_DAMAGE_LISTS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 9
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_analytics:DoJob("JOB_UPDATE_FOW_PREDICTION")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 10
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_analytics:DoJob("JOB_UPDATE_LANE_PRESSURE")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 11
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 		
 		job_domain_analytics:DoJob("JOB_UPDATE_STRATEGIZE_WARDS")
-		DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 12
-		i = i + 1; DEBUG_fromTime = RealTime()
+		
+		
+		
 	end
 	
 	if job_domain_task.active then
 		
 		job_domain_task:DoAllJobs()
 	end
-	DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 13
-	i = i + 1; DEBUG_fromTime = RealTime()
+	
+	
+	
 
 	if job_domain.active then
 		
@@ -424,6 +436,7 @@ function Captain_CaptainThink()
 		job_domain:DoAllJobs()
 	end
 	DEBUG_timeTest[i] = DEBUG_timeTest[i] + RealTime() - DEBUG_fromTime -- bench 14
+	
 	i = i + 1; DEBUG_fromTime = RealTime()
 
 
@@ -454,7 +467,9 @@ function Captain_CaptainThink()
 
 	check_captain_chat_queue()
 
+	
 	generic_microthink()
+	
 end
 
 function Captain_GetCaptainJobDomain()

@@ -1,12 +1,12 @@
 local hero_data = {
 	"leshrac",
-	{1, 3, 3, 1, 2, 4, 2, 2, 2, 1, 1, 4, 3, 3, 8, 6, 4, 10, 12},
+	{3, 1, 3, 1, 3, 4, 3, 2, 2, 2, 2, 4, 1, 1, 7, 6, 4, 10, 11},
 	{
-		"item_tango","item_branches","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_bottle","item_boots","item_arcane_boots","item_magic_wand","item_point_booster","item_voodoo_mask","item_wind_lace","item_bloodstone","item_kaya","item_kaya_and_sange","item_eternal_shroud","item_point_booster","item_ultimate_scepter","item_blink","item_overwhelming_blink","item_aghanims_shard","item_ultimate_scepter_2","item_sheepstick",
+		"item_tango","item_branches","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_bottle","item_boots","item_arcane_boots","item_wind_lace","item_point_booster","item_voodoo_mask","item_vitality_booster","item_bloodstone","item_magic_wand","item_blink","item_kaya","item_platemail","item_shivas_guard","item_kaya_and_sange","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_overwhelming_blink",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{
-		"Split Earth","Diabolic Edict","Lightning Storm","Pulse Nova","+1.5 Mana Regen","+40 Split Earth Radius","+100 Lightning Storm Damage","+10% Movement Speed during Pulse Nova","+20% Damage Reduction during Pulse Nova","+40 Pulse Nova Damage","Lightning Storm Can Bounce Twice On Units","+25 Diabolic Edict Explosions",
+		"Split Earth","Diabolic Edict","Lightning Storm","Pulse Nova","+1.5 Mana Regen","+40 Split Earth Radius","+100 Lightning Storm Damage","+10% Movement Speed during Pulse Nova","+20% Damage Reduction during Pulse Nova","+40 Pulse Nova Damage","Pulse Nova triggers Lightning Storm","+25 Diabolic Edict Explosions",
 	}
 }
 --@EndAutomatedHeroData

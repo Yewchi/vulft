@@ -1,10 +1,10 @@
 local hero_data = {
 	"wisp",
-	{1, 3, 3, 1, 2, 4, 2, 3, 3, 6, 2, 4, 2},
+	{1, 3, 3, 2, 3, 4, 3, 1, 2, 6, 2, 4, 9},
 	{
-		"item_tango","item_quelling_blade","item_helm_of_iron_will","item_diadem","item_helm_of_the_dominator","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_sange","item_staff_of_wizardry","item_robe","item_kaya_and_sange","item_vitality_booster","item_reaver","item_heart","item_mithril_hammer","item_blight_stone","item_mithril_hammer","item_desolator","item_force_staff","item_blade_of_alacrity","item_belt_of_strength","item_hurricane_pike",
+		"item_tango","item_ward_sentry","item_magic_stick","item_blood_grenade","item_branches","item_branches","item_faerie_fire","item_branches","item_branches","item_faerie_fire","item_branches","item_ring_of_regen","item_headdress","item_magic_wand","item_mekansm","item_medallion_of_courage","item_crown","item_wind_lace","item_solar_crest","item_cloak","item_glimmer_cape","item_heart","item_gem",
 	},
-	{ {1,1,1,2,5,}, {5,5,4,2,1,}, 0.1 },
+	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
 	{
 		"Tether","Spirits","Overcharge","Relocate","+15% Tether Enemy Move/Attack Slow","+15 Attack Damage to Tethered Units","+6% Tether Movement Speed","+55 Spirits Hero Damage","+0.2% Overcharge Max HP Regen Bonus","-25s Relocate Cooldown","+400 Health to Tethered Units","Attack Tethered Ally's Target",
 	}

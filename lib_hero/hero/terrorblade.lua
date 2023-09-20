@@ -1,10 +1,10 @@
 local hero_data = {
 	"terrorblade",
-	{3, 1, 3, 2, 2, 2, 2, 3, 3, 6, 1, 4, 1, 1, 7, 9, 4, 4, 12},
+	{1, 3, 2, 3, 2, 2, 4, 2, 3, 6, 3, 4, 1, 1},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_circlet","item_branches","item_circlet","item_boots_of_elves","item_boots","item_gloves","item_power_treads","item_ring_of_basilius","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_yasha","item_ultimate_orb","item_ultimate_orb","item_skadi","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_black_king_bar","item_force_staff","item_hurricane_pike","item_ultimate_orb","item_manta","item_greater_crit","item_moon_shard","item_satanic",
+		"item_quelling_blade","item_branches","item_branches","item_magic_stick","item_faerie_fire","item_tango","item_magic_wand","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_blade_of_alacrity","item_yasha","item_blade_of_alacrity","item_dragon_lance","item_ultimate_orb","item_ultimate_orb","item_skadi","item_lesser_crit","item_greater_crit","item_lifesteal","item_satanic","item_sange","item_sange_and_yasha","item_force_staff","item_hurricane_pike","item_black_king_bar",
 	},
-	{ {1,1,1,1,4,}, {1,1,1,1,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Reflection","Conjure Image","Metamorphosis","Sunder","-3s Reflection Cooldown","+10% Conjure Image Damage","+300 Health","+10% Reflection Slow/Damage","+10 All Stats","+10s Conjure Image Duration","-30s Sunder Cooldown","+20s Metamorphosis Duration",
 	}

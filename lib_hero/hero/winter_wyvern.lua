@@ -1,10 +1,10 @@
 local hero_data = {
 	"winter_wyvern",
-	{1, 2, 2, 3, 2, 4, 2, 1, 1, 6, 1, 4, 3, 3, 8, 3, 4, 10},
+	{1, 2, 1, 2, 2, 4, 1, 2, 1, 6, 3, 4, 3, 3, 7, 3, 4, 9},
 	{
-		"item_tango","item_circlet","item_faerie_fire","item_faerie_fire","item_circlet","item_null_talisman","item_null_talisman","item_boots","item_gloves","item_belt_of_strength","item_power_treads","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_cornucopia","item_ultimate_orb","item_sphere","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange",
+		"item_circlet","item_gauntlets","item_tango","item_enchanted_mango","item_branches","item_faerie_fire","item_bracer","item_magic_wand","item_boots","item_gloves","item_power_treads","item_robe","item_chainmail","item_witch_blade","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_dragon_lance","item_hurricane_pike","item_mystic_staff","item_revenants_brooch",
 	},
-	{ {3,3,3,2,5,}, {4,4,4,3,2,}, 0.1 },
+	{ {3,3,3,1,2,}, {3,3,5,4,2,}, 0.1 },
 	{
 		"Arctic Burn","Splinter Blast","Cold Embrace","Winter's Curse","+25.0HP/s Cold Embrace Heal","+35 Damage","+2.0s Arctic Burn Debuff Duration","+400 Splinter Blast Shatter Radius","+12% Arctic Burn Slow","+100 Splinter Blast Damage","+1.25s Winter's Curse Duration","Splinter Blast 1.5s Stun",
 	}

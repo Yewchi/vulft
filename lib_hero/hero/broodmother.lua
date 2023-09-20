@@ -1,10 +1,10 @@
 local hero_data = {
 	"broodmother",
-	{2, 1, 1, 2, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 7, 3, 4, 9, 11},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 6, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_gauntlets","item_faerie_fire","item_gauntlets","item_branches","item_ward_observer","item_cornucopia","item_soul_ring","item_blitz_knuckles","item_orchid","item_boots","item_gloves","item_orb_of_corrosion","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_buckler","item_hyperstone","item_assault","item_void_stone","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_desolator",
+		"item_gauntlets","item_circlet","item_gauntlets","item_branches","item_tango","item_ward_observer","item_bracer","item_boots","item_soul_ring","item_gloves","item_belt_of_strength","item_power_treads","item_cornucopia","item_blitz_knuckles","item_orchid","item_quarterstaff","item_robe","item_ogre_axe","item_boots_of_elves","item_echo_sabre","item_blade_of_alacrity","item_yasha","item_manta","item_aghanims_shard","item_mage_slayer","item_bloodthorn","item_diadem","item_harpoon","item_helm_of_iron_will","item_nullifier","item_ultimate_orb","item_ultimate_orb","item_point_booster","item_skadi",
 	},
-	{ {3,3,3,2,2,}, {3,3,3,2,2,}, 0.1 },
+	{ {2,2,2,2,3,}, {2,2,2,4,3,}, 0.1 },
 	{
 		"Insatiable Hunger","Spin Web","Silken Bola","Spawn Spiderlings","+80 Spawn Spiderlings Damage","+3 Spin Web Simultaneous Webs","-7s Spin Web Restore Time","+130 Spiderlings Health","+400 AoE Silken Bola","+35 Attack Speed","+0.3s BAT during Insatiable Hunger","+35% Silken Bola Slow/Miss Chance",
 	}

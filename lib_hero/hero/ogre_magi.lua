@@ -1,12 +1,12 @@
 local hero_data = {
 	"ogre_magi",
-	{2, 1, 2, 1, 2, 4, 2, 3, 1, 6, 1, 4, 3, 3, 8, 3, 4, 10, 13, 11},
+	{2, 1, 2, 1, 2, 5, 2, 1, 1, 3, 3, 5, 3, 3, 9, 6, 5, 7, 13, 11},
 	{
-		"item_tango","item_enchanted_mango","item_branches","item_branches","item_ward_sentry","item_blood_grenade","item_boots","item_tranquil_boots","item_ring_of_basilius","item_crown","item_veil_of_discord","item_wind_lace","item_magic_wand","item_belt_of_strength","item_ancient_janggo","item_boots_of_bearing","item_staff_of_wizardry","item_fluffy_hat","item_gem","item_force_staff","item_gem","item_energy_booster","item_void_stone","item_aether_lens","item_gem",
+		"item_tango","item_quelling_blade","item_gauntlets","item_circlet","item_branches","item_branches","item_bracer","item_hand_of_midas","item_boots","item_arcane_boots","item_point_booster","item_octarine_core","item_ultimate_orb","item_sheepstick","item_diadem","item_voodoo_mask","item_dagon_5","item_gem","item_dagon_4L","item_dagon_5L","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_ultimate_scepter_2","item_sphere",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,3,4,}, 0.1 },
+	{ {3,3,3,1,1,}, {3,3,3,5,5,}, 0.1 },
 	{
-		"Fireblast","Ignite","Bloodlust","Multicast","Dumb Luck","+16 Ignite DPS","-1.0s Fireblast Cooldown","+80 Damage","+250 Health","+30 Strength","+25 Bloodlust AS","17% Fireblast chance on attack","+240 Fireblast Damage",
+		"Fireblast","Ignite","Bloodlust","Dumb Luck","Multicast","+16 Ignite DPS","-1s Fireblast Cooldown","+80 Damage","+250 Health","+30 Strength","+25 Bloodlust AS","17% Fireblast chance on attack","+240 Fireblast Damage",
 	}
 }
 --@EndAutomatedHeroData

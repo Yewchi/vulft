@@ -172,14 +172,14 @@ blueprint = {
 			
 			local underTower = Set_GetTowerOverLocation(standingLoc)
 			local score = (0.3+anyIntendHarmFactor)*(theorizedDangerScore*15) + max(0, farmLaneScoreFactor)
-					-(creep and tta and 50 - 50*min(1, max(0, tta - (Vector_PointDistance(
+					-(creep and tta and 10 - 10*min(1, max(0, tta - (Vector_PointDistance(
 									gsiPlayer.lastSeen.location,
 									creep.lastSeen.location
 								) / (gsiPlayer.currentMovementSpeed - 30)
 							))) or 0)
 			local towerScore = underTower and (1-gsiPlayer.hpp)
 						* ((underTower.team == TEAM
-							and 25 or -35) / 1+(0.15*gsiPlayer.level))
+							and 25 or -35) / (1+(0.15*gsiPlayer.level)))
 					or 0
 						 -- TODO pretty loose
 			return farmLaneObjective, score + towerScore

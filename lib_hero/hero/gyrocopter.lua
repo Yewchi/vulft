@@ -1,10 +1,10 @@
 local hero_data = {
 	"gyrocopter",
-	{2, 1, 1, 3, 1, 4, 1, 3, 3, 3, 2, 4, 2, 2, 8, 5, 4, 9, 11},
+	{2, 3, 3, 1, 3, 4, 3, 8, 11},
 	{
-		"item_magic_stick","item_branches","item_circlet","item_tango","item_branches","item_branches","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_boots","item_magic_wand","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_point_booster","item_ultimate_scepter","item_ogre_axe","item_black_king_bar","item_lifesteal","item_claymore","item_demon_edge","item_satanic","item_blitz_knuckles","item_javelin","item_monkey_king_bar","item_lesser_crit","item_greater_crit","item_blink","item_ultimate_scepter_2","item_swift_blink","item_refresher",
+		"item_branches","item_branches","item_magic_stick","item_branches","item_tango","item_slippers","item_wraith_band","item_blades_of_attack","item_magic_wand","item_boots","item_falcon_blade","item_gloves","item_boots_of_elves","item_power_treads","item_blade_of_alacrity","item_ogre_axe","item_staff_of_wizardry","item_point_booster","item_ultimate_scepter","item_blades_of_attack","item_broadsword","item_lesser_crit","item_blitz_knuckles","item_shadow_amulet","item_broadsword","item_silver_edge","item_lifesteal","item_claymore","item_satanic","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_butterfly","item_ultimate_scepter_2","item_skadi",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Rocket Barrage","Homing Missile","Flak Cannon","Call Down","+30 Movement Speed during Rocket Barrage","+200 Health","+0.3s Homing Missile Stun Duration","+3 Flak Cannon Attacks","+40 Flak Cannon Damage","+14 Rocket Barrage Damage","-6s Flak Cannon Cooldown","3x Call Down",
 	}

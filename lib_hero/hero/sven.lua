@@ -1,8 +1,8 @@
 local hero_data = {
 	"sven",
-	{1, 3, 1, 2, 2, 4, 2, 2, 3, 6, 3, 4, 3, 1, 7, 1, 4, 10, 11},
+	{1, 3, 2, 2, 2, 4, 2, 1, 1, 6, 1, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_quelling_blade","item_tango","item_magic_stick","item_branches","item_branches","item_branches","item_magic_wand","item_boots","item_gloves","item_power_treads","item_lifesteal","item_mask_of_madness","item_quarterstaff","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_lesser_crit","item_blitz_knuckles","item_shadow_amulet","item_invis_sword","item_lesser_crit","item_silver_edge","item_orchid","item_bloodthorn","item_harpoon","item_reaver","item_overwhelming_blink","item_cornucopia","item_cornucopia","item_refresher","item_cornucopia","item_sphere","item_moon_shard","item_helm_of_iron_will","item_platemail","item_hyperstone","item_assault","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
+		"item_branches","item_branches","item_quelling_blade","item_tango","item_magic_stick","item_faerie_fire","item_magic_wand","item_belt_of_strength","item_boots","item_power_treads","item_quarterstaff","item_mask_of_madness","item_oblivion_staff","item_echo_sabre","item_blink","item_mithril_hammer","item_black_king_bar","item_lesser_crit","item_greater_crit","item_aghanims_shard","item_swift_blink","item_claymore","item_satanic","item_assault","item_hyperstone","item_moon_shard","item_javelin","item_blitz_knuckles","item_javelin","item_javelin","item_blitz_knuckles","item_demon_edge","item_monkey_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

@@ -53,7 +53,7 @@ local Analytics_GetMostDamagingUnitTypeToUnit = Analytics_GetMostDamagingUnitTyp
 local FarmLane_UtilizingLaneSafety = FarmLane_UtilizingLaneSafety
 local Task_CreateUpdatePriorityDeagroJob = Task_CreateUpdatePriorityDeagroJob
 local Set_GetCenterOfSetUnits = Set_GetCenterOfSetUnits
-local Set_GetAlliedHeroesInLocRadius = Set_GetAlliedHeroesInLocRadius
+local Set_GetAlliedHeroesInLocRad = Set_GetAlliedHeroesInLocRad
 local Set_GetNearestTeamTowerToPlayer = Set_GetNearestTeamTowerToPlayer
 local FightClimate_AnyIntentToHarm = FightClimate_AnyIntentToHarm
 local FightClimate_CreepPressureFast = FightClimate_CreepPressureFast
@@ -337,7 +337,7 @@ blueprint = {
 			centerOfEnemies = Set_GetCenterOfSetUnits(nearbyEnemies) or playerLoc
 			timeData.centerOfEnemies = centerOfEnemies
 		end
-		local nearbyAllies = Set_GetAlliedHeroesInLocRadius(gsiPlayer, centerOfEnemies, 1700, false)
+		local nearbyAllies = Set_GetAlliedHeroesInLocRad(gsiPlayer, centerOfEnemies, 1700, false)
 		local numNearbyEnemies = #nearbyEnemies
 		local numNearbyAllies = #nearbyAllies
 		local numOfTeamCenterPlayer = 1 + numNearbyAllies

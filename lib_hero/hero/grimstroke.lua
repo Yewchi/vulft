@@ -1,10 +1,10 @@
 local hero_data = {
 	"grimstroke",
-	{1, 3, 1, 2, 1, 4, 3, 3, 1, 6, 2, 4, 2, 2, 8, 3, 4, 10},
+	{1, 3, 2, 3, 3, 2, 3, 2, 2, 6, 4, 4, 1, 1, 1, 7, 4, 10, 11},
 	{
-		"item_ward_observer","item_tango","item_blood_grenade","item_branches","item_branches","item_circlet","item_branches","item_magic_wand","item_boots","item_energy_booster","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aether_lens","item_gem",
+		"item_ward_observer","item_branches","item_tango","item_blood_grenade","item_magic_stick","item_clarity","item_boots","item_energy_booster","item_arcane_boots","item_magic_wand","item_void_stone","item_wind_lace","item_aether_lens","item_tranquil_boots","item_cloak","item_glimmer_cape","item_aghanims_shard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_mystic_staff","item_sheepstick","item_ultimate_scepter_2","item_cyclone","item_mystic_staff",
 	},
-	{ {5,3,1,1,3,}, {5,5,4,4,4,}, 0.1 },
+	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
 	{
 		"Stroke of Fate","Phantom's Embrace","Ink Swell","Soulbind","+65 Phantom's Embrace DPS","-5.0s Ink Swell Cooldown","+25.0% Soulbind Spell Damage","+16% Ink Swell Movement Speed","+1000 Stroke of Fate Cast Range","+3 Hits to Kill Phantom","+150 Ink Swell Radius","+60% Stroke of Fate Damage",
 	}
@@ -27,8 +27,8 @@ local CURRENT_TASK = Task_GetCurrentTaskHandle
 local CAN_BE_CAST = AbilityLogic_AbilityCanBeCast
 local CHARGE_CAN_BE_CAST = ChargedCooldown_AbilityCanBeCast
 local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
-local VEC_POINT_DISTANCE = Vector_PointDistance
-local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint
+local VEC_POINT_DISTANCE = Vector_PointDistance2D
+local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint2D
 local ACTIVITY_TYPE = ACTIVITY_TYPE
 local HANDLE_AUTOCAST_GENERIC = AbilityLogic_HandleAutocastGeneric
 local AOHK = AbilityLogic_AllowOneHitKill
@@ -81,7 +81,7 @@ d = {
 		local soulChain = playerAbilities[5]
 
 		local darkArtRadius = darkArt:GetAOERadius()
-		darkArtRadius = darkArtRadius or 120
+		darkArtRadius = darkArtRadius and darkArtRadius > 0 and darkArtRadius or 120
 
 		local highUse = gsiPlayer.highUseManaSimple
 		local currentTask = CURRENT_TASK(gsiPlayer)
@@ -166,10 +166,10 @@ d = {
 			elseif arbitraryEnemy and currentActivityType >= ACTIVITY_TYPE.FEAR then
 				local nearestEnemy = Set_GetNearestEnemyHeroToLocation(playerLoc)
 				if nearestEnemy and SPELL_SUCCESS(gsiPlayer, nearestEnemy, phantom) > 0
-						and VEC_POINT_DISTANCE(playerLoc, thisEnemy.lastSeen.location)
+						and VEC_POINT_DISTANCE(playerLoc, nearestEnemy.lastSeen.location)
 								< phantomCastRange + 40
 						and HIGH_USE(gsiPlayer, phantom, highUse, playerHpp) then
-					USE_ABILITY(gsiPlayer, phantom, fht, 400, nil)
+					USE_ABILITY(gsiPlayer, phantom, nearestEnemy, 400, nil)
 					return;
 				end
 			end
@@ -194,7 +194,7 @@ d = {
 			-- TODO
 			if fhtReal and HIGH_USE(gsiPlayer, darkArt, highUse, fhtHpp) then
 				local extrapolatedFht = fhtHUnit:GetExtrapolatedLocation(
-						( S_O_F_CAST_POINT + distToFht / S_O_F_TRAVEL_SPEED)
+						( S_O_F_CAST_POINT + distToFht*1.15 / S_O_F_TRAVEL_SPEED)
 							* max(0.125, fhtHUnit:GetMovementDirectionStability())
 					)
 				local darkArtRange = darkArt:GetSpecialValueInt("abilitycastrange")
@@ -221,7 +221,7 @@ d = {
 				local nearbyEnemyCreepSet = Set_GetNearestEnemyCreepSetToLocation(playerLoc)
 				if nearbyEnemyCreepSet and nearbyEnemyCreepSet.units[1] then
 					local crowdedCenter, crowdedRating = CROWDED_RATING(nearbyEnemyCreepSet.center, SET_HERO_ENEMY)
-					if crowdedRating > 2 and VEC_POINT_DSTANCE(playerLoc, crowdedCenter) then
+					if crowdedRating > 2 and VEC_POINT_DISTANCE(playerLoc, crowdedCenter) then
 						USE_ABILITY(gsiPlayer, darkArt, crowdedCenter, 400, nil)
 						return;
 					end

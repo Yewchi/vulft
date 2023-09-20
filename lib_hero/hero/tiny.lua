@@ -1,10 +1,10 @@
 local hero_data = {
 	"tiny",
-	{3, 1, 2, 1, 1, 4, 1, 2, 2, 2, 6, 4, 3, 12, 8, 3, 4, 10},
+	{3, 1, 2, 1, 1, 4, 1, 2, 2, 2, 6, 4, 3, 3, 8, 3, 4, 9, 12},
 	{
-		"item_ward_observer","item_branches","item_faerie_fire","item_quelling_blade","item_tango","item_bottle","item_boots","item_chainmail","item_blades_of_attack","item_wind_lace","item_phase_boots","item_blink","item_oblivion_staff","item_echo_sabre","item_blades_of_attack","item_lesser_crit","item_point_booster","item_ultimate_scepter","item_echo_sabre","item_aghanims_shard","item_greater_crit","item_hyperstone","item_assault","item_swift_blink","item_ultimate_scepter_2","item_blitz_knuckles",
+		"item_quelling_blade","item_faerie_fire","item_tango","item_branches","item_branches","item_ward_observer","item_bottle","item_magic_wand","item_gloves","item_power_treads","item_blink","item_ogre_axe","item_quarterstaff","item_echo_sabre","item_aghanims_shard","item_hyperstone","item_buckler","item_assault","item_lesser_crit","item_point_booster","item_ultimate_scepter","item_greater_crit","item_gem","item_ultimate_scepter_2","item_relic","item_demon_edge",
 	},
-	{ {3,3,2,5,2,}, {4,4,4,2,2,}, 0.1 },
+	{ {2,2,5,3,3,}, {2,2,4,4,3,}, 0.1 },
 	{
 		"Avalanche","Toss","Tree Grab","Grow","+20 Movement Speed","+10 Strength","+10% Status Resistance","+80 Avalanche Damage","+40% Grow Bonus Damage With Tree","Toss Requires No Target","-8s Avalanche Cooldown","2 Toss Charges",
 	}

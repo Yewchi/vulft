@@ -1,12 +1,12 @@
 local hero_data = {
 	"hoodwink",
-	{2, 1, 3, 2, 2, 4, 2, 1, 1, 6, 1, 4, 3, 3, 8, 3, 4, 9, 12},
+	{2, 1, 2, 3, 2, 4, 2, 1, 1, 1, 6, 4, 3, 3, 8, 3, 4, 9, 12},
 	{
-		"item_circlet","item_circlet","item_branches","item_branches","item_tango","item_faerie_fire","item_wraith_band","item_wraith_band","item_boots","item_power_treads","item_lesser_crit","item_magic_wand","item_force_staff","item_greater_crit","item_dragon_lance","item_hurricane_pike","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_demon_edge","item_rapier","item_satanic","item_rapier",
+		"item_tango","item_branches","item_magic_stick","item_clarity","item_ward_sentry","item_enchanted_mango","item_enchanted_mango","item_blood_grenade","item_boots","item_arcane_boots","item_magic_wand","item_javelin","item_mithril_hammer","item_maelstrom","item_staff_of_wizardry","item_gungir","item_broadsword","item_blades_of_attack","item_lesser_crit","item_blade_of_alacrity","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_greater_crit",
 	},
-	{ {3,3,3,3,1,}, {3,3,4,1,4,}, 0.1 },
+	{ {3,3,3,3,3,}, {4,4,4,4,4,}, 0.1 },
 	{
-		"Acorn Shot","Bushwhack","Scurry","Sharpshooter","+40% Scurry Evasion When Active","-3.0s Bushwhack Cooldown","+60.0 Bushwhack Damage","+2 Acorn Shot Bounces","25.0% Sharpshooter Faster Projectile / Charge Time","-4 Armor Corruption","2 Acorn Shot Charges","+135 Bushwhack Radius",
+		"Acorn Shot","Bushwhack","Scurry","Sharpshooter","+40% Scurry Evasion When Active","-3.0s Bushwhack Cooldown","+60.0 Bushwhack Damage","+2 Acorn Shot Bounces","+125 Sharpshooter Max Damage","-4 Armor Corruption","2 Acorn Shot Charges","+135 Bushwhack Radius",
 	}
 }
 --@EndAutomatedHeroData

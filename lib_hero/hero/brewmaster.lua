@@ -1,10 +1,10 @@
 local hero_data = {
 	"brewmaster",
-	{1, 2, 2, 1, 2, 4, 2, 1, 3, 3, 3, 4, 3, 6, 8, 1, 4, 9, 12},
+	{1, 2, 1, 3, 2, 4, 2, 2, 3, 6, 3, 4, 1, 1, 8, 3, 4, 9, 12},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_branches","item_gauntlets","item_gauntlets","item_bracer","item_tranquil_boots","item_soul_ring","item_magic_wand","item_gloves","item_hand_of_midas","item_blink","item_cloak","item_headdress","item_ring_of_health","item_pipe","item_aghanims_shard","item_ultimate_orb","item_void_stone","item_sheepstick","item_refresher","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aeon_disk","item_ultimate_scepter_2",
+		"item_tango","item_quelling_blade","item_magic_stick","item_gauntlets","item_circlet","item_branches","item_enchanted_mango","item_gauntlets","item_bracer","item_boots","item_urn_of_shadows","item_magic_wand","item_fluffy_hat","item_spirit_vessel","item_gloves","item_hand_of_midas","item_aghanims_shard","item_relic","item_talisman_of_evasion","item_radiance","item_platemail","item_buckler","item_hyperstone","item_assault","item_shivas_guard",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
+	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
 		"Thunder Clap","Cinder Brew","Drunken Brawler","Primal Split","+10 Brewlings Damage","+200 Thunder Clap AoE","+30% Cinder Brew Damage/Duration","+1x Brewed Up multiplier for Drunken Brawler","+1200 Brewlings Health","+80 Attack Speed","Brewlings Gain Drunken Brawler Passive","Cinder Brew applies Fear when ignited",
 	}

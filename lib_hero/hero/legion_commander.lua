@@ -1,12 +1,12 @@
 local hero_data = {
 	"legion_commander",
-	{1, 3, 1, 2, 1, 4, 1, 3, 3, 6, 3, 4, 2, 2, 7, 2, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 6, 3, 4, 2, 2, 8, 2, 4, 10, 11},
 	{
-		"item_gauntlets","item_quelling_blade","item_gauntlets","item_tango","item_branches","item_branches","item_chainmail","item_magic_wand","item_boots","item_phase_boots","item_chainmail","item_broadsword","item_blade_mail","item_blink","item_soul_ring","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_lesser_crit","item_heavens_halberd","item_invis_sword","item_silver_edge","item_gem",
+		"item_quelling_blade","item_tango","item_gauntlets","item_circlet","item_branches","item_branches","item_bracer","item_magic_wand","item_boots","item_wind_lace","item_chainmail","item_blades_of_attack","item_phase_boots","item_chainmail","item_broadsword","item_blade_mail","item_blink","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_gem","item_ultimate_orb","item_sphere","item_refresher",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Overwhelming Odds","Press The Attack","Moment of Courage","Duel","-2s Overwhelming Odds Cooldown","+8 Duel Bonus Damage","+40.0 Press The Attack HP Regen","+75 Overwhelming Odds Damage per Hero","250 AoE Press The Attack","+12% Moment of Courage Proc Chance","+50% Moment of Courage Lifesteal","Press the Attack grants 1.5s Debuff Immunity",
+		"Overwhelming Odds","Press The Attack","Moment of Courage","Duel","-2s Overwhelming Odds Cooldown","+8 Duel Bonus Damage","+30.0 Press The Attack HP Regen","+50 Overwhelming Odds Damage per Hero","250 AoE Press The Attack","+12% Moment of Courage Proc Chance","+50% Moment of Courage Lifesteal","Press the Attack grants 1.5s Debuff Immunity",
 	}
 }
 --@EndAutomatedHeroData

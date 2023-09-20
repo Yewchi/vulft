@@ -1,12 +1,12 @@
 local hero_data = {
 	"spirit_breaker",
-	{3, 1, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 5, 4, 10, 11},
+	{3, 1, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 6, 4, 10, 12},
 	{
-		"item_tango","item_blood_grenade","item_quelling_blade","item_orb_of_venom","item_branches","item_branches","item_magic_stick","item_magic_wand","item_boots","item_chainmail","item_phase_boots","item_wind_lace","item_belt_of_strength","item_robe","item_ancient_janggo","item_blitz_knuckles","item_invis_sword","item_ogre_axe","item_black_king_bar","item_gem","item_ultimate_scepter","item_gem","item_yasha_and_kaya","item_ultimate_scepter_2","item_gem","item_silver_edge","item_cyclone",
+		"item_tango","item_branches","item_branches","item_magic_stick","item_branches","item_ward_observer","item_bottle","item_magic_wand","item_boots","item_wind_lace","item_phase_boots","item_blitz_knuckles","item_broadsword","item_invis_sword","item_void_stone","item_point_booster","item_octarine_core","item_point_booster","item_ultimate_scepter","item_aghanims_shard","item_yasha_and_kaya","item_ultimate_orb","item_cornucopia","item_sphere","item_ultimate_scepter_2","item_sheepstick","item_silver_edge","item_assault","item_moon_shard",
 	},
-	{ {3,3,3,3,3,}, {3,3,3,4,4,}, 0.1 },
+	{ {3,3,3,1,5,}, {3,3,3,5,4,}, 0.1 },
 	{
-		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-4.0s Bulldoze Cooldown","+40 Damage","+13% Greater Bash Chance","+175 Charge of Darkness Bonus Speed","+25% Greater Bash Damage","Bulldoze +500 All Damage Barrier",
+		"Charge of Darkness","Bulldoze","Greater Bash","Nether Strike","+500 Night Vision","+4 Armor","-3.0s Bulldoze Cooldown","+40 Damage","+25% Greater Bash Damage","+200 Charge of Darkness Bonus Speed","+20% Greater Bash Chance","Bulldoze +500 All Damage Barrier",
 	}
 }
 --@EndAutomatedHeroData

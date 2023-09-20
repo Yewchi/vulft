@@ -1,10 +1,10 @@
 local hero_data = {
 	"muerta",
-	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 5, 4, 2, 2, 8, 2, 4, 10, 12},
+	{1, 2, 1, 3, 1, 4, 1, 3, 3, 3, 6, 4, 2, 2, 8, 2, 4, 10, 12},
 	{
-		"item_quelling_blade","item_circlet","item_slippers","item_branches","item_tango","item_branches","item_wraith_band","item_power_treads","item_robe","item_falcon_blade","item_javelin","item_maelstrom","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_lesser_crit","item_blitz_knuckles","item_shadow_amulet","item_silver_edge","item_staff_of_wizardry","item_crown","item_crown","item_crown","item_gungir","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_force_staff","item_hurricane_pike","item_blink","item_swift_blink","item_moon_shard","item_boots",
+		"item_branches","item_magic_wand","item_boots","item_blades_of_attack","item_fluffy_hat","item_falcon_blade","item_gloves","item_robe","item_power_treads","item_javelin","item_maelstrom","item_fluffy_hat","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_staff_of_wizardry","item_fluffy_hat","item_hurricane_pike","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mjollnir","item_broadsword","item_blades_of_attack","item_lesser_crit","item_invis_sword","item_silver_edge","item_blink","item_swift_blink","item_aghanims_shard",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
 		"Dead Shot","The Calling","Gunslinger","Pierce the Veil","+80 Dead Shot Damage","+8 Strength","+250 Dead Shot Cast Range","+35 Damage","2 Dead Shot Charges","+20% Gunslinger chance","The Calling summons +2 additional revenants","+25% Magic Resistance",
 	}

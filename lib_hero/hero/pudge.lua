@@ -2,9 +2,9 @@ local hero_data = {
 	"pudge",
 	{1, 2, 2, 3, 2, 4, 2, 3, 3, 3, 5, 4, 1, 1, 7, 1, 4, 9, 11},
 	{
-		"item_branches","item_tango","item_branches","item_circlet","item_quelling_blade","item_slippers","item_boots","item_wraith_band","item_magic_wand","item_ring_of_health","item_vanguard","item_chainmail","item_blades_of_attack","item_phase_boots","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_cloak","item_ogre_axe","item_ring_of_health","item_eternal_shroud","item_blink","item_mystic_staff","item_shivas_guard","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_overwhelming_blink",
+		"item_gauntlets","item_circlet","item_tango","item_branches","item_branches","item_ward_observer","item_faerie_fire","item_bracer","item_boots","item_bottle","item_crown","item_urn_of_shadows","item_fluffy_hat","item_spirit_vessel","item_chainmail","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_platemail","item_mystic_staff","item_shivas_guard","item_cornucopia","item_cornucopia","item_refresher","item_overwhelming_blink",
 	},
-	{ {1,1,2,5,3,}, {1,1,2,4,3,}, 0.1 },
+	{ {3,3,3,2,1,}, {3,3,3,2,1,}, 0.1 },
 	{
 		"Meat Hook","Rot","Flesh Heap","Dismember","+4 Armor","-16% Rot Slow","+8% Spell Lifesteal","+120 Meat Hook Damage","+0.75s Dismember Duration","-4s Meat Hook Cooldown","x1.8x Dismember Damage/Heal","x1.5x Flesh Heap Stack Str and Damage Block bonuses",
 	}

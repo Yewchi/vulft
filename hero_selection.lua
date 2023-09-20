@@ -24,7 +24,9 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
--- CUSTOM_HERO_PICK! HEY! If you would like to override the heroes that bots will pick, then remove the '--[[' from the below line, and change the names. If you want a position on a team, use that player's slot 5 to 1 in the lobby.
+print("/VUL-FT/ [INFO] HERO SELECTION LOADING")
+
+-- CUSTOM_HERO_PICK! HEY! If you would like to override the heroes that bots will pick, then remove the '--[[' from the below line, and change the names. If you want a position on a team, use that player's slot 6 to 1 in the lobby.
 --[[
 CUSTOM_PICKS = {
 --RADIANT
@@ -42,6 +44,9 @@ CUSTOM_PICKS = {
 }
 --]] -- FOR IMPLEMENTED HEROES CHECK THE 't_heroes_implemented' LIST BELOW
 
+
+RandomFloat = RandomFloat or Script_RandomFloat or RandomFloatWrapper
+
 local APIGameTime = GameTime
 local GameTime = GameTime -- May be changed to faster time for '/all !fast'
 local fake_time = 0 -- Incremented if GameTime is overridden to add pretend time, running the think func recursively to end picks immediately (turbo force picks now)
@@ -53,6 +58,8 @@ local HERO_UNPICKED_UNLOADED_FLAG = nil
 local HERO_UNPICKED_STR = ""
 
 local TEAM_IS_RADIANT = GetTeam() == TEAM_RADIANT
+
+
 
 local t_heroes_implemented = {
 		[-1] = "default", -- used when a hero has been picked that VUL-FT doesn't have data for
@@ -752,6 +759,7 @@ function Think()
 
 
 
+print(GetGameState())
 
 		InstallChatCallback(
 			function(event)

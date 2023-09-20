@@ -534,7 +534,7 @@ end
 
 -- Takes the half-way point, then uses y = -x and the difference of the shorter line to the lane to determine the crash
 function Map_LaneHalfwayPoint(lane, p1, p2)
-	local additionalPregameTime = DotaTime() < 0 and -DotaTime() or 0
+	local additionalPregameTime = DotaTime() < 0 and -DotaTime() or 0 -- Good bug puts bots in lanes, for now TODO
 	local pointBetweenPoints = Vector_PointBetweenPoints(p1, p2)
 if DEBUG then
 	DebugDrawLine(p1, p2, 180, 100, 255)
@@ -590,6 +590,7 @@ local function update_last_seen(this, newLoc, facingDegrees)
 		this.location = Vector(newLoc.x, newLoc.y, newLoc.z)
 	end
 	if facingDegrees then
+		this.previousFacingDegrees = this.facingDegrees or 0
 		this.facingDegrees = facingDegrees
 	end
 	this.timeStamp = currTime

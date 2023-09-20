@@ -1,12 +1,12 @@
 local hero_data = {
 	"snapfire",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 8, 3, 4, 10, 12},
+	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_enchanted_mango","item_magic_stick","item_tango","item_circlet","item_wraith_band","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_cloak","item_headdress","item_pipe","item_aghanims_shard","item_void_stone","item_ultimate_orb","item_sheepstick","item_blink","item_vitality_booster","item_energy_booster","item_gem","item_gem","item_reaver","item_aeon_disk","item_overwhelming_blink","item_gem","item_gem","item_cornucopia","item_cornucopia","item_refresher",
+		"item_ward_observer","item_branches","item_branches","item_faerie_fire","item_tango","item_branches","item_bottle","item_bracer","item_boots","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_mithril_hammer","item_rod_of_atos","item_javelin","item_mithril_hammer","item_gungir","item_invis_sword","item_javelin","item_blitz_knuckles","item_blitz_knuckles","item_monkey_king_bar","item_silver_edge","item_lesser_crit","item_greater_crit",
 	},
-	{ {3,3,3,2,1,}, {3,3,5,2,4,}, 0.1 },
+	{ {2,2,3,5,3,}, {4,4,4,2,2,}, 0.1 },
 	{
-		"Scatterblast","Firesnap Cookie","Lil' Shredder","Mortimer Kisses","+70 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","Lil' Shredder Uses Your Attack Damage","+60 Mortimer Kisses Impact Damage","3x Lil' Shredder Multishot","+6 Mortimer Kisses Launched",
+		"Scatterblast","Firesnap Cookie","Lil' Shredder","Mortimer Kisses","+70 Scatterblast Damage","Firesnap Cookie Restores +125 Health","+2 Lil' Shredder attacks","-4s Firesnap Cookie Cooldown","3x Lil' Shredder Multishot","+60 Mortimer Kisses Impact Damage","Lil' Shredder Uses +100% of Your Attack Damage","+6 Mortimer Kisses Launched",
 	}
 }
 --@EndAutomatedHeroData

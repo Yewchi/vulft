@@ -28,11 +28,12 @@ LOCALE = "en"
 
 -- EOF: require(GetScriptDirectory().."/lib_job/modules/communication"); require(GetScriptDirectory().."/lib_util/string");
 
+RandomFloat = RandomFloat or Script_RandomFloat or RandomFloatWrapper
+
 CPP_TO_LUA_ARRAY_OFFSET = 1
 HIGH_32_BIT = 0x80000000
 LOW_32_BIT = -0x80000000
 _G.EMPTY_TABLE = {}
-
 
 --DEBUG_TARGET = "Tcaptain|Ttask"
 DEBUG = false
@@ -40,8 +41,8 @@ VERBOSE = true and DEBUG
 TEST = true and DEBUG
 
 RELEASE_STAGE = "Alpha"
-VERSION = "v0.8a-230429"
-META_DATE = "25 April 2023"
+VERSION = "v0.9-230920"
+META_DATE = "19 September 2023"
 
 VULFT_VERSION = RELEASE_STAGE
 		
@@ -56,6 +57,8 @@ DRAW_EMOTES = false
 require(GetScriptDirectory().."/lib_util/time")
 
 Time_startTimeOfDarkSim = GameTime()
+
+local next = next
 
 local INFO_PRE = VULFT_STR.." "..INFO_STR.." "
 function INFO_print(str, ...)
@@ -267,6 +270,8 @@ STR = Util_Printable
 
 local table_print_time_limit = 0
 local exiting_time_limit = false
+local tkeyElements = {}
+local tElements = {}
 function printable_table(tbl, depthAllowed)
 	if depthAllowed == nil then depthAllowed = 7 
 	elseif depthAllowed <= 0 then 
@@ -286,16 +291,40 @@ function printable_table(tbl, depthAllowed)
 		theseTabs = theseTabs.."\t"
 	end
 	if depthAllowed == 1 then str = str..theseTabs end -- once this \n for inline final array or key pair
-	for k,v in pairs(tbl) do
+
+	local tkeyElements = tkeyElements
+	local tElements = tElements
+	local ntElements = 0
+	for k,v in next,tbl do
+		local printShortNow = true
+		if type(v) == "table" then
+			for q,r in next,v do
+				if type(r) == "table" then
+					printShortNow = false
+					break; -- it could recurse, print after
+				end
+			end
+		end
+		if printShortNow then
+			if depthAllowed > 1 then str = str..theseTabs end -- each \n
+			str = str.."["..Util_Printable(k).."]="..Util_PrintableTable(v, depthAllowed - 1)
+		else
+			ntElements = ntElements + 1
+			tkeyElements[ntElements] = k
+			tElements[ntElements] = v
+		end
+	end
+
+	for i=1,ntElements do
 		if depthAllowed > 1 then str = str..theseTabs end -- each \n
-		str = str.."["..Util_Printable(k).."]="..Util_PrintableTable(v, depthAllowed - 1)
+		str = str.."["..Util_Printable(tkeyElements[i]).."]="..Util_PrintableTable(tElements[i], depthAllowed - 1)
 	end
 	if depthAllowed ~= 1 then str = str..theseTabs end -- once for everything but final depth inline close block
 	return str.."}\n"
 end
 
 function Util_PrintableTable(tbl, depthAllowed)
-	table_print_time_limit = RealTime() + 0.001
+	table_print_time_limit = RealTime() + 0.00001
 	exiting_time_limit = false
 	return printable_table(tbl, depthAllowed)
 end
@@ -311,7 +340,7 @@ end
 
 function Util_TableEmpty(tbl)
 	if tbl == nil then return true end
-	for _,_ in pairs(tbl) do
+	for _,_ in next,tbl do
 		return false
 	end
 	return true

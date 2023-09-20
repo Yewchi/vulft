@@ -1,10 +1,10 @@
 local hero_data = {
 	"rubick",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10},
+	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 1, 4, 1, 1, 7, 5, 4, 10, 11},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_blood_grenade","item_ward_observer","item_magic_stick","item_boots","item_magic_wand","item_energy_booster","item_arcane_boots","item_cloak","item_shadow_amulet","item_glimmer_cape","item_mekansm","item_gem","item_blink","item_guardian_greaves",
+		"item_tango","item_circlet","item_circlet","item_faerie_fire","item_enchanted_mango","item_boots","item_diadem","item_phylactery","item_null_talisman","item_null_talisman","item_arcane_boots","item_blink","item_aether_lens","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_kaya","item_ethereal_blade","item_aghanims_shard","item_void_stone","item_ultimate_scepter_2","item_sheepstick","item_arcane_blink","item_octarine_core",
 	},
-	{ {5,5,1,3,3,}, {4,4,4,4,5,}, 0.1 },
+	{ {3,3,3,3,1,}, {4,4,4,3,5,}, 0.1 },
 	{
 		"Telekinesis","Fade Bolt","Arcane Supremacy","Spell Steal","+150 Telekinesis Landing Damage","-12% Fade Bolt Damage Reduction","-25% Stolen Spells Cooldown","+0.4s Telekinesis Lift Duration","-5s Fade Bolt Cooldown","+240 Telekinesis Land Distance","-12s Telekinesis Cooldown","+40% Spell Amp For Stolen Spells",
 	}

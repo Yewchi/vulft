@@ -1,10 +1,10 @@
 local hero_data = {
 	"elder_titan",
-	{2, 3, 2, 1, 2, 1, 2, 1, 1, 3, 3, 4, 3, 4, 8, 6, 4, 9, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 3, 3, 3, 1, 1, 4, 7, 5, 4, 9, 12},
 	{
-		"item_wind_lace","item_tango","item_faerie_fire","item_branches","item_ward_sentry","item_blood_grenade","item_boots","item_tranquil_boots","item_magic_wand","item_robe","item_belt_of_strength","item_ancient_janggo","item_wind_lace","item_boots_of_bearing","item_cloak","item_glimmer_cape","item_medallion_of_courage","item_crown","item_solar_crest","item_gem","item_gem","item_gem",
+		"item_ward_sentry","item_tango","item_blood_grenade","item_magic_stick","item_branches","item_branches","item_ward_observer","item_magic_wand","item_wind_lace","item_boots","item_wind_lace","item_tranquil_boots","item_soul_ring","item_chainmail","item_chainmail","item_blight_stone","item_chainmail","item_medallion_of_courage","item_solar_crest","item_wind_lace","item_belt_of_strength","item_robe","item_ancient_janggo","item_boots_of_bearing","item_ogre_axe","item_blade_of_alacrity","item_echo_sabre","item_gem","item_vladmir",
 	},
-	{ {3,3,3,1,1,}, {3,3,5,4,5,}, 0.1 },
+	{ {3,3,1,1,1,}, {4,4,4,5,5,}, 0.1 },
 	{
 		"Echo Stomp","Astral Spirit","Natural Order","Earth Splitter","+2% Astral Spirit Move Speed Per Hero","+25 Attack Speed","+75 Echo Stomp Damage","+25 Astral Spirit Hero Attack","+100% Cleave","+100 Natural Order Radius","-60s Earth Splitter Cooldown","+450 Echo Stomp Wake Damage",
 	}

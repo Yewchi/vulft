@@ -1,12 +1,12 @@
 local hero_data = {
 	"weaver",
-	{2, 3, 2, 1, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 7, 1, 4, 9, 12},
+	{2, 3, 1, 2, 2, 4, 2, 3, 3, 3, 6, 4, 1, 1, 8, 1, 4, 9, 12},
 	{
-		"item_quelling_blade","item_branches","item_tango","item_magic_stick","item_branches","item_blood_grenade","item_magic_wand","item_gloves","item_boots_of_elves","item_boots","item_power_treads","item_blades_of_attack","item_falcon_blade","item_javelin","item_mithril_hammer","item_maelstrom","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_mjollnir","item_ultimate_orb","item_sphere","item_nullifier","item_lesser_crit","item_greater_crit","item_quarterstaff","item_butterfly","item_aghanims_shard","item_moon_shard",
+		"item_branches","item_branches","item_branches","item_branches","item_magic_stick","item_tango","item_magic_wand","item_blight_stone","item_boots_of_elves","item_power_treads","item_javelin","item_maelstrom","item_mithril_hammer","item_black_king_bar","item_mjollnir","item_ultimate_orb","item_skadi","item_lifesteal","item_claymore","item_satanic","item_helm_of_iron_will","item_nullifier","item_monkey_king_bar","item_moon_shard","item_refresher","item_boots","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,3,3,}, {1,1,1,4,4,}, 0.1 },
+	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"The Swarm","Shukuchi","Geminate Attack","Time Lapse","+50 Shukuchi Damage","+9 Strength","+20 Mana Break","+2 Swarm Attacks to Kill","+90 Geminate Attack Damage","+0.5 Swarm Armor Reduction","-2.5s Shukuchi Cooldown","+1 Geminate Attack",
+		"The Swarm","Shukuchi","Geminate Attack","Time Lapse","+55 Shukuchi Damage","+9 Strength","+20 Mana Break","+2 Swarm Attacks to Kill","+90 Geminate Attack Damage","+0.5 Swarm Armor Reduction","-2.5s Shukuchi Cooldown","+1 Geminate Attack",
 	}
 }
 --@EndAutomatedHeroData

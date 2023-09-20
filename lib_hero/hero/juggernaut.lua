@@ -1,12 +1,12 @@
 local hero_data = {
 	"juggernaut",
-	{1, 2, 1, 3, 1, 4, 1, 2, 2, 5, 2, 4, 3, 3, 8, 3, 10, 4, 12},
+	{1, 2, 1, 3, 1, 4, 1, 2, 2, 5, 2, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_blood_grenade","item_branches","item_branches","item_quelling_blade","item_tango","item_circlet","item_boots","item_blades_of_attack","item_chainmail","item_wind_lace","item_phase_boots","item_magic_wand","item_wraith_band","item_javelin","item_maelstrom","item_blade_of_alacrity","item_yasha","item_manta","item_aghanims_shard","item_belt_of_strength","item_basher","item_quarterstaff","item_eagle","item_talisman_of_evasion","item_butterfly","item_ultimate_orb","item_point_booster","item_skadi","item_abyssal_blade","item_mjollnir","item_ultimate_scepter_2",
+		"item_circlet","item_tango","item_magic_stick","item_branches","item_quelling_blade","item_boots","item_wraith_band","item_magic_wand","item_chainmail","item_blades_of_attack","item_phase_boots","item_gloves","item_wind_lace","item_mithril_hammer","item_hand_of_midas","item_mithril_hammer","item_maelstrom","item_mjollnir","item_yasha","item_belt_of_strength","item_manta","item_blade_of_alacrity","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_basher","item_eagle","item_talisman_of_evasion","item_quarterstaff","item_butterfly","item_abyssal_blade",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Blade Fury","Healing Ward","Blade Dance","Omnislash","+5 All Stats","+100.0 Blade Fury Radius","-20.0s Healing Ward Cooldown","+1s Blade Fury Duration","+50% Blade Dance Lifesteal","+150 Blade Fury DPS","+1s Omnislash Duration","+2 Healing Ward Hits to Kill",
+		"Blade Fury","Healing Ward","Blade Dance","Omnislash","+5 All Stats","+100 Blade Fury Radius","-20.0s Healing Ward Cooldown","+100 Blade Fury DPS","+60% Blade Dance Lifesteal","-3s Blade Fury Cooldown","+1s Omnislash Duration","+2 Healing Ward Hits to Kill",
 	}
 }
 --@EndAutomatedHeroData
@@ -187,6 +187,11 @@ d = {
 		INFO_print("TEST SUMMON", gsiSummon); Util_TablePrint(gsiSummon);
 	end,
 	["AbilityThink"] = function(gsiPlayer) 
+		if AbilityLogic_PlaceholderGenericAbilityUse(gsiPlayer, t_player_abilities) then
+			return
+		elseif false then -- TODO generic item use (probably can use same func for finished heroes)
+			return;
+		end
 		if UseAbility_IsPlayerLocked(gsiPlayer) then
 			return;
 		end
@@ -217,8 +222,7 @@ d = {
 
 		local danger = DANGER(gsiPlayer)
 
-		local allE = Set_NumericalIndexUnion({}, nearbyEnemies)
-		Set_NumericalIndexUnion(allE, outerEnemies)
+		local allE = Set_NumericalIndexUnion(nil, nearbyEnemies, outerEnemies)
 
 		local damageInTimeline = DAMAGE_IN_TIMELINE(gsiPlayer.hUnit)
 
@@ -279,7 +283,7 @@ d = {
 					USE_ABILITY(gsiPlayer, bladeFury, nil, 400)
 					return;
 				end
-				if #allE > 0 and (currActivityType >= ACTIVITY_TYPE.FEAR and futureDamage > 0
+				if #allE > 0 and (currActivityType >= A_T.FEAR and futureDamage > 0
 							or currTask == fight_harass_handle
 						) and ( hUnit:IsRooted()
 							or gsiPlayer.currentMovementSpeed+1
@@ -290,7 +294,7 @@ d = {
 					return;
 				end
 			end
-			if currActivityType <= ACTIVITY_TYPE.CONTROLLED_AGGRESSION
+			if currActivityType <= A_T.CONTROLLED_AGGRESSION
 					and fhtReal then
 				
 				if bladeFuryRadius+44 > distToFht

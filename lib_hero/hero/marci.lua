@@ -1,12 +1,12 @@
 local hero_data = {
 	"marci",
-	{1, 2, 3, 3, 3, 4, 3, 2, 2, 5, 2, 4, 1, 1, 7, 1, 4, 10, 12},
+	{1, 2, 2, 1, 2, 4, 2, 1, 1, 5, 3, 4, 3, 3, 8, 3, 4, 10, 12},
 	{
-		"item_quelling_blade","item_gauntlets","item_gauntlets","item_branches","item_branches","item_tango","item_soul_ring","item_boots","item_blades_of_attack","item_chainmail","item_phase_boots","item_belt_of_strength","item_magic_wand","item_mithril_hammer","item_basher","item_mithril_hammer","item_black_king_bar","item_blink","item_ring_of_health","item_abyssal_blade","item_demon_edge","item_javelin","item_monkey_king_bar","item_reaver","item_overwhelming_blink",
+		"item_tango","item_ward_observer","item_branches","item_branches","item_circlet","item_branches","item_bottle","item_bracer","item_magic_wand","item_boots","item_phase_boots","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_basher","item_gem","item_ultimate_orb","item_mystic_staff","item_sheepstick",
 	},
-	{ {3,3,3,1,2,}, {3,3,3,1,2,}, 0.1 },
+	{ {5,5,2,2,2,}, {4,4,1,5,2,}, 0.1 },
 	{
-		"Dispose","Rebound","Sidekick","Unleash","+100 Rebound Cast/Jump Range","+70 Dispose Damage","+15% Sidekick Lifesteal","-3s Rebound Cooldown","+0.5s Rebound Stun Duration","+15% Unleash Movement Speed","+350 Dispose Throw Distance","1.5s Sidekick Debuff Immunity",
+		"Dispose","Rebound","Sidekick","Unleash","+100 Rebound Cast/Jump Range","+10% Sidekick Lifesteal","+70 Dispose Damage","+10% Rebound Movement Speed Bonus","+0.75s Rebound Stun Duration","+15% Unleash Movement Speed","+350 Dispose Throw Distance","+65 Sidekick Damage",
 	}
 }
 --@EndAutomatedHeroData

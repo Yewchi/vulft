@@ -292,7 +292,8 @@ local function get_closest_rune_possible(gsiPlayer, spawnTimeAllowed)
 	--[[RUNE_I___FAST]]
 	for i=1,I_BOUNTIES_MAX do
 		local thisRune = RUNE_LOCATIONS[i]
-		local thisDist = Math_PointToPointDistance2D(thisRune[1], playerLoc)
+		local runeLoc = thisRune[1]
+		local thisDist = ((runeLoc.x-playerLoc.x)^2 + (runeLoc.y-playerLoc.y)^2)^0.5
 
 		-- Update status
 		thisRune[RUNE_I__STATUS] = GetRuneStatus(thisRune[RUNE_I__HANDLE])
@@ -1035,8 +1036,9 @@ end
 
 			local missingMana = gsiPlayer.maxMana - gsiPlayer.lastSeenMana
 			local missingHealth = gsiPlayer.maxHealth - gsiPlayer.lastSeenHealth
+			local dotaTime = DotaTime()
 			if runeObjective.runeHandle <= I_POWERS_MAX then
-				if currTime > PRE_GAME_END_TIME+85 and DotaTime() < 300 --[[WATER RUNE BAKE]]
+				if currTime > PRE_GAME_END_TIME+85 and dotaTime < 300 --[[WATER RUNE BAKE]]
 						or isRegen then
 					local availMana = isRegen and 300 or 80
 					local manaGain = isRegen and min(missingMana, max(0, availMana - 150*#known))
@@ -1050,8 +1052,10 @@ end
 						end
 					end	
 					modStrat = -75 + 15*math.log(1 + missingMana + missingHealth)
-				else
-
+				elseif dotaTime > 300 then
+					local taskIsCurrent = Task_GetCurrentTaskHandle(gsiPlayer) == task_handle
+					--modStrat = (30-(dotaTime % 120))
+					--modStrat = modStrat > 0 and 0 or modStrat
 				end
 
 			end

@@ -46,6 +46,7 @@ local HIGH_CREEP_MAX_HEALTH = HIGH_CREEP_MAX_HEALTH
 local max = math.max
 local min = math.min
 local abs = math.abs
+local remove = table.remove
 local DEBUG = DEBUG
 local TEST = TEST
 local VERBOSE = VERBOSE
@@ -111,6 +112,7 @@ local t_creep_time_to_attack = {}
 local iobj_lane_creep_sets = {} -- Imaginary creep sets, and how long until they arrive (you will get a few last hits here, in about 40 seconds) 
 local iobj_lane_creep_wave_crash_time = {} -- the time until a predicted wave crashes
 
+local t_recycle_lhr = {}
 
 function FarmLane_IncentiviseHardLastHit(gsiPlayer, taskHandle, maxIncentive, healthAfterHit, duration)
 	local playerAttackDamage = gsiPlayer.hUnit:GetAttackDamage()
@@ -138,7 +140,7 @@ end
 
 local function register_last_hit_request(gsiPlayer, creep, extrapolatedXeta)
 	if not confirmed_last_hit_request_denials[creep] then
-		confirmed_last_hit_request_denials[creep] = {}
+		confirmed_last_hit_request_denials[creep] = remove(t_recycle_lhr) or {}
 	end
 	local confirmedDenial = confirmed_last_hit_request_denials[creep]
 	confirmedDenial.player = gsiPlayer
@@ -148,7 +150,7 @@ end
 
 local function register_lane_creep_set_request(gsiPlayer, creepSet, extrapolatedXeta)
 	if not confirmed_lane_creep_set_request_denials[creepSet] then
-		confirmed_lane_creep_set_request_denials[creepSet] = {}
+		confirmed_lane_creep_set_request_denials[creepSet] = remove(t_recycle_lhr) or {}
 	end
 	local confirmedDenial = confirmed_lane_creep_set_request_denials[creepSet]
 	confirmedDenial.player = gsiPlayer
@@ -221,6 +223,13 @@ local function task_init_func(taskJobDomain)
 end
 Blueprint_RegisterTask(task_init_func)
 
+local function set_creep_attack_time(gsiPlayer, creep, tillAttackTime, xetaScore)
+	local ttaTbl = t_creep_time_to_attack[gsiPlayer.nOnTeam]
+	ttaTbl[1] = creep
+	ttaTbl[2] = tillAttackTime
+	ttaTbl[3] = xetaScore
+end
+
 function FarmLane_AnyCreepLastHitTracked(gsiPlayer)
 	local ttaTbl = t_creep_time_to_attack[gsiPlayer.nOnTeam]
 	if ttaTbl[1] and not cUnit_IsNullOrDead(ttaTbl[1]) then
@@ -285,34 +294,30 @@ end
 local Farm_TryCreepSetRequest = Farm_TryCreepSetRequest
 
 function Farm_CancelConfirmedDenial(gsiPlayer, objectiveDenied)
-	if confirmed_last_hit_request_denials[objectiveDenied] then
-		if confirmed_last_hit_request_denials[objectiveDenied].player == gsiPlayer then
-			confirmed_last_hit_request_denials[objectiveDenied] = nil
-		end
+	local denial = confirmed_last_hit_request_denials[objectiveDenied]
+	if denial and denial.player == gsiPlayer then
+		local recyc = t_recycle_lhr
+		recyc[#recyc] = denial
+		confirmed_last_hit_request_denials[objectiveDenied] = nil
 	end
-	if confirmed_lane_creep_set_request_denials[objectiveDenied] then
-		if confirmed_lane_creep_set_request_denials[objectiveDenied].player == gsiPlayer then
-			confirmed_lane_creep_set_request_denials[objectiveDenied] = nil
-		end
+	denail = confirmed_lane_creep_set_request_denials[objectiveDenied]
+	if denial and denial.player == gsiPlayer then
+		recyc[#recyc] = denial
+		confirmed_lane_creep_set_request_denials[objectiveDenied] = nil
 	end
 end
 local Farm_CancelConfirmedDenial = Farm_CancelConfirmedDenial
 
 function Farm_CancelAnyConfirmedDenials(gsiPlayer)
-	for creep,tConfirmedDenial in pairs(confirmed_last_hit_request_denials) do
+	for creep,tConfirmedDenial in next,confirmed_last_hit_request_denials do
 		if tConfirmedDenial.player == gsiPlayer then 
+			local recyc = t_recycle_lhr
+			recyc[#recyc] = tConfirmedDenial
 			confirmed_last_hit_request_denials[creep] = nil
 		end
 	end
 end
 local Farm_CancelAnyConfirmedDenials = Farm_CancelAnyConfirmedDenials
-
-local function set_creep_attack_time(gsiPlayer, creep, tillAttackTime, xetaScore)
-	local ttaTbl = t_creep_time_to_attack[gsiPlayer.nOnTeam]
-	ttaTbl[1] = creep
-	ttaTbl[2] = tillAttackTime
-	ttaTbl[3] = xetaScore
-end
 
 function FarmLane_IsUtilizingLaneSafety(gsiPlayer)
 	return t_utilizing_lane_safety_value[gsiPlayer.nOnTeam]
@@ -375,7 +380,7 @@ local function try_deny_creep(gsiPlayer, friendlyCreep, limitTime)
 		
 		set_creep_attack_time(gsiPlayer, friendlyCreep, timeTillStartDeny, 20 - 10*timeTillStartDeny)
 		if denyNowForBestLastHit then
-			if DEBUG then DebugDrawCircle(friendlyCreep.lastSeen.location, 150, 255, 255, 100) end
+			if DEBUG then DebugDrawCircle(friendlyCreep.lastSeen.location, 30, 100, 0, 255) end
 			if DEBUG and DEBUG_IsBotTheIntern() then DebugDrawText(950, 484, "denyNowBest", 0, 255, 0) end
 			gsiPlayer.hUnit:Action_AttackUnit(friendlyCreep.hUnit, false)
 			FarmLane_IncentiviseHardLastHit(gsiPlayer, fight_harass_handle, 25, healthThen, 1)
@@ -427,7 +432,7 @@ blueprint_farm_lane = {
 				if cUnit_IsNullOrDead(objective) then
 					aRemovedObjective = objective
 					confirmed_last_hit_request_denials[objective] = nil
-					Task_InformObjectiveDisallow(gsiPlayer, {objective, nil})
+					--Task_InformObjectiveDisallow(gsiPlayer, {objective, nil})
 				else
 					cUnit_UpdateHealthAndLocation(objective)
 					attackNowForBestLastHit, timeTillStartAttack = Lhp_AttackNowForBestLastHit(gsiPlayer, objective)
@@ -522,7 +527,7 @@ blueprint_farm_lane = {
 					max(0, 0.2 - timeTillStartAttack*0.2)
 				)
 			if DEBUG and TEAM_IS_RADIANT then
-				DebugDrawText(600, 200+15*gsiPlayer.nOnTeam,
+				DebugDrawText(600, 220+15*gsiPlayer.nOnTeam,
 						string.format("PID%d\\ttatk: %.2f. giving: %.2f",
 								gsiPlayer.playerID,
 								timeTillStartAttack or 0,
@@ -713,6 +718,7 @@ blueprint_farm_lane = {
 			local timeTillLands = highestValueCreep and timeTillStartAttacks
 					and Projectile_TimeToLandProjectile(gsiPlayer, highestValueCreep) or 0
 			if not timeTillStartAttack or timeTillStartAttack > secondsPerAttack*1.5 + timeTillLands then
+				-- Having time for additional attacks before last hit...
 				if crashIsDeep then
 					local goBackToPreviousAlliedCheck = Unit_GetArmorPhysicalFactor(gsiPlayer)
 							* (4+danger) * max(0.33, 5 - gsiPlayer.level)
@@ -779,7 +785,7 @@ blueprint_farm_lane = {
 					if DEBUG and DEBUG_IsBotTheIntern() then
 						print("farm_lane::score() returning 2")
 					end
-					return prevObjective, prevScore
+					return prevObjective, prevObjective == highestValueCreep and highestValueCreepXeta or prevScore
 				end
 				
 				local highestValueXeta = min(100,
@@ -805,6 +811,9 @@ blueprint_farm_lane = {
 						+ max(0, (dangerOfLaneScore+recentDamageTakenCare
 							-highestValueCreep.hUnit:GetBountyGoldMin())) * (0.67
 								- 0.67 * max(0, 1 - timeTillAttack)
+							) - (crashIsDeep
+								and 100/(1+gsiPlayer.ehpArmor*gsiPlayer.lastSeenHealth*0.001)
+								or 0
 							)
 			end
 			if DEBUG and DEBUG_IsBotTheIntern() then
@@ -823,7 +832,7 @@ blueprint_farm_lane = {
 			if DEBUG then print("setting new imaginary for lane#: ", laneToFarm, locationOfNextLaneCreepBattle, timeUntilNextLaneCreepBattle) end
 			if locationOfNextLaneCreepBattle then
 				-- print("Setting new imaginary creep set xeta score object, lane", laneToFarm, "on team", TEAM)
-				iobj_lane_creep_wave_crash_time[laneToFarm] = GameTime() + timeUntilNextLaneCreepBattle
+				iobj_lane_creep_wave_crash_time[laneToFarm] = timeUntilNextLaneCreepBattle
 				-- DebugDrawText(-1400+TEAM*800, 500+laneToFarm*20, string.format("%s, %s", locationOfNextLaneCreepBattle, Util_Printable(Map_LimitLaneLocationToLowTierTeamTower(
 							-- ENEMY_TEAM,
 							-- laneToFarm, 
@@ -843,7 +852,7 @@ blueprint_farm_lane = {
 					) -- TODO Primative expires time
 				iThisLaneToFarmObj.lane = laneToFarm
 				iobj_lane_creep_sets[laneToFarm] = iThisLaneToFarmObj
-				if DEBUG and laneToFarm == MAP_LOGICAL_MIDDLE_LANE then DebugDrawCircle(locationOfNextLaneCreepBattle, 255, 255, 255, 255) end
+				if DEBUG and laneToFarm == MAP_LOGICAL_MIDDLE_LANE then DebugDrawCircle(locationOfNextLaneCreepBattle, 3, 255, 255, 255) end
 			end
 		end
 		if iThisLaneToFarmObj then 

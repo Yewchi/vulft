@@ -69,6 +69,7 @@ local ITEM_RES_MAP_COMPONENTS_I__COMBINES_TO = 0
 local item_resolution_map = {} -- end of file init
 
 local EMPTY_TABLE = EMPTY_TABLE
+print("THE EMPTY TABLE IS WHILE LOADING", EMPTY_TABLE, EMPTY_TABLE[1])
 
 ---- item_logic constants --
 local PLACEHOLDER_PURCHASE_SUCCESS = -1 -- Not sure, observed return when courier picking up new item via pUnit:ActionImmediate_PurchaseItem(). 
@@ -546,33 +547,60 @@ end
 
 --[FUNCVAL]]local replenishHealthPlatter = {}
 --[FUNCVAL]]local replenishManaPlatter = {}
-local recycle_table, recycle_table2
+local t_item_platter1, t_item_platter2 = {}, {}
 function Item_GetReplenishers(gsiPlayer, removeBackpackIfLocked) -- TODO Inventory tracking is probably easier and faster
 	local pUnit = gsiPlayer.hUnit
 	local endSearchIndex = removeBackpackIfLocked and not Item_IsInventorySwitchingAllowed(gsiPlayer) and ITEM_END_INVENTORY_INDEX or ITEM_END_BACKPACK_INDEX
-	local iPlatterHealth = 1
-	local iPlatterMana = 1
-	local healthReplenishAvailable = recycle_table or {}
-	local manaReplenishAvailable = recycle_table2 or {}
+	local iPlatterHealth = 0
+	local iPlatterMana = 0
+	local healthReplenishAvailable = t_item_platter1
+	local manaReplenishAvailable = t_item_platter2
+	local preHealthPlatterSize = #healthReplenishAvailable
+	local preManaPlatterSize = #manaReplenishAvailable
+
 	for i=0,endSearchIndex,1 do
 		local thisItem = pUnit:GetItemInSlot(i)
 		if thisItem then
-			if Item_IsManaOnUse(thisItem:GetName()) then
-				manaReplenishAvailable[iPlatterMana] = thisItem
+			local itemName = thisItem:GetName()
+			if Item_IsManaOnUse(itemName) then
 				iPlatterMana = iPlatterMana + 1
-				if string.find(thisItem:GetName(), "magi", ITEM_NAME_SEARCH_START) 
-				or string.find(thisItem:GetName(), "holy_l", ITEM_NAME_SEARCH_START) 
-				or string.find(thisItem:GetName(), "bott", ITEM_NAME_SEARCH_START) 
-				or string.find(thisItem:GetName(), "guar", ITEM_NAME_SEARCH_START) then -- .'. if string.find(manaReplenish[1]:GetName(), "magic_(wand)") then else end hack
-				
-					healthReplenishAvailable[iPlatterHealth] = thisItem
+				manaReplenishAvailable[iPlatterMana] = thisItem -- INSERT
+				if itemName == "item_magic_stick"
+						or itemName == "item_magic_wand" 
+						or itemName == "item_holy_locket" 
+						or itemName == "item_bottle"
+						or itemName == "item_guardian_greaves" then
 					iPlatterHealth = iPlatterHealth + 1
+					healthReplenishAvailable[iPlatterHealth] = thisItem -- HEALTH+MANA INSERT
 				end
-			elseif Item_IsHealthOnUse(thisItem:GetName()) then
-				healthReplenishAvailable[iPlatterHealth] = thisItem
+			elseif Item_IsHealthOnUse(itemName) then
 				iPlatterHealth = iPlatterHealth + 1
+				healthReplenishAvailable[iPlatterHealth] = thisItem -- INSERT
 			end
 		end
+	end
+	for i=iPlatterHealth+1,preHealthPlatterSize do
+		healthReplenishAvailable[i] = nil
+	end
+	for i=iPlatterMana+1,preManaPlatterSize do
+		manaReplenishAvailable[i] = nil
+	end
+	for i=1,#manaReplenishAvailable do
+		if not manaReplenishAvailable[i]
+				or not manaReplenishAvailable[i].GetName then
+			print("WTF? REPLENISH")
+			Util_TablePrint(manaReplenishAvailable, 3)
+		end
+	end
+	for i=1,#healthReplenishAvailable do
+		if not healthReplenishAvailable[i]
+				or not healthReplenishAvailable[i].GetName then
+			print("WTF? REPLENISH H")
+			Util_TablePrint(healthReplenishAvailable, 3)
+		end
+	end
+	if EMPTY_TABLE[1] then
+		print("THE EMPTY TABLE IS REPLENISH", EMPTY_TABLE, EMPTY_TABLE[1], EMPTY_TABLE[1] and Util_TablePrint(EMPTY_TABLE[1] or "fine", 2))
 	end
 	if healthReplenishAvailable[1] then
 		recycle_table = {}
@@ -614,6 +642,7 @@ function Item_GetUsableNonReplenishers(gsiPlayer, removeBackpackIfLocked)
 			end
 		end
 	end
+	print("THE EMPTY TABLE IS REPLENISH", EMPTY_TABLE, EMPTY_TABLE[1])
 	if healthReplenishAvailable[1] then
 		recycle_table = {}
 		if manaReplenishAvailable[1] then

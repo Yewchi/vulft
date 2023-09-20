@@ -605,11 +605,11 @@ function Positioning_ZSAttackRangeUnitHugAllied(
 	
 
 	local targetToCloseAlliedCreepSetVector = aheadness < 0.5
-			and directionalFromUnit
-			or Positioning_FlipAxisTeamIfAggressiveOrientationMovement(
+			and Positioning_FlipAxisTeamIfAggressiveOrientationMovement(
 					directionalFromUnit,
 					safeOrAheadnessTargetLoc
 				)
+			or directionalFromUnit
 	
 
 	-- TODO ranged heroes use a -^- shape where carrot is stradling the enemy, to avoid

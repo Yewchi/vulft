@@ -204,6 +204,7 @@ blueprint = {
 		local nearestTower
 		local nearestTowerDist
 		local nearestTowerLoc
+		local enemyFountain = ENEMY_FOUNTAIN
 		local playerEhp = (1 + Unit_GetArmorPhysicalFactor(gsiPlayer)) * gsiPlayer.lastSeenHealth
 		t_player_check_location[gsiPlayer.nOnTeam] = nil
 		for i=1,#t_enemy_players do
@@ -217,7 +218,6 @@ blueprint = {
 
 
 
-			local enemyFountain = ENEMY_FOUNTAIN
 			if IsHeroAlive(thisEnemy.playerID)
 					and lastSeenTime < timeStampConsiderUnknown and GameTime() - lastSeenTime < TIME_SINCE_SEEN_LIMIT_SEARCH
 					and Vector_PointDistance2D(gsiPlayer.lastSeen.location, thisEnemy.lastSeen.location)
@@ -238,7 +238,7 @@ blueprint = {
 						)
 					local playerCanWithstandOrNoTower = (not nearestTower
 							or playerEhp / nearestTower.attackDamage > 4 * (thisHpp + #t_enemy_players))
-							and ((checkLocation.x-enemyFountain.x)^2 + (checkLocation.y-enemyFountain.y)^2)^0.5 < 1100
+							and ((checkLocation.x-enemyFountain.x)^2 + (checkLocation.y-enemyFountain.y)^2)^0.5 < 1600
 					if playerCanWithstandOrNoTower
 							or ( Vector_PointDistance(checkLocation, nearestTower.lastSeen.location)
 											> nearestTower.attackRange + 200
@@ -263,8 +263,24 @@ blueprint = {
 			local earlyGameReduction = DotaTime() < 720 and 1+(720 - DotaTime())/720 or 1
 			
 			t_player_check_location[gsiPlayer.nOnTeam] = lowestHealthCheckLocation
+			local checkBezier = t_player_bezier_escape[gsiPlayer.nOnTeam]
+			local scaredFountainFactor = 0
+			if checkBezier and checkBezier.val then
+				local guessLoc = checkBezier.val
+				local distFountain = ((guessLoc.x-enemyFountain.x)^2 + (guessLoc.y-enemyFountain.y)^2)^0.5
+				if distFountain < 1800 or not (guessLoc.x > enemyFountain.x or guessLoc.y > enemyFountain.y) then
+					distFountain = 1 - (distFountain - 1000)/1400
+					if distFountain > 0 then
+						distFountain = distFountain > 1 and 1 or distFountain
+						scaredFountainFactor = -3200 + Math_GetFastThrottledBounded((gsiPlayer.lastSeenHealth*0.01
+									/ (Unit_GetArmorPhysicalFactor(gsiPlayer)*(1-gsiPlayer.evasion))),
+								3000, 3200, 20000
+							) * distFountain
+					end
+				end
+			end
 			return lowestHealthEnemy, (30 - earlyGameReduction*2*(GameTime() - lowestHealthEnemy.lastSeen.timeStamp))
-					* (-danger)*((1-lowestHealthPercent)+0.33) - towerFear
+					* (-danger)*((1-lowestHealthPercent)+0.33) - towerFear + scaredFountainFactor
 		end
 		return false, XETA_SCORE_DO_NOT_RUN
 	end,

@@ -1,8 +1,8 @@
 local hero_data = {
 	"luna",
-	{3, 1, 3, 5, 3, 2, 3, 2, 2, 2, 4, 4, 1, 1, 8, 1, 4, 9, 11},
+	{3, 1, 3, 2, 3, 2, 3, 2, 2, 5, 1, 4, 1, 4, 7, 1, 4, 9, 12},
 	{
-		"item_slippers","item_circlet","item_quelling_blade","item_tango","item_branches","item_branches","item_wraith_band","item_boots","item_lifesteal","item_gloves","item_magic_wand","item_boots_of_elves","item_power_treads","item_mask_of_madness","item_yasha","item_sphere","item_manta","item_broadsword","item_blades_of_attack","item_lesser_crit","item_silver_edge","item_black_king_bar","item_eagle","item_talisman_of_evasion","item_butterfly","item_satanic","item_moon_shard","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
+		"item_tango","item_branches","item_circlet","item_magic_stick","item_quelling_blade","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_magic_wand","item_power_treads","item_quarterstaff","item_mask_of_madness","item_blade_of_alacrity","item_yasha","item_manta","item_dragon_lance","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_shadow_amulet","item_broadsword","item_invis_sword","item_silver_edge","item_force_staff","item_hurricane_pike","item_claymore","item_satanic","item_demon_edge","item_javelin","item_blitz_knuckles","item_monkey_king_bar",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

@@ -1,12 +1,12 @@
 local hero_data = {
 	"clinkz",
-	{2, 3, 2, 3, 2, 6, 2, 1, 1, 1, 1, 6, 7, 3, 9, 3, 6, 12, 13},
+	{2, 3, 2, 1, 2, 6, 2, 3, 1, 7, 3, 6, 1, 1, 9, 3, 6, 12, 14},
 	{
-		"item_tango","item_circlet","item_slippers","item_branches","item_faerie_fire","item_ward_observer","item_branches","item_bottle","item_wraith_band","item_boots","item_fluffy_hat","item_blades_of_attack","item_magic_wand","item_falcon_blade","item_cornucopia","item_orchid","item_dragon_lance","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_force_staff","item_hurricane_pike","item_black_king_bar","item_sheepstick",
+		"item_magic_stick","item_faerie_fire","item_branches","item_tango","item_branches","item_ward_observer","item_magic_wand","item_boots","item_blight_stone","item_medallion_of_courage","item_crown","item_wind_lace","item_tranquil_boots","item_solar_crest","item_diadem","item_phylactery","item_blitz_knuckles","item_staff_of_wizardry","item_orchid","item_cloak","item_oblivion_staff","item_bloodthorn","item_blight_stone","item_mithril_hammer","item_mithril_hammer","item_desolator","item_void_stone",
 	},
-	{ {1,1,1,1,2,}, {1,1,1,1,2,}, 0.1 },
+	{ {2,2,2,3,3,}, {2,2,2,4,4,}, 0.1 },
 	{
-		"Strafe","Tar Bomb","Death Pact","Burning Army","Burning Barrage","Skeleton Walk","+20 Tar Bomb Bonus Attack Damage","-3s Skeleton Walk Cooldown","+75 Attack Range","+1 Death Pact Charge","+200 Death Pact Health","+40 Strafe Attack Speed","-7s Strafe Cooldown","Tar Bomb Multishot",
+		"Strafe","Tar Bomb","Death Pact","Burning Army","Burning Barrage","Skeleton Walk","+15 Tar Bomb Bonus Attack Damage","-4s Skeleton Walk Cooldown","+75 Attack Range","+1 Death Pact Charge","+250 Death Pact Health","+40 Strafe Attack Speed","-8s Strafe Cooldown","Tar Bomb Multishot",
 	}
 }
 --@EndAutomatedHeroData

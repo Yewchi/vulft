@@ -699,6 +699,7 @@ blueprint = {
 			for i=1,#healthReplenishAvailable,1 do
 				local thisItem = healthReplenishAvailable[i]
 				local thisItemName = thisItem:GetName()
+				
 				if checkFlask and string.find(thisItemName, "flask", ITEM_NAME_SEARCH_START) then
 					local obj, score, add = checkFlask(gsiPlayer, thisItem, playerHealthAfterPassiveRegenBuffer, highestScore)
 					checkFlask = false
@@ -769,6 +770,7 @@ blueprint = {
 		if manaReplenishAvailable then
 			for i=1,#manaReplenishAvailable,1 do
 				local thisItem = manaReplenishAvailable[i]
+				
 				local thisItemName = thisItem:GetName()
 				if checkMango and string.find(thisItemName, "ench", ITEM_NAME_SEARCH_START) then
 					local obj, score, add = checkMango(gsiPlayer, thisItem, playerManaAfterPassiveRegenBuffer, highestScore)

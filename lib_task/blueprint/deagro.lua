@@ -96,7 +96,7 @@ end
 		local underTower = Set_GetEnemyTowerPlayerIsUnder(gsiPlayer)
 		if VERBOSE then INFO_print(string.format("%d underTower: %s, %s, %s", gsiPlayer.nOnTeam, Util_Printable(underTower), Util_Printable(Analytics_GetNearFutureHealth(gsiPlayer)), Util_Printable(gsiPlayer.lastSeenHealth))) end
 		if Analytics_GetNearFutureHealth(gsiPlayer) >= gsiPlayer.lastSeenHealth then return false, XETA_SCORE_DO_NOT_RUN end
-		if underTower and underTower.hUnit:CanBeSeen() then 
+		if underTower and not underTower.hUnit:IsNull() and underTower.hUnit:CanBeSeen() then 
 			local nearbyAlliedCreeps = Set_GetNearestAlliedCreepSetToLocation(gsiPlayer.lastSeen.location)
 			local alliedCreepsUnderTower = Set_GetUnitsInRadiusCircle(underTower.lastSeen.location, underTower.attackRange-150, nearbyAlliedCreeps, nil)
 			local numUnderTower = #alliedCreepsUnderTower

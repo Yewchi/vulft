@@ -94,7 +94,8 @@ local Vector_Addition = Vector_Addition
 
 -- and this would be the fix \/\/\/\/\/\/
 function Vector_ScalarMultiply2D(v, s)
-	return Vector(v.x*s, v.y*s, v.z)
+	--return Vector(v.x*s, v.y*s, v.z)
+	return Vector(v.x*s, v.y*s, 0)
 end
 local Vector_ScalarMultiply2D = Vector_ScalarMultiply2D
 
@@ -554,15 +555,15 @@ local function get_bezier_xy2(self, progress)
 	local p0 = self.p0
 	local p1 = self.p1
 	local p2 = self.p2
-	local A = { p0[1] + progress*(p1[1] - p0[1]),
-			p0[2] + progress*(p1[2] - p0[2]),
-			p0[3] + progress*(p1[3] - p0[3]) }
-	local B = { p1[1] + progress*(p2[1] - p1[1]),
-			p1[2] + progress*(p2[2] - p1[2]),
-			p1[3] + progress*(p2[3] - p1[3]) } 
-	self.val = Vector( A[1] + progress*(B[1] - A[1]),
-			A[2] + progress*(B[2] - A[2]),
-			A[3] + progress*(B[3] - A[3]) )
+	local Ax = p0[1] + progress*(p1[1] - p0[1])
+	local Ay = p0[2] + progress*(p1[2] - p0[2])
+	local Bx = p1[1] + progress*(p2[1] - p1[1])
+	local By = p1[2] + progress*(p2[2] - p1[2])
+	local val = self.val or Vector(0, 0, 0)
+	val.x = Ax + progress*(Bx-Ax)
+	val.y = Ay + progress*(By-Ay)
+	val.z = 0
+	self.val = val
 	self.progress = progress
 	return self.val
 end
@@ -581,8 +582,8 @@ local function get_bezier_forwards(self, progress, andUpdate)
 	local forwardsVal = self:compute(progressSave+progress)
 	local forwardsProgress = self.progress
 	if not andUpdate then
-		self.val = val
-		self.progress = valSave
+		self.val = valSave
+		self.progress = progressSave
 	end
 	return forwardsVal, forwardsProgress, valSave ~= nil
 end

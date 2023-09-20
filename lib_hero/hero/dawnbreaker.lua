@@ -1,12 +1,12 @@
 local hero_data = {
 	"dawnbreaker",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 1, 1, 4, 3, 1, 8, 5, 4, 10, 11},
+	{2, 1, 2, 3, 2, 4, 2, 1, 3, 1, 5, 4, 3, 1, 7, 3, 4, 10, 11},
 	{
-		"item_gauntlets","item_circlet","item_branches","item_enchanted_mango","item_tango","item_quelling_blade","item_boots","item_bracer","item_chainmail","item_blades_of_attack","item_phase_boots","item_magic_wand","item_robe","item_quarterstaff","item_oblivion_staff","item_ogre_axe","item_echo_sabre","item_aghanims_shard","item_blight_stone","item_diadem","item_harpoon","item_mithril_hammer","item_desolator","item_blink","item_ogre_axe","item_black_king_bar","item_helm_of_iron_will","item_nullifier",
+		"item_blight_stone","item_branches","item_faerie_fire","item_tango","item_ward_observer","item_branches","item_branches","item_bottle","item_boots","item_magic_wand","item_phase_boots","item_robe","item_ogre_axe","item_quarterstaff","item_ogre_axe","item_echo_sabre","item_mithril_hammer","item_desolator","item_aghanims_shard","item_blink","item_diadem","item_harpoon","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_buckler","item_platemail","item_assault","item_basher","item_abyssal_blade",
 	},
-	{ {3,3,3,1,5,}, {3,3,3,1,4,}, 0.1 },
+	{ {3,3,3,3,5,}, {3,3,3,3,4,}, 0.1 },
 	{
-		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+14% Celestial Hammer Slow","+50% Luminosity Critical Strike Damage","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","-6s Starbreaker Cooldown","+80%% Celestial Hammer Cast Range/Speed",
+		"Starbreaker","Celestial Hammer","Luminosity","Solar Guardian","+18 Starbreaker Swipe/Smash Damage","+15% Celestial Hammer Slow","+50% Luminosity Critical Strike Damage","-20s Solar Guardian Cooldown","+150 Solar Guardian Radius","-1 Luminosity Attacks Required","-6s Starbreaker Cooldown","+80%% Celestial Hammer Cast Range/Speed",
 	}
 }
 --@EndAutomatedHeroData

@@ -44,6 +44,7 @@ DIRE_NUMBER_OF_PLAYERS = #GetTeamPlayers(TEAM_DIRE)
 TEAM_IS_RADIANT = TEAM == TEAM_RADIANT
 TEAM_NUETRAL = TEAM_NEUTRAL
 
+
 BOTH_TEAMS = -1
 
 TYPE_NONE = 				nil -- (0 and 1) == 1; u.type and u.type or "no type"
@@ -94,6 +95,7 @@ function GSI_Initialize()
 --[[DEBUG]]if DEBUG then DEBUG_print("gsi: Initializing game state interface.") end		
 	if initialize_attempted == true then
 		DEBUG_KILLSWITCH = true
+		ERROR_print(true, true, string.format("[GSI] Attempted to re-initialize GSI -- %s cannot initialize.", TEAM_READABLE))
 		return
 	end
 	

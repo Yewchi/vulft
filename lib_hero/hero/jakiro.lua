@@ -1,12 +1,12 @@
 local hero_data = {
 	"jakiro",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 4, 3, 3, 5, 7, 4, 10, 12},
+	{1, 3, 1, 3, 2, 4, 1, 1, 2, 3, 3, 4, 2, 2, 7, 6, 4, 9, 11},
 	{
-		"item_tango","item_magic_stick","item_blood_grenade","item_branches","item_branches","item_ward_observer","item_boots","item_magic_wand","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_aghanims_shard","item_staff_of_wizardry","item_fluffy_hat","item_force_staff","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_ultimate_scepter","item_ghost","item_cornucopia","item_cornucopia","item_refresher","item_gem",
+		"item_ward_observer","item_boots","item_arcane_boots","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_magic_wand","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_gem","item_aether_lens","item_tranquil_boots","item_aghanims_shard","item_cornucopia","item_cornucopia","item_refresher","item_ancient_janggo","item_boots_of_bearing","item_gem","item_hurricane_pike","item_gem","item_void_stone","item_void_stone","item_soul_booster","item_octarine_core","item_ultimate_scepter_2","item_kaya","item_kaya_and_sange",
 	},
-	{ {1,1,1,3,3,}, {5,5,5,3,4,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+275 Attack Range","-10%/-10 Dual Breath Movement/Attack Speed Slow","-50 Liquid Fire Attack Speed","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","+100%% Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
+		"Dual Breath","Ice Path","Liquid Fire","Macropyre","+275 Attack Range","-10%/-10 Dual Breath Movement/Attack Speed Slow","-50% Liquid Fire Attack Speed Slow","+325 Health","+0.5s Ice Path Duration","+30 Macropyre Damage","+100%% Dual Breath Damage and Range","-2.5s Ice Path Cooldown",
 	}
 }
 --@EndAutomatedHeroData

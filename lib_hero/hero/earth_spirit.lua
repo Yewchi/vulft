@@ -1,12 +1,12 @@
 local hero_data = {
 	"earth_spirit",
-	{1, 2, 1, 2, 1, 4, 1, 2, 2, 5, 3, 4, 3, 3, 8, 3, 4, 9, 11},
+	{1, 2, 1, 2, 1, 4, 2, 2, 1, 6, 3, 4, 3, 3, 8, 3, 4, 9, 11},
 	{
-		"item_tango","item_quelling_blade","item_ward_observer","item_branches","item_branches","item_branches","item_bottle","item_boots","item_magic_wand","item_hand_of_midas","item_chainmail","item_blade_mail","item_kaya","item_ogre_axe","item_belt_of_strength","item_kaya_and_sange","item_black_king_bar","item_ultimate_scepter","item_aghanims_shard","item_ultimate_scepter_2","item_lotus_orb","item_refresher",
+		"item_tango","item_quelling_blade","item_branches","item_branches","item_branches","item_faerie_fire","item_ward_observer","item_boots","item_bottle","item_magic_wand","item_gloves","item_power_treads","item_chainmail","item_broadsword","item_blade_mail","item_reaver","item_heart","item_kaya","item_kaya_and_sange","item_void_stone","item_void_stone","item_vitality_booster","item_energy_booster","item_octarine_core","item_dagon_5","item_dagon_4L",
 	},
-	{ {5,2,2,3,1,}, {5,2,4,4,2,}, 0.1 },
+	{ {2,2,2,2,5,}, {2,2,2,2,4,}, 0.1 },
 	{
-		"Boulder Smash","Rolling Boulder","Geomagnetic Grip","Magnetize","+325 Rolling Boulder Distance","+8% Spell Amplification","+25% Magnetize Damage &amp; Duration","+120 Rolling Boulder Damage","+125 Boulder Smash Damage","-2s Geomagnetic Grip Cooldown","Magnetize Undispellable","+0.5s Rolling Boulder Stun Duration",
+		"Boulder Smash","Rolling Boulder","Geomagnetic Grip","Magnetize","+325 Rolling Boulder Distance","+10% Spell Amplification","+30%% Magnetize Damage &amp; Duration","+120 Rolling Boulder Damage","+125 Boulder Smash Damage","-2s Geomagnetic Grip Cooldown","Magnetize Undispellable","+0.5s Rolling Boulder Stun Duration",
 	}
 }
 --@EndAutomatedHeroData

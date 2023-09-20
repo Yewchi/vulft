@@ -1,8 +1,8 @@
 local hero_data = {
 	"troll_warlord",
-	{2, 1, 3, 3, 1, 4, 3, 1, 1, 6, 2, 4, 3, 2, 7, 2, 4, 10, 12},
+	{2, 1, 3, 2, 2, 4, 2, 3, 3, 1, 6, 4, 1, 1, 7, 3, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_slippers","item_circlet","item_branches","item_branches","item_wraith_band","item_cornucopia","item_boots","item_magic_wand","item_broadsword","item_bfury","item_phase_boots","item_boots_of_elves","item_blade_of_alacrity","item_yasha","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_basher","item_lifesteal","item_claymore","item_satanic","item_helm_of_iron_will","item_nullifier","item_abyssal_blade","item_aghanims_shard","item_blink","item_swift_blink",
+		"item_tango","item_quelling_blade","item_circlet","item_slippers","item_branches","item_branches","item_wraith_band","item_blades_of_attack","item_boots","item_phase_boots","item_cornucopia","item_broadsword","item_claymore","item_bfury","item_blade_of_alacrity","item_yasha","item_sange","item_sange_and_yasha","item_mithril_hammer","item_ogre_axe","item_belt_of_strength","item_black_king_bar","item_basher","item_ultimate_orb","item_sphere","item_javelin","item_blitz_knuckles","item_monkey_king_bar","item_abyssal_blade","item_blink","item_swift_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_aghanims_shard",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{

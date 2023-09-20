@@ -161,6 +161,9 @@ function ZoneDefend_TakeCreepAggroTowerToHeroDownLane(gsiPlayer, objective)
 			) and distToSet < gsiPlayer.attackRange + (-currDanger*300) then
 		local pullUnit = Set_GetSetUnitNearestToLocation(gsiPlayer.lastSeen.location, enemyCreeps)
 		if pullUnit and pullUnit.creepType ~= CREEP_TYPE_SIEGE then
+			if Analytics_AttacksWho(pullUnit.hUnit) == gsiPlayer.hUnit then
+				return false
+			end
 			
 			gsiPlayer.hUnit:Action_AttackUnit(pullUnit.hUnit, true)
 			return true
@@ -279,10 +282,9 @@ blueprint = {
 					local commitTypes = wpForBotTask[POSTER_I.COMMIT_TYPES]
 					local towerHpp = wpObjective.lastSeenHealth / wpObjective.maxHealth
 					local towerNearFutureHealth = Analytics_GetNearFutureHealth(wpObjective)
-					local alliesNearObj = Set_GetAlliedHeroesInLocRad
 					if towerNearFutureHealth / wpObjective.maxHealth > 0.33
 							and (not wpForBotTask.skipWaitWhileFightingExpiry
-									or GameTime() > wpForBotTask.skipWaitWhileFightingExpiry
+									or GameTime() > wpForBotTask.skipWaitWhileFightingExpiry -- 'or the bot was not recently under attack'
 								) then
 						-- only avoid while waiting for incoming defenders unless soon destroyed
 						for i=1,TEAM_NUMBER_OF_PLAYERS do

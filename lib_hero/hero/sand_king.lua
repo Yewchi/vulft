@@ -1,12 +1,12 @@
 local hero_data = {
 	"sand_king",
-	{3, 1, 2, 2, 2, 4, 2, 1, 1, 1, 6, 4, 3, 3, 7, 3, 4, 9, 12},
+	{1, 2, 2, 5, 2, 4, 2, 1, 1, 1, 3, 4, 3, 3, 7, 3, 4, 9, 12},
 	{
-		"item_quelling_blade","item_branches","item_branches","item_circlet","item_tango","item_enchanted_mango","item_branches","item_tango","item_ring_of_health","item_vitality_booster","item_vanguard","item_boots","item_blink","item_magic_wand","item_staff_of_wizardry","item_wind_lace","item_cyclone","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_aeon_disk","item_void_stone","item_soul_booster","item_octarine_core",
+		"item_quelling_blade","item_tango","item_gauntlets","item_magic_stick","item_branches","item_branches","item_branches","item_boots","item_magic_wand","item_tranquil_boots","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_blink","item_headdress","item_point_booster","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_ring_of_health","item_cloak","item_boots_of_bearing","item_pipe","item_gem","item_aghanims_shard",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","20 Sand Storm Damage Per Second","+0.4s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100 Epicenter Base Radius","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
+		"Burrowstrike","Sand Storm","Caustic Finale","Epicenter","+20 Sand Storm Damage Per Second","+0.4s Burrowstrike Stun","+125 Sand Storm Radius","+120.0 Caustic Finale Damage","-2.0s Burrowstrike Cooldown","+100/+100 Base/Incremental Radius of Epicenter","+5 Epicenter Pulses","35% Sand Storm Slow and Blind",
 	}
 }
 --@EndAutomatedHeroData
@@ -86,7 +86,7 @@ d = {
 		local nearbyEnemies, outerEnemies
 				= Set_GetEnemyHeroesInLocRadOuter(gsiPlayer.lastSeen.location, ABILITY_USE_RANGE, OUTER_RANGE, 6)
 		local nearbyAllies
-				= Set_GetAlliedHeroesInLocRadius(gsiPlayer, gsiPlayer.lastSeen.location,
+				= Set_GetAlliedHeroesInLocRad(gsiPlayer, gsiPlayer.lastSeen.location,
 					ABILITY_USE_RANGE, false
 				)
 		local fightHarassTarget = Task_GetTaskObjective(gsiPlayer, fight_harass_handle)

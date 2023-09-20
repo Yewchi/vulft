@@ -1143,7 +1143,8 @@ local t_neutrals_ability_funcs = {
 					local dmg = ability:GetSpecialValueFloat("initial_damage")
 					local bestTarget
 					local bestScore = 0
-					Set_NumericalIndexUnion(outerToAllEnemies, nearbyEnemies) -- tbl1 broken
+					Set_NumericalIndexUnion( nil, outerToAllEnemies,
+							nearbyEnemies )
 					for i=1,#nearbyEnemies do
 						local thisEnemy = nearbyEnemies[i]
 						local magicRes = AbilityLogic_CastOnTargetWillSucceed(gsiUnit, thisEnemy, ability)

@@ -117,7 +117,7 @@ function Analytics_RegisterAnalyticsJobDomainToFightModerate(jobDomain)
 					for i=1,TEAM_NUMBER_OF_PLAYERS do
 						t_initiation_hierarchy[i] = nil
 					end
-					-- Update initation power hierarchy
+					-- Update initiation power hierarchy
 					local Armor = Unit_GetArmorPhysicalFactor
 					local t_item_initiation_power = t_item_initiation_power
 					local t_item_initiation_power_unindexed = t_item_initiation_power_unindexed
@@ -140,9 +140,9 @@ function Analytics_RegisterAnalyticsJobDomainToFightModerate(jobDomain)
 							end
 						end
 						local healthPercent = gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth
-						local effectiveHealth = (gsiPlayer.lastSeenHealth
-										+ healthPercent*5*(gsiPlayer.hUnit:GetHealthRegen()^1.2)
-								) * Armor(gsiPlayer)
+						local effectiveHealth = gsiPlayer.ehpArmor * (gsiPlayer.lastSeenHealth
+								+ healthPercent*5*(gsiPlayer.hUnit:GetHealthRegen()^1.2)
+							)
 						local thisInitiationPower = effectiveHealth * netInitiationFactor
 						t_initiation_power[i] = thisInitiationPower
 						-- Insert sorted the PNOT for initiation power hierarchy

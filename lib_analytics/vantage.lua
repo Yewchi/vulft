@@ -521,6 +521,7 @@ function VAN_GuideWardAtIndex(gsiPlayer, wardIndex, hItem)
 			gsiPlayer.hUnit:Action_UseAbilityOnLocation(hItem, correctedVec)
 		end
 		
+		
 
 		return true;
 	end

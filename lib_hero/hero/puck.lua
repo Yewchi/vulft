@@ -1,8 +1,8 @@
 local hero_data = {
 	"puck",
-	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 3, 3, 3, 5, 8, 4, 4, 9, 11},
+	{1, 3, 1, 2, 1, 4, 1, 2, 2, 2, 5, 3, 3, 3, 8, 4, 4, 9, 11},
 	{
-		"item_tango","item_faerie_fire","item_branches","item_branches","item_branches","item_branches","item_ward_observer","item_bottle","item_robe","item_chainmail","item_witch_blade","item_boots","item_robe","item_gloves","item_power_treads","item_blink","item_robe","item_staff_of_wizardry","item_kaya","item_kaya_and_sange","item_ultimate_orb","item_cornucopia","item_sphere","item_energy_booster","item_octarine_core","item_overwhelming_blink","item_revenants_brooch","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity",
+		"item_branches","item_branches","item_ward_observer","item_branches","item_faerie_fire","item_branches","item_tango","item_bottle","item_robe","item_magic_wand","item_gloves","item_boots","item_power_treads","item_robe","item_blitz_knuckles","item_witch_blade","item_blink","item_kaya","item_aghanims_shard","item_kaya_and_sange","item_soul_booster","item_octarine_core","item_dagon_2","item_gem","item_dagon_4","item_dagon_5","item_overwhelming_blink","item_sphere","item_point_booster","item_desolator","item_ultimate_scepter_2",
 	},
 	{ {2,2,2,2,2,}, {2,2,2,2,2,}, 0.1 },
 	{

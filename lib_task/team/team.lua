@@ -397,7 +397,7 @@ function Team_FortUnderAttack(gsiUnit)
 		doCheapAssBuybacks = true
 	else
 		doCheapAssBuybacks = false
-		local defenders = Set_GetAlliedHeroesInLocRadius(nil, ancient_on_ropes_fight_loc, 4000)
+		local defenders = Set_GetAlliedHeroesInLocRad(nil, ancient_on_ropes_fight_loc, 4000)
 		local attackers = Set_GetEnemyHeroesInLocRadOuter(ancient_on_ropes_fight_loc, 5000, 5000, 10)
 		local defensivePower = Analytics_GetTheoreticalEncounterPower(
 				defenders,

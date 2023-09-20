@@ -1,12 +1,12 @@
 local hero_data = {
 	"naga_siren",
-	{1, 3, 4, 1, 1, 3, 1, 3, 3, 6, 2, 2, 2, 2, 7, 4, 4, 10, 11},
+	{1, 3, 2, 1, 1, 3, 1, 3, 3, 6, 4, 2, 2, 2, 7, 4, 4, 10, 11},
 	{
-		"item_quelling_blade","item_circlet","item_slippers","item_tango","item_branches","item_branches","item_wraith_band","item_gloves","item_boots_of_elves","item_power_treads","item_hand_of_midas","item_yasha","item_manta","item_reaver","item_cornucopia","item_heart","item_blitz_knuckles","item_staff_of_wizardry","item_orchid","item_mage_slayer","item_bloodthorn","item_black_king_bar","item_boots","item_sheepstick","item_aghanims_shard","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_moon_shard","item_revenants_brooch","item_refresher",
+		"item_quelling_blade","item_circlet","item_tango","item_slippers","item_branches","item_branches","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_wind_lace","item_blade_of_alacrity","item_yasha","item_manta","item_cornucopia","item_orchid","item_reaver","item_heart","item_diffusal_blade_2","item_disperser","item_bloodthorn","item_ultimate_orb","item_skadi","item_aghanims_shard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2","item_moon_shard","item_moon_shard","item_moon_shard","item_moon_shard","item_moon_shard","item_moon_shard","item_quarterstaff","item_butterfly","item_buckler","item_assault","item_refresher",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Mirror Image","Ensnare","Rip Tide","Song of the Siren","-2s Ensnare Cooldown","+30 Rip Tide Damage","+13% Mirror Image Damage","+15 Strength","-20s Song of the Siren Cooldown","+1 Mirror Image Illusion","-10s Mirror Image Cooldown","-1 Attack to Trigger Rip Tide",
+		"Mirror Image","Ensnare","Rip Tide","Song of the Siren","-2s Ensnare Cooldown","+30 Rip Tide Damage","+10% Mirror Image Damage","+15 Strength","-20s Song of the Siren Cooldown","+1 Mirror Image Illusion","-10s Mirror Image Cooldown","-1 Attack to Trigger Rip Tide",
 	}
 }
 --@EndAutomatedHeroData

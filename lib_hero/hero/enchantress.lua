@@ -1,12 +1,12 @@
 local hero_data = {
 	"enchantress",
-	{1, 2, 2, 1, 2, 5, 1, 1, 3, 3, 3, 5, 3, 6, 8, 2, 5, 10, 12},
+	{3, 2, 2, 1, 2, 5, 1, 1, 1, 3, 3, 5, 3, 6, 8, 2, 5, 10, 12},
 	{
-		"item_ward_observer","item_tango","item_blood_grenade","item_branches","item_faerie_fire","item_magic_stick","item_boots","item_gloves","item_robe","item_magic_wand","item_power_treads","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_force_staff","item_hurricane_pike","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_wraith_band","item_ultimate_scepter","item_gem","item_black_king_bar","item_lesser_crit","item_demon_edge","item_greater_crit",
+		"item_tango","item_branches","item_faerie_fire","item_mantle","item_circlet","item_branches","item_null_talisman","item_boots","item_magic_wand","item_blade_of_alacrity","item_belt_of_strength","item_dragon_lance","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_hurricane_pike","item_aghanims_shard","item_robe","item_power_treads","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blitz_knuckles","item_staff_of_wizardry","item_cornucopia","item_orchid","item_mage_slayer","item_bloodthorn","item_witch_blade",
 	},
-	{ {3,3,3,1,1,}, {5,5,4,4,4,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
 	{
-		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+8% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","+-65 Untouchable Attack Slow","+30%% Enchanted Creep Health/Damage","+8% Impetus Damage","+20 Nature's Attendants Heal",
+		"Impetus","Enchant","Nature's Attendants","Little Friends","Untouchable","+8% Magic Resistance","+30 Movespeed during Nature's Attendants","+45 Damage","+5 Nature's Attendants Wisps","+-65 Untouchable Attack Slow","+30%% Enchanted Creep Health/Damage","+6.5% Impetus Damage","+20 Nature's Attendants Heal",
 	}
 }
 --@EndAutomatedHeroData

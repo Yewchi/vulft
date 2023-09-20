@@ -1,12 +1,12 @@
 local hero_data = {
 	"tidehunter",
-	{3, 2, 3, 2, 3, 5, 3, 6, 2, 2, 1, 5, 1, 1, 1, 8, 5, 10, 11},
+	{3, 1, 3, 2, 3, 5, 3, 2, 2, 2, 6, 5, 1, 1, 9, 1, 5, 11, 8},
 	{
-		"item_tango","item_ring_of_regen","item_ring_of_regen","item_enchanted_mango","item_faerie_fire","item_crown","item_ring_of_health","item_pers","item_crown","item_meteor_hammer","item_boots","item_mekansm","item_energy_booster","item_arcane_boots","item_mekansm","item_buckler","item_guardian_greaves","item_ogre_axe","item_point_booster","item_staff_of_wizardry","item_blade_of_alacrity","item_cloak","item_ultimate_scepter","item_headdress","item_pipe","item_sange","item_talisman_of_evasion","item_heavens_halberd",
+		"item_enchanted_mango","item_tango","item_quelling_blade","item_branches","item_branches","item_magic_stick","item_chainmail","item_boots","item_phase_boots","item_magic_wand","item_soul_ring","item_bracer","item_chainmail","item_headdress","item_mekansm","item_blink","item_aghanims_shard","item_platemail","item_void_stone","item_pers","item_lotus_orb","item_point_booster","item_ultimate_scepter","item_refresher","item_staff_of_wizardry","item_wind_lace","item_wind_waker",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Gush","Kraken Shell","Anchor Smash","Tendrils of the Deep","Ravage","+50 Anchor Smash Damage","+10.0% Gush Slow","+120 Gush Damage","-25% Anchor Smash Damage Reduction","Anchor Smash affects buildings","+40 Kraken Shell Damage Block","+0.8s Ravage Stun Duration","50% chance of Anchor Smash on attack",
+		"Gush","Kraken Shell","Anchor Smash","Dead in the Water","Ravage","+50 Anchor Smash Damage","+10.0% Gush Slow","+100 Gush Damage","-25% Anchor Smash Damage Reduction","Anchor Smash affects buildings","+4 Kraken Shell Damage Block per Anchor Smash Kill","+0.8s Ravage Stun Duration","50% chance of Anchor Smash on attack",
 	}
 }
 --@EndAutomatedHeroData

@@ -1,12 +1,12 @@
 local hero_data = {
 	"death_prophet",
-	{1, 3, 3, 1, 3, 4, 3, 2, 1, 1, 6, 4, 2, 2, 7, 2, 4, 10, 11},
+	{1, 3, 3, 1, 3, 4, 3, 2, 1, 1, 6, 4, 2, 2, 7, 2, 4, 10, 12},
 	{
-		"item_circlet","item_tango","item_branches","item_slippers","item_enchanted_mango","item_blood_grenade","item_wraith_band","item_boots","item_wind_lace","item_arcane_boots","item_headdress","item_magic_wand","item_mekansm","item_buckler","item_guardian_greaves","item_ogre_axe","item_sange","item_heavens_halberd","item_platemail","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_aghanims_shard","item_shivas_guard","item_blink","item_gem",
+		"item_quelling_blade","item_tango","item_branches","item_branches","item_branches","item_circlet","item_bracer","item_boots","item_arcane_boots","item_magic_wand","item_headdress","item_chainmail","item_mekansm","item_buckler","item_guardian_greaves","item_wind_lace","item_void_stone","item_cyclone","item_sange","item_heavens_halberd","item_platemail","item_shivas_guard","item_vitality_booster","item_energy_booster","item_aeon_disk",
 	},
 	{ {3,3,3,3,2,}, {3,3,3,3,2,}, 0.1 },
 	{
-		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+300 Health","-2.0s Crypt Swarm Cooldown","25.0% Spirit Siphon Move Speed Slow","+30 Spirit Siphon Damage/Heal","-22s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
+		"Crypt Swarm","Silence","Spirit Siphon","Exorcism","+30 Damage","+12% Magic Resistance","+300 Health","-2.0s Crypt Swarm Cooldown","Crypt Swarm applies +1% slow for +1s","+30 Spirit Siphon Damage/Heal","-22s Spirit Siphon Replenish Time","+8 Exorcism Spirits",
 	}
 }
 --@EndAutomatedHeroData
@@ -215,7 +215,7 @@ d = {
 				-- Loosely uses the extended range of the circle at the cast location, may miss
 				if VEC_POINT_DISTANCE(playerLoc, extrapolatedFht) < CRYPT_SWARM_RANGE*0.9 then
 					local crowdedCenter, crowdedRating = CROWDED_RATING(extrapolatedFht, SET_HERO_ENEMY)
-					if crowdedRating > 1.5 then -- if / else, save it for more enemies, with bugs
+					if crowdedRating > 1.33 then -- if / else, save it for more enemies, with bugs
 						if VEC_POINT_DISTANCE(playerLoc, crowdedCenter) < CRYPT_SWARM_RANGE
 								and HIGH_USE(gsiPlayer, cryptSwarm, highUse, fhtHpp/crowdedRating) then
 							USE_ABILITY(gsiPlayer, cryptSwarm, crowdedCenter, 400, nil)

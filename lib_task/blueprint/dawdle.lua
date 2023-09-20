@@ -95,11 +95,17 @@ Blueprint_RegisterTask(task_init_func)
 
 blueprint = {
 	run = function(gsiPlayer, objective, xetaScore)
-		if objective and objective.isOutpost then
+		if objective and objective.type == UNIT_TYPE_BUILDING then
+			if objective.isOutpost then 
+				AbilityLogic_UseOutpost(gsiPlayer, objective)
+			elseif objective.isLamp then
+				AbilityLogic_UseLantern(gsiPlayer, objective)
+			elseif objective.isTwinGate then
+				AbilityLogic_UseTwinGate(gsiPlayer, objective) -- result: unusable
+			elseif objective.isMangoTree then
+				AbilityLogic_UseFamangoTree(gsiPlayer, objective) -- result: unusable
+			end
 			-- TEMP
-			AbilityLogic_UseOutpost(gsiPlayer, objective)
-			--AbilityLogic_UseTwinGate(gsiPlayer, objective) -- result: unusable
-			--AbilityLogic_UseFamangoTree(gsiPlayer, objective) -- result: unusable
 			return xetaScore;
 		end
 		local danger = Analytics_GetTheoreticalDangerAmount(gsiPlayer)
@@ -205,7 +211,8 @@ blueprint = {
 				gsiPlayer.currentMovementSpeed*9/(1+0.75*gsiPlayer.vibe.greedRating+max(0,danger+1))
 			)
 		if outpost and not outpost.hUnit:HasModifier("modifier_invulnerable")
-				and not gsiPlayer.hUnit:IsSilenced() then
+				and not gsiPlayer.hUnit:IsSilenced()
+				and outpost.team ~= gsiPlayer.team then
 			-- TEMP
 			
 			local averageLevel = GSI_GetTeamAverageLevel(TEAM)
@@ -228,10 +235,10 @@ blueprint = {
 				return outpost, scoreOutpost
 			end
 		end
-		-- [[ 7.33 all tests did not pass ]]
+		-- [[ TESTS FAILED 2023-05-03 ]]
 		if false then
 			local lantern, lanternDist = SET_TYPE_UNIT_NEARBY(
-					gsiPlayer.lastSeen.location, SET_CREEP_NEUTRAL, "lanterns"
+					gsiPlayer.lastSeen.location, SET_BUILDING_NEUTRAL, "lanterns"
 				)
 			
 			if lantern then
@@ -239,7 +246,7 @@ blueprint = {
 			end
 		elseif false then
 			local twinGate, twinGateDist = SET_TYPE_UNIT_NEARBY(
-					gsiPlayer.lastSeen.location, SET_CREEP_NEUTRAL, "twinGates"
+					gsiPlayer.lastSeen.location, SET_BUILDING_NEUTRAL, "twinGates"
 				)
 			
 			if twinGate then
@@ -247,7 +254,7 @@ blueprint = {
 			end
 		elseif false then
 			local mangoTree, mangoTreeDist = SET_TYPE_UNIT_NEARBY(
-					gsiPlayer.lastSeen.location, SET_CREEP_NEUTRAL, "mangoTrees"
+					gsiPlayer.lastSeen.location, SET_BUILDING_NEUTRAL, "mangoTrees"
 				)
 			
 			if mangoTree then

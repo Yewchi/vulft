@@ -61,7 +61,7 @@ local TEAM_NUMBER_OF_PLAYERS = TEAM_NUMBER_OF_PLAYERS
 local XETA_SCORE_DO_NOT_RUN = XETA_SCORE_DO_NOT_RUN
 local min = math.min
 local max = math.max
-local pairs = pairs
+local next = next
 local VERBOSE = VERBOSE or DEBUG_TARGET and string.find(DEBUG_TARGET, "Dtask")
 local DEBUG = VERBOSE or DEBUG
 local TEST = TEST or DEBUG_TARGET and string.find(DEBUG_TARGET, "Ttask")
@@ -138,7 +138,7 @@ do
 			function(workingSet)
 				if workingSet.throttle:allowed() then
 					for n=1,TEAM_NUMBER_OF_PLAYERS,1 do
-						for k,_ in pairs(t_player_tasks_failing_inits[n]) do
+						for k,_ in next,t_player_tasks_failing_inits[n] do
 							t_player_tasks_failing_inits[n][k] = t_player_tasks_failing_inits[n][k] - 1
 							if t_player_tasks_failing_inits[n][k] == 0 then 
 								t_player_tasks_failing_inits[n][k] = nil
@@ -214,7 +214,9 @@ end
 
 -------------- remove_tasks_with_disallowed_objectives()
 local function remove_tasks_with_disallowed_objectives(gsiPlayer, disallowedObjective)
-	for key,task in pairs(t_tasks[gsiPlayer.nOnTeam] or {}) do
+	local tasksTbl = t_tasks[gsiPlayer.nOnTeam]
+	if not tasks then return; end
+	for key,task in next,tasksTbl do
 		if task[TASK_I__OBJECTIVE] == disallowedObjective then
 			t_tasks[gsiPlayer.nOnTeam][key][TASK_I__OBJECTIVE] = false
 			t_tasks[gsiPlayer.nOnTeam][key][TASK_I__SCORE] = XETA_SCORE_DO_NOT_RUN -- Rescore please.
@@ -230,13 +232,14 @@ local function score_task(gsiPlayer, task)
 	local taskHandle = task[TASK_I__HANDLE]
 	
 	if TEST then
-		TEBUG_print("[task] scoring %s::#%d", gsiPlayer.shortName, taskHandle)
+		TEBUG_print("[task] scoring %s::#%d tbls: %f", gsiPlayer.shortName, taskHandle, VERBOSE and collectgarbage("count") or -0)
 		DEBUG_timeScoringTask[taskHandle] = DEBUG_timeScoringTask[taskHandle] or 0;
 		DEBUG_taskScoredCount[taskHandle] = DEBUG_taskScoredCount[taskHandle] and DEBUG_taskScoredCount[taskHandle] + 1 or 1;
 		score_task_prev_time = RealTime()
 	end
 	task[TASK_I__OBJECTIVE], prevToCurrScore = task[TASK_I__SCORING_FUNC](gsiPlayer, prevObjective, prevToCurrScore)
 	if TEST then
+		if VERBOSE then TEBUG_print("[task] tbls: %f", collectgarbage("count")) end
 		DEBUG_timeScoringTask[taskHandle] = DEBUG_timeScoringTask[taskHandle] + RealTime() - score_task_prev_time or 0;
 		if DEBUG_taskScoredCount[taskHandle] > 500 then
 			TEBUG_print("[task::score_task] <BENCH> Task handle %d scoring 500 times took %.4fms", taskHandle, DEBUG_timeScoringTask[taskHandle]*1000)
@@ -571,7 +574,7 @@ function Task_InformAliveAndRemoveObjectiveDisallows(gsiPlayer) -- Did anyone te
 	end
 	local myObjectiveDisallows = t_player_disallowed_objective_targets[gsiPlayer.nOnTeam]
 	if myObjectiveDisallows ~= nil then
-		for key,objectiveDisallow in pairs(myObjectiveDisallows) do
+		for key,objectiveDisallow in next,myObjectiveDisallows do
 			remove_tasks_with_disallowed_objectives(gsiPlayer, objectiveDisallow[OBJECTIVE_DISALLOW_I__OBJECTIVE])
 			-- Run the cancel function for each denial type and objective being disallowed:
 			TASK_DISALLOW_OBJECTIVE_FUNCS[objectiveDisallow[OBJECTIVE_DISALLOW_I__CANCEL_FUNCTION_TYPE]](gsiPlayer, objectiveDisallow[OBJECTIVE_DISALLOW_I__OBJECTIVE])

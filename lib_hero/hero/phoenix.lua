@@ -1,10 +1,10 @@
 local hero_data = {
 	"phoenix",
-	{2, 1, 2, 3, 2, 4, 2, 3, 3, 3, 5, 4, 1, 1, 7, 1, 4, 9, 11},
+	{2, 1, 2, 1, 2, 4, 2, 3, 3, 3, 3, 4, 6, 1, 7, 1, 4, 9, 11},
 	{
-		"item_tango","item_branches","item_blood_grenade","item_branches","item_branches","item_branches","item_flask","item_ward_observer","item_boots","item_magic_wand","item_tranquil_boots","item_wind_lace","item_ring_of_basilius","item_crown","item_veil_of_discord","item_kaya","item_ghost","item_ethereal_blade","item_aghanims_shard","item_refresher","item_gem","item_aeon_disk","item_gem","item_gem","item_gem","item_gem","item_mask_of_madness",
+		"item_blood_grenade","item_ward_sentry","item_ward_sentry","item_tango","item_magic_stick","item_faerie_fire","item_branches","item_magic_wand","item_boots","item_urn_of_shadows","item_mekansm","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_ancient_janggo","item_tranquil_boots","item_sheepstick","item_gem","item_ultimate_scepter","item_aghanims_shard",
 	},
-	{ {3,3,3,1,1,}, {4,4,4,5,5,}, 0.1 },
+	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Icarus Dive","Fire Spirits","Sun Ray","Supernova","+25% Icarus Dive Slow","+6% Spell Amplification","+20 Fire Spirits Damage Per Second","+500 Health","+1.5% Max Health Sun Ray Damage","+0.4s Supernova Stun Duration","+3 Supernova Hit Count","+1000 Icarus Dive Cast Range",
 	}

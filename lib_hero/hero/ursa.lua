@@ -2,11 +2,11 @@ local hero_data = {
 	"ursa",
 	{3, 1, 3, 2, 3, 4, 3, 2, 2, 2, 1, 4, 1, 1, 7, 5, 4, 10, 12},
 	{
-		"item_quelling_blade","item_tango","item_faerie_fire","item_branches","item_branches","item_magic_stick","item_boots","item_blades_of_attack","item_magic_wand","item_phase_boots","item_broadsword","item_cornucopia","item_claymore","item_bfury","item_wind_lace","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_basher","item_vanguard","item_abyssal_blade","item_monkey_king_bar","item_eagle","item_swift_blink","item_aghanims_shard","item_sphere","item_cornucopia","item_cornucopia","item_refresher",
+		"item_magic_stick","item_branches","item_tango","item_branches","item_quelling_blade","item_branches","item_boots","item_blades_of_attack","item_magic_wand","item_chainmail","item_orb_of_venom","item_phase_boots","item_orb_of_corrosion","item_cornucopia","item_broadsword","item_claymore","item_bfury","item_blink","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_mithril_hammer","item_belt_of_strength","item_basher","item_abyssal_blade","item_nullifier","item_aghanims_shard","item_swift_blink","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
 	},
 	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
 	{
-		"Earthshock","Overpower","Fury Swipes","Enrage","+20s Fury Swipes Reset Time","+1.75 Mana Regen","Earthshock Applies +2 Fury Swipes","+10% Enrage Status Resistance","-2s Earthshock Cooldown","+12 Fury Swipes Damage","Enrage provides half benefits to allies in a +700 radius","+3 Overpower Attacks",
+		"Earthshock","Overpower","Fury Swipes","Enrage","+20s Fury Swipes Reset Time","+1.75 Mana Regen","Earthshock Applies +2 Fury Swipes","+20% Enrage Status Resistance","+400 Earthshock Radius","+10 Fury Swipes Damage","Earthshock has +2 Charges","+3 Overpower Attacks",
 	}
 }
 --@EndAutomatedHeroData

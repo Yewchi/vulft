@@ -79,6 +79,8 @@ local function open_jungle_token_item(gsiPlayer, hItem)
 			print(gsiPlayer.hUnit:ActionImmediate_SwapItems(i, JUNGLE_ITEM_ITEM_SLOT))
 		end
 		print("use on me", gsiPlayer.hUnit:Action_UseAbilityOnEntity(hItem, gsiPlayer.hUnit))]]
+		--[[ TEST FAILED 2023-05-03 ]]
+		print("use", gsiPlayer.hUnit:Action_UseAbility(hItem))
 		print("use on digit", gsiPlayer.hUnit:Action_UseAbilityOnTree(hItem, 1))
 		for k,v in pairs(getmetatable(hItem).__index) do
 			print(hItem:GetName(), k, v)

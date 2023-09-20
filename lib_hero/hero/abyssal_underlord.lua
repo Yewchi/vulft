@@ -1,12 +1,12 @@
 local hero_data = {
 	"abyssal_underlord",
-	{1, 3, 1, 2, 1, 4, 1, 3, 2, 2, 2, 4, 6, 3, 7, 3, 4, 9, 11},
+	{3, 1, 2, 1, 1, 4, 1, 2, 2, 6, 2, 4, 3, 3, 7, 3, 4, 9, 11},
 	{
-		"item_quelling_blade","item_gauntlets","item_gauntlets","item_tango","item_branches","item_branches","item_enchanted_mango","item_ring_of_health","item_boots","item_soul_ring","item_vanguard","item_headdress","item_chainmail","item_mekansm","item_arcane_boots","item_buckler","item_guardian_greaves","item_headdress","item_cloak","item_pipe","item_mystic_staff","item_ultimate_orb","item_sheepstick","item_crimson_guard","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_platemail","item_shivas_guard",
+		"item_quelling_blade","item_gauntlets","item_gauntlets","item_tango","item_branches","item_faerie_fire","item_ring_of_health","item_soul_ring","item_vanguard","item_boots","item_magic_wand","item_arcane_boots","item_vitality_booster","item_rod_of_atos","item_aghanims_shard","item_chainmail","item_headdress","item_buckler","item_guardian_greaves","item_void_stone","item_platemail","item_pers","item_energy_booster","item_lotus_orb","item_platemail","item_shivas_guard","item_heart","item_gungir",
 	},
 	{ {3,3,3,3,3,}, {3,3,3,3,3,}, 0.1 },
 	{
-		"Firestorm","Pit of Malice","Atrophy Aura","Fiend's Gate","+5 Armor","+100 Firestorm Radius","+75 Pit of Malice AoE","-4s Firestorm Cooldown","+1% Firestorm Burn Damage","+15% Atrophy Aura Attack Damage Reduction","+0.65s Pit of Malice Root","+50% Atrophy Allied Hero Bonus",
+		"Firestorm","Pit of Malice","Atrophy Aura","Fiend's Gate","+5 Armor","+75 Firestorm Radius","+75 Pit of Malice AoE","-3s Firestorm Cooldown","+0.8% Firestorm Burn Damage","+15% Atrophy Aura Attack Damage Reduction","+0.65s Pit of Malice Root","+50% Atrophy Allied Hero Bonus",
 	}
 }
 --@EndAutomatedHeroData

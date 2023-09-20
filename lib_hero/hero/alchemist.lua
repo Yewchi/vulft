@@ -1,12 +1,12 @@
 local hero_data = {
 	"alchemist",
-	{2, 1, 1, 2, 1, 5, 1, 2, 2, 7, 3, 5, 3, 3, 9, 3, 5, 6, 12, 13},
+	{2, 1, 2, 1, 1, 5, 1, 2, 2, 3, 3, 5, 3, 3, 9, 6, 5, 7, 12, 13},
 	{
-		"item_tango","item_magic_stick","item_quelling_blade","item_faerie_fire","item_branches","item_branches","item_belt_of_strength","item_boots","item_gloves","item_power_treads","item_cornucopia","item_broadsword","item_bfury","item_magic_wand","item_belt_of_strength","item_sange","item_sange_and_yasha","item_blink","item_invis_sword","item_reaver","item_heart","item_silver_edge","item_overwhelming_blink","item_black_king_bar","item_basher","item_vanguard","item_abyssal_blade","item_moon_shard","item_buckler","item_assault","item_ultimate_scepter","item_ultimate_scepter","item_gem",
+		"item_tango","item_branches","item_magic_stick","item_quelling_blade","item_branches","item_branches","item_belt_of_strength","item_gloves","item_boots","item_power_treads","item_relic","item_radiance","item_ogre_axe","item_mithril_hammer","item_black_king_bar","item_blink","item_oblivion_staff","item_ogre_axe","item_echo_sabre","item_diadem","item_harpoon","item_invis_sword","item_lesser_crit","item_silver_edge","item_reaver","item_radiance","item_butterfly","item_overwhelming_blink","item_nullifier",
 	},
-	{ {1,1,1,1,1,}, {1,1,1,1,1,}, 0.1 },
+	{ {1,1,1,1,5,}, {1,1,1,1,4,}, 0.1 },
 	{
-		"Acid Spray","Unstable Concoction","Corrosive Weaponry","Greevil's Greed","Chemical Rage","+1 Acid Spray Armor Reduction","+125 Unstable Concoction Radius","Acid Spray grants armor to allies","+3 Damage per Greevil's Greed stack","-0.1s Chemical Rage Base Attack Time","+400 Unstable Concoction Max Damage","+50 Chemical Rage Movement Speed","+50 Chemical Rage Regeneration",
+		"Acid Spray","Unstable Concoction","Corrosive Weaponry","Greevil's Greed","Chemical Rage","+1 Acid Spray Armor Reduction","+125 Unstable Concoction Radius","Acid Spray grants armor to allies","+2 Damage per Greevil's Greed stack","-0.1s Chemical Rage Base Attack Time","+400 Unstable Concoction Max Damage","+50 Chemical Rage Movement Speed","+50 Chemical Rage Regeneration",
 	}
 }
 --@EndAutomatedHeroData

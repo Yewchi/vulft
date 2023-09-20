@@ -1,12 +1,12 @@
 local hero_data = {
 	"skywrath_mage",
-	{2, 1, 2, 3, 1, 4, 1, 1, 3, 3, 3, 4, 5, 2, 8, 2, 4, 10, 12},
+	{2, 1, 1, 3, 2, 4, 2, 3, 2, 6, 3, 4, 1, 1, 7, 3, 4, 10, 12},
 	{
-		"item_blood_grenade","item_ward_observer","item_tango","item_mantle","item_circlet","item_mantle","item_blood_grenade","item_null_talisman","item_null_talisman","item_boots","item_tranquil_boots","item_crown","item_crown","item_ring_of_basilius","item_veil_of_discord","item_staff_of_wizardry","item_crown","item_rod_of_atos","item_staff_of_wizardry","item_ultimate_scepter","item_blink","item_ultimate_orb","item_void_stone","item_sheepstick","item_gem","item_ultimate_scepter_2",
+		"item_tango","item_blood_grenade","item_enchanted_mango","item_enchanted_mango","item_branches","item_ward_sentry","item_ward_sentry","item_tango","item_clarity","item_boots","item_arcane_boots","item_medallion_of_courage","item_wind_lace","item_solar_crest","item_void_stone","item_aether_lens","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_ultimate_orb",
 	},
-	{ {5,5,3,3,2,}, {4,4,4,4,4,}, 0.1 },
+	{ {5,5,5,3,3,}, {4,4,4,4,4,}, 0.1 },
 	{
-		"Arcane Bolt","Concussive Shot","Ancient Seal","Mystic Flare","+200 Health","+8 Intelligence","-8s Ancient Seal Cooldown","+1 Arcane Bolt Per Cast","Global Concussive Shot","+-10% Ancient Seal Increased Magic Damage","Arcane Bolt Pierces Spell Immunity","+400 Mystic Flare Damage",
+		"Arcane Bolt","Concussive Shot","Ancient Seal","Mystic Flare","+200 Health","+8 Intelligence","-7s Ancient Seal Cooldown","+25% Arcane Bolt Spell Lifesteal","Global Concussive Shot","-10% Ancient Seal Increased Magic Damage","Arcane Bolt Pierces Spell Immunity","+400 Mystic Flare Damage",
 	}
 }
 --@EndAutomatedHeroData

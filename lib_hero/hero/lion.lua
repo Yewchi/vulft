@@ -1,12 +1,12 @@
 local hero_data = {
 	"lion",
-	{1, 3, 1, 2, 1, 4, 1, 3, 2, 2, 2, 4, 3, 5, 8, 3, 4, 9, 12},
+	{1, 3, 1, 2, 1, 4, 1, 3, 3, 6, 2, 4, 2, 2, 8, 3, 4, 10, 12},
 	{
-		"item_tango","item_ward_observer","item_branches","item_branches","item_branches","item_blight_stone","item_branches","item_boots","item_wind_lace","item_tranquil_boots","item_magic_wand","item_blink","item_belt_of_strength","item_robe","item_wind_lace","item_ancient_janggo","item_aghanims_shard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_boots_of_bearing","item_aether_lens","item_yasha",
+		"item_tango","item_branches","item_branches","item_branches","item_magic_stick","item_blood_grenade","item_ward_sentry","item_ward_sentry","item_boots","item_tranquil_boots","item_magic_wand","item_blink","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_ghost","item_kaya","item_ethereal_blade","item_diadem","item_voodoo_mask","item_dagon_5","item_dagon_3L",
 	},
-	{ {3,3,3,3,1,}, {4,4,4,4,5,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,4,}, 0.1 },
 	{
-		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","Mana Drain Restores Allies","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","-3s Hex Cooldown","Mana Drain Deals Damage","+250 AoE Hex",
+		"Earth Spike","Hex","Mana Drain","Finger of Death","+10% Mana Drain Slow","+65 Earth Spike Damage","-2s Hex Cooldown","+70 Max Health Per Finger of Death Kill","+20 Finger of Death Damage Per Kill","Earth Spike affects a 30º cone","Mana Drain Deals Damage","+250 AoE Hex",
 	}
 }
 --@EndAutomatedHeroData

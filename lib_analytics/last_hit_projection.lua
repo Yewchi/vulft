@@ -49,9 +49,12 @@ local EMPTY_TABLE = EMPTY_TABLE
 local GameTime = GameTime
 
 local DEBUG = DEBUG
-local VERBOSE = VERBOSE and nil
+local VERBOSE = VERBOSE and false
 
 local max = math.max
+local insert = table.insert
+local remove = table.remove
+local next = next
 
 local DEAGRO_UPDATE_PRIORITY
 --
@@ -79,6 +82,7 @@ local DEAGRO_UPDATE_PRIORITY
 
 local future_damage_lists = {} -- all of the attacks in the future, (and 4 seconds past for analytics)
 local t_lists_with_recyclable_nodes = {}
+local t_recyclable_fdls = {}
 local t_recyclable_nodes = {} -- At one point before v0.7, this was keeping a table of almost every attack for the entire match. (:
 local t_attacker_to_future_damage_node = {} -- the current pre-attack-point attacking behavior of a unit.
 
@@ -94,13 +98,13 @@ end
 -------------- indicate_far_past_is_for_recycling()
 local function indicate_far_past_is_for_recycling()
 	local deleteOlderThan = GameTime() - FAR_PAST_DELETE_DAMAGE_NODE
-	for atUnit,list in pairs(future_damage_lists) do
+	for atUnit,list in next,future_damage_lists do
 		local currNode = list.oldestNode
 		local foundOlderThan
 		local n = 0
 		while(currNode and currNode.timeLanding < deleteOlderThan) do
 			n = n + 1 if n > 1000 then ERROR_print(false, not DEBUG, "[LHP] '%s' infinite future damage list caught.", atUnit) if atUnit.IsNull and not atUnit:IsNull() then DEBUG_KILLSWITCH = true TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(atUnit:GetLocation().x, atUnit:GetLocation().y, false) end Util_TablePrint(future_damage_lists[atUnit]) Util_ThrowError() return end
-			table.insert(t_recyclable_nodes, currNode.prevNode)
+			insert(t_recyclable_nodes, currNode.prevNode)
 			currNode.prevNode = nil
 			--future_damage_lists[atUnit].numAttacks = future_damage_lists[atUnit].numAttacks - 1
 			future_damage_lists[atUnit].totalDmgRecently = future_damage_lists[atUnit].totalDmgRecently - currNode.damage
@@ -111,14 +115,17 @@ local function indicate_far_past_is_for_recycling()
 			currNode = currNode.nextNode
 		end
 		if not currNode then
+			insert(t_recyclable_fdls, list)
+			
 			future_damage_lists[atUnit] = nil
-			return
+		else
+			currNode.prevNode = nil
+			list.oldestNode = currNode
 		end
-		currNode.prevNode = nil
-		list.oldestNode = currNode
 	end
 end
 
+-------------- unstitch_and_recycle_node_simple()
 local function unstitch_and_recycle_node_simple(node)
 	if node.nextNeeds then
 		if node.nextNeeds.nextNeeds then
@@ -129,8 +136,11 @@ local function unstitch_and_recycle_node_simple(node)
 		unstitch_and_recycle_node_simple(node.nextNeeds)
 	end
 	if node.head.firstNodeFromNow == node then
-		node.head.firstNodeFromNow = node.nextNode
-		
+		if node.nextNeeds and node.nextNode == node.nextNeeds then
+			node.head.firstNodeFromNow = node.nextNeeds.nextNode
+		else
+			node.head.firstNodeFromNow = node.nextNode
+		end
 	end
 	if node.head.oldestNode == node then
 		node.head.oldestNode = node.nextNode
@@ -141,9 +151,11 @@ local function unstitch_and_recycle_node_simple(node)
 	if node.nextNode then 
 		node.nextNode.prevNode = node.prevNode
 	end
-	table.insert(t_recyclable_nodes, nextNeeds)
+	insert(t_recyclable_nodes, node.nextNeeds)
 end
 
+-- Let indicate_far_past_is_for_recycling take care of recycle list,
+-- as it recurses once to nextNeeds
 -------------- correct_unit_changed_target()
 local function correct_unit_changed_target(node, fromUnit, atUnit)
 
@@ -161,14 +173,10 @@ local function correct_unit_changed_target(node, fromUnit, atUnit)
 		unstitch_and_recycle_node_simple(node)
 	end
 	
-	if node.head.firstNodeFromNow == nil and node.head.oldestNode == nil then
-		future_damage_lists[atUnit] = nil
-	else
-		node.head.futureDamage = max(0, node.head.futureDamage - node.damage)
-	end
+	node.head.futureDamage = max(0, node.head.futureDamage - node.damage)
 
 	t_attacker_to_future_damage_node[fromUnit] = nil
-	table.insert(t_recyclable_nodes, node)
+	insert(t_recyclable_nodes, node)
 end
 
 -------------- correct_attacker_node_for_projectile()
@@ -260,15 +268,15 @@ end
 local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit, attackPointPercent, needsProjectileCorrection) -- Ensure nextNode, prevNode are set at least once (because recycling)
 	-- create a new potential attack node, to be confirmed by update_current_attacks__job
 	
-	local new = table.remove(t_recyclable_nodes) or {}
-	for i=1,#t_recyclable_nodes do
-		if t_recyclable_nodes == new then
-			DEBUG_KILLSWITCH = true
-			ERROR_print(false, not DEBUG, "FOUND A REPEATED RECYCLE TABLE")
-			Util_TablePrint(new)
-			Util_ThrowError()
-		end
-	end
+	local new = remove(t_recyclable_nodes) or {}
+
+
+
+
+
+
+
+
 	new.damage = damage
 	new.timeLanding = timeLanding
 	new.lastSeenAnimCycle = fromUnit:GetAnimCycle()
@@ -279,19 +287,24 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 	new.nextNode = nil
 	new.prevNode = nil
 	
-	t_attacker_to_future_damage_node[fromUnit] = t_attacker_to_future_damage_node[fromUnit] or new
+	local prevAttackNode = t_attacker_to_future_damage_node[fromUnit]
+	if not prevAttackNode or prevAttackNode.head.atUnit ~= atUnit then
+		t_attacker_to_future_damage_node[fromUnit] = new
+	end
 	
 	if not future_damage_lists[atUnit] then
-		local newDamageList = {}
+		local newDamageList = remove(t_recyclable_fdls) or {}
+		
 		future_damage_lists[atUnit] = newDamageList
+		
 		newDamageList.firstNodeFromNow = new
 		newDamageList.oldestNode = new
-		--newDamageList.numAttacks = 1
 		newDamageList.totalDmgRecently = new.damage
 		newDamageList.futureDamage = new.damage
 		newDamageList.atUnit = atUnit
 	else
 		local thisUnitDamageList = future_damage_lists[atUnit]
+		
 		--print(thisUnitDamageList.firstNodeFromNow, thisUnitDamageList.oldestNode)
 		local currNode = thisUnitDamageList.firstNodeFromNow or thisUnitDamageList.oldestNode
 		local m = 0
@@ -311,7 +324,6 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 				if thisUnitDamageList.oldestNode == currNode then -- implies list only includes future attacks
 					thisUnitDamageList.oldestNode = new
 				end
-				--thisUnitDamageList.numAttacks = thisUnitDamageList.numAttacks + 1
 				break;
 			elseif currNode.nextNode == nil then
 				currNode.nextNode = new
@@ -319,16 +331,20 @@ local function insert_new_attack_time_node(atUnit, damage, timeLanding, fromUnit
 				if not thisUnitDamageList.firstNodeFromNow then
 					thisUnitDamageList.firstNodeFromNow = new
 				end
-				--thisUnitDamageList.numAttacks = thisUnitDamageList.numAttacks + 1
 				break;
 			end
-			thisUnitDamageList.totalDmgRecently = thisUnitDamageList.totalDmgRecently + new.damage
-			thisUnitDamageList.futureDamage = thisUnitDamageList.futureDamage + new.damage
 			currNode = currNode.nextNode
 		end
+		thisUnitDamageList.totalDmgRecently = thisUnitDamageList.totalDmgRecently + new.damage
+		thisUnitDamageList.futureDamage = thisUnitDamageList.futureDamage + new.damage
 	end
+	
 	new.head = future_damage_lists[atUnit]
 	
+
+
+
+		
 	return new
 end
 
@@ -337,7 +353,7 @@ end
 local function update_current_attacks__job(workingSet)
 	if workingSet.throttle:allowed() then
 		local currTime = GameTime()
-		for atUnit,list in pairs(future_damage_lists) do
+		for atUnit,list in next,future_damage_lists do
 			local currNode = list.firstNodeFromNow
 			local m = 0
 			-- Shift to future
@@ -348,25 +364,27 @@ local function update_current_attacks__job(workingSet)
 				end
 				--print("jump up to", currNode.nextNode and currNode.nextNode.timeLanding)
 				list.firstNodeFromNow = currNode.nextNode
-				list.futureDamage = max(0, list.futureDamage - currNode.damage)
+				local futureDmg = list.futureDamage - currNode.damage
+				list.futureDamage = futureDmg < 0 and 0 or futureDmg
 				currNode = currNode.nextNode
 			end
 		end
 		local m = 0
 		local currTime = GameTime()
 		-- Remove changed target
-		for fromUnit,node in pairs(t_attacker_to_future_damage_node) do
+		for fromUnit,node in next,t_attacker_to_future_damage_node do
 			m = m + 1; if m > 1000 then DEBUG_KILLSWITCH = true; ERROR_print(true, not DEBUG, "[LHP] L"); TEAM_CAPTAIN_UNIT:ActionImmediate_Ping(fromUnit:GetLocation().x, fromUnit:GetLocation().x, true); return; end
 
 			local atUnit = node.head.atUnit
 			local isNullOrDead = Unit_IsNullOrDead(fromUnit) or not fromUnit:CanBeSeen()
-			if true or isNullOrDead or not fromUnit:IsTower() then
+			local switchedTarget = not isNullOrDead and fromUnit:GetAttackTarget() ~= atUnit
+			if switchedTarget or isNullOrDead or not fromUnit:IsTower() then
 				local currAnim = not isNullOrDead and fromUnit:GetAnimCycle() or 0.0
 				local isMelee = not isNullOrDead and (fromUnit:GetAttackProjectileSpeed() == 0
 						or fromUnit:GetAttackRange() < 249) --[[RANGED BAKE]] --[[MELEE BAKE]]
 				
 				
-				if node.timeLanding < currTime then
+				if node.timeLanding < currTime and not isNullOrDead then
 					
 					
 					-- Promote to next attack
@@ -376,7 +394,7 @@ local function update_current_attacks__job(workingSet)
 				elseif (--[[currAnim+0.015 < node.lastSeenAnimCycle]]
 							(needsProjectileCorrection or isMelee)
 							and ( isNullOrDead 
-								or (fromUnit:GetAttackTarget() ~= atUnit and currAnim > 0)
+								or (switchedTarget and currAnim > 0)
 							)
 						) then
 					
@@ -390,22 +408,20 @@ local function update_current_attacks__job(workingSet)
 	end
 end
 
+local set_working_tbl = {}
 -------------- create_future_damage_lists__job()
 local function create_future_damage_lists__job(workingSet)
 	if workingSet.throttle:allowed() then
-		local sets = Set_NumericalIndexUnion( -- Temporary solution
-					Set_GetCreepSetsNearAlliedHeroes(), Set_NumericalIndexUnion(
-						Set_GetEnemyHeroSetsNearAlliedHeroes(), Set_GetTowersNearAlliedHeroes()
-					)
-				)
+		local sets = set_working_tbl; sets[1] = nil;
+		Set_NumericalIndexUnion( sets,
+				Set_GetCreepSetsNearAlliedHeroes(),
+				Set_GetEnemyHeroSetsNearAlliedHeroes(),
+				Set_GetTowersNearAlliedHeroes()
+			)
 		indicate_far_past_is_for_recycling()
-		
+
 		local foundOneLowHealthAttackingTower = false
 		local fortHasNotAlerted = true
-		local DEBUGinternTarget = not TEAM_IS_RADIANT
-				and Task_GetTaskObjective(GSI_GetTeamPlayers(TEAM)[4],
-						FarmLane_GetTaskHandle()
-					) or {}
 
 		for i=1,#sets,1 do
 			local sendOneUnagroablePushAlert = true -- push_lane taking advantage of full attack check
@@ -425,8 +441,7 @@ local function create_future_damage_lists__job(workingSet)
 					local hUnitAttacked, timeTilAttackLands, needsProjectileLater
 							= Projectile_GetNextAttackComplete(gsiUnit,
 									attackerNode and (attackerNode.needsProjectileCorrection
-										or not attackerNode.needsProjectileCorrection
-										and attackerNode.nextNeeds and true
+										or attackerNode.nextNeeds and true
 									)
 								)
 
@@ -510,7 +525,7 @@ local function create_future_damage_lists__job(workingSet)
 							end
 						else
 							-- have attackerNode, the attackerNode does not need a projectile
-							local attackIsAfterAttackerNode
+							local attackIsAfterAttackerNode --nb. 'after timelanding' !all in attackIsAfterAttackerNode{} set
 									= timeTilAttackLands + currTime
 										> attackerNode.timeLanding + gsiUnit.halfSecAttack
 							if not attackerNode.nextNeeds then
@@ -573,12 +588,13 @@ end
 -------- LHP_UpdateHunit()
 function LHP_UpdateHunit(previousHunit, newHunit) -- New rule is no 
 
+
 	local attackNode = t_attacker_to_future_damage_node[previousHunit]
 	if attackNode then -- attacking?
 		-- update any pre attack-point attack by the unit
 		t_attacker_to_future_damage_node[newHunit] = attackNode
 		t_attacker_to_future_damage_node[previousHunit] = nil
-		attackNode.fromUnit = previousHunit
+		attackNode.fromUnit = newHunit
 	end
 	local attackedList = future_damage_lists[previousHunit]
 	if attackedList then -- attacked?
@@ -586,6 +602,7 @@ function LHP_UpdateHunit(previousHunit, newHunit) -- New rule is no
 		future_damage_lists[newHunit] = attackedList
 	end
 	future_damage_lists[newHunit] = attackedList
+	future_damage_lists[previousHunit] = nil
 
 end
 
@@ -699,6 +716,7 @@ function Lhp_GetActualFromUnitToUnitAttackOnce(hUnitAttacking, hUnitAttacked) --
 		)
 end
 
+
 -------- Lhp_AttackNowForBestLastHit()
 function Lhp_AttackNowForBestLastHit(gsiPlayer, gsiUnit, dontBreak) -- Requires units are not dead nor null
 	local currTime = GameTime()
@@ -733,6 +751,7 @@ function Lhp_AttackNowForBestLastHit(gsiPlayer, gsiUnit, dontBreak) -- Requires 
 	local totalDmgFuture = 0
 	local unusedPlayerDmg = 0
 
+
 	while(currNode) do
 		--if DEBUG and DEBUG_IsBotTheIntern() then print("currNode: ", m, currNode.fromUnit, currNode.fromUnit:GetUnitName()) end
 		 n = n + 1 -- Running determine real future attacks (for a nasty est of how long till death if the target will not die from the future attacks plus our own)
@@ -741,6 +760,7 @@ function Lhp_AttackNowForBestLastHit(gsiPlayer, gsiUnit, dontBreak) -- Requires 
 					or currNode.needsProjectileCorrection
 				) then
 			unusedPlayerDmg = currNode.damage
+			goto NEXT_TPH;
 		end
 		timeProgressedHealth = timeProgressedHealth - currNode.damage
 		trueProgressedHealth = timeProgressedHealth
@@ -885,7 +905,14 @@ function Analytics_GetFutureDamageInTimeline(hUnit)
 	return future_damage_lists[hUnit] and future_damage_lists[hUnit].futureDamage or 0
 end
 
+-------- Analytics_AttacksWho()
+function Analytics_AttacksWho(hUnit)
+	local list = t_attacker_to_future_damage_node[hUnit]
+	return list and list.atUnit
+end
+
 local players_found = {}
+-------- Analytics_GetTotalDamageNumberAttackers()
 function Analytics_GetTotalDamageNumberAttackers(gsiPlayer) -- for team players
 	local damageList = future_damage_lists[gsiPlayer.hUnit]
 	if damageList then
@@ -1003,7 +1030,7 @@ function Analytics_GetMostDamagingUnitTypeToUnit(gsiUnit, limitPast)
 		end
 		local highestValue = 0
 		local highestType = UNIT_TYPE_NONE
-		for k,v in pairs(damageTotal) do -- compare
+		for k,v in next,damageTotal do -- compare
 			if v > highestValue then
 				highestValue = v
 				highestType = k
@@ -1026,26 +1053,40 @@ function Lhp_CageFightKillTime(gsiPlayer, gsiTarget) -- Time taken for this hero
 end
 
 if DEBUG then
-	function DEBUG_LHP_DrawLhpTarget(p)
+------------ DEBUG_LHP_DrawLhpTarget()
+	function DEBUG_LHP_DrawLhpTarget(p, targ)
 		local farmLaneObj = Task_GetTaskObjective(p, FarmLane_GetTaskHandle())
-		local list = farmLaneObj and future_damage_lists[farmLaneObj.hUnit]
+		local list = farmLaneObj and future_damage_lists[targ or farmLaneObj.hUnit]
 		if not list then
 			DebugDrawText(2, 200, "[]", 200, 100, 100)
 			return;
 		end
+
 		local currNode = list.oldestNode
 		local currTime = GameTime()
-		local m=-1
+		local m=0
+		DebugDrawText(2, 124, string.format("u&%s: %s",
+					string.sub(tostring(farmLaneObj.hUnit), -8),
+					string.sub(farmLaneObj.name, -14)
+				), 155, 205, 255
+			)
 		while(currNode) do
 			if m*85 > 1800 then return; end
-			local c = currNode.timeLanding > currTime and 155 or 0
+			local c = currNode.timeLanding > currTime and 155 or 20
+			DebugDrawText(2+m*85, 166, string.format("<>%s",
+						string.sub(tostring(currNode.head), -8)
+					), 155, 205, 255
+				)
 			DebugDrawText(2+m*85, 175, string.format("n&%-8.8s",
 						string.sub(tostring(currNode), -8)
 					), c, c+50, c+100
 				)
 			DebugDrawText(2+m*85, 185, string.format("[%-8.8s]%s",
-						string.sub(not currNode.fromUnit:IsNull()
-							and currNode.fromUnit:GetUnitName() or "nulled", -8),
+						currNode.fromUnit:IsNull() and "nulled"
+							or string.format("%s%s",
+									string.sub(currNode.fromUnit:GetUnitName(), 16, 17),
+									string.sub(currNode.fromUnit:GetUnitName(), -6, -1)
+								),
 						currNode.nextNode and "->" or ""
 					), c, c+50, c+100
 				)
@@ -1064,6 +1105,7 @@ if DEBUG then
 					), c, c+50, c+100
 				)
 			currNode = currNode.nextNode
+			m=m+1
 		end
 	end
 end

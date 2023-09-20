@@ -46,10 +46,10 @@ local function create_or_recycle_safe_unit()
 	return table.remove(recycle_list) or {}
 end
 
-local function set_recyclable(hUnit)
-	table.insert(recycle_list, t_creeps[hUnit])
-	t_creeps[hUnit] = nil
-end
+--local function set_recyclable(hUnit)
+--	table.insert(recycle_list, t_creeps[hUnit])
+--	t_creeps[hUnit] = nil
+--end
 
 function GSI_CreateUpdateCreepUnits()
 	local function delete_none_typed__job(workingSet)
@@ -102,21 +102,18 @@ end
 
 function cUnit_IsNullOrDead(creep) -- Call this if you know you're dealing with a creep and the creep will be removed from local hUnit -> creepSafeUnit storage
 	if creep.hUnit then
-		if (not creep.hUnit.IsNull or creep.hUnit:IsNull() or not creep.hUnit:IsAlive()) then
-			set_recyclable(creep.hUnit)
-			return true
+		if not creep.hUnit.IsNull or creep.hUnit:IsNull()
+				or not creep.hUnit:IsAlive() then
+			table.insert(recycle_list, t_creeps[creep])
+			t_creeps[creep] = nil
+			return true;
 		end
-		return false
 	elseif creep.IsNull then
-		if (creep:IsNull() or not creep:IsAlive()) then
-			set_recyclable(creep)
-			return true
+		if ( creep:IsNull() or not creep:IsAlive() ) then
+			return true;
 		end
-		return false
-	elseif t_creeps[creep] then
-		set_recyclable(creep)
-	end
-	return nil
+	else return true; end
+	return false;
 end
 
 function cUnit_ConvertListToSafeUnits(list)
@@ -153,6 +150,7 @@ function cUnit_NewSafeUnit(hUnit)
 	newSafeUnit.creepType = cUnit_GetCreepType(newSafeUnit.name)
 	newSafeUnit.attackPointPercent = hUnit:GetAttackPoint() -- updated in projtl
 	newSafeUnit.isRanged = Unit_UnitIsRanged(newSafeUnit)
+	newSafeUnit.playerID = hUnit.GetPlayerID and hUnit:GetPlayerID() or -1
 	newSafeUnit.halfSecAttack = hUnit:GetSecondsPerAttack() / 2
 	newSafeUnit.Key = Unit_Key
 	newSafeUnit.dotaType = hUnit:GetTeam() == TEAM and CREEP_ALLIED or CREEP_ENEMY

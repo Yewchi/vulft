@@ -1,12 +1,12 @@
 local hero_data = {
 	"monkey_king",
-	{1, 3, 3, 2, 2, 2, 2, 4, 1, 1, 1, 3, 6, 3, 7, 4, 4, 10, 12},
+	{1, 3, 3, 2, 3, 1, 2, 3, 1, 1, 4, 4, 2, 2, 8, 6, 4, 10, 12},
 	{
-		"item_tango","item_quelling_blade","item_slippers","item_circlet","item_branches","item_branches","item_wraith_band","item_boots","item_gloves","item_boots_of_elves","item_power_treads","item_quarterstaff","item_robe","item_echo_sabre","item_magic_wand","item_mithril_hammer","item_black_king_bar","item_echo_sabre","item_mithril_hammer","item_desolator","item_diadem","item_harpoon","item_basher","item_skadi","item_cornucopia","item_cornucopia","item_refresher","item_abyssal_blade","item_rapier","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter_2",
+		"item_branches","item_quelling_blade","item_magic_stick","item_circlet","item_tango","item_orb_of_venom","item_boots","item_orb_of_corrosion","item_boots_of_elves","item_power_treads","item_quarterstaff","item_oblivion_staff","item_ogre_axe","item_echo_sabre","item_mithril_hammer","item_desolator","item_blitz_knuckles","item_broadsword","item_invis_sword","item_lesser_crit","item_silver_edge","item_mithril_hammer","item_ogre_axe","item_black_king_bar","item_harpoon","item_ultimate_orb","item_void_stone","item_sheepstick",
 	},
-	{ {1,1,1,1,3,}, {1,1,1,1,3,}, 0.1 },
+	{ {1,1,1,1,5,}, {1,1,1,1,4,}, 0.1 },
 	{
-		"Boundless Strike","Tree Dance","Jingu Mastery","Wukong's Command","+0.2s Mischief Invulnerability Duration","+0.3s Boundless Strike Stun Duration","+450 Tree Dance Cast Range","+130 Jingu Mastery Damage","0 Cooldown Primal Spring","-7.0s Boundless Strike Cooldown","-1 Jingu Mastery Required Hits","Additional Wukong's Command Ring",
+		"Boundless Strike","Tree Dance","Jingu Mastery","Wukong's Command","+0.2s Mischief Invulnerability Duration","+0.3s Boundless Strike Stun Duration","+450 Tree Dance Cast Range","+110 Jingu Mastery Damage","0 Cooldown Primal Spring","-7.0s Boundless Strike Cooldown","-1 Jingu Mastery Required Hits","Additional Wukong's Command Ring",
 	}
 }
 --@EndAutomatedHeroData

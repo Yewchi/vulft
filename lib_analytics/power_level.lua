@@ -24,11 +24,11 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
-local Set_GetAlliedHeroesInPlayerRadius = Set_GetAlliedHeroesInPlayerRadius
+local Set_GetAlliedHeroesInLocRad = Set_GetAlliedHeroesInLocRad
+local Set_GetEnemyHeroesInLocRad = Set_GetEnemyHeroesInLocRad
 local Analytics_GetKnownTheorizedEngageables
 local min = math.min
 local max = math.max
-local sqrt = math.sqrt
 local abs = math.abs
 
 local CRAZY_VERBOSE = VERBOSE and false
@@ -49,24 +49,22 @@ function Analytics_GetPowerLevel(gsiPlayer, kda, notRelative) -- TODO Needs AFK 
 		healthFactor = healthPercFactor -- lazy incorporate hero design
 				* ( gsiPlayer.lastSeenHealth/1024 -- ALL co-factors to this; 1024
 					* (1 - physicalTaken * doesntEvade * magicTaken)
-					/ sqrt(gsiPlayer.maxHealth)
+					/ (gsiPlayer.maxHealth^0.5)
 				)^(1/2)
 	else
 		healthFactor = healthPercFactor -- lazy incorporate hero design
 				* gsiPlayer.lastSeenHealth -- ALL co-factors to this
 					* (1 - physicalTaken * doesntEvade * magicTaken)
-					/ sqrt(gsiPlayer.maxHealth) -- incorporate the design of the hero, by lazy magic TODO
+					/ (gsiPlayer.maxHealth^0.5) -- incorporate the design of the hero, by lazy magic TODO
 		highHealthFactor = highHealthFactor
 				+ (healthFactor - highHealthFactor)
 					* (healthFactor > highHealthFactor and 0.15 or 0.025)
 		healthFactor = healthFactor / highHealthFactor + (healthFactor/1024)^(1/2) -- 1024
 	end
-	local powerLevel = min(0.67,
-			max(1.65,	
-					kda or GSI_GetKDA(gsiPlayer)
-				)
-			) * (1+gsiPlayer.level*BASIC_ONE_LEVEL_OVER_POWER)
-			* max(0.143, healthFactor)
+	kda = kda or GSI_GetKDA(gsiPlayer)
+	kda = kda < 0.67 and 0.67 or kda > 1.65 and 1.65 or kda
+	local powerLevel = kda * (1+gsiPlayer.level*BASIC_ONE_LEVEL_OVER_POWER)
+			* (healthFactor < 0.143 and 0.143 or healthFactor)
 			* (0.775
 					+ (0.125+0.1*healthPercFactor)
 						* (gsiPlayer.lastSeenMana and max(0, (gsiPlayer.lastSeenMana / gsiPlayer.maxMana))
@@ -146,23 +144,25 @@ function Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies, location)
 		return timeData.theorizedDanger, timeData.knownEngageables, timeData.theorizedEngageables
 	end
 
-	nearbyAllies = nearbyAllies or Set_GetAlliedHeroesInPlayerRadius(gsiPlayer, 4000)
+	local playerLoc = location or gsiPlayer.lastSeen.location
+
+	nearbyAllies = nearbyAllies or Set_GetAlliedHeroesInLocRad(gsiPlayer, playerLoc, 4000)
 	--local lowestEhp = 1-(0.06*hUnit:GetArmor()/(1+0.06*unitArmor))
 	--local lowestEhpPlayer = gsiPlayer
-	local nearbyEnemies = Set_GetEnemyHeroesInPlayerRadius(gsiPlayer, 4000)
+	local nearbyEnemies = Set_GetEnemyHeroesInLocRad(playerLoc, 4000)
 	local playerPower = GetPowerLevel(gsiPlayer)
 	local knownEngageables, theorizedEngageables, theorizedDangerAmount
-			= Analytics_GetKnownTheorizedEngageables(gsiPlayer, location) -- TIMEDATA known/theorizedEngables set
+			= Analytics_GetKnownTheorizedEngageables(gsiPlayer, playerLoc) -- TIMEDATA known/theorizedEngables set
 	theorizedDangerAmount = theorizedDangerAmount * playerPower -- Reverse the mimic score to raw power of enemies
 	
 	--local theorizedDangerAmount = 0
-	local playerLoc = gsiPlayer.lastSeen.location
-	-- TODO YOU FEEL ASLEEP HARD ON THE DESK TRYIN TO FIX THIS GOODNIGHT
 	for i=1,#nearbyEnemies do
 		-- Process true enemies
 		local thisEnemy = nearbyEnemies[i]
+		local loc = thisEnemy.lastSeen.location
+		local workingValue = ((((loc.x-playerLoc.x)^2 + (loc.y-playerLoc.y)^2)^0.5-900)/900)^0.5
 		theorizedDangerAmount = theorizedDangerAmount + GetPowerLevel(thisEnemy)
-				/ sqrt(max(1, (Vector_PointDistance2D(thisEnemy.lastSeen.location, playerLoc)-900)/900))
+				/ (workingValue>1 and workingValue or 1)
 	end
 	if #knownEngageables < ENEMY_TEAM_NUMBER_OF_PLAYERS and #nearbyEnemies > 0 then
 		-- because 'consider known' from fow_logic
@@ -174,9 +174,11 @@ function Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies, location)
 			repeat
 				if i>#nearbyEnemies then
 					local hpp = thisEnemy.lastSeenHealth/thisEnemy.maxHealth
+					local loc = thisEnemy.lastSeen.location
+					local workingValue = ((((loc.x-playerLoc.x)^2 + (loc.y-playerLoc.y)^2)^0.5-900)/900)^0.5
 					theorizedDangerAmount = theorizedDangerAmount + (thisEnemy.lastSeen.powerLevel
 								or 0.5+0.5*hpp+BASIC_ONE_LEVEL_OVER*thisEnemy.level*(hpp))
-							/ sqrt(max(1, (Vector_PointDistance2D(thisEnemy.lastSeen.location, playerLoc)-900)/900))
+							/ (workingValue>1 and workingValue or 1)
 				end
 				if nearbyEnemies[i] == thisEnemy then break; end
 				i = i + 1
@@ -188,40 +190,45 @@ function Analytics_GetTheoreticalDangerAmount(gsiPlayer, nearbyAllies, location)
 	local nearbyTeamTower = Set_GetNearestTeamTowerToPlayer(TEAM, gsiPlayer)
 	
 	if nearbyEnemyTower then 
-		local enemyDangerTowerFactor = 1.2 - sqrt(0.00005
-			* max(0, (Vector_PointDistance2D(playerLoc, nearbyEnemyTower.lastSeen.location) - 0.035))
-		)
-		theorizedDangerAmount = theorizedDangerAmount * max(0.91, enemyDangerTowerFactor)
+		local towerLoc = nearbyEnemyTower.lastSeen.location
+		local workingValue = -0.175
+				+ 0.0002 * ((towerLoc.x-playerLoc.x)^2 + (towerLoc.y-playerLoc.y)^2)^0.5 
+		local enemyDangerTowerFactor = 1.2 - (workingValue>0 and workingValue or 0)
+		theorizedDangerAmount = theorizedDangerAmount
+				* (enemyDangerTowerFactor > 0.91 and enemyDangerTowerFactor or 0.91)
 	end
 	
 	local alliedPower = 0
 	for i=1, #nearbyAllies do
 		local thisAllied = nearbyAllies[i]
+		local loc = thisAllied.lastSeen.location
+		local workingValue = ((((loc.x-playerLoc.x)^2 + (loc.y-playerLoc.y)^2)^0.5 - 900)/900)^0.5
 		alliedPower = alliedPower + GetPowerLevel(thisAllied)
-				/ sqrt(max(1, (Vector_PointDistance2D(thisAllied.lastSeen.location, playerLoc)-900)/900))
+				/ (workingValue>1 and workingValue or 1)
 	end
 	alliedPower = alliedPower + playerPower
 	
-	alliedPower = alliedPower * max(1, sqrt(playerPower / (alliedPower / (1+#nearbyAllies))))
+	alliedPower = alliedPower * max(1, (playerPower / (alliedPower / (1+#nearbyAllies)))^0.5)
 	
 	if nearbyTeamTower then
-		local teamSafetyTowerFactor = 1.2 - sqrt(0.00005
-				* max(0, (Vector_PointDistance2D(playerLoc, nearbyTeamTower.lastSeen.location) - 0.02))
-			)
+		local towerLoc = nearbyTeamTower.lastSeen.location
+		local workingValue = -0.125
+				+ 0.0002 * ((towerLoc.x-playerLoc.x)^2 + (towerLoc.y-playerLoc.y)^2)^0.5 
+		local teamSafetyTowerFactor = 1.2 - (workingValue>0 and workingValue or 0)
 		alliedPower = alliedPower * max(0.9, teamSafetyTowerFactor)
 	end
 	
 	theorizedDangerAmount = theorizedDangerAmount - alliedPower
 	
-	theorizedDangerAmount = theorizedDangerAmount < 0 and -sqrt(abs(theorizedDangerAmount))
-			or sqrt(theorizedDangerAmount + 0.0001)
+	theorizedDangerAmount = theorizedDangerAmount < 0 and -(abs(theorizedDangerAmount)^0.5)
+			or (theorizedDangerAmount + 0.0001)^0.5
 	
 	if allowCache then
 		local backupDangerAmount = dangerBackup[gsiPlayer.nOnTeam]
 		if not (backupDangerAmount < theorizedDangerAmount or plummets_allowed) then
 			--print("SLOWED DANGER", theorizedDangerAmount, backupDangerAmount)
 			theorizedDangerAmount = backupDangerAmount
-					- (backupDangerAmount - theorizedDangerAmount)/6
+					- (backupDangerAmount - theorizedDangerAmount)/32
 			--print(theorizedDangerAmount)
 			if end_plummets < GameTime() then
 				-- NB bots may do a plummet allowed a different amount of times
@@ -242,10 +249,12 @@ function Analytics_GetTheoreticalEncounterPower(heroList, location, startExclude
 	local middleExcludeDist = (startExcludeDist+fullExcludeDist)/2
 	local range = fullExcludeDist - startExcludeDist
 	local halfRange = range/2
+	local currTime = GameTime()
 	for i=1,#heroList do
 		local thisHero = heroList[i]
-		local dist = Math_PointToPointDistance2D(thisHero.lastSeen.location, location)
-				/ (1 + (GameTime() - thisHero.lastSeen.timeStamp)/10)
+		local heroLoc = thisHero.lastSeen.location
+		local dist = ((heroLoc.x-location.x)^2 + (heroLoc.y-location.y)^2)^0.5
+				/ (1 + (currTime - thisHero.lastSeen.timeStamp)/10)
 		local factorIncluded = dist < startExcludeDist and 0.95
 				or (dist < middleExcludeDist and 0.6 + 0.35*(halfRange - dist + startExcludeDist)/halfRange) 
 				or 0.6*max(0, (range - dist + middleExcludeDist)/halfRange)

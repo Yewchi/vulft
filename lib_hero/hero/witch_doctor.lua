@@ -1,10 +1,10 @@
 local hero_data = {
 	"witch_doctor",
-	{1, 3, 3, 1, 3, 4, 3, 1, 1, 6, 2, 4, 2, 2, 7, 2, 4, 9},
+	{1, 3, 3, 1, 3, 4, 1, 1, 3, 6, 2, 4, 2, 2, 7, 2, 4, 9, 12},
 	{
-		"item_tango","item_circlet","item_ring_of_protection","item_branches","item_branches","item_faerie_fire","item_boots","item_arcane_boots","item_headdress","item_chainmail","item_mekansm","item_wind_lace","item_cloak","item_headdress","item_pipe","item_buckler","item_guardian_greaves","item_aghanims_shard","item_diadem","item_headdress","item_magic_wand","item_holy_locket","item_sange","item_heavens_halberd","item_shivas_guard",
+		"item_circlet","item_circlet","item_tango","item_blood_grenade","item_branches","item_branches","item_branches","item_ward_sentry","item_tango","item_magic_wand","item_boots","item_arcane_boots","item_blink","item_void_stone","item_aether_lens","item_aghanims_shard","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_ultimate_orb","item_sphere","item_gem","item_ultimate_scepter_2",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,3,}, 0.1 },
+	{ {1,1,1,3,3,}, {5,5,5,4,3,}, 0.1 },
 	{
 		"Paralyzing Cask","Voodoo Restoration","Maledict","Death Ward","-25% Voodoo Restoration Mana Per Second","+75 Maledict AoE","+2 Cask Bounces","+300 Health","+100 Death Ward Attack Range","+25% Maledict Burst Damage","+1.5% Max Health Voodoo Restoration Heal/Damage","+60 Death Ward Damage",
 	}

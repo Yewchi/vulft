@@ -1,12 +1,12 @@
 local hero_data = {
 	"bristleback",
-	{2, 3, 2, 3, 2, 4, 2, 3, 1, 3, 6, 4, 1, 1, 7, 1, 4, 10, 12},
+	{2, 3, 2, 1, 2, 4, 2, 3, 3, 6, 3, 4, 1, 1, 8, 1, 4, 10, 12},
 	{
-		"item_tango","item_quelling_blade","item_branches","item_branches","item_ring_of_health","item_boots","item_energy_booster","item_arcane_boots","item_vanguard","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_reaver","item_power_treads","item_heart","item_mithril_hammer","item_belt_of_strength","item_basher","item_abyssal_blade","item_platemail","item_hyperstone","item_buckler","item_assault","item_aghanims_shard","item_ultimate_orb","item_sheepstick","item_ultimate_scepter_2","item_blink","item_reaver","item_overwhelming_blink","item_moon_shard",
+		"item_quelling_blade","item_magic_stick","item_branches","item_branches","item_tango","item_enchanted_mango","item_ring_of_health","item_vanguard","item_boots","item_soul_ring","item_magic_wand","item_belt_of_strength","item_gloves","item_power_treads","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_ultimate_scepter","item_platemail","item_pers","item_energy_booster","item_lotus_orb","item_voodoo_mask","item_bloodstone","item_aghanims_shard","item_reaver","item_heart","item_assault","item_black_king_bar","item_ultimate_scepter_2",
 	},
-	{ {3,3,3,1,2,}, {3,3,3,1,2,}, 0.1 },
+	{ {3,3,3,2,1,}, {3,3,3,2,1,}, 0.1 },
 	{
-		"Viscous Nasal Goo","Quill Spray","Bristleback","Warpath","+15 Damage","+1.5 Mana Regen","+150 Goo Cast Range","+8%/+8% Bristleback Back/Side Damage Reduction","+20 Health Regen","+20 Quill Stack Damage","+12% Spell Lifesteal","+18 Warpath Damage Per Stack",
+		"Viscous Nasal Goo","Quill Spray","Bristleback","Warpath","+20 Damage","+1.5 Mana Regen","+150 Goo Cast Range","+8%/+8% Bristleback Back/Side Damage Reduction","+25 Health Regen","+25 Quill Stack Damage","+12% Spell Lifesteal","+18 Warpath Damage Per Stack",
 	}
 }
 --@EndAutomatedHeroData
@@ -25,8 +25,8 @@ local ENCASED_IN_RECT = Set_GetEnemiesInRectangle
 local CURRENT_TASK = Task_GetCurrentTaskHandle
 local CAN_BE_CAST = AbilityLogic_AbilityCanBeCast
 local USE_ABILITY = UseAbility_RegisterAbilityUseAndLockToScore
-local VEC_POINT_DISTANCE = Vector_PointDistance
-local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint
+local VEC_POINT_DISTANCE = Vector_PointDistance2D
+local VEC_UNIT_DIRECTIONAL = Vector_UnitDirectionalPointToPoint2D
 local ACTIVITY_TYPE = ACTIVITY_TYPE
 local HANDLE_AUTOCAST_GENERIC = AbilityLogic_HandleAutocastGeneric
 local CURRENT_ACTIVITY_TYPE = Blueprint_GetCurrentTaskActivityType
@@ -180,6 +180,7 @@ d = {
 			local goCrazyDmg = d.GetQuillsDamageTotal(quills, quillStacks, goCrazyQuills, surviveTime)
 			goCrazyDmg = Unit_GetArmorPhysicalFactor(fht)*goCrazyDmg
 			local crazyWorthRatio = goCrazyDmg / fht.lastSeenHealth
+			crazyWorthRatio = crazyWorthRatio < 150 and crazyWorthRatio or 150
 			--print(crazyWorthRatio, goCrazyDmg, surviveTime)
 			if crazyWorthRatio > 1 then
 				--print("incentivising bristle for go crazy")

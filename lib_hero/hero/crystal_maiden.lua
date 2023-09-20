@@ -1,10 +1,10 @@
 local hero_data = {
 	"crystal_maiden",
-	{1, 2, 3, 2, 2, 4, 2, 3, 3, 3, 1, 4, 5, 1, 7, 1, 4, 10, 11},
+	{1, 2, 3, 2, 2, 4, 2, 1, 1, 1, 5, 4, 3, 3, 7, 3, 4, 10, 11},
 	{
-		"item_tango","item_blood_grenade","item_ward_sentry","item_smoke_of_deceit","item_flask","item_branches","item_clarity","item_branches","item_boots","item_wind_lace","item_magic_wand","item_belt_of_strength","item_robe","item_ancient_janggo","item_wind_lace","item_tranquil_boots","item_boots_of_bearing","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_mekansm","item_energy_booster","item_buckler","item_arcane_boots","item_guardian_greaves","item_aeon_disk","item_gem","item_ultimate_scepter_2","item_gem",
+		"item_tango","item_clarity","item_faerie_fire","item_enchanted_mango","item_blood_grenade","item_ward_observer","item_boots","item_wind_lace","item_tranquil_boots","item_bracer","item_cloak","item_wind_lace","item_shadow_amulet","item_glimmer_cape","item_aghanims_shard","item_fluffy_hat","item_staff_of_wizardry","item_force_staff","item_staff_of_wizardry","item_ogre_axe","item_blade_of_alacrity","item_ultimate_scepter","item_gem","item_black_king_bar",
 	},
-	{ {1,1,1,1,1,}, {5,5,5,5,5,}, 0.1 },
+	{ {1,1,1,1,5,}, {5,5,5,5,4,}, 0.1 },
 	{
 		"Crystal Nova","Frostbite","Arcane Aura","Freezing Field","+250 Health","+125 Crystal Nova AoE","+125 Frostbite Cast Range","-3s Crystal Nova Cooldown","+225 Attack Speed","+50 Freezing Field Damage","+1.25s Frostbite Duration","+240 Crystal Nova Damage",
 	}

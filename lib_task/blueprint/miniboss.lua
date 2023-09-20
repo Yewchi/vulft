@@ -24,25 +24,46 @@
 -- - - SOFTWARE.
 -- - #################################################################################### -
 
-local t_heat_map = {}
+local blueprint
+local VEBOSE = VERBOSE
+local DEBUG = DEBUG
+local TEST = TEST
 
-function Analytics_CreateUpdateMapControl()
-	job_domain_analytics:RegisterJob(
-			function(workingSet)
-				if workingSet.throttle:allowed() then
-					update_map_heat__job()
-				end
-			end,
-			{["throttle"] = Time_CreateModThrottle(30, 1)},
-			"JOB_UPDATE_LANE_BASIC_POWER"
-		)
-	Analytics_CreateUpdateLanePressure = nil
+local min = math.min
+
+local task_handle = Task_CreateNewTask()
+
+local function estimated_time_til_completed(gsiPlayer, objective)
+	return 10 -- don't care
 end
+local function task_init_func()
+	Blueprint_RegisterTaskName(task_handle, "miniboss")
+	if VERBOSE then VEBUG_print(string.format("miniboss: Initialized with handle #%d.", task_handle)) end
+	
+	Task_RegisterTask(task_handle, PLAYERS_ALL, blueprint.run, blueprint.score, blueprint.init)
+	
+	Blueprint_RegisterTaskActivityType(task_handle, ACTIVITY_TYPE["NOT_APPLICABLE"])
+	task_init_func = nil
+	return task_handle, estimated_time_til_completed
+end
+Blueprint_RegisterTask(task_init_func)
 
-function Analytics_RegisterAnalyticsJobDomainToLanePressure(analyticsJobDomain)
-	job_domain_analytics = analyticsJobDomain
+blueprint = {
+	run = function(gsiPlayer, objective, xetaScore)
+	end,
+	
+	score = function(gsiPlayer, prevObjective, prevScore)
+		local tormentor = Set_GetSetTypeUnitNearestToLocation(Vector(-3000, 0), SET_BUILDING_NEUTRAL, "tormentor")
+		if tormentor then
+			return tormentor, 50000
+		return false, XETA_SCORE_DO_NOT_RUN
+	end,
+	
+	init = function(gsiPlayer, objective, extrapolatedXeta)
+		return extrapolatedXeta
+	end
+}
 
-	t_enemy_players = GSI_GetTeamPlayers(ENEMY_TEAM)
-
-	Analytics_RegisterAnalyticsJobDomainToLanePressure = nil
+function Deagro_GetTaskHandle()
+	return task_handle
 end

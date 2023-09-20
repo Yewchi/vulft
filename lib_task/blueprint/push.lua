@@ -108,10 +108,13 @@ blueprint = {
 			Positioning_ZSAttackRangeUnitHugAllied(gsiPlayer, objective.lastSeen.location, nil, nil, 0)
 			return;
 		end
-		if objective.center and objective.units[1].team == TEAM then
-			-- Chase the allied creep set into an enemy base for pushing buildings
-			Positioning_ZSAttackRangeUnitHugAllied(gsiPlayer, objective.center, nil, nil, 0)
-			return;
+		if objective.center then
+			if objective.units[1] and objective.units[1].team == TEAM then
+				-- Chase the allied creep set into an enemy base for pushing buildings
+				Positioning_ZSAttackRangeUnitHugAllied(gsiPlayer, objective.center, nil, nil, 0)
+				return;
+			end
+			return XETA_SCORE_DO_NOT_RUN;
 		end
 		if Unit_IsNullOrDead(objective) then
 			return XETA_SCORE_DO_NOT_RUN
@@ -312,6 +315,7 @@ blueprint = {
 						gsiPlayer, arbitraryUnit,
 						nearestTower.lastSeen.location, nearestTower.attackRange + 100
 					) or (not nearestTower.hUnit:IsNull()
+						and allied and allied.units[2]
 						and IsLocationVisible(nearestTower.lastSeen.location)
 						and nearestTower.hUnit:GetAttackTarget() and nearestTower.hUnit:GetAttackTarget():IsCreep()
 					) then

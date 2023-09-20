@@ -1,12 +1,12 @@
 local hero_data = {
 	"shadow_demon",
-	{3, 1, 3, 1, 3, 4, 3, 1, 1, 5, 2, 4, 2, 2, 8, 2, 4, 10, 12},
+	{1, 3, 3, 1, 3, 4, 3, 1, 1, 2, 2, 4, 2, 2, 7, 5, 4, 10, 12},
 	{
-		"item_ward_observer","item_tango","item_enchanted_mango","item_enchanted_mango","item_enchanted_mango","item_faerie_fire","item_blood_grenade","item_flask","item_boots","item_arcane_boots","item_magic_wand","item_wind_lace","item_aghanims_shard","item_void_stone","item_aether_lens","item_point_booster","item_ogre_axe","item_staff_of_wizardry","item_blade_of_alacrity","item_ultimate_scepter","item_glimmer_cape","item_tranquil_boots","item_gem","item_blink","item_ancient_janggo","item_boots_of_bearing","item_gem",
+		"item_blood_grenade","item_branches","item_tango","item_magic_stick","item_branches","item_ward_observer","item_magic_wand","item_boots","item_arcane_boots","item_aether_lens","item_wind_lace","item_tranquil_boots","item_blink","item_point_booster","item_staff_of_wizardry","item_ogre_axe","item_ultimate_scepter","item_aghanims_shard","item_gem","item_gem","item_soul_booster","item_octarine_core","item_gem","item_gem","item_ghost",
 	},
-	{ {1,1,1,1,3,}, {5,5,5,5,4,}, 0.1 },
+	{ {3,3,3,3,5,}, {4,4,4,4,4,}, 0.1 },
 	{
-		"Disruption","Disseminate","Shadow Poison","Demonic Purge","+15.0% Shadow Poison Damage","+12 Strength","+25 Movement Speed","-1.0s Shadow Poison Cooldown","+10% Disseminate Shared Damage","+200 Demonic Purge/Cleanse Damage/Heal","-30.0s Demonic Purge Cooldown","2 Charges of Disruption",
+		"Disruption","Disseminate","Shadow Poison","Demonic Purge","+15.0% Shadow Poison Damage","+12 Strength","+25 Movement Speed","-1.0s Shadow Poison Cooldown","+15% Disseminate Shared Damage","+200 Demonic Purge/Cleanse Damage/Heal","-30.0s Demonic Purge Cooldown","2 Charges of Disruption",
 	}
 }
 --@EndAutomatedHeroData

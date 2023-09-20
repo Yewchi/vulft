@@ -79,6 +79,23 @@ local EMPTY_TABLE = EMPTY_TABLE
 local avoid_hide_handle
 local increase_safety_handle
 
+local FIGHT_DIRECTIVE = {
+		["LEAVE"] = 1,
+		["HELP_ESCAPE"] = 2,
+		["NONE"] = 3,
+		["FOLLOW_UP"] = 4,
+		["INIT"] = 5,
+		["NO_ESCAPE"] = 6
+}
+
+local FIGHT_DIRECTIVE_COMMAND = {
+		["WAIT"] = 1,
+		["SURROUND"] = 2,
+		["GO"] = 3
+}
+
+local fight_tension_locs = {}
+
 local INTENT_UPDATE_THROTTLE = 0.2
 local intent_throttle = Time_CreateThrottle(INTENT_UPDATE_THROTTLE) -- 3-state behavior over time system .'. intents updated every 0.6s
 local t_intent = {}
@@ -284,7 +301,7 @@ function FightClimate_NoSlowIsLostKillSimple(gsiPlayer, gsiTarget, slowPerc, abi
 	local heat = FightClimate_GetEnemiesTotalHeat(nearbyEnemies, true)
 	-- TODO very incomplete and inaccurate
 	local distFactor = max(0, (nearestDist-gsiPlayer.attackRange)/500)
-	DebugDrawText(1300, 250+gsiPlayer.nOnTeam*8, string.format("noslow %d < %d < %d", dmg*(1.5 + distFactor), gsiTarget.lastSeenHealth, dmg*6.5), 255, TEAM_IS_RADIANT and 255 or 0, 128)
+	
 	if gsiTarget.lastSeenHealth > dmg*(1.5 + distFactor) and gsiTarget.lastSeenHealth < dmg*6.5 then
 		
 		return true, distUnits
@@ -404,7 +421,7 @@ function Analytics_RegisterAnalyticsJobDomainToFightClimate(gsiDomain)
 	increase_safety_handle = IncreaseSafety_GetTaskHandle()
 end
 
-function FightClimate_ImmediatelyExposedToAttack(gsiTargetted, enemyHeroesToTargeted, timeCheck,
+function FightClimate_ImmediatelyExposedToAttack(gsiTargetted, enemyHeroesToTargetted, timeCheck,
 			minRange, useLocation
 		)
 	local exposedCount = 0
@@ -514,7 +531,7 @@ function FightClimate_InformAbilityCast(gsiPlayer, hAbility, castInfo)
 			and B_AND(hAbiilty:GetTargetFlags(), ABIILTY_Set_GetNearestHeroToLocation(castInfo.location)
 	local targetEnemy, targetEnemyDist = 
 	local nearbyAllies = castInfo.location
-			and Set_GetAlliedHeroesInLocRadius(gsiPlayer, castInfo.location, 1200)
+			and Set_GetAlliedHeroesInLocRad(gsiPlayer, castInfo.location, 1200)
 	if target and targetDist < 800
 	]]
 end
@@ -594,6 +611,19 @@ function FightClimate_GetIntent(gsiPlayer)
 				end
 			end
 		elseif state == 1 then state = 2;
+		-- (unrelated to intent) update fight directives
+			local ft_locs = fight_tension_locs
+			local num_ft_locs = 0
+			local acceptableSeen = currTime - 40
+			local INCLUDE_IN_FT_LOC = 2400
+			local CHECK_FIX_FIGHT_DIST = 3400
+			for i=1,#enemies do
+				local thisEnemy = enemies[i]
+				if thisEnemy.lastSeen.timeStamp > acceptableSeen then
+					local pLoc = thisEnemy.lastSeen.location
+					local a
+				end
+			end
 		elseif state == 2 then state = 0
 		--	determine intent, save cached
 			local recentAggression

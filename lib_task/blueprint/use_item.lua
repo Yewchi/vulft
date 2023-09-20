@@ -376,8 +376,8 @@ force_staff_to_unit_dominate = function()
 	if DEBUG then DebugDrawText(500, 550, gsiPlayer.shortName, 255, 255, 255) end
 	moveTo = Vector_ScalarMultiply2D(moveTo, 10)
 	moveTo = Vector_Addition(playerLoc, moveTo)
-	DebugDrawLine(playerLoc, moveTo, 255, 0, 0)
-	DebugDrawCircle(target.lastSeen.location, 180, 255, 0, 0)
+	
+	
 	gsiPlayer.hUnit:Action_MoveDirectly(moveTo)
 end
 
@@ -671,8 +671,13 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 	["item_blood_grenade"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
 				if hItem:GetCooldownTimeRemaining() > 0 then return; end
+
+				local activityType = CURR_ACTIVITY_TYPE(gsiPlayer)
+				if activityType > ACTIVITY_TYPE.CONTROLLED_AGGRESSION then return; end
+
 				local fht, fhtReal = FightHarass_GetTarget(gsiPlayer)
 				if not fhtReal then return; end
+
 				local distUnits = Vector_DistUnitToUnit(gsiPlayer, fht)
 				
 				if distUnits > hItem:GetCastRange() + 150 then return; end
@@ -1175,16 +1180,21 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 					return false, XETA_SCORE_DO_NOT_RUN
 				end
 				if GameTime() % 0.33 < 0.05 then
+					local lastSeen = gsiPlayer.lastSeen
 					if not (gsiPlayer.hUnit:IsStunned() or gsiPlayer.hUnit:IsRooted())
-							and ( gsiPlayer.hUnit:GetMovementDirectionStability() % 1 == 0 -- 1 or 0
-								or gsiPlayer.recentMoveTo
-									and Vector_UnitFacingLoc(gsiPlayer, gsiPlayer.recentMoveTo) < 0.5
-							) then
-						local trees = gsiPlayer.hUnit:GetNearbyTrees(150)
-						if not trees or not trees[1] then return; end
-						t_tree_target[gsiPlayer.nOnTeam] = trees[1]
-						return GetTreeLocation(trees[1]), INSTANT_NO_TURNING_SCORE / 2
+							and gsiPlayer.hUnit:GetMovementDirectionStability() == 1 then
+						local facingMoveTo = gsiPlayer.recentMoveTo
+								and Vector_UnitFacingLoc(gsiPlayer, gsiPlayer.recentMoveTo) or -1
+						local isMoving = lastSeen.previousLocation ~= lastSeen.location
+								and lastSeen.facingDegrees ~= lastSeen.previousFacingDegrees
+						if isMoving and facingMoveTo < 0.67 then
+							local trees = gsiPlayer.hUnit:GetNearbyTrees(125)
+							if not trees or not trees[1] then return; end
+							t_tree_target[gsiPlayer.nOnTeam] = trees[1]
+							return GetTreeLocation(trees[1]), INSTANT_NO_TURNING_SCORE / 2
+						end
 					end
+
 					if gsiPlayer.recentMoveTo
 							and (GameTime()+gsiPlayer.nOnTeam*0.1) % 0.5 < 0.1 then
 						local trees = gsiPlayer.hUnit:GetNearbyTrees(250)
@@ -1194,9 +1204,10 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 						local playerLoc = gsiPlayer.lastSeen.location
 						for i=1,#trees do
 							local treeLoc = GetTreeLocation(trees[i])
-							if Vector_UnitFacingLoc(gsiPlayer, treeLoc) then
+							local facing = Vector_UnitFacingLoc(gsiPlayer, treeLoc)
+							if facing > 0.5 then
 								local dist = ((playerLoc.x-treeLoc.x)^2 + (playerLoc.y-treeLoc.y)^2)^0.5
-								if dist < closestTree then
+								if facing > 0.95 - 0.1*(dist/250) and dist < closestTree then
 									closestTree = dist
 									closestFacingTree = trees[i]
 								end
@@ -1228,8 +1239,7 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 
 				local override = SpecialBehavior_GetBooleanOr("armletSuggestOverride", nil, gsiPlayer, hItem)
 				if override ~= nil and override ~= armletIsOn then
-					hUnit:Action_UseAbility(hItem)
-					return;
+					return gsiPlayer, INSTANT_NO_TURNING_SCORE;
 				end
 
 
@@ -1246,16 +1256,12 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 							local playerLoc = gsiPlayer.lastSeen.location
 							for i=1,#projectiles do
 								local proj = projectiles[i]
-								if proj and Vector_PointDistance2D(proj.location, playerLoc) /
-											(proj.caster and not proj.caster:IsNull()
-												and proj.caster:GetAttackProjectileSpeed() or 1000
-											) < 0.6 then
-									return
+								if proj and Vector_PointDistance2D(proj.location, playerLoc) > 400 then
+									
+									gsiPlayer.hUnit:Action_UseAbility(hItem)
+									return gsiPlayer, INSTANT_NO_TURNING_SCORE;
 								end
 							end
-							
-							gsiPlayer.hUnit:Action_UseAbility(hItem)
-							gsiPlayer.hUnit:Action_UseAbility(hItem)
 						end
 					elseif not armletIsOn and fht
 							and (hUnit:GetAttackTarget() == fht.hUnit
@@ -1263,39 +1269,38 @@ T_ITEM_FUNCS = {--[item_name] = {score_func, run_func}, ....
 									+ (fht.currentMovementSpeed - gsiPlayer.currentMovementSpeed)*2
 									< max(350, gsiPlayer.attackRange*1.5)) then
 						
-						hUnit:Action_UseAbility(hItem)
+						return gsiPlayer, INSTANT_NO_TURNING_SCORE;
 					end
 				elseif armletIsOn and #nearbyEnemies == 0 and not hUnit:GetAttackTarget()
 						and GameTime() - hUnit:GetLastAttackTime()
 							> hUnit:GetSecondsPerAttack() + 0.5
 						and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth < 0.95 then
 						
-					hUnit:Action_UseAbility(hItem)
+					return gsiPlayer, INSTANT_NO_TURNING_SCORE;
 				elseif not armletIsOn then
 						
 					if hUnit:GetDifficulty() >= 3 then
 						local projectiles = hUnit:GetIncomingTrackingProjectiles()
 						local playerLoc = gsiPlayer.lastSeen.location
-						for i=0,#projectiles do
+						for i=1,#projectiles do
 							local proj = projectiles[i]
 							if proj and Vector_PointDistance(proj.location, playerLoc) > 450
 									or gsiPlayer.lastSeenHealth < 700 + 15 * gsiPlayer.level then
 								
 						
-								hUnit:Action_UseAbility(hItem)
-								break;
+								return gsiPlayer, INSTANT_NO_TURNING_SCORE;
 							end
 						end
 					end
 					if hUnit:GetAttackTarget() and gsiPlayer.lastSeenHealth / gsiPlayer.maxHealth > 0.75
 							- Analytics_GetTheoreticalDangerAmount(gsiPlayer) * 0.125 then
 						
-						hUnit:Action_UseAbility(hItem)
+						return gsiPlayer, INSTANT_NO_TURNING_SCORE;
 					end
 				end
 				
 			end,
-			nil
+			generic_no_target_func
 	},
 	["item_mjollnir"] = {
 			function(gsiPlayer, hItem, nearbyEnemies, nearbyAllies)
@@ -1539,9 +1544,13 @@ blueprint = {
 						)
 				)
 		end
+		if itemToUse:IsNull() then
+			return XETA_SCORE_DO_NOT_RUN
+		end
 		
 		local itemName = itemToUse and not itemToUse:IsNull() and itemToUse:GetName()
-		if not t_ignore_keep_casting[itemName] and ( (itemToUse and currentlyCasting == itemToUse)
+		if not t_ignore_keep_casting[itemName]
+				and ( (itemToUse and currentlyCasting == itemToUse)
 					or UseItem_IsChanneling(gsiPlayer, itemName)
 					or itemToUse:IsNull()
 				) then
